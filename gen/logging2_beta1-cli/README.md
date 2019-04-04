@@ -25,24 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Logging* API at revision *20180929*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Logging* API at revision *20190325*. The CLI is at version *1.0.8*.
 
 ```bash
 logging2-beta1 [options]
-        billing-accounts
-                logs-delete <log-name> [-p <v>]... [-o <out>]
-                logs-list <parent> [-p <v>]... [-o <out>]
         entries
                 list (-r <kv>)... [-p <v>]... [-o <out>]
                 write (-r <kv>)... [-p <v>]... [-o <out>]
         monitored-resource-descriptors
                 list [-p <v>]... [-o <out>]
-        organizations
-                logs-delete <log-name> [-p <v>]... [-o <out>]
-                logs-list <parent> [-p <v>]... [-o <out>]
         projects
-                logs-delete <log-name> [-p <v>]... [-o <out>]
-                logs-list <parent> [-p <v>]... [-o <out>]
                 metrics-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 metrics-delete <metric-name> [-p <v>]... [-o <out>]
                 metrics-get <metric-name> [-p <v>]... [-o <out>]

@@ -46,6 +46,97 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _projects_client_events_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "client-event.event-id" => Some(("clientEvent.eventId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-event.parent-event-id" => Some(("clientEvent.parentEventId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-event.extra-info" => Some(("clientEvent.extraInfo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "client-event.job-event.type" => Some(("clientEvent.jobEvent.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-event.job-event.jobs" => Some(("clientEvent.jobEvent.jobs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "client-event.request-id" => Some(("clientEvent.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-event.create-time" => Some(("clientEvent.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-event", "create-time", "event-id", "extra-info", "job-event", "jobs", "parent-event-id", "request-id", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CreateClientEventRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().client_events_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_companies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -72,9 +163,6 @@ impl<'n> Engine<'n> {
                     "company.display-name" => Some(("company.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.name" => Some(("company.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.career-site-uri" => Some(("company.careerSiteUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "company.headquarters-address" => Some(("company.headquartersAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "company.eeo-text" => Some(("company.eeoText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "company.image-uri" => Some(("company.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.location-type" => Some(("company.derivedInfo.headquartersLocation.locationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.radius-in-miles" => Some(("company.derivedInfo.headquartersLocation.radiusInMiles", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.lat-lng.latitude" => Some(("company.derivedInfo.headquartersLocation.latLng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -90,6 +178,9 @@ impl<'n> Engine<'n> {
                     "company.derived-info.headquarters-location.postal-address.organization" => Some(("company.derivedInfo.headquartersLocation.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.postal-address.sublocality" => Some(("company.derivedInfo.headquartersLocation.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.postal-address.revision" => Some(("company.derivedInfo.headquartersLocation.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "company.eeo-text" => Some(("company.eeoText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "company.image-uri" => Some(("company.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "company.headquarters-address" => Some(("company.headquartersAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.external-id" => Some(("company.externalId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.website-uri" => Some(("company.websiteUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.suspended" => Some(("company.suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -349,9 +440,6 @@ impl<'n> Engine<'n> {
                     "company.display-name" => Some(("company.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.name" => Some(("company.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.career-site-uri" => Some(("company.careerSiteUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "company.headquarters-address" => Some(("company.headquartersAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "company.eeo-text" => Some(("company.eeoText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "company.image-uri" => Some(("company.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.location-type" => Some(("company.derivedInfo.headquartersLocation.locationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.radius-in-miles" => Some(("company.derivedInfo.headquartersLocation.radiusInMiles", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.lat-lng.latitude" => Some(("company.derivedInfo.headquartersLocation.latLng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -367,6 +455,9 @@ impl<'n> Engine<'n> {
                     "company.derived-info.headquarters-location.postal-address.organization" => Some(("company.derivedInfo.headquartersLocation.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.postal-address.sublocality" => Some(("company.derivedInfo.headquartersLocation.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.derived-info.headquarters-location.postal-address.revision" => Some(("company.derivedInfo.headquartersLocation.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "company.eeo-text" => Some(("company.eeoText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "company.image-uri" => Some(("company.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "company.headquarters-address" => Some(("company.headquartersAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.external-id" => Some(("company.externalId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.website-uri" => Some(("company.websiteUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company.suspended" => Some(("company.suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -453,6 +544,9 @@ impl<'n> Engine<'n> {
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
                 },
+                "language-codes" => {
+                    call = call.add_language_codes(value.unwrap_or(""));
+                },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
                 },
@@ -472,7 +566,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language-code", "page-size", "company-name", "query", "scope", "type"].iter().map(|v|*v));
+                                                                           v.extend(["language-code", "page-size", "company-name", "query", "scope", "language-codes", "type"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -620,34 +714,34 @@ impl<'n> Engine<'n> {
                     "job.promotion-value" => Some(("job.promotionValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job.employment-types" => Some(("job.employmentTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.job-end-time" => Some(("job.jobEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.description" => Some(("job.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.application-info.instruction" => Some(("job.applicationInfo.instruction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.application-info.emails" => Some(("job.applicationInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.application-info.uris" => Some(("job.applicationInfo.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.posting-expire-time" => Some(("job.postingExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.title" => Some(("job.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.responsibilities" => Some(("job.responsibilities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.job-start-time" => Some(("job.jobStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-total-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.min-compensation.nanos" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-total-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.min-compensation.currency-code" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-total-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.max-compensation.nanos" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-total-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.max-compensation.currency-code" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-base-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.min-compensation.nanos" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-base-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.min-compensation.currency-code" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-base-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.max-compensation.nanos" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-base-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.max-compensation.currency-code" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.department" => Some(("job.department", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.posting-update-time" => Some(("job.postingUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.job-benefits" => Some(("job.jobBenefits", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.requisition-id" => Some(("job.requisitionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.posting-publish-time" => Some(("job.postingPublishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.application-info.instruction" => Some(("job.applicationInfo.instruction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.application-info.uris" => Some(("job.applicationInfo.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "job.application-info.emails" => Some(("job.applicationInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.description" => Some(("job.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.company-name" => Some(("job.companyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.derived-info.job-categories" => Some(("job.derivedInfo.jobCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.qualifications" => Some(("job.qualifications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.requisition-id" => Some(("job.requisitionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.job-benefits" => Some(("job.jobBenefits", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.incentives" => Some(("job.incentives", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.visibility" => Some(("job.visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.posting-create-time" => Some(("job.postingCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -916,34 +1010,34 @@ impl<'n> Engine<'n> {
                     "job.promotion-value" => Some(("job.promotionValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job.employment-types" => Some(("job.employmentTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.job-end-time" => Some(("job.jobEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.description" => Some(("job.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.application-info.instruction" => Some(("job.applicationInfo.instruction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.application-info.emails" => Some(("job.applicationInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.application-info.uris" => Some(("job.applicationInfo.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.posting-expire-time" => Some(("job.postingExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.title" => Some(("job.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.responsibilities" => Some(("job.responsibilities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.job-start-time" => Some(("job.jobStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-total-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.min-compensation.nanos" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-total-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.min-compensation.currency-code" => Some(("job.compensationInfo.annualizedTotalCompensationRange.minCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-total-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.max-compensation.nanos" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-total-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-total-compensation-range.max-compensation.currency-code" => Some(("job.compensationInfo.annualizedTotalCompensationRange.maxCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-base-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.min-compensation.nanos" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-base-compensation-range.min-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.min-compensation.currency-code" => Some(("job.compensationInfo.annualizedBaseCompensationRange.minCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.compensation-info.annualized-base-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.max-compensation.nanos" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.compensation-info.annualized-base-compensation-range.max-compensation.units" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.compensation-info.annualized-base-compensation-range.max-compensation.currency-code" => Some(("job.compensationInfo.annualizedBaseCompensationRange.maxCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.department" => Some(("job.department", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.posting-update-time" => Some(("job.postingUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.job-benefits" => Some(("job.jobBenefits", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.requisition-id" => Some(("job.requisitionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.posting-publish-time" => Some(("job.postingPublishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.application-info.instruction" => Some(("job.applicationInfo.instruction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.application-info.uris" => Some(("job.applicationInfo.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "job.application-info.emails" => Some(("job.applicationInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.description" => Some(("job.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.company-name" => Some(("job.companyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.derived-info.job-categories" => Some(("job.derivedInfo.jobCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.qualifications" => Some(("job.qualifications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job.requisition-id" => Some(("job.requisitionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.job-benefits" => Some(("job.jobBenefits", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.incentives" => Some(("job.incentives", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.visibility" => Some(("job.visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.posting-create-time" => Some(("job.postingCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1039,7 +1133,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "histogram-facets.simple-histogram-facets" => Some(("histogramFacets.simpleHistogramFacets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "diversification-level" => Some(("diversificationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-broadening" => Some(("enableBroadening", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-query.disable-spell-check" => Some(("jobQuery.disableSpellCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-query.custom-attribute-filter" => Some(("jobQuery.customAttributeFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1047,10 +1141,10 @@ impl<'n> Engine<'n> {
                     "job-query.query" => Some(("jobQuery.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.end-time" => Some(("jobQuery.publishTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.start-time" => Some(("jobQuery.publishTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job-query.commute-filter.departure-time.nanos" => Some(("jobQuery.commuteFilter.departureTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "job-query.commute-filter.departure-time.seconds" => Some(("jobQuery.commuteFilter.departureTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.departure-time.hours" => Some(("jobQuery.commuteFilter.departureTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.commute-filter.departure-time.nanos" => Some(("jobQuery.commuteFilter.departureTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.departure-time.minutes" => Some(("jobQuery.commuteFilter.departureTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.commute-filter.departure-time.seconds" => Some(("jobQuery.commuteFilter.departureTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.road-traffic" => Some(("jobQuery.commuteFilter.roadTraffic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.start-coordinates.latitude" => Some(("jobQuery.commuteFilter.startCoordinates.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.start-coordinates.longitude" => Some(("jobQuery.commuteFilter.startCoordinates.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1062,28 +1156,29 @@ impl<'n> Engine<'n> {
                     "job-query.company-names" => Some(("jobQuery.companyNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job-query.company-display-names" => Some(("jobQuery.companyDisplayNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job-query.compensation-filter.units" => Some(("jobQuery.compensationFilter.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "job-query.compensation-filter.range.min-compensation.units" => Some(("jobQuery.compensationFilter.range.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.min-compensation.nanos" => Some(("jobQuery.compensationFilter.range.minCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.compensation-filter.range.min-compensation.units" => Some(("jobQuery.compensationFilter.range.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.min-compensation.currency-code" => Some(("jobQuery.compensationFilter.range.minCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job-query.compensation-filter.range.max-compensation.units" => Some(("jobQuery.compensationFilter.range.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.max-compensation.nanos" => Some(("jobQuery.compensationFilter.range.maxCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.compensation-filter.range.max-compensation.units" => Some(("jobQuery.compensationFilter.range.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.max-compensation.currency-code" => Some(("jobQuery.compensationFilter.range.maxCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.type" => Some(("jobQuery.compensationFilter.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.include-jobs-with-unspecified-compensation-range" => Some(("jobQuery.compensationFilter.includeJobsWithUnspecifiedCompensationRange", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "histogram-facets.simple-histogram-facets" => Some(("histogramFacets.simpleHistogramFacets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.user-id" => Some(("requestMetadata.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "request-metadata.session-id" => Some(("requestMetadata.sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-metadata.domain" => Some(("requestMetadata.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.device-type" => Some(("requestMetadata.deviceInfo.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.id" => Some(("requestMetadata.deviceInfo.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "request-metadata.domain" => Some(("requestMetadata.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-metadata.session-id" => Some(("requestMetadata.sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "require-precise-result-size" => Some(("requirePreciseResultSize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-view" => Some(("jobView", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "disable-keyword-match" => Some(("disableKeywordMatch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1167,7 +1262,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "histogram-facets.simple-histogram-facets" => Some(("histogramFacets.simpleHistogramFacets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "diversification-level" => Some(("diversificationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-broadening" => Some(("enableBroadening", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-query.disable-spell-check" => Some(("jobQuery.disableSpellCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-query.custom-attribute-filter" => Some(("jobQuery.customAttributeFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1175,10 +1270,10 @@ impl<'n> Engine<'n> {
                     "job-query.query" => Some(("jobQuery.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.end-time" => Some(("jobQuery.publishTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.start-time" => Some(("jobQuery.publishTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job-query.commute-filter.departure-time.nanos" => Some(("jobQuery.commuteFilter.departureTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "job-query.commute-filter.departure-time.seconds" => Some(("jobQuery.commuteFilter.departureTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.departure-time.hours" => Some(("jobQuery.commuteFilter.departureTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.commute-filter.departure-time.nanos" => Some(("jobQuery.commuteFilter.departureTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.departure-time.minutes" => Some(("jobQuery.commuteFilter.departureTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.commute-filter.departure-time.seconds" => Some(("jobQuery.commuteFilter.departureTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.road-traffic" => Some(("jobQuery.commuteFilter.roadTraffic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.start-coordinates.latitude" => Some(("jobQuery.commuteFilter.startCoordinates.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "job-query.commute-filter.start-coordinates.longitude" => Some(("jobQuery.commuteFilter.startCoordinates.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1190,28 +1285,29 @@ impl<'n> Engine<'n> {
                     "job-query.company-names" => Some(("jobQuery.companyNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job-query.company-display-names" => Some(("jobQuery.companyDisplayNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job-query.compensation-filter.units" => Some(("jobQuery.compensationFilter.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "job-query.compensation-filter.range.min-compensation.units" => Some(("jobQuery.compensationFilter.range.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.min-compensation.nanos" => Some(("jobQuery.compensationFilter.range.minCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.compensation-filter.range.min-compensation.units" => Some(("jobQuery.compensationFilter.range.minCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.min-compensation.currency-code" => Some(("jobQuery.compensationFilter.range.minCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "job-query.compensation-filter.range.max-compensation.units" => Some(("jobQuery.compensationFilter.range.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.max-compensation.nanos" => Some(("jobQuery.compensationFilter.range.maxCompensation.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job-query.compensation-filter.range.max-compensation.units" => Some(("jobQuery.compensationFilter.range.maxCompensation.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.range.max-compensation.currency-code" => Some(("jobQuery.compensationFilter.range.maxCompensation.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.type" => Some(("jobQuery.compensationFilter.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.compensation-filter.include-jobs-with-unspecified-compensation-range" => Some(("jobQuery.compensationFilter.includeJobsWithUnspecifiedCompensationRange", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "histogram-facets.simple-histogram-facets" => Some(("histogramFacets.simpleHistogramFacets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.user-id" => Some(("requestMetadata.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "request-metadata.session-id" => Some(("requestMetadata.sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-metadata.domain" => Some(("requestMetadata.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.device-type" => Some(("requestMetadata.deviceInfo.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.id" => Some(("requestMetadata.deviceInfo.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "request-metadata.domain" => Some(("requestMetadata.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-metadata.session-id" => Some(("requestMetadata.sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "require-precise-result-size" => Some(("requirePreciseResultSize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-view" => Some(("jobView", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "disable-keyword-match" => Some(("disableKeywordMatch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1278,6 +1374,9 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("client-events-create", Some(opt)) => {
+                        call_result = self._projects_client_events_create(opt, dry_run, &mut err);
+                    },
                     ("companies-create", Some(opt)) => {
                         call_result = self._projects_companies_create(opt, dry_run, &mut err);
                     },
@@ -1411,7 +1510,41 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'companies-create', 'companies-delete', 'companies-get', 'companies-list', 'companies-patch', 'complete', 'jobs-batch-delete', 'jobs-create', 'jobs-delete', 'jobs-get', 'jobs-list', 'jobs-patch', 'jobs-search' and 'jobs-search-for-alert'", vec![
+        ("projects", "methods: 'client-events-create', 'companies-create', 'companies-delete', 'companies-get', 'companies-list', 'companies-patch', 'complete', 'jobs-batch-delete', 'jobs-create', 'jobs-delete', 'jobs-get', 'jobs-list', 'jobs-patch', 'jobs-search' and 'jobs-search-for-alert'", vec![
+            ("client-events-create",
+                    Some(r##"Report events issued when end user interacts with customer's application
+        that uses Cloud Talent Solution. You may inspect the created events in
+        [self service
+        tools](https://console.cloud.google.com/talent-solution/overview).
+        [Learn
+        more](https://cloud.google.com/talent-solution/job-search/docs/management-tools)
+        about self service tools."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_jobs3_cli/projects_client-events-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Parent project name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("companies-create",
                     Some(r##"Creates a new company entity."##),
                     "Details at http://byron.github.io/google-apis-rs/google_jobs3_cli/projects_companies-create",
@@ -1446,7 +1579,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("companies-delete",
-                    Some(r##"Deletes specified company."##),
+                    Some(r##"Deletes specified company.
+        Prerequisite: The company has no jobs associated with it."##),
                     "Details at http://byron.github.io/google-apis-rs/google_jobs3_cli/projects_companies-delete",
                   vec![
                     (Some(r##"name"##),
@@ -1869,7 +2003,7 @@ fn main() {
     
     let mut app = App::new("jobs3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181008")
+           .version("1.0.8+20190322")
            .about("Cloud Talent Solution provides the capability to create, read, update, and delete job postings, as well as search jobs based on keywords and filters.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_jobs3_cli")

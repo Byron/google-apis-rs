@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Broker* crate version *1.0.8+20180924*, where *20180924* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Service Broker* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Service Broker* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kubernetes-engine/docs/concepts/add-on/service-broker).
@@ -421,7 +421,7 @@ pub struct GoogleIamV1__Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
-    /// Unimplemented. The condition that is associated with this binding.
+    /// The condition that is associated with this binding.
     /// NOTE: an unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
@@ -446,7 +446,7 @@ pub struct GoogleIamV1__Binding {
     ///    For example, `admins@example.com`.
     /// 
     /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
     /// 
@@ -466,22 +466,22 @@ impl Part for GoogleIamV1__Binding {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleType__Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
     /// Textual representation of an expression in
     /// Common Expression Language syntax.
     /// 
     /// The application context of the containing message determines which
     /// well-known feature set of CEL is supported.
     pub expression: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
     /// An optional string indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
 }
 
 impl Part for GoogleType__Expr {}
@@ -804,7 +804,7 @@ impl<'a, C, A> MethodTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -820,10 +820,7 @@ impl<'a, C, A> MethodTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -855,7 +852,7 @@ impl<'a, C, A> MethodTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -946,7 +943,7 @@ impl<'a, C, A> MethodTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1088,7 +1085,7 @@ impl<'a, C, A> MethodSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1104,10 +1101,7 @@ impl<'a, C, A> MethodSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1139,7 +1133,7 @@ impl<'a, C, A> MethodSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1230,7 +1224,7 @@ impl<'a, C, A> MethodSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1366,7 +1360,7 @@ impl<'a, C, A> MethodGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1382,10 +1376,7 @@ impl<'a, C, A> MethodGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1405,7 +1396,7 @@ impl<'a, C, A> MethodGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1484,7 +1475,7 @@ impl<'a, C, A> MethodGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

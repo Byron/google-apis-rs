@@ -133,11 +133,11 @@ impl<'n> Engine<'n> {
                     "memory-size-gb" => Some(("memorySizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "authorized-network" => Some(("authorizedNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redis-configs" => Some(("redisConfigs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "authorized-network" => Some(("authorizedNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternative-location-id", "authorized-network", "create-time", "current-location-id", "display-name", "host", "labels", "location-id", "memory-size-gb", "name", "port", "redis-configs", "redis-version", "reserved-ip-range", "state", "status-message", "tier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -206,6 +206,91 @@ impl<'n> Engine<'n> {
     fn _projects_locations_instances_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_instances_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_instances_failover(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "data-protection-mode" => Some(("dataProtectionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-protection-mode"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::FailoverInstanceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_failover(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -401,11 +486,11 @@ impl<'n> Engine<'n> {
                     "memory-size-gb" => Some(("memorySizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "authorized-network" => Some(("authorizedNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redis-configs" => Some(("redisConfigs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "authorized-network" => Some(("authorizedNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternative-location-id", "authorized-network", "create-time", "current-location-id", "display-name", "host", "labels", "location-id", "memory-size-gb", "name", "port", "redis-configs", "redis-version", "reserved-ip-range", "state", "status-message", "tier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -767,6 +852,9 @@ impl<'n> Engine<'n> {
                     ("locations-instances-delete", Some(opt)) => {
                         call_result = self._projects_locations_instances_delete(opt, dry_run, &mut err);
                     },
+                    ("locations-instances-failover", Some(opt)) => {
+                        call_result = self._projects_locations_instances_failover(opt, dry_run, &mut err);
+                    },
                     ("locations-instances-get", Some(opt)) => {
                         call_result = self._projects_locations_instances_get(opt, dry_run, &mut err);
                     },
@@ -882,7 +970,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-failover', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_redis1_cli/projects_locations-get",
@@ -958,6 +1046,37 @@ fn main() {
         where `location_id` refers to a GCP region"##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-instances-failover",
+                    Some(r##"Failover the master role to current replica node against a specific
+        STANDARD tier redis instance."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_redis1_cli/projects_locations-instances-failover",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Redis instance resource name using the form:
+            `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+        where `location_id` refers to a GCP region"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -1205,8 +1324,8 @@ fn main() {
     
     let mut app = App::new("redis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180928")
-           .about("The Google Cloud Memorystore for Redis API is used for creating and managing Redis instances on the Google Cloud Platform.")
+           .version("1.0.8+20190327")
+           .about("Creates and manages Redis instances on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_redis1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

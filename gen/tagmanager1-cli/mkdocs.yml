@@ -1,4 +1,4 @@
-site_name: Tag Manager v1.0.8+20171108
+site_name: Tag Manager v1.0.8+20190220
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager1-cli
 site_description: A complete library to interact with Tag Manager (protocol v1)
 
@@ -15,7 +15,6 @@ pages:
 - ['accounts_containers-environments-delete.md', 'Accounts', 'Containers Environments Delete']
 - ['accounts_containers-environments-get.md', 'Accounts', 'Containers Environments Get']
 - ['accounts_containers-environments-list.md', 'Accounts', 'Containers Environments List']
-- ['accounts_containers-environments-patch.md', 'Accounts', 'Containers Environments Patch']
 - ['accounts_containers-environments-update.md', 'Accounts', 'Containers Environments Update']
 - ['accounts_containers-folders-create.md', 'Accounts', 'Containers Folders Create']
 - ['accounts_containers-folders-delete.md', 'Accounts', 'Containers Folders Delete']

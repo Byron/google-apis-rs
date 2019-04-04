@@ -4,7 +4,7 @@
 [package]
 
 name = "google-vault1-cli"
-version = "1.0.8+20180827"
+version = "1.0.8+20190312"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Vault (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/vault1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-vault1]
 path = "../vault1"
-version = "1.0.8+20180827"
+version = "1.0.8+20190312"

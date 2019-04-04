@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Photos Library* crate version *1.0.8+20181004*, where *20181004* is the exact revision of the *photoslibrary:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Photos Library* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *photoslibrary:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Photos Library* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/photos/).
@@ -12,11 +12,11 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.PhotosLibrary.html) ... 
 //! 
 //! * [albums](struct.Album.html)
-//!  * [*add enrichment*](struct.AlbumAddEnrichmentCall.html), [*create*](struct.AlbumCreateCall.html), [*get*](struct.AlbumGetCall.html), [*list*](struct.AlbumListCall.html) and [*share*](struct.AlbumShareCall.html)
+//!  * [*add enrichment*](struct.AlbumAddEnrichmentCall.html), [*create*](struct.AlbumCreateCall.html), [*get*](struct.AlbumGetCall.html), [*list*](struct.AlbumListCall.html), [*share*](struct.AlbumShareCall.html) and [*unshare*](struct.AlbumUnshareCall.html)
 //! * [media items](struct.MediaItem.html)
-//!  * [*batch create*](struct.MediaItemBatchCreateCall.html), [*get*](struct.MediaItemGetCall.html), [*list*](struct.MediaItemListCall.html) and [*search*](struct.MediaItemSearchCall.html)
+//!  * [*batch create*](struct.MediaItemBatchCreateCall.html), [*batch get*](struct.MediaItemBatchGetCall.html), [*get*](struct.MediaItemGetCall.html), [*list*](struct.MediaItemListCall.html) and [*search*](struct.MediaItemSearchCall.html)
 //! * shared albums
-//!  * [*get*](struct.SharedAlbumGetCall.html), [*join*](struct.SharedAlbumJoinCall.html) and [*list*](struct.SharedAlbumListCall.html)
+//!  * [*get*](struct.SharedAlbumGetCall.html), [*join*](struct.SharedAlbumJoinCall.html), [*leave*](struct.SharedAlbumLeaveCall.html) and [*list*](struct.SharedAlbumListCall.html)
 //! 
 //! 
 //! 
@@ -51,9 +51,10 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.albums().list(...).doit()
-//! let r = hub.albums().add_enrichment(...).doit()
 //! let r = hub.shared_albums().get(...).doit()
+//! let r = hub.albums().add_enrichment(...).doit()
+//! let r = hub.albums().list(...).doit()
+//! let r = hub.albums().unshare(...).doit()
 //! let r = hub.albums().share(...).doit()
 //! let r = hub.albums().create(...).doit()
 //! let r = hub.albums().get(...).doit()
@@ -404,9 +405,10 @@ impl<'a, C, A> PhotosLibrary<C, A>
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list albums](struct.AlbumListCall.html) (none)
-/// * [add enrichment albums](struct.AlbumAddEnrichmentCall.html) (none)
 /// * [get shared albums](struct.SharedAlbumGetCall.html) (response)
+/// * [add enrichment albums](struct.AlbumAddEnrichmentCall.html) (none)
+/// * [list albums](struct.AlbumListCall.html) (none)
+/// * [unshare albums](struct.AlbumUnshareCall.html) (none)
 /// * [share albums](struct.AlbumShareCall.html) (none)
 /// * [create albums](struct.AlbumCreateCall.html) (response)
 /// * [get albums](struct.AlbumGetCall.html) (response)
@@ -454,28 +456,27 @@ impl Resource for Album {}
 impl ResponseResult for Album {}
 
 
-/// List of all media items from the user's Google Photos library.
+/// Response to retrieve a list of media items.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list media items](struct.MediaItemListCall.html) (response)
+/// * [batch get media items](struct.MediaItemBatchGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListMediaItemsResponse {
-    /// [Output only] Token to use to get the next set of media items. Its presence
-    /// is the only reliable indicator of more media items being available in the
-    /// next request.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// [Output only] List of media items in the user's library.
-    #[serde(rename="mediaItems")]
-    pub media_items: Option<Vec<MediaItem>>,
+pub struct BatchGetMediaItemsResponse {
+    /// [Output only] List of media items retrieved.
+    /// Note that even if the call to BatchGetMediaItems succeeds, there may have
+    /// been failures for some media items in the batch. These failures are
+    /// indicated in each
+    /// MediaItemResult.status.
+    #[serde(rename="mediaItemResults")]
+    pub media_item_results: Option<Vec<MediaItemResult>>,
 }
 
-impl ResponseResult for ListMediaItemsResponse {}
+impl ResponseResult for BatchGetMediaItemsResponse {}
 
 
 /// An enrichment containing text.
@@ -563,6 +564,7 @@ impl ResponseResult for ListAlbumsResponse {}
 /// * [batch create media items](struct.MediaItemBatchCreateCall.html) (none)
 /// * [get media items](struct.MediaItemGetCall.html) (response)
 /// * [search media items](struct.MediaItemSearchCall.html) (none)
+/// * [batch get media items](struct.MediaItemBatchGetCall.html) (none)
 /// * [list media items](struct.MediaItemListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -601,58 +603,43 @@ impl Resource for MediaItem {}
 impl ResponseResult for MediaItem {}
 
 
-/// Request to add an enrichment to a specific album at a specific position.
+/// Response to successfully leaving the shared album on behalf of the user.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [add enrichment albums](struct.AlbumAddEnrichmentCall.html) (request)
+/// * [leave shared albums](struct.SharedAlbumLeaveCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddEnrichmentToAlbumRequest {
-    /// The position in the album where the enrichment is to be inserted.
-    #[serde(rename="albumPosition")]
-    pub album_position: Option<AlbumPosition>,
-    /// The enrichment to be added.
-    #[serde(rename="newEnrichmentItem")]
-    pub new_enrichment_item: Option<NewEnrichmentItem>,
-}
+pub struct LeaveSharedAlbumResponse { _never_set: Option<bool> }
 
-impl RequestValue for AddEnrichmentToAlbumRequest {}
+impl ResponseResult for LeaveSharedAlbumResponse {}
 
 
-/// Request to create one or more media items in a user's Google Photos library.
-/// If an `albumid` is specified, the media items are also added to that album.
-/// `albumPosition` is optional and can only be specified if an `albumId` is set.
+/// List of all media items from the user's Google Photos library.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [batch create media items](struct.MediaItemBatchCreateCall.html) (request)
+/// * [list media items](struct.MediaItemListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchCreateMediaItemsRequest {
-    /// Identifier of the album where the media items are added. The media items
-    /// are also added to the user's library. This is an optional field.
-    #[serde(rename="albumId")]
-    pub album_id: Option<String>,
-    /// List of media items to be created.
-    #[serde(rename="newMediaItems")]
-    pub new_media_items: Option<Vec<NewMediaItem>>,
-    /// Position in the album where the media items are added. If not
-    /// specified, the media items are added to the end of the album (as per
-    /// the default value, that is, `LAST_IN_ALBUM`). The request fails if this
-    /// field is set and the `albumId` is not specified. The request will also fail
-    /// if you set the field and are not the owner of the shared album.
-    #[serde(rename="albumPosition")]
-    pub album_position: Option<AlbumPosition>,
+pub struct ListMediaItemsResponse {
+    /// [Output only] Token to use to get the next set of media items. Its presence
+    /// is the only reliable indicator of more media items being available in the
+    /// next request.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// [Output only] List of media items in the user's library.
+    #[serde(rename="mediaItems")]
+    pub media_items: Option<Vec<MediaItem>>,
 }
 
-impl RequestValue for BatchCreateMediaItemsRequest {}
+impl ResponseResult for ListMediaItemsResponse {}
 
 
 /// Represents a physical location.
@@ -671,6 +658,25 @@ pub struct Location {
 impl Part for Location {}
 
 
+/// Result of retrieving a media item.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MediaItemResult {
+    /// Media item retrieved from the user's library. It's populated if no errors
+    /// occurred and the media item was fetched successfully.
+    #[serde(rename="mediaItem")]
+    pub media_item: Option<MediaItem>,
+    /// If an error occurred while accessing this media item, this field
+    /// is populated with information related to the error. For details regarding
+    /// this field, see Status.
+    pub status: Option<Status>,
+}
+
+impl Part for MediaItemResult {}
+
+
 /// Specifies a position in an album.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -681,12 +687,12 @@ pub struct AlbumPosition {
     /// Only used when position type is AFTER_MEDIA_ITEM.
     #[serde(rename="relativeMediaItemId")]
     pub relative_media_item_id: Option<String>,
-    /// Type of position, for a media or enrichment item.
-    pub position: Option<String>,
     /// The enrichment item to which the position is relative to.
     /// Only used when position type is AFTER_ENRICHMENT_ITEM.
     #[serde(rename="relativeEnrichmentItemId")]
     pub relative_enrichment_item_id: Option<String>,
+    /// Type of position, for a media or enrichment item.
+    pub position: Option<String>,
 }
 
 impl Part for AlbumPosition {}
@@ -715,30 +721,36 @@ pub struct ListSharedAlbumsResponse {
 impl ResponseResult for ListSharedAlbumsResponse {}
 
 
-/// An enrichment item.
+/// Options that control the sharing of an album.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnrichmentItem {
-    /// Identifier of the enrichment item.
-    pub id: Option<String>,
+pub struct SharedAlbumOptions {
+    /// True if the shared album allows the owner and the collaborators (users
+    /// who have joined the album) to add comments to the album. Defaults to false.
+    #[serde(rename="isCommentable")]
+    pub is_commentable: Option<bool>,
+    /// True if the shared album allows collaborators (users who have joined
+    /// the album) to add media items to it. Defaults to false.
+    #[serde(rename="isCollaborative")]
+    pub is_collaborative: Option<bool>,
 }
 
-impl Part for EnrichmentItem {}
+impl Part for SharedAlbumOptions {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -799,6 +811,26 @@ pub struct Status {
 impl Part for Status {}
 
 
+/// Request to leave a shared album on behalf of the user. This uses a shareToken
+/// which can be acquired via the or listSharedAlbums or getAlbum calls.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [leave shared albums](struct.SharedAlbumLeaveCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LeaveSharedAlbumRequest {
+    /// Token to leave the shared album on behalf of the user.
+    #[serde(rename="shareToken")]
+    pub share_token: Option<String>,
+}
+
+impl RequestValue for LeaveSharedAlbumRequest {}
+
+
 /// An enrichment containing a map, showing origin and destination locations.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -827,23 +859,17 @@ pub struct LocationEnrichment {
 impl Part for LocationEnrichment {}
 
 
-/// Options that control the sharing of an album.
+/// An enrichment item.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SharedAlbumOptions {
-    /// True if the shared album allows the owner and the collaborators (users
-    /// who have joined the album) to add comments to the album. Defaults to false.
-    #[serde(rename="isCommentable")]
-    pub is_commentable: Option<bool>,
-    /// True if the shared album allows collaborators (users who have joined
-    /// the album) to add media items to it. Defaults to false.
-    #[serde(rename="isCollaborative")]
-    pub is_collaborative: Option<bool>,
+pub struct EnrichmentItem {
+    /// Identifier of the enrichment item.
+    pub id: Option<String>,
 }
 
-impl Part for SharedAlbumOptions {}
+impl Part for EnrichmentItem {}
 
 
 /// Response to successfully joining the shared album on behalf of the user.
@@ -870,14 +896,14 @@ impl ResponseResult for JoinSharedAlbumResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
-    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a year/month where the day isn't significant.
-    pub day: Option<i32>,
     /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
     /// month and day.
     pub month: Option<i32>,
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a year/month where the day isn't significant.
+    pub day: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
 impl Part for Date {}
@@ -915,12 +941,12 @@ impl ResponseResult for SearchMediaItemsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Filters {
-    /// Filters the media items based on their creation date.
-    #[serde(rename="dateFilter")]
-    pub date_filter: Option<DateFilter>,
     /// Filters the media items based on their content.
     #[serde(rename="contentFilter")]
     pub content_filter: Option<ContentFilter>,
+    /// Filters the media items based on their creation date.
+    #[serde(rename="dateFilter")]
+    pub date_filter: Option<DateFilter>,
     /// If set, the results include media items that the user has archived.
     /// Defaults to false (archived media items aren't included).
     #[serde(rename="includeArchivedMedia")]
@@ -1012,9 +1038,11 @@ impl Part for MediaTypeFilter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ShareInfo {
-    /// Options that control the sharing of an album.
-    #[serde(rename="sharedAlbumOptions")]
-    pub shared_album_options: Option<SharedAlbumOptions>,
+    /// A link to the album that's now shared on the Google Photos website and app.
+    /// Anyone with the link can access this shared album and see all of the items
+    /// present in the album.
+    #[serde(rename="shareableUrl")]
+    pub shareable_url: Option<String>,
     /// A token that can be used by other users to join this shared album via the
     /// API.
     #[serde(rename="shareToken")]
@@ -1023,11 +1051,9 @@ pub struct ShareInfo {
     /// of the shared album.
     #[serde(rename="isJoined")]
     pub is_joined: Option<bool>,
-    /// A link to the album that's now shared on the Google Photos website and app.
-    /// Anyone with the link can access this shared album and see all of the items
-    /// present in the album.
-    #[serde(rename="shareableUrl")]
-    pub shareable_url: Option<String>,
+    /// Options that control the sharing of an album.
+    #[serde(rename="sharedAlbumOptions")]
+    pub shared_album_options: Option<SharedAlbumOptions>,
 }
 
 impl Part for ShareInfo {}
@@ -1050,6 +1076,21 @@ pub struct AddEnrichmentToAlbumResponse {
 }
 
 impl ResponseResult for AddEnrichmentToAlbumResponse {}
+
+
+/// Response of a successful unshare of a shared album.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [unshare albums](struct.AlbumUnshareCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UnshareAlbumResponse { _never_set: Option<bool> }
+
+impl ResponseResult for UnshareAlbumResponse {}
 
 
 /// New media item that's created in a user's Google Photos account.
@@ -1095,18 +1136,18 @@ impl Part for ContributorInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MediaMetadata {
-    /// Original width (in pixels) of the media item.
-    pub width: Option<String>,
+    /// Metadata for a photo media type.
+    pub photo: Option<Photo>,
+    /// Metadata for a video media type.
+    pub video: Option<Video>,
+    /// Original height (in pixels) of the media item.
+    pub height: Option<String>,
     /// Time when the media item was first created (not when it was uploaded to
     /// Google Photos).
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// Metadata for a video media type.
-    pub video: Option<Video>,
-    /// Metadata for a photo media type.
-    pub photo: Option<Photo>,
-    /// Original height (in pixels) of the media item.
-    pub height: Option<String>,
+    /// Original width (in pixels) of the media item.
+    pub width: Option<String>,
 }
 
 impl Part for MediaMetadata {}
@@ -1170,49 +1211,22 @@ pub struct CreateAlbumRequest {
 impl RequestValue for CreateAlbumRequest {}
 
 
-/// Request to search for media items in a user's library.
+/// This filter defines the allowed dates or date ranges for the media returned.
+/// It's possible to pick a set of specific dates and a set of date ranges.
 /// 
-/// If the album id is specified, this call will return the list of media items
-/// in the album. If neither filters nor album id are
-/// specified, this call will return all media items in a user's Google Photos
-/// library.
-/// 
-/// If filters are specified, this call will return all media items in
-/// the user's library that fulfill the filter criteria.
-/// 
-/// Filters and album id must not both be set, as this will result in an
-/// invalid request.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [search media items](struct.MediaItemSearchCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchMediaItemsRequest {
-    /// Identifier of an album. If populated, lists all media items in
-    /// specified album. Can't set in conjunction with any filters.
-    #[serde(rename="albumId")]
-    pub album_id: Option<String>,
-    /// Maximum number of media items to return in the response. The default number
-    /// of media items to return at a time is 25. The maximum
-    /// `pageSize` is 100.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
-    /// Filters to apply to the request. Can't be set in conjunction with an
-    /// `albumId`.
-    pub filters: Option<Filters>,
-    /// A continuation token to get the next page of the results. Adding this to
-    /// the request returns the rows after the `pageToken`. The `pageToken` should
-    /// be the value returned in the `nextPageToken` parameter in the response to
-    /// the `searchMediaItems` request.
-    #[serde(rename="pageToken")]
-    pub page_token: Option<String>,
+pub struct DateFilter {
+    /// List of dates ranges that match the media items' creation date. A
+    /// maximum of 5 dates ranges can be included per request.
+    pub ranges: Option<Vec<DateRange>>,
+    /// List of dates that match the media items' creation date. A maximum of
+    /// 5 dates can be included per request.
+    pub dates: Option<Vec<Date>>,
 }
 
-impl RequestValue for SearchMediaItemsRequest {}
+impl Part for DateFilter {}
 
 
 /// Request to join a shared album on behalf of the user. This uses a shareToken
@@ -1273,22 +1287,103 @@ pub struct BatchCreateMediaItemsResponse {
 impl ResponseResult for BatchCreateMediaItemsResponse {}
 
 
-/// This filter defines the allowed dates or date ranges for the media returned.
-/// It's possible to pick a set of specific dates and a set of date ranges.
+/// Request to add an enrichment to a specific album at a specific position.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [add enrichment albums](struct.AlbumAddEnrichmentCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DateFilter {
-    /// List of dates ranges that match the media items' creation date. A
-    /// maximum of 5 dates ranges can be included per request.
-    pub ranges: Option<Vec<DateRange>>,
-    /// List of dates that match the media items' creation date. A maximum of
-    /// 5 dates can be included per request.
-    pub dates: Option<Vec<Date>>,
+pub struct AddEnrichmentToAlbumRequest {
+    /// The position in the album where the enrichment is to be inserted.
+    #[serde(rename="albumPosition")]
+    pub album_position: Option<AlbumPosition>,
+    /// The enrichment to be added.
+    #[serde(rename="newEnrichmentItem")]
+    pub new_enrichment_item: Option<NewEnrichmentItem>,
 }
 
-impl Part for DateFilter {}
+impl RequestValue for AddEnrichmentToAlbumRequest {}
+
+
+/// Request to search for media items in a user's library.
+/// 
+/// If the album id is specified, this call will return the list of media items
+/// in the album. If neither filters nor album id are
+/// specified, this call will return all media items in a user's Google Photos
+/// library.
+/// 
+/// If filters are specified, this call will return all media items in
+/// the user's library that fulfill the filter criteria.
+/// 
+/// Filters and album id must not both be set, as this will result in an
+/// invalid request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [search media items](struct.MediaItemSearchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchMediaItemsRequest {
+    /// Identifier of an album. If populated, lists all media items in
+    /// specified album. Can't set in conjunction with any filters.
+    #[serde(rename="albumId")]
+    pub album_id: Option<String>,
+    /// Filters to apply to the request. Can't be set in conjunction with an
+    /// `albumId`.
+    pub filters: Option<Filters>,
+    /// Maximum number of media items to return in the response. The default number
+    /// of media items to return at a time is 25. The maximum
+    /// `pageSize` is 100.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+    /// A continuation token to get the next page of the results. Adding this to
+    /// the request returns the rows after the `pageToken`. The `pageToken` should
+    /// be the value returned in the `nextPageToken` parameter in the response to
+    /// the `searchMediaItems` request.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+}
+
+impl RequestValue for SearchMediaItemsRequest {}
+
+
+/// Request to create one or more media items in a user's Google Photos library.
+/// If an `albumid` is specified, the media items are also added to that album.
+/// `albumPosition` is optional and can only be specified if an `albumId` is set.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch create media items](struct.MediaItemBatchCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchCreateMediaItemsRequest {
+    /// Identifier of the album where the media items are added. The media items
+    /// are also added to the user's library. This is an optional field.
+    #[serde(rename="albumId")]
+    pub album_id: Option<String>,
+    /// List of media items to be created.
+    #[serde(rename="newMediaItems")]
+    pub new_media_items: Option<Vec<NewMediaItem>>,
+    /// Position in the album where the media items are added. If not
+    /// specified, the media items are added to the end of the album (as per
+    /// the default value, that is, `LAST_IN_ALBUM`). The request fails if this
+    /// field is set and the `albumId` is not specified. The request will also fail
+    /// if you set the field and are not the owner of the shared album.
+    #[serde(rename="albumPosition")]
+    pub album_position: Option<AlbumPosition>,
+}
+
+impl RequestValue for BatchCreateMediaItemsRequest {}
 
 
 /// Metadata that is specific to a video, for example, fps and processing status.
@@ -1319,6 +1414,10 @@ impl Part for Video {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NewMediaItemResult {
+    /// Media item created with the upload token. It's populated if no errors
+    /// occurred and the media item was created successfully.
+    #[serde(rename="mediaItem")]
+    pub media_item: Option<MediaItem>,
     /// If an error occurred during the creation of this media item, this field
     /// is  populated with information related to the error. For details regarding
     /// this field, see <a href="#Status">Status</a>.
@@ -1326,10 +1425,6 @@ pub struct NewMediaItemResult {
     /// The upload token used to create this new media item.
     #[serde(rename="uploadToken")]
     pub upload_token: Option<String>,
-    /// Media item created with the upload token. It's populated if no errors
-    /// occurred and the media item was created successfully.
-    #[serde(rename="mediaItem")]
-    pub media_item: Option<MediaItem>,
 }
 
 impl Part for NewMediaItemResult {}
@@ -1365,245 +1460,25 @@ pub struct Photo {
 impl Part for Photo {}
 
 
+/// Request to unshare a shared album in Google Photos.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [unshare albums](struct.AlbumUnshareCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UnshareAlbumRequest { _never_set: Option<bool> }
+
+impl RequestValue for UnshareAlbumRequest {}
+
+
 
 // ###################
 // MethodBuilders ###
 // #################
-
-/// A builder providing access to all methods supported on *album* resources.
-/// It is not used directly, but through the `PhotosLibrary` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_photoslibrary1 as photoslibrary1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use photoslibrary1::PhotosLibrary;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `add_enrichment(...)`, `create(...)`, `get(...)`, `list(...)` and `share(...)`
-/// // to build up your call.
-/// let rb = hub.albums();
-/// # }
-/// ```
-pub struct AlbumMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for AlbumMethods<'a, C, A> {}
-
-impl<'a, C, A> AlbumMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Marks an album as shared and accessible to other users. This action can
-    /// only be performed on albums which were created by the developer via the
-    /// API.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `albumId` - Identifier of the album to be shared. This `albumId` must belong to an
-    ///               album created by the developer.
-    pub fn share(&self, request: ShareAlbumRequest, album_id: &str) -> AlbumShareCall<'a, C, A> {
-        AlbumShareCall {
-            hub: self.hub,
-            _request: request,
-            _album_id: album_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists all albums shown to a user in the Albums tab of the Google
-    /// Photos app.
-    pub fn list(&self) -> AlbumListCall<'a, C, A> {
-        AlbumListCall {
-            hub: self.hub,
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _exclude_non_app_created_data: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Adds an enrichment at a specified position in a defined album.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `albumId` - Identifier of the album where the enrichment is to be added.
-    pub fn add_enrichment(&self, request: AddEnrichmentToAlbumRequest, album_id: &str) -> AlbumAddEnrichmentCall<'a, C, A> {
-        AlbumAddEnrichmentCall {
-            hub: self.hub,
-            _request: request,
-            _album_id: album_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates an album in a user's Google Photos library.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn create(&self, request: CreateAlbumRequest) -> AlbumCreateCall<'a, C, A> {
-        AlbumCreateCall {
-            hub: self.hub,
-            _request: request,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns the album based on the specified `albumId` or `shareToken`.
-    /// Exactly one of `albumId` and `shareToken` must be set.
-    /// The `albumId` should be the ID of an album owned by the user or a shared
-    /// album that the user has joined.
-    /// 
-    /// # Arguments
-    ///
-    /// * `albumId` - Identifier of the album to be requested. Must not be set if `shareToken` is
-    ///               set.
-    pub fn get(&self, album_id: &str) -> AlbumGetCall<'a, C, A> {
-        AlbumGetCall {
-            hub: self.hub,
-            _album_id: album_id.to_string(),
-            _share_token: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *sharedAlbum* resources.
-/// It is not used directly, but through the `PhotosLibrary` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_photoslibrary1 as photoslibrary1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use photoslibrary1::PhotosLibrary;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `join(...)` and `list(...)`
-/// // to build up your call.
-/// let rb = hub.shared_albums();
-/// # }
-/// ```
-pub struct SharedAlbumMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for SharedAlbumMethods<'a, C, A> {}
-
-impl<'a, C, A> SharedAlbumMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Joins a shared album on behalf of the Google Photos user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn join(&self, request: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, C, A> {
-        SharedAlbumJoinCall {
-            hub: self.hub,
-            _request: request,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns the album based on the specified `albumId` or `shareToken`.
-    /// Exactly one of `albumId` and `shareToken` must be set.
-    /// The `albumId` should be the ID of an album owned by the user or a shared
-    /// album that the user has joined.
-    /// 
-    /// # Arguments
-    ///
-    /// * `shareToken` - Share token of the album to be request. Must not be set if `albumId` is
-    ///                  set.
-    pub fn get(&self, share_token: &str) -> SharedAlbumGetCall<'a, C, A> {
-        SharedAlbumGetCall {
-            hub: self.hub,
-            _share_token: share_token.to_string(),
-            _album_id: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists all shared albums available in the Sharing tab of the
-    /// user's Google Photos app.
-    pub fn list(&self) -> SharedAlbumListCall<'a, C, A> {
-        SharedAlbumListCall {
-            hub: self.hub,
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _exclude_non_app_created_data: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
 
 /// A builder providing access to all methods supported on *mediaItem* resources.
 /// It is not used directly, but through the `PhotosLibrary` hub.
@@ -1629,7 +1504,7 @@ impl<'a, C, A> SharedAlbumMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `batch_create(...)`, `get(...)`, `list(...)` and `search(...)`
+/// // like `batch_create(...)`, `batch_get(...)`, `get(...)`, `list(...)` and `search(...)`
 /// // to build up your call.
 /// let rb = hub.media_items();
 /// # }
@@ -1643,6 +1518,43 @@ pub struct MediaItemMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for MediaItemMethods<'a, C, A> {}
 
 impl<'a, C, A> MediaItemMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Searches for media items in a user's Google Photos library.
+    /// If no filters are set, then all media items in the user's library are
+    /// returned.
+    /// If an album is set, all media items in the specified album are returned.
+    /// If filters are specified, media items that match the filters from the
+    /// user's library are listed. If you set both the album and the filters, the
+    /// request results in an error.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn search(&self, request: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, C, A> {
+        MediaItemSearchCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the list of media items for the specified media item identifiers.
+    /// Items are returned in the same order as the supplied identifiers.
+    pub fn batch_get(&self) -> MediaItemBatchGetCall<'a, C, A> {
+        MediaItemBatchGetCall {
+            hub: self.hub,
+            _media_item_ids: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1680,38 +1592,15 @@ impl<'a, C, A> MediaItemMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the media item for the specified media item `id`.
+    /// Returns the media item for the specified media item identifier.
     /// 
     /// # Arguments
     ///
-    /// * `mediaItemId` - Identifier of media item to be requested.
+    /// * `mediaItemId` - Identifier of the media item to be requested.
     pub fn get(&self, media_item_id: &str) -> MediaItemGetCall<'a, C, A> {
         MediaItemGetCall {
             hub: self.hub,
             _media_item_id: media_item_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Searches for media items in a user's Google Photos library.
-    /// If no filters are set, then all media items in the user's library are
-    /// returned.
-    /// If an album is set, all media items in the specified album are returned.
-    /// If filters are specified, media items that match the filters from the user's
-    /// library are listed.
-    /// If you set both the album and the filters, the request results in an error.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn search(&self, request: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, C, A> {
-        MediaItemSearchCall {
-            hub: self.hub,
-            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1735,18 +1624,292 @@ impl<'a, C, A> MediaItemMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *sharedAlbum* resources.
+/// It is not used directly, but through the `PhotosLibrary` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_photoslibrary1 as photoslibrary1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use photoslibrary1::PhotosLibrary;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`, `join(...)`, `leave(...)` and `list(...)`
+/// // to build up your call.
+/// let rb = hub.shared_albums();
+/// # }
+/// ```
+pub struct SharedAlbumMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for SharedAlbumMethods<'a, C, A> {}
+
+impl<'a, C, A> SharedAlbumMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the album based on the specified `shareToken`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shareToken` - Share token of the album to be requested.
+    pub fn get(&self, share_token: &str) -> SharedAlbumGetCall<'a, C, A> {
+        SharedAlbumGetCall {
+            hub: self.hub,
+            _share_token: share_token.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Leaves a previously-joined shared album on behalf of the Google Photos
+    /// user. The user must not own this album.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn leave(&self, request: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a, C, A> {
+        SharedAlbumLeaveCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Joins a shared album on behalf of the Google Photos user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn join(&self, request: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, C, A> {
+        SharedAlbumJoinCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all shared albums available in the Sharing tab of the
+    /// user's Google Photos app.
+    pub fn list(&self) -> SharedAlbumListCall<'a, C, A> {
+        SharedAlbumListCall {
+            hub: self.hub,
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _exclude_non_app_created_data: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *album* resources.
+/// It is not used directly, but through the `PhotosLibrary` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_photoslibrary1 as photoslibrary1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use photoslibrary1::PhotosLibrary;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `add_enrichment(...)`, `create(...)`, `get(...)`, `list(...)`, `share(...)` and `unshare(...)`
+/// // to build up your call.
+/// let rb = hub.albums();
+/// # }
+/// ```
+pub struct AlbumMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for AlbumMethods<'a, C, A> {}
+
+impl<'a, C, A> AlbumMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Adds an enrichment at a specified position in a defined album.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `albumId` - Identifier of the album where the enrichment is to be added.
+    pub fn add_enrichment(&self, request: AddEnrichmentToAlbumRequest, album_id: &str) -> AlbumAddEnrichmentCall<'a, C, A> {
+        AlbumAddEnrichmentCall {
+            hub: self.hub,
+            _request: request,
+            _album_id: album_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all albums shown to a user in the Albums tab of the Google
+    /// Photos app.
+    pub fn list(&self) -> AlbumListCall<'a, C, A> {
+        AlbumListCall {
+            hub: self.hub,
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _exclude_non_app_created_data: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Marks a previously shared album as private. This means that the album is
+    /// no longer shared and all the non-owners will lose access to the album. All
+    /// non-owner content will be removed from the album. If a non-owner has
+    /// previously added the album to their library, they will retain all photos in
+    /// their library. This action can only be performed on albums which were
+    /// created by the developer via the API.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `albumId` - Identifier of the album to be unshared. This album id must belong to an
+    ///               album created by the developer.
+    pub fn unshare(&self, request: UnshareAlbumRequest, album_id: &str) -> AlbumUnshareCall<'a, C, A> {
+        AlbumUnshareCall {
+            hub: self.hub,
+            _request: request,
+            _album_id: album_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Marks an album as shared and accessible to other users. This action can
+    /// only be performed on albums which were created by the developer via the
+    /// API.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `albumId` - Identifier of the album to be shared. This `albumId` must belong to an
+    ///               album created by the developer.
+    pub fn share(&self, request: ShareAlbumRequest, album_id: &str) -> AlbumShareCall<'a, C, A> {
+        AlbumShareCall {
+            hub: self.hub,
+            _request: request,
+            _album_id: album_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates an album in a user's Google Photos library.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: CreateAlbumRequest) -> AlbumCreateCall<'a, C, A> {
+        AlbumCreateCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the album based on the specified `albumId`.
+    /// The `albumId` must be the ID of an album owned by the user or a shared
+    /// album that the user has joined.
+    /// 
+    /// # Arguments
+    ///
+    /// * `albumId` - Identifier of the album to be requested.
+    pub fn get(&self, album_id: &str) -> AlbumGetCall<'a, C, A> {
+        AlbumGetCall {
+            hub: self.hub,
+            _album_id: album_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 
 
 // ###################
 // CallBuilders   ###
 // #################
 
-/// Marks an album as shared and accessible to other users. This action can
-/// only be performed on albums which were created by the developer via the
-/// API.
+/// Searches for media items in a user's Google Photos library.
+/// If no filters are set, then all media items in the user's library are
+/// returned.
+/// If an album is set, all media items in the specified album are returned.
+/// If filters are specified, media items that match the filters from the
+/// user's library are listed. If you set both the album and the filters, the
+/// request results in an error.
 ///
-/// A builder for the *share* method supported by a *album* resource.
-/// It is not used directly, but through a `AlbumMethods` instance.
+/// A builder for the *search* method supported by a *mediaItem* resource.
+/// It is not used directly, but through a `MediaItemMethods` instance.
 ///
 /// # Example
 ///
@@ -1757,7 +1920,7 @@ impl<'a, C, A> MediaItemMethods<'a, C, A> {
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_photoslibrary1 as photoslibrary1;
-/// use photoslibrary1::ShareAlbumRequest;
+/// use photoslibrary1::SearchMediaItemsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1771,34 +1934,32 @@ impl<'a, C, A> MediaItemMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = ShareAlbumRequest::default();
+/// let mut req = SearchMediaItemsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.albums().share(req, "albumId")
+/// let result = hub.media_items().search(req)
 ///              .doit();
 /// # }
 /// ```
-pub struct AlbumShareCall<'a, C, A>
+pub struct MediaItemSearchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a PhotosLibrary<C, A>,
-    _request: ShareAlbumRequest,
-    _album_id: String,
+    _request: SearchMediaItemsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AlbumShareCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MediaItemSearchCall<'a, C, A> {}
 
-impl<'a, C, A> AlbumShareCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MediaItemSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ShareAlbumResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SearchMediaItemsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1806,11 +1967,10 @@ impl<'a, C, A> AlbumShareCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "photoslibrary.albums.share",
+        dlg.begin(MethodInfo { id: "photoslibrary.mediaItems.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("albumId", self._album_id.to_string()));
-        for &field in ["alt", "albumId"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1822,580 +1982,13 @@ impl<'a, C, A> AlbumShareCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/albums/{+albumId}:share";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Sharing.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+albumId}", "albumId")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["albumId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ShareAlbumRequest) -> AlbumShareCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Identifier of the album to be shared. This `albumId` must belong to an
-    /// album created by the developer.
-    ///
-    /// Sets the *album id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumShareCall<'a, C, A> {
-        self._album_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumShareCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumShareCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Sharing`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumShareCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists all albums shown to a user in the Albums tab of the Google
-/// Photos app.
-///
-/// A builder for the *list* method supported by a *album* resource.
-/// It is not used directly, but through a `AlbumMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_photoslibrary1 as photoslibrary1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use photoslibrary1::PhotosLibrary;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.albums().list()
-///              .page_token("amet.")
-///              .page_size(-81)
-///              .exclude_non_app_created_data(true)
-///              .doit();
-/// # }
-/// ```
-pub struct AlbumListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _exclude_non_app_created_data: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AlbumListCall<'a, C, A> {}
-
-impl<'a, C, A> AlbumListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListAlbumsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "photoslibrary.albums.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._exclude_non_app_created_data {
-            params.push(("excludeNonAppCreatedData", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "pageSize", "excludeNonAppCreatedData"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/albums";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// A continuation token to get the next page of the results. Adding this to
-    /// the request returns the rows after the `pageToken`. The `pageToken` should
-    /// be the value returned in the `nextPageToken` parameter in the response to
-    /// the `listAlbums` request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AlbumListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum number of albums to return in the response. The default number of
-    /// albums to return at a time is 20. The maximum `pageSize` is 50.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AlbumListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// If set, the results exclude media items that were not created by this app.
-    /// Defaults to false (all albums are returned). This field is ignored if the
-    /// photoslibrary.readonly.appcreateddata scope is used.
-    ///
-    /// Sets the *exclude non app created data* query property to the given value.
-    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> AlbumListCall<'a, C, A> {
-        self._exclude_non_app_created_data = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Adds an enrichment at a specified position in a defined album.
-///
-/// A builder for the *addEnrichment* method supported by a *album* resource.
-/// It is not used directly, but through a `AlbumMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_photoslibrary1 as photoslibrary1;
-/// use photoslibrary1::AddEnrichmentToAlbumRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use photoslibrary1::PhotosLibrary;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AddEnrichmentToAlbumRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.albums().add_enrichment(req, "albumId")
-///              .doit();
-/// # }
-/// ```
-pub struct AlbumAddEnrichmentCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-    _request: AddEnrichmentToAlbumRequest,
-    _album_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AlbumAddEnrichmentCall<'a, C, A> {}
-
-impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AddEnrichmentToAlbumResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "photoslibrary.albums.addEnrichment",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("albumId", self._album_id.to_string()));
-        for &field in ["alt", "albumId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/albums/{+albumId}:addEnrichment";
+        let mut url = self.hub._base_url.clone() + "v1/mediaItems:search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+albumId}", "albumId")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["albumId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2427,7 +2020,7 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2488,18 +2081,8 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddEnrichmentToAlbumRequest) -> AlbumAddEnrichmentCall<'a, C, A> {
+    pub fn request(mut self, new_value: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, C, A> {
         self._request = new_value;
-        self
-    }
-    /// Identifier of the album where the enrichment is to be added.
-    ///
-    /// Sets the *album id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumAddEnrichmentCall<'a, C, A> {
-        self._album_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2508,7 +2091,7 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumAddEnrichmentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MediaItemSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2517,7 +2100,7 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2533,7 +2116,7 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumAddEnrichmentCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2553,7 +2136,7 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumAddEnrichmentCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemSearchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2565,10 +2148,11 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Creates an album in a user's Google Photos library.
+/// Returns the list of media items for the specified media item identifiers.
+/// Items are returned in the same order as the supplied identifiers.
 ///
-/// A builder for the *create* method supported by a *album* resource.
-/// It is not used directly, but through a `AlbumMethods` instance.
+/// A builder for the *batchGet* method supported by a *mediaItem* resource.
+/// It is not used directly, but through a `MediaItemMethods` instance.
 ///
 /// # Example
 ///
@@ -2579,7 +2163,6 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_photoslibrary1 as photoslibrary1;
-/// use photoslibrary1::CreateAlbumRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2590,35 +2173,31 @@ impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = CreateAlbumRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.albums().create(req)
+/// let result = hub.media_items().batch_get()
+///              .add_media_item_ids("justo")
 ///              .doit();
 /// # }
 /// ```
-pub struct AlbumCreateCall<'a, C, A>
+pub struct MediaItemBatchGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a PhotosLibrary<C, A>,
-    _request: CreateAlbumRequest,
+    _media_item_ids: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AlbumCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MediaItemBatchGetCall<'a, C, A> {}
 
-impl<'a, C, A> AlbumCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MediaItemBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Album)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchGetMediaItemsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2626,10 +2205,15 @@ impl<'a, C, A> AlbumCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "photoslibrary.albums.create",
-                               http_method: hyper::method::Method::Post });
+        dlg.begin(MethodInfo { id: "photoslibrary.mediaItems.batchGet",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        for &field in ["alt"].iter() {
+        if self._media_item_ids.len() > 0 {
+            for f in self._media_item_ids.iter() {
+                params.push(("mediaItemIds", f.to_string()));
+            }
+        }
+        for &field in ["alt", "mediaItemIds"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2641,289 +2225,13 @@ impl<'a, C, A> AlbumCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/albums";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateAlbumRequest) -> AlbumCreateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumCreateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumCreateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumCreateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Returns the album based on the specified `albumId` or `shareToken`.
-/// Exactly one of `albumId` and `shareToken` must be set.
-/// The `albumId` should be the ID of an album owned by the user or a shared
-/// album that the user has joined.
-///
-/// A builder for the *get* method supported by a *album* resource.
-/// It is not used directly, but through a `AlbumMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_photoslibrary1 as photoslibrary1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use photoslibrary1::PhotosLibrary;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.albums().get("albumId")
-///              .share_token("dolores")
-///              .doit();
-/// # }
-/// ```
-pub struct AlbumGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-    _album_id: String,
-    _share_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AlbumGetCall<'a, C, A> {}
-
-impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Album)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "photoslibrary.albums.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("albumId", self._album_id.to_string()));
-        if let Some(value) = self._share_token {
-            params.push(("shareToken", value.to_string()));
-        }
-        for &field in ["alt", "albumId", "shareToken"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/albums/{+albumId}";
+        let mut url = self.hub._base_url.clone() + "v1/mediaItems:batchGet";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+albumId}", "albumId")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["albumId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2943,7 +2251,7 @@ impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2996,23 +2304,14 @@ impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Identifier of the album to be requested. Must not be set if `shareToken` is
-    /// set.
+    /// Identifiers of the media items to be requested.
+    /// Must not contain repeated identifiers and cannot be empty. The maximum
+    /// number of media items that can be retrieved in one call is 50.
     ///
-    /// Sets the *album id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumGetCall<'a, C, A> {
-        self._album_id = new_value.to_string();
-        self
-    }
-    /// Share token of the album to be request. Must not be set if `albumId` is
-    /// set.
-    ///
-    /// Sets the *share token* query property to the given value.
-    pub fn share_token(mut self, new_value: &str) -> AlbumGetCall<'a, C, A> {
-        self._share_token = Some(new_value.to_string());
+    /// Append the given value to the *media item ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_media_item_ids(mut self, new_value: &str) -> MediaItemBatchGetCall<'a, C, A> {
+        self._media_item_ids.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3021,7 +2320,7 @@ impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MediaItemBatchGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3030,7 +2329,7 @@ impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3046,7 +2345,7 @@ impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3066,777 +2365,7 @@ impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Joins a shared album on behalf of the Google Photos user.
-///
-/// A builder for the *join* method supported by a *sharedAlbum* resource.
-/// It is not used directly, but through a `SharedAlbumMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_photoslibrary1 as photoslibrary1;
-/// use photoslibrary1::JoinSharedAlbumRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use photoslibrary1::PhotosLibrary;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = JoinSharedAlbumRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.shared_albums().join(req)
-///              .doit();
-/// # }
-/// ```
-pub struct SharedAlbumJoinCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-    _request: JoinSharedAlbumRequest,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for SharedAlbumJoinCall<'a, C, A> {}
-
-impl<'a, C, A> SharedAlbumJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, JoinSharedAlbumResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "photoslibrary.sharedAlbums.join",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/sharedAlbums:join";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Sharing.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SharedAlbumJoinCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumJoinCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Sharing`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumJoinCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Returns the album based on the specified `albumId` or `shareToken`.
-/// Exactly one of `albumId` and `shareToken` must be set.
-/// The `albumId` should be the ID of an album owned by the user or a shared
-/// album that the user has joined.
-///
-/// A builder for the *get* method supported by a *sharedAlbum* resource.
-/// It is not used directly, but through a `SharedAlbumMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_photoslibrary1 as photoslibrary1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use photoslibrary1::PhotosLibrary;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.shared_albums().get("shareToken")
-///              .album_id("sadipscing")
-///              .doit();
-/// # }
-/// ```
-pub struct SharedAlbumGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-    _share_token: String,
-    _album_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for SharedAlbumGetCall<'a, C, A> {}
-
-impl<'a, C, A> SharedAlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Album)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "photoslibrary.sharedAlbums.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("shareToken", self._share_token.to_string()));
-        if let Some(value) = self._album_id {
-            params.push(("albumId", value.to_string()));
-        }
-        for &field in ["alt", "shareToken", "albumId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/sharedAlbums/{+shareToken}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+shareToken}", "shareToken")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["shareToken"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Share token of the album to be request. Must not be set if `albumId` is
-    /// set.
-    ///
-    /// Sets the *share token* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn share_token(mut self, new_value: &str) -> SharedAlbumGetCall<'a, C, A> {
-        self._share_token = new_value.to_string();
-        self
-    }
-    /// Identifier of the album to be requested. Must not be set if `shareToken` is
-    /// set.
-    ///
-    /// Sets the *album id* query property to the given value.
-    pub fn album_id(mut self, new_value: &str) -> SharedAlbumGetCall<'a, C, A> {
-        self._album_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SharedAlbumGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists all shared albums available in the Sharing tab of the
-/// user's Google Photos app.
-///
-/// A builder for the *list* method supported by a *sharedAlbum* resource.
-/// It is not used directly, but through a `SharedAlbumMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_photoslibrary1 as photoslibrary1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use photoslibrary1::PhotosLibrary;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.shared_albums().list()
-///              .page_token("aliquyam")
-///              .page_size(-66)
-///              .exclude_non_app_created_data(false)
-///              .doit();
-/// # }
-/// ```
-pub struct SharedAlbumListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _exclude_non_app_created_data: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for SharedAlbumListCall<'a, C, A> {}
-
-impl<'a, C, A> SharedAlbumListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListSharedAlbumsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "photoslibrary.sharedAlbums.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._exclude_non_app_created_data {
-            params.push(("excludeNonAppCreatedData", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "pageSize", "excludeNonAppCreatedData"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/sharedAlbums";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// A continuation token to get the next page of the results. Adding this to
-    /// the request returns the rows after the `pageToken`. The `pageToken` should
-    /// be the value returned in the `nextPageToken` parameter in the response to
-    /// the `listSharedAlbums` request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SharedAlbumListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum number of albums to return in the response. The default number of
-    /// albums to return at a time is 20. The maximum `pageSize` is 50.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SharedAlbumListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// If set, the results exclude media items that were not created by this app.
-    /// Defaults to false (all albums are returned). This field is ignored if the
-    /// photoslibrary.readonly.appcreateddata scope is used.
-    ///
-    /// Sets the *exclude non app created data* query property to the given value.
-    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> SharedAlbumListCall<'a, C, A> {
-        self._exclude_non_app_created_data = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SharedAlbumListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemBatchGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3947,10 +2476,7 @@ impl<'a, C, A> MediaItemBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3982,7 +2508,7 @@ impl<'a, C, A> MediaItemBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4062,7 +2588,7 @@ impl<'a, C, A> MediaItemBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4110,7 +2636,7 @@ impl<'a, C, A> MediaItemBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Returns the media item for the specified media item `id`.
+/// Returns the media item for the specified media item identifier.
 ///
 /// A builder for the *get* method supported by a *mediaItem* resource.
 /// It is not used directly, but through a `MediaItemMethods` instance.
@@ -4196,7 +2722,7 @@ impl<'a, C, A> MediaItemGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4212,10 +2738,7 @@ impl<'a, C, A> MediaItemGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4235,7 +2758,7 @@ impl<'a, C, A> MediaItemGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4288,7 +2811,7 @@ impl<'a, C, A> MediaItemGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Identifier of media item to be requested.
+    /// Identifier of the media item to be requested.
     ///
     /// Sets the *media item id* path property to the given value.
     ///
@@ -4313,7 +2836,7 @@ impl<'a, C, A> MediaItemGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4361,257 +2884,6 @@ impl<'a, C, A> MediaItemGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Searches for media items in a user's Google Photos library.
-/// If no filters are set, then all media items in the user's library are
-/// returned.
-/// If an album is set, all media items in the specified album are returned.
-/// If filters are specified, media items that match the filters from the user's
-/// library are listed.
-/// If you set both the album and the filters, the request results in an error.
-///
-/// A builder for the *search* method supported by a *mediaItem* resource.
-/// It is not used directly, but through a `MediaItemMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_photoslibrary1 as photoslibrary1;
-/// use photoslibrary1::SearchMediaItemsRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use photoslibrary1::PhotosLibrary;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SearchMediaItemsRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.media_items().search(req)
-///              .doit();
-/// # }
-/// ```
-pub struct MediaItemSearchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PhotosLibrary<C, A>,
-    _request: SearchMediaItemsRequest,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MediaItemSearchCall<'a, C, A> {}
-
-impl<'a, C, A> MediaItemSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, SearchMediaItemsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "photoslibrary.mediaItems.search",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/mediaItems:search";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MediaItemSearchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemSearchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemSearchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// List all media items from a user's Google Photos library.
 ///
 /// A builder for the *list* method supported by a *mediaItem* resource.
@@ -4640,8 +2912,8 @@ impl<'a, C, A> MediaItemSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.media_items().list()
-///              .page_token("justo")
-///              .page_size(-34)
+///              .page_token("erat")
+///              .page_size(-35)
 ///              .doit();
 /// # }
 /// ```
@@ -4697,10 +2969,7 @@ impl<'a, C, A> MediaItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4720,7 +2989,7 @@ impl<'a, C, A> MediaItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4806,7 +3075,7 @@ impl<'a, C, A> MediaItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4843,6 +3112,2585 @@ impl<'a, C, A> MediaItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns the album based on the specified `shareToken`.
+///
+/// A builder for the *get* method supported by a *sharedAlbum* resource.
+/// It is not used directly, but through a `SharedAlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.shared_albums().get("shareToken")
+///              .doit();
+/// # }
+/// ```
+pub struct SharedAlbumGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _share_token: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SharedAlbumGetCall<'a, C, A> {}
+
+impl<'a, C, A> SharedAlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Album)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.sharedAlbums.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("shareToken", self._share_token.to_string()));
+        for &field in ["alt", "shareToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/sharedAlbums/{+shareToken}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Sharing.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+shareToken}", "shareToken")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["shareToken"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Share token of the album to be requested.
+    ///
+    /// Sets the *share token* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn share_token(mut self, new_value: &str) -> SharedAlbumGetCall<'a, C, A> {
+        self._share_token = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SharedAlbumGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Sharing`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Leaves a previously-joined shared album on behalf of the Google Photos
+/// user. The user must not own this album.
+///
+/// A builder for the *leave* method supported by a *sharedAlbum* resource.
+/// It is not used directly, but through a `SharedAlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// use photoslibrary1::LeaveSharedAlbumRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = LeaveSharedAlbumRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.shared_albums().leave(req)
+///              .doit();
+/// # }
+/// ```
+pub struct SharedAlbumLeaveCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _request: LeaveSharedAlbumRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SharedAlbumLeaveCall<'a, C, A> {}
+
+impl<'a, C, A> SharedAlbumLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaveSharedAlbumResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.sharedAlbums.leave",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/sharedAlbums:leave";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Sharing.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SharedAlbumLeaveCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumLeaveCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Sharing`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumLeaveCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Joins a shared album on behalf of the Google Photos user.
+///
+/// A builder for the *join* method supported by a *sharedAlbum* resource.
+/// It is not used directly, but through a `SharedAlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// use photoslibrary1::JoinSharedAlbumRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = JoinSharedAlbumRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.shared_albums().join(req)
+///              .doit();
+/// # }
+/// ```
+pub struct SharedAlbumJoinCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _request: JoinSharedAlbumRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SharedAlbumJoinCall<'a, C, A> {}
+
+impl<'a, C, A> SharedAlbumJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, JoinSharedAlbumResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.sharedAlbums.join",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/sharedAlbums:join";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Sharing.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SharedAlbumJoinCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumJoinCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Sharing`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumJoinCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists all shared albums available in the Sharing tab of the
+/// user's Google Photos app.
+///
+/// A builder for the *list* method supported by a *sharedAlbum* resource.
+/// It is not used directly, but through a `SharedAlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.shared_albums().list()
+///              .page_token("nonumy")
+///              .page_size(-19)
+///              .exclude_non_app_created_data(false)
+///              .doit();
+/// # }
+/// ```
+pub struct SharedAlbumListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _exclude_non_app_created_data: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SharedAlbumListCall<'a, C, A> {}
+
+impl<'a, C, A> SharedAlbumListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListSharedAlbumsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.sharedAlbums.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._exclude_non_app_created_data {
+            params.push(("excludeNonAppCreatedData", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "pageSize", "excludeNonAppCreatedData"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/sharedAlbums";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// A continuation token to get the next page of the results. Adding this to
+    /// the request returns the rows after the `pageToken`. The `pageToken` should
+    /// be the value returned in the `nextPageToken` parameter in the response to
+    /// the `listSharedAlbums` request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> SharedAlbumListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of albums to return in the response. The default number of
+    /// albums to return at a time is 20. The maximum `pageSize` is 50.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> SharedAlbumListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// If set, the results exclude media items that were not created by this app.
+    /// Defaults to false (all albums are returned). This field is ignored if the
+    /// photoslibrary.readonly.appcreateddata scope is used.
+    ///
+    /// Sets the *exclude non app created data* query property to the given value.
+    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> SharedAlbumListCall<'a, C, A> {
+        self._exclude_non_app_created_data = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SharedAlbumListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Adds an enrichment at a specified position in a defined album.
+///
+/// A builder for the *addEnrichment* method supported by a *album* resource.
+/// It is not used directly, but through a `AlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// use photoslibrary1::AddEnrichmentToAlbumRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddEnrichmentToAlbumRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.albums().add_enrichment(req, "albumId")
+///              .doit();
+/// # }
+/// ```
+pub struct AlbumAddEnrichmentCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _request: AddEnrichmentToAlbumRequest,
+    _album_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlbumAddEnrichmentCall<'a, C, A> {}
+
+impl<'a, C, A> AlbumAddEnrichmentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AddEnrichmentToAlbumResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.albums.addEnrichment",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("albumId", self._album_id.to_string()));
+        for &field in ["alt", "albumId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/albums/{+albumId}:addEnrichment";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+albumId}", "albumId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["albumId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddEnrichmentToAlbumRequest) -> AlbumAddEnrichmentCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier of the album where the enrichment is to be added.
+    ///
+    /// Sets the *album id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn album_id(mut self, new_value: &str) -> AlbumAddEnrichmentCall<'a, C, A> {
+        self._album_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumAddEnrichmentCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumAddEnrichmentCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumAddEnrichmentCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists all albums shown to a user in the Albums tab of the Google
+/// Photos app.
+///
+/// A builder for the *list* method supported by a *album* resource.
+/// It is not used directly, but through a `AlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.albums().list()
+///              .page_token("aliquyam")
+///              .page_size(-66)
+///              .exclude_non_app_created_data(false)
+///              .doit();
+/// # }
+/// ```
+pub struct AlbumListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _exclude_non_app_created_data: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlbumListCall<'a, C, A> {}
+
+impl<'a, C, A> AlbumListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListAlbumsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.albums.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._exclude_non_app_created_data {
+            params.push(("excludeNonAppCreatedData", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "pageSize", "excludeNonAppCreatedData"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/albums";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// A continuation token to get the next page of the results. Adding this to
+    /// the request returns the rows after the `pageToken`. The `pageToken` should
+    /// be the value returned in the `nextPageToken` parameter in the response to
+    /// the `listAlbums` request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AlbumListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of albums to return in the response. The default number of
+    /// albums to return at a time is 20. The maximum `pageSize` is 50.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AlbumListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// If set, the results exclude media items that were not created by this app.
+    /// Defaults to false (all albums are returned). This field is ignored if the
+    /// photoslibrary.readonly.appcreateddata scope is used.
+    ///
+    /// Sets the *exclude non app created data* query property to the given value.
+    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> AlbumListCall<'a, C, A> {
+        self._exclude_non_app_created_data = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Marks a previously shared album as private. This means that the album is
+/// no longer shared and all the non-owners will lose access to the album. All
+/// non-owner content will be removed from the album. If a non-owner has
+/// previously added the album to their library, they will retain all photos in
+/// their library. This action can only be performed on albums which were
+/// created by the developer via the API.
+///
+/// A builder for the *unshare* method supported by a *album* resource.
+/// It is not used directly, but through a `AlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// use photoslibrary1::UnshareAlbumRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UnshareAlbumRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.albums().unshare(req, "albumId")
+///              .doit();
+/// # }
+/// ```
+pub struct AlbumUnshareCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _request: UnshareAlbumRequest,
+    _album_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlbumUnshareCall<'a, C, A> {}
+
+impl<'a, C, A> AlbumUnshareCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, UnshareAlbumResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.albums.unshare",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("albumId", self._album_id.to_string()));
+        for &field in ["alt", "albumId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/albums/{+albumId}:unshare";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Sharing.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+albumId}", "albumId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["albumId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UnshareAlbumRequest) -> AlbumUnshareCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier of the album to be unshared. This album id must belong to an
+    /// album created by the developer.
+    ///
+    /// Sets the *album id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn album_id(mut self, new_value: &str) -> AlbumUnshareCall<'a, C, A> {
+        self._album_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumUnshareCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumUnshareCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Sharing`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumUnshareCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Marks an album as shared and accessible to other users. This action can
+/// only be performed on albums which were created by the developer via the
+/// API.
+///
+/// A builder for the *share* method supported by a *album* resource.
+/// It is not used directly, but through a `AlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// use photoslibrary1::ShareAlbumRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ShareAlbumRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.albums().share(req, "albumId")
+///              .doit();
+/// # }
+/// ```
+pub struct AlbumShareCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _request: ShareAlbumRequest,
+    _album_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlbumShareCall<'a, C, A> {}
+
+impl<'a, C, A> AlbumShareCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ShareAlbumResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.albums.share",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("albumId", self._album_id.to_string()));
+        for &field in ["alt", "albumId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/albums/{+albumId}:share";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Sharing.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+albumId}", "albumId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["albumId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ShareAlbumRequest) -> AlbumShareCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier of the album to be shared. This `albumId` must belong to an
+    /// album created by the developer.
+    ///
+    /// Sets the *album id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn album_id(mut self, new_value: &str) -> AlbumShareCall<'a, C, A> {
+        self._album_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumShareCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumShareCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Sharing`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumShareCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates an album in a user's Google Photos library.
+///
+/// A builder for the *create* method supported by a *album* resource.
+/// It is not used directly, but through a `AlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// use photoslibrary1::CreateAlbumRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CreateAlbumRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.albums().create(req)
+///              .doit();
+/// # }
+/// ```
+pub struct AlbumCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _request: CreateAlbumRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlbumCreateCall<'a, C, A> {}
+
+impl<'a, C, A> AlbumCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Album)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.albums.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/albums";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CreateAlbumRequest) -> AlbumCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns the album based on the specified `albumId`.
+/// The `albumId` must be the ID of an album owned by the user or a shared
+/// album that the user has joined.
+///
+/// A builder for the *get* method supported by a *album* resource.
+/// It is not used directly, but through a `AlbumMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_photoslibrary1 as photoslibrary1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use photoslibrary1::PhotosLibrary;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.albums().get("albumId")
+///              .doit();
+/// # }
+/// ```
+pub struct AlbumGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a PhotosLibrary<C, A>,
+    _album_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlbumGetCall<'a, C, A> {}
+
+impl<'a, C, A> AlbumGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Album)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "photoslibrary.albums.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("albumId", self._album_id.to_string()));
+        for &field in ["alt", "albumId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/albums/{+albumId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+albumId}", "albumId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["albumId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifier of the album to be requested.
+    ///
+    /// Sets the *album id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn album_id(mut self, new_value: &str) -> AlbumGetCall<'a, C, A> {
+        self._album_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlbumGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

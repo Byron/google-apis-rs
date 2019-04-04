@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud RuntimeConfig* crate version *1.0.8+20180924*, where *20180924* is the exact revision of the *runtimeconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud RuntimeConfig* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *runtimeconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud RuntimeConfig* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/runtime-configurator/).
@@ -370,17 +370,17 @@ impl<'a, C, A> CloudRuntimeConfig<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -441,21 +441,6 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// The request message for Operations.CancelOperation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancel operations](struct.OperationCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelOperationRequest {}
-
-
 /// This resource represents a long-running operation that is the result of a
 /// network API call.
 /// 
@@ -499,25 +484,19 @@ pub struct Operation {
 impl Resource for Operation {}
 
 
-/// The response message for Operations.ListOperations.
+/// The request message for Operations.CancelOperation.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list operations](struct.OperationListCall.html) (response)
+/// * [cancel operations](struct.OperationCancelCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
-}
+pub struct CancelOperationRequest { _never_set: Option<bool> }
 
-impl ResponseResult for ListOperationsResponse {}
+impl RequestValue for CancelOperationRequest {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -542,6 +521,27 @@ impl ResponseResult for ListOperationsResponse {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
+
+
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list operations](struct.OperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
 
 
 
@@ -784,7 +784,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -800,10 +800,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -823,7 +820,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -922,7 +919,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1059,7 +1056,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1075,10 +1072,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1098,7 +1092,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1176,7 +1170,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1326,7 +1320,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1342,10 +1336,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1377,7 +1368,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1467,7 +1458,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

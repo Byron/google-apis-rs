@@ -155,8 +155,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity-type-batch-uri" => Some(("entityTypeBatchUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["entity-type-batch-uri", "language-code", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1246,6 +1246,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "input-audio" => Some(("inputAudio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.sample-rate-hertz" => Some(("outputAudioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "output-audio-config.audio-encoding" => Some(("outputAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.effects-profile-id" => Some(("outputAudioConfig.synthesizeSpeechConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1254,7 +1255,6 @@ impl<'n> Engine<'n> {
                     "output-audio-config.synthesize-speech-config.speaking-rate" => Some(("outputAudioConfig.synthesizeSpeechConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.pitch" => Some(("outputAudioConfig.synthesizeSpeechConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "input-audio" => Some(("inputAudio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.language-code" => Some(("queryInput.text.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.event.language-code" => Some(("queryInput.event.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1262,8 +1262,8 @@ impl<'n> Engine<'n> {
                     "query-input.audio-config.phrase-hints" => Some(("queryInput.audioConfig.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-input.audio-config.language-code" => Some(("queryInput.audioConfig.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.model" => Some(("queryInput.audioConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.sample-rate-hertz" => Some(("queryInput.audioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.sentiment-analysis-request-config.analyze-query-text-sentiment" => Some(("queryParams.sentimentAnalysisRequestConfig.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2571,11 +2571,11 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2800,6 +2800,185 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_agent_knowledge_bases_documents_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1Document = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().agent_knowledge_bases_documents_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_agent_knowledge_bases_documents_reload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1ReloadDocumentRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().agent_knowledge_bases_documents_reload(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_agent_knowledge_bases_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().agent_knowledge_bases_get(opt.value_of("name").unwrap_or(""));
@@ -2878,6 +3057,96 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_agent_knowledge_bases_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1KnowledgeBase = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().agent_knowledge_bases_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3470,6 +3739,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "input-audio" => Some(("inputAudio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.sample-rate-hertz" => Some(("outputAudioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "output-audio-config.audio-encoding" => Some(("outputAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.effects-profile-id" => Some(("outputAudioConfig.synthesizeSpeechConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3478,7 +3748,6 @@ impl<'n> Engine<'n> {
                     "output-audio-config.synthesize-speech-config.speaking-rate" => Some(("outputAudioConfig.synthesizeSpeechConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.pitch" => Some(("outputAudioConfig.synthesizeSpeechConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "input-audio" => Some(("inputAudio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.language-code" => Some(("queryInput.text.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.event.language-code" => Some(("queryInput.event.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3486,8 +3755,8 @@ impl<'n> Engine<'n> {
                     "query-input.audio-config.phrase-hints" => Some(("queryInput.audioConfig.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-input.audio-config.language-code" => Some(("queryInput.audioConfig.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.model" => Some(("queryInput.audioConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.sample-rate-hertz" => Some(("queryInput.audioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.sentiment-analysis-request-config.analyze-query-text-sentiment" => Some(("queryParams.sentimentAnalysisRequestConfig.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -3978,1631 +4247,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_conversation_profiles_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "human-agent-assistant-config.notification-config.topic" => Some(("humanAgentAssistantConfig.notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "human-agent-assistant-config.name" => Some(("humanAgentAssistantConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automated-agent-config.agent" => Some(("automatedAgentConfig.agent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification-config.topic" => Some(("notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent", "automated-agent-config", "display-name", "human-agent-assistant-config", "name", "notification-config", "topic"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1ConversationProfile = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversation_profiles_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversation_profiles_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversation_profiles_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversation_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversation_profiles_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversation_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversation_profiles_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversation_profiles_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "human-agent-assistant-config.notification-config.topic" => Some(("humanAgentAssistantConfig.notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "human-agent-assistant-config.name" => Some(("humanAgentAssistantConfig.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automated-agent-config.agent" => Some(("automatedAgentConfig.agent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification-config.topic" => Some(("notificationConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent", "automated-agent-config", "display-name", "human-agent-assistant-config", "name", "notification-config", "topic"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1ConversationProfile = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversation_profiles_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_add_conversation_phone_number(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1AddConversationPhoneNumberRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversations_add_conversation_phone_number(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_complete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1CompleteConversationRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversations_complete(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "conversation-profile" => Some(("conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "phone-number.phone-number" => Some(("phoneNumber.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["conversation-profile", "end-time", "lifecycle-state", "name", "phone-number", "start-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1Conversation = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversations_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversations_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_messages_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversations_messages_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_participants_analyze_content(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "reply-audio-config.sample-rate-hertz" => Some(("replyAudioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "reply-audio-config.audio-encoding" => Some(("replyAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.effects-profile-id" => Some(("replyAudioConfig.synthesizeSpeechConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "reply-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("replyAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.voice.name" => Some(("replyAudioConfig.synthesizeSpeechConfig.voice.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.speaking-rate" => Some(("replyAudioConfig.synthesizeSpeechConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.volume-gain-db" => Some(("replyAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.pitch" => Some(("replyAudioConfig.synthesizeSpeechConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "text.text" => Some(("text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.language-code" => Some(("text.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio.audio" => Some(("audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio.config.phrase-hints" => Some(("audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "audio.config.language-code" => Some(("audio.config.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio.config.model" => Some(("audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio.config.audio-encoding" => Some(("audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio.config.sample-rate-hertz" => Some(("audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio", "audio-encoding", "config", "effects-profile-id", "language-code", "model", "name", "phrase-hints", "pitch", "reply-audio-config", "sample-rate-hertz", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "voice", "volume-gain-db"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1AnalyzeContentRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversations_participants_analyze_content(request, opt.value_of("participant").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_participants_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "role"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1Participant = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversations_participants_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_participants_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversations_participants_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_participants_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversations_participants_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_participants_streaming_analyze_content(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "input-text" => Some(("inputText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reply-audio-config.sample-rate-hertz" => Some(("replyAudioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "reply-audio-config.audio-encoding" => Some(("replyAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.effects-profile-id" => Some(("replyAudioConfig.synthesizeSpeechConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "reply-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("replyAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.voice.name" => Some(("replyAudioConfig.synthesizeSpeechConfig.voice.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.speaking-rate" => Some(("replyAudioConfig.synthesizeSpeechConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.volume-gain-db" => Some(("replyAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "reply-audio-config.synthesize-speech-config.pitch" => Some(("replyAudioConfig.synthesizeSpeechConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "input-audio" => Some(("inputAudio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text-config.language-code" => Some(("textConfig.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio-config.phrase-hints" => Some(("audioConfig.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "audio-config.language-code" => Some(("audioConfig.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio-config.model" => Some(("audioConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio-config.audio-encoding" => Some(("audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio-config.sample-rate-hertz" => Some(("audioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-config", "audio-encoding", "effects-profile-id", "input-audio", "input-text", "language-code", "model", "name", "phrase-hints", "pitch", "reply-audio-config", "sample-rate-hertz", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text-config", "voice", "volume-gain-db"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1StreamingAnalyzeContentRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().conversations_participants_streaming_analyze_content(request, opt.value_of("participant").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_conversations_participants_suggestions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().conversations_participants_suggestions_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_environments_users_conversations_contexts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifespan-count" => Some(("lifespanCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["lifespan-count", "name"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1Context = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().environments_users_conversations_contexts_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_environments_users_conversations_contexts_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().environments_users_conversations_contexts_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_environments_users_conversations_contexts_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().environments_users_conversations_contexts_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_environments_users_conversations_contexts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().environments_users_conversations_contexts_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_environments_users_conversations_contexts_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifespan-count" => Some(("lifespanCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["lifespan-count", "name"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1Context = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().environments_users_conversations_contexts_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_environments_users_conversations_delete_contexts(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().environments_users_conversations_delete_contexts(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _projects_get_agent(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get_agent(opt.value_of("parent").unwrap_or(""));
@@ -5622,433 +4266,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_human_agent_assistants_compile_suggestions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1CompileSuggestionsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().human_agent_assistants_compile_suggestions(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_human_agent_assistants_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "faq-answers-config.max-results" => Some(("faqAnswersConfig.maxResults", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "faq-answers-config.knowledge-base-name" => Some(("faqAnswersConfig.knowledgeBaseName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "article-suggestion-config.knowledge-base-name" => Some(("articleSuggestionConfig.knowledgeBaseName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["article-suggestion-config", "faq-answers-config", "knowledge-base-name", "max-results", "name"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1HumanAgentAssistant = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().human_agent_assistants_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_human_agent_assistants_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().human_agent_assistants_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_human_agent_assistants_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().human_agent_assistants_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_human_agent_assistants_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().human_agent_assistants_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_human_agent_assistants_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "faq-answers-config.max-results" => Some(("faqAnswersConfig.maxResults", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "faq-answers-config.knowledge-base-name" => Some(("faqAnswersConfig.knowledgeBaseName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "article-suggestion-config.knowledge-base-name" => Some(("articleSuggestionConfig.knowledgeBaseName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["article-suggestion-config", "faq-answers-config", "knowledge-base-name", "max-results", "name"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1HumanAgentAssistant = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().human_agent_assistants_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6249,11 +4466,11 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6478,6 +4695,185 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_knowledge_bases_documents_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1Document = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().knowledge_bases_documents_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_knowledge_bases_documents_reload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1ReloadDocumentRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().knowledge_bases_documents_reload(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_knowledge_bases_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().knowledge_bases_get(opt.value_of("name").unwrap_or(""));
@@ -6589,682 +4985,99 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_knowledge_bases_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1KnowledgeBase = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().knowledge_bases_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().operations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_number_orders_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1CancelPhoneNumberOrderRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().phone_number_orders_cancel(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_number_orders_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "phone-number-spec.preferred-area-codes" => Some(("phoneNumberSpec.preferredAreaCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "phone-number-spec.count" => Some(("phoneNumberSpec.count", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "phone-numbers" => Some(("phoneNumbers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["count", "create-time", "description", "lifecycle-state", "name", "phone-number-spec", "phone-numbers", "preferred-area-codes", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1PhoneNumberOrder = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().phone_number_orders_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_number_orders_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().phone_number_orders_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_number_orders_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().phone_number_orders_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_number_orders_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "phone-number-spec.preferred-area-codes" => Some(("phoneNumberSpec.preferredAreaCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "phone-number-spec.count" => Some(("phoneNumberSpec.count", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "phone-numbers" => Some(("phoneNumbers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["count", "create-time", "description", "lifecycle-state", "name", "phone-number-spec", "phone-numbers", "preferred-area-codes", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1PhoneNumberOrder = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().phone_number_orders_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_numbers_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().phone_numbers_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_numbers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().phone_numbers_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
-                },
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["show-deleted", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_numbers_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "conversation-profile" => Some(("conversationProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "phone-number" => Some(("phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["conversation-profile", "lifecycle-state", "name", "phone-number"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1PhoneNumber = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().phone_numbers_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_phone_numbers_undelete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1UndeletePhoneNumberRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().phone_numbers_undelete(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7432,11 +5245,20 @@ impl<'n> Engine<'n> {
                     ("agent-knowledge-bases-documents-list", Some(opt)) => {
                         call_result = self._projects_agent_knowledge_bases_documents_list(opt, dry_run, &mut err);
                     },
+                    ("agent-knowledge-bases-documents-patch", Some(opt)) => {
+                        call_result = self._projects_agent_knowledge_bases_documents_patch(opt, dry_run, &mut err);
+                    },
+                    ("agent-knowledge-bases-documents-reload", Some(opt)) => {
+                        call_result = self._projects_agent_knowledge_bases_documents_reload(opt, dry_run, &mut err);
+                    },
                     ("agent-knowledge-bases-get", Some(opt)) => {
                         call_result = self._projects_agent_knowledge_bases_get(opt, dry_run, &mut err);
                     },
                     ("agent-knowledge-bases-list", Some(opt)) => {
                         call_result = self._projects_agent_knowledge_bases_list(opt, dry_run, &mut err);
+                    },
+                    ("agent-knowledge-bases-patch", Some(opt)) => {
+                        call_result = self._projects_agent_knowledge_bases_patch(opt, dry_run, &mut err);
                     },
                     ("agent-restore", Some(opt)) => {
                         call_result = self._projects_agent_restore(opt, dry_run, &mut err);
@@ -7483,95 +5305,8 @@ impl<'n> Engine<'n> {
                     ("agent-train", Some(opt)) => {
                         call_result = self._projects_agent_train(opt, dry_run, &mut err);
                     },
-                    ("conversation-profiles-create", Some(opt)) => {
-                        call_result = self._projects_conversation_profiles_create(opt, dry_run, &mut err);
-                    },
-                    ("conversation-profiles-delete", Some(opt)) => {
-                        call_result = self._projects_conversation_profiles_delete(opt, dry_run, &mut err);
-                    },
-                    ("conversation-profiles-get", Some(opt)) => {
-                        call_result = self._projects_conversation_profiles_get(opt, dry_run, &mut err);
-                    },
-                    ("conversation-profiles-list", Some(opt)) => {
-                        call_result = self._projects_conversation_profiles_list(opt, dry_run, &mut err);
-                    },
-                    ("conversation-profiles-patch", Some(opt)) => {
-                        call_result = self._projects_conversation_profiles_patch(opt, dry_run, &mut err);
-                    },
-                    ("conversations-add-conversation-phone-number", Some(opt)) => {
-                        call_result = self._projects_conversations_add_conversation_phone_number(opt, dry_run, &mut err);
-                    },
-                    ("conversations-complete", Some(opt)) => {
-                        call_result = self._projects_conversations_complete(opt, dry_run, &mut err);
-                    },
-                    ("conversations-create", Some(opt)) => {
-                        call_result = self._projects_conversations_create(opt, dry_run, &mut err);
-                    },
-                    ("conversations-get", Some(opt)) => {
-                        call_result = self._projects_conversations_get(opt, dry_run, &mut err);
-                    },
-                    ("conversations-list", Some(opt)) => {
-                        call_result = self._projects_conversations_list(opt, dry_run, &mut err);
-                    },
-                    ("conversations-messages-list", Some(opt)) => {
-                        call_result = self._projects_conversations_messages_list(opt, dry_run, &mut err);
-                    },
-                    ("conversations-participants-analyze-content", Some(opt)) => {
-                        call_result = self._projects_conversations_participants_analyze_content(opt, dry_run, &mut err);
-                    },
-                    ("conversations-participants-create", Some(opt)) => {
-                        call_result = self._projects_conversations_participants_create(opt, dry_run, &mut err);
-                    },
-                    ("conversations-participants-get", Some(opt)) => {
-                        call_result = self._projects_conversations_participants_get(opt, dry_run, &mut err);
-                    },
-                    ("conversations-participants-list", Some(opt)) => {
-                        call_result = self._projects_conversations_participants_list(opt, dry_run, &mut err);
-                    },
-                    ("conversations-participants-streaming-analyze-content", Some(opt)) => {
-                        call_result = self._projects_conversations_participants_streaming_analyze_content(opt, dry_run, &mut err);
-                    },
-                    ("conversations-participants-suggestions-list", Some(opt)) => {
-                        call_result = self._projects_conversations_participants_suggestions_list(opt, dry_run, &mut err);
-                    },
-                    ("environments-users-conversations-contexts-create", Some(opt)) => {
-                        call_result = self._projects_environments_users_conversations_contexts_create(opt, dry_run, &mut err);
-                    },
-                    ("environments-users-conversations-contexts-delete", Some(opt)) => {
-                        call_result = self._projects_environments_users_conversations_contexts_delete(opt, dry_run, &mut err);
-                    },
-                    ("environments-users-conversations-contexts-get", Some(opt)) => {
-                        call_result = self._projects_environments_users_conversations_contexts_get(opt, dry_run, &mut err);
-                    },
-                    ("environments-users-conversations-contexts-list", Some(opt)) => {
-                        call_result = self._projects_environments_users_conversations_contexts_list(opt, dry_run, &mut err);
-                    },
-                    ("environments-users-conversations-contexts-patch", Some(opt)) => {
-                        call_result = self._projects_environments_users_conversations_contexts_patch(opt, dry_run, &mut err);
-                    },
-                    ("environments-users-conversations-delete-contexts", Some(opt)) => {
-                        call_result = self._projects_environments_users_conversations_delete_contexts(opt, dry_run, &mut err);
-                    },
                     ("get-agent", Some(opt)) => {
                         call_result = self._projects_get_agent(opt, dry_run, &mut err);
-                    },
-                    ("human-agent-assistants-compile-suggestions", Some(opt)) => {
-                        call_result = self._projects_human_agent_assistants_compile_suggestions(opt, dry_run, &mut err);
-                    },
-                    ("human-agent-assistants-create", Some(opt)) => {
-                        call_result = self._projects_human_agent_assistants_create(opt, dry_run, &mut err);
-                    },
-                    ("human-agent-assistants-delete", Some(opt)) => {
-                        call_result = self._projects_human_agent_assistants_delete(opt, dry_run, &mut err);
-                    },
-                    ("human-agent-assistants-get", Some(opt)) => {
-                        call_result = self._projects_human_agent_assistants_get(opt, dry_run, &mut err);
-                    },
-                    ("human-agent-assistants-list", Some(opt)) => {
-                        call_result = self._projects_human_agent_assistants_list(opt, dry_run, &mut err);
-                    },
-                    ("human-agent-assistants-patch", Some(opt)) => {
-                        call_result = self._projects_human_agent_assistants_patch(opt, dry_run, &mut err);
                     },
                     ("knowledge-bases-create", Some(opt)) => {
                         call_result = self._projects_knowledge_bases_create(opt, dry_run, &mut err);
@@ -7591,41 +5326,23 @@ impl<'n> Engine<'n> {
                     ("knowledge-bases-documents-list", Some(opt)) => {
                         call_result = self._projects_knowledge_bases_documents_list(opt, dry_run, &mut err);
                     },
+                    ("knowledge-bases-documents-patch", Some(opt)) => {
+                        call_result = self._projects_knowledge_bases_documents_patch(opt, dry_run, &mut err);
+                    },
+                    ("knowledge-bases-documents-reload", Some(opt)) => {
+                        call_result = self._projects_knowledge_bases_documents_reload(opt, dry_run, &mut err);
+                    },
                     ("knowledge-bases-get", Some(opt)) => {
                         call_result = self._projects_knowledge_bases_get(opt, dry_run, &mut err);
                     },
                     ("knowledge-bases-list", Some(opt)) => {
                         call_result = self._projects_knowledge_bases_list(opt, dry_run, &mut err);
                     },
+                    ("knowledge-bases-patch", Some(opt)) => {
+                        call_result = self._projects_knowledge_bases_patch(opt, dry_run, &mut err);
+                    },
                     ("operations-get", Some(opt)) => {
                         call_result = self._projects_operations_get(opt, dry_run, &mut err);
-                    },
-                    ("phone-number-orders-cancel", Some(opt)) => {
-                        call_result = self._projects_phone_number_orders_cancel(opt, dry_run, &mut err);
-                    },
-                    ("phone-number-orders-create", Some(opt)) => {
-                        call_result = self._projects_phone_number_orders_create(opt, dry_run, &mut err);
-                    },
-                    ("phone-number-orders-get", Some(opt)) => {
-                        call_result = self._projects_phone_number_orders_get(opt, dry_run, &mut err);
-                    },
-                    ("phone-number-orders-list", Some(opt)) => {
-                        call_result = self._projects_phone_number_orders_list(opt, dry_run, &mut err);
-                    },
-                    ("phone-number-orders-patch", Some(opt)) => {
-                        call_result = self._projects_phone_number_orders_patch(opt, dry_run, &mut err);
-                    },
-                    ("phone-numbers-delete", Some(opt)) => {
-                        call_result = self._projects_phone_numbers_delete(opt, dry_run, &mut err);
-                    },
-                    ("phone-numbers-list", Some(opt)) => {
-                        call_result = self._projects_phone_numbers_list(opt, dry_run, &mut err);
-                    },
-                    ("phone-numbers-patch", Some(opt)) => {
-                        call_result = self._projects_phone_numbers_patch(opt, dry_run, &mut err);
-                    },
-                    ("phone-numbers-undelete", Some(opt)) => {
-                        call_result = self._projects_phone_numbers_undelete(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -7718,12 +5435,11 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'conversation-profiles-create', 'conversation-profiles-delete', 'conversation-profiles-get', 'conversation-profiles-list', 'conversation-profiles-patch', 'conversations-add-conversation-phone-number', 'conversations-complete', 'conversations-create', 'conversations-get', 'conversations-list', 'conversations-messages-list', 'conversations-participants-analyze-content', 'conversations-participants-create', 'conversations-participants-get', 'conversations-participants-list', 'conversations-participants-streaming-analyze-content', 'conversations-participants-suggestions-list', 'environments-users-conversations-contexts-create', 'environments-users-conversations-contexts-delete', 'environments-users-conversations-contexts-get', 'environments-users-conversations-contexts-list', 'environments-users-conversations-contexts-patch', 'environments-users-conversations-delete-contexts', 'get-agent', 'human-agent-assistants-compile-suggestions', 'human-agent-assistants-create', 'human-agent-assistants-delete', 'human-agent-assistants-get', 'human-agent-assistants-list', 'human-agent-assistants-patch', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-get', 'knowledge-bases-documents-list', 'knowledge-bases-get', 'knowledge-bases-list', 'operations-get', 'phone-number-orders-cancel', 'phone-number-orders-create', 'phone-number-orders-get', 'phone-number-orders-list', 'phone-number-orders-patch', 'phone-numbers-delete', 'phone-numbers-list', 'phone-numbers-patch' and 'phone-numbers-undelete'", vec![
+        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-documents-patch', 'agent-knowledge-bases-documents-reload', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-knowledge-bases-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'get-agent', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-get', 'knowledge-bases-documents-list', 'knowledge-bases-documents-patch', 'knowledge-bases-documents-reload', 'knowledge-bases-get', 'knowledge-bases-list', 'knowledge-bases-patch' and 'operations-get'", vec![
             ("agent-entity-types-batch-delete",
                     Some(r##"Deletes entity types in the specified agent.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-entity-types-batch-delete",
                   vec![
                     (Some(r##"parent"##),
@@ -7754,8 +5470,7 @@ fn main() {
             ("agent-entity-types-batch-update",
                     Some(r##"Updates/Creates multiple entity types in the specified agent.
         
-        Operation <response: BatchUpdateEntityTypesResponse,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: BatchUpdateEntityTypesResponse>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-entity-types-batch-update",
                   vec![
                     (Some(r##"parent"##),
@@ -7869,8 +5584,7 @@ fn main() {
             ("agent-entity-types-entities-batch-delete",
                     Some(r##"Deletes entities in the specified entity type.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-entity-types-entities-batch-delete",
                   vec![
                     (Some(r##"parent"##),
@@ -7903,8 +5617,7 @@ fn main() {
         method does not affect entities in the entity type that aren't explicitly
         specified in the request.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-entity-types-entities-batch-update",
                   vec![
                     (Some(r##"parent"##),
@@ -7984,10 +5697,10 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required for all methods except `create` (`create` populates the name
-        automatically.
-        The unique identifier of the entity type. Format:
-        `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`."##),
+                     Some(r##"The unique identifier of the entity type.
+        Required for EntityTypes.UpdateEntityType and
+        EntityTypes.BatchUpdateEntityTypes methods.
+        Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`."##),
                      Some(true),
                      Some(false)),
         
@@ -8134,10 +5847,13 @@ fn main() {
                      Some(r##"Required. The unique identifier of the context. Format:
         `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`,
         or `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-        ID>/sessions/<Session ID>/contexts/<Context ID>`. The `Context ID` is
-        always converted to lowercase. If `Environment ID` is not specified, we
-        assume default 'draft' environment. If `User ID` is not specified, we
-        assume default '-' user."##),
+        ID>/sessions/<Session ID>/contexts/<Context ID>`.
+        
+        The `Context ID` is always converted to lowercase, may only contain
+        characters in a-zA-Z0-9_-% and may be at most 250 bytes long.
+        
+        If `Environment ID` is not specified, we assume default 'draft'
+        environment. If `User ID` is not specified, we assume default '-' user."##),
                      Some(true),
                      Some(false)),
         
@@ -8382,8 +6098,7 @@ fn main() {
                     Some(r##"Exports the specified agent to a ZIP file.
         
         
-        Operation <response: ExportAgentResponse,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: ExportAgentResponse>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-export",
                   vec![
                     (Some(r##"parent"##),
@@ -8419,8 +6134,7 @@ fn main() {
         versions from ImportAgentRequest.
         
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-import",
                   vec![
                     (Some(r##"parent"##),
@@ -8616,9 +6330,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required for all methods except `create` (`create` populates the name
-        automatically.
-        The unique identifier of this intent.
+                     Some(r##"The unique identifier of this intent.
+        Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
+        methods.
         Format: `projects/<Project ID>/agent/intents/<Intent ID>`."##),
                      Some(true),
                      Some(false)),
@@ -8799,6 +6513,74 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("agent-knowledge-bases-documents-patch",
+                    Some(r##"Updates the specified document.
+        Operation <response: Document,
+                   metadata: KnowledgeOperationMetadata>"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-knowledge-bases-documents-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The document resource name.
+        The name must be empty when creating a document.
+        Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
+        ID>/documents/<Document ID>`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("agent-knowledge-bases-documents-reload",
+                    Some(r##"Reloads the specified document from its specified source, content_uri or
+        content. The previously loaded content of the document will be deleted.
+        Note: Even when the content of the document has not changed, there still
+        may be side effects because of internal implementation changes.
+        Operation <response: Document,
+                   metadata: KnowledgeOperationMetadata>"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-knowledge-bases-documents-reload",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the document to reload.
+        Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
+        ID>/documents/<Document ID>`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("agent-knowledge-bases-get",
                     Some(r##"Retrieves the specified knowledge base."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-knowledge-bases-get",
@@ -8845,6 +6627,36 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("agent-knowledge-bases-patch",
+                    Some(r##"Updates the specified knowledge base."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-knowledge-bases-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The knowledge base resource name.
+        The name must be empty when creating a knowledge base.
+        Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base ID>`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("agent-restore",
                     Some(r##"Restores the specified agent from a ZIP file.
         
@@ -8852,8 +6664,7 @@ fn main() {
         entity types in the older version are deleted.
         
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-restore",
                   vec![
                     (Some(r##"parent"##),
@@ -9035,10 +6846,13 @@ fn main() {
                      Some(r##"Required. The unique identifier of the context. Format:
         `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`,
         or `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-        ID>/sessions/<Session ID>/contexts/<Context ID>`. The `Context ID` is
-        always converted to lowercase. If `Environment ID` is not specified, we
-        assume default 'draft' environment. If `User ID` is not specified, we
-        assume default '-' user."##),
+        ID>/sessions/<Session ID>/contexts/<Context ID>`.
+        
+        The `Context ID` is always converted to lowercase, may only contain
+        characters in a-zA-Z0-9_-% and may be at most 250 bytes long.
+        
+        If `Environment ID` is not specified, we assume default 'draft'
+        environment. If `User ID` is not specified, we assume default '-' user."##),
                      Some(true),
                      Some(false)),
         
@@ -9283,8 +7097,7 @@ fn main() {
                     Some(r##"Trains the specified agent.
         
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-train",
                   vec![
                     (Some(r##"parent"##),
@@ -9312,650 +7125,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("conversation-profiles-create",
-                    Some(r##"Creates a conversation profile in the specified project."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversation-profiles-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The project to create a conversation profile for.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversation-profiles-delete",
-                    Some(r##"Deletes the specified conversation profile."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversation-profiles-delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The name of the conversation profile to delete.
-        Format: `projects/<Project ID>/conversationProfiles/<Conversation Profile
-        ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversation-profiles-get",
-                    Some(r##"Retrieves the specified conversation profile."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversation-profiles-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The resource name of the conversation profile.
-        Format: `projects/<Project ID>/conversationProfiles/<Conversation Profile
-        ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversation-profiles-list",
-                    Some(r##"Returns the list of all conversation profiles in the specified project."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversation-profiles-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The project to list all conversation profiles from.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversation-profiles-patch",
-                    Some(r##"Updates the specified conversation profile."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversation-profiles-patch",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required for all methods except `create` (`create` populates the name
-        automatically).
-        The unique identifier of this conversation profile.
-        Format: `projects/<Project ID>/conversationProfiles/<Conversation Profile
-        ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-add-conversation-phone-number",
-                    Some(r##"Sets a phone number for this converstion to connect to."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-add-conversation-phone-number",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of this conversation.
-        Format: `projects/<Project ID>/conversations/<Conversation ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-complete",
-                    Some(r##"Completes the specified conversation. Finished conversations are purged
-        from the database after 30 days."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-complete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. Resource identifier of the conversation to close.
-        Format: `projects/<Project ID>/conversations/<Conversation ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-create",
-                    Some(r##"Creates a new conversation. Conversation are auto-completed after 24 hours."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. Resource identifier of the project creating the conversation.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-get",
-                    Some(r##"Retrieves the specific conversation."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The name of the conversation. Format:
-        `projects/<Project ID>/conversations/<Conversation ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-list",
-                    Some(r##"Returns the list of all conversations in the specified project."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The project from which to list all conversation.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-messages-list",
-                    Some(r##"Lists messages that belong to a given conversation."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-messages-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The name of the conversation to list messages for.
-        Format: `projects/<Project ID>/conversations/<Conversation ID>`"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-participants-analyze-content",
-                    Some(r##"Adds a text (chat, for example), or audio (phone recording, for example)
-        message from a participan  into the conversation."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-analyze-content",
-                  vec![
-                    (Some(r##"participant"##),
-                     None,
-                     Some(r##"Required. The name of the participant this text comes from.
-        Format: `projects/<Project ID>/conversations/<Conversation
-        ID>/participants/<Participant ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-participants-create",
-                    Some(r##"Creates a new participant in a conversation."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. Resource identifier of the conversation adding the participant.
-        Format: `projects/<Project ID>/conversations/<Conversation ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-participants-get",
-                    Some(r##"Retrieves a conversation participant."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The name of the participant. Format:
-        `projects/<Project ID>/conversations/<Conversation
-        ID>/participants/<Participant ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-participants-list",
-                    Some(r##"Returns the list of all participants in the specified conversation."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The conversation to list all contexts from.
-        Format: `projects/<Project ID>/conversations/<Conversation ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-participants-streaming-analyze-content",
-                    Some(r##"Adds a text (chat, for example), or audio (phone recording, for example)
-        message from a participan  into the conversation.
-        Note: This method is only available through the gRPC API (not REST).
-        
-        The top-level message sent to the client by the server is
-        `StreamingAnalyzeContentResponse`. Multiple response messages can be
-        returned in order. The first one or more messages contain the
-        `recognition_result` field. Each result represents a more complete
-        transcript of what the user said. The next message contains the
-        `reply_text` field and potentially the `reply_audio` field. The message can
-        also contain the `automated_agent_reply` field."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-streaming-analyze-content",
-                  vec![
-                    (Some(r##"participant"##),
-                     None,
-                     Some(r##"Required. The name of the participant this text comes from.
-        Format: `projects/<Project ID>/conversations/<Conversation
-        ID>/participants/<Participant ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("conversations-participants-suggestions-list",
-                    Some(r##"Retrieves suggestions for live agents.
-        
-        This method should be used by human agent client software to fetch
-        suggestions in real-time, while the conversation with an end user is in
-        progress. The functionality is implemented in terms of the
-        [list pagination](/apis/design/design_patterns#list_pagination)
-        design pattern. The client app should use the `next_page_token` field
-        to fetch the next batch of suggestions."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-suggestions-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The name of the conversation participant for whom to fetch
-        suggestions.
-        Format: `projects/<Project ID>/conversations/<Conversation
-        ID>/participants/<Participant ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("environments-users-conversations-contexts-create",
-                    Some(r##"Creates a context.
-        
-        If the specified context already exists, overrides the context."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_environments-users-conversations-contexts-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The session to create a context for.
-        Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
-        `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-        ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
-        default 'draft' environment. If `User ID` is not specified, we assume
-        default '-' user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("environments-users-conversations-contexts-delete",
-                    Some(r##"Deletes the specified context."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_environments-users-conversations-contexts-delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The name of the context to delete. Format:
-        `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`
-        or `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-        ID>/sessions/<Session ID>/contexts/<Context ID>`. If `Environment ID` is
-        not specified, we assume default 'draft' environment. If `User ID` is not
-        specified, we assume default '-' user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("environments-users-conversations-contexts-get",
-                    Some(r##"Retrieves the specified context."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_environments-users-conversations-contexts-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The name of the context. Format:
-        `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`
-        or `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-        ID>/sessions/<Session ID>/contexts/<Context ID>`. If `Environment ID` is
-        not specified, we assume default 'draft' environment. If `User ID` is not
-        specified, we assume default '-' user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("environments-users-conversations-contexts-list",
-                    Some(r##"Returns the list of all contexts in the specified session."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_environments-users-conversations-contexts-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The session to list all contexts from.
-        Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
-        `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-        ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
-        default 'draft' environment. If `User ID` is not specified, we assume
-        default '-' user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("environments-users-conversations-contexts-patch",
-                    Some(r##"Updates the specified context."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_environments-users-conversations-contexts-patch",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of the context. Format:
-        `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`,
-        or `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-        ID>/sessions/<Session ID>/contexts/<Context ID>`. The `Context ID` is
-        always converted to lowercase. If `Environment ID` is not specified, we
-        assume default 'draft' environment. If `User ID` is not specified, we
-        assume default '-' user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("environments-users-conversations-delete-contexts",
-                    Some(r##"Deletes all active contexts in the specified session."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_environments-users-conversations-delete-contexts",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The name of the session to delete all contexts from. Format:
-        `projects/<Project ID>/agent/sessions/<Session ID>` or `projects/<Project
-        ID>/agent/environments/<Environment ID>/users/<User ID>/sessions/<Session
-        ID>`. If `Environment ID` is not specified we assume default 'draft'
-        environment. If `User ID` is not specified, we assume default '-' user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("get-agent",
                     Some(r##"Retrieves the specified agent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_get-agent",
@@ -9966,169 +7135,6 @@ fn main() {
         Format: `projects/<Project ID>`."##),
                      Some(true),
                      Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("human-agent-assistants-compile-suggestions",
-                    Some(r##"Uses the specified human agent assistant to come up with suggestions
-        (relevant articles and FAQs) on how to respond to a given conversation."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_human-agent-assistants-compile-suggestions",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The resource name of the agent assistant.
-        Format: `projects/<Project ID>/humanAgentAssistants/<Human Agent Assistant
-        ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("human-agent-assistants-create",
-                    Some(r##"Creates a human agent assistant."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_human-agent-assistants-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The project to create a agent assistant for.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("human-agent-assistants-delete",
-                    Some(r##"Deletes the specified human agent assistant."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_human-agent-assistants-delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The resource name of the agent assistant.
-        Format: `projects/<Project ID>/humanAgentAssistants/<Human Agent Assistant
-        ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("human-agent-assistants-get",
-                    Some(r##"Retrieves a human agent assistant."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_human-agent-assistants-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The resource name of the agent assistant.
-        Format: `projects/<Project ID>/humanAgentAssistants/<Human Agent Assistant
-        ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("human-agent-assistants-list",
-                    Some(r##"Returns the list of all human agent assistants."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_human-agent-assistants-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The project to list all agent assistants from.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("human-agent-assistants-patch",
-                    Some(r##"Updates the specified human agent assistant."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_human-agent-assistants-patch",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required for all methods except `create` (`create` populates the name
-        automatically).
-        The unique identifier of human agent assistant.
-        Format: `projects/<Project ID>/humanAgentAssistants/<Human Agent Assistant
-        ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -10300,6 +7306,74 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("knowledge-bases-documents-patch",
+                    Some(r##"Updates the specified document.
+        Operation <response: Document,
+                   metadata: KnowledgeOperationMetadata>"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_knowledge-bases-documents-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The document resource name.
+        The name must be empty when creating a document.
+        Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
+        ID>/documents/<Document ID>`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("knowledge-bases-documents-reload",
+                    Some(r##"Reloads the specified document from its specified source, content_uri or
+        content. The previously loaded content of the document will be deleted.
+        Note: Even when the content of the document has not changed, there still
+        may be side effects because of internal implementation changes.
+        Operation <response: Document,
+                   metadata: KnowledgeOperationMetadata>"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_knowledge-bases-documents-reload",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the document to reload.
+        Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
+        ID>/documents/<Document ID>`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("knowledge-bases-get",
                     Some(r##"Retrieves the specified knowledge base."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_knowledge-bases-get",
@@ -10346,6 +7420,36 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("knowledge-bases-patch",
+                    Some(r##"Updates the specified knowledge base."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_knowledge-bases-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The knowledge base resource name.
+        The name must be empty when creating a knowledge base.
+        Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base ID>`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("operations-get",
                     Some(r##"Gets the latest state of a long-running operation.  Clients can use this
         method to poll the operation result at intervals as recommended by the API
@@ -10370,265 +7474,14 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("phone-number-orders-cancel",
-                    Some(r##"Cancels an `PhoneNumberOrder`.
-        Returns an error if the order is in state
-        IN_PROGRESS or
-        COMPLETED."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-number-orders-cancel",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of the order to delete.
-        Format: `projects/<Project ID>/phoneNumberOrders/<Order ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-number-orders-create",
-                    Some(r##"Creates an order to request phone numbers be added to a project.
-        The initial `LifecycleState` of a newly created order is
-        PENDING."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-number-orders-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. Resource identifier of the project requesting the orders.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-number-orders-get",
-                    Some(r##"Returns a specific `PhoneNumberOrder`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-number-orders-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of the order to retrieve.
-        Format: `projects/<Project ID>/phoneNumberOrders/<Order ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-number-orders-list",
-                    Some(r##"Lists of all `PhoneNumberOrder` resources in the specified project."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-number-orders-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The project to list all orders from.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-number-orders-patch",
-                    Some(r##"Updates the specified `PhoneNumberOrder` resource.
-        Returns an error if the order is in state
-        IN_PROGRESS or
-        COMPLETED."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-number-orders-patch",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of this order.
-        Format: `projects/<Project ID>/phoneNumberOrders/<Order ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-numbers-delete",
-                    Some(r##"Requests deletion of a `PhoneNumber`. The `PhoneNumber` is moved into the
-        DELETE_REQUESTED state
-        immediately, and is deleted approximately 30 days later. This method may
-        only be called on a `PhoneNumber` in the
-        ACTIVE state."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-numbers-delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of the `PhoneNumber` to delete.
-        Format: `projects/<Project ID>/phoneNumbers/<PhoneNumber ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-numbers-list",
-                    Some(r##"Returns the list of all phone numbers in the specified project."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-numbers-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The project to list all `PhoneNumber` resources from.
-        Format: `projects/<Project ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-numbers-patch",
-                    Some(r##"Updates the specified `PhoneNumber`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-numbers-patch",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of this phone number.
-        Format: `projects/<Project ID>/phoneNumbers/<PhoneNumber ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("phone-numbers-undelete",
-                    Some(r##"Cancels the deletion request for a `PhoneNumber`. This method may only be
-        called on a `PhoneNumber` in the
-        DELETE_REQUESTED state."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_phone-numbers-undelete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of the `PhoneNumber` to delete.
-        Format: `projects/<Project ID>/phoneNumbers/<PhoneNumber ID>`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ]),
         
     ];
     
     let mut app = App::new("dialogflow2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181009")
-           .about("An end-to-end development suite for conversational interfaces (e.g., chatbots, voice-powered apps and devices).")
+           .version("1.0.8+20190402")
+           .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

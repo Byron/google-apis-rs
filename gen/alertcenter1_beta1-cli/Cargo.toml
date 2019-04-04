@@ -4,7 +4,7 @@
 [package]
 
 name = "google-alertcenter1_beta1-cli"
-version = "1.0.8+20181011"
+version = "1.0.8+20190329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AlertCenter (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/alertcenter1_beta1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-alertcenter1_beta1]
 path = "../alertcenter1_beta1"
-version = "1.0.8+20181011"
+version = "1.0.8+20190329"

@@ -1,4 +1,4 @@
-site_name: Spanner v1.0.8+20180920
+site_name: Spanner v1.0.8+20190312
 site_url: http://byron.github.io/google-apis-rs/google-spanner1-cli
 site_description: A complete library to interact with Spanner (protocol v1)
 
@@ -26,6 +26,7 @@ pages:
 - ['projects_instances-databases-sessions-commit.md', 'Projects', 'Instances Databases Sessions Commit']
 - ['projects_instances-databases-sessions-create.md', 'Projects', 'Instances Databases Sessions Create']
 - ['projects_instances-databases-sessions-delete.md', 'Projects', 'Instances Databases Sessions Delete']
+- ['projects_instances-databases-sessions-execute-batch-dml.md', 'Projects', 'Instances Databases Sessions Execute Batch Dml']
 - ['projects_instances-databases-sessions-execute-sql.md', 'Projects', 'Instances Databases Sessions Execute Sql']
 - ['projects_instances-databases-sessions-execute-streaming-sql.md', 'Projects', 'Instances Databases Sessions Execute Streaming Sql']
 - ['projects_instances-databases-sessions-get.md', 'Projects', 'Instances Databases Sessions Get']

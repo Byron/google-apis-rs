@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Debugger* crate version *1.0.8+20180925*, where *20180925* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Debugger* crate version *1.0.8+20190313*, where *20190313* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Debugger* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/debugger).
@@ -448,14 +448,14 @@ impl Part for CloudWorkspaceSourceContext {}
 pub struct StackFrame {
     /// Demangled function name at the call site.
     pub function: Option<String>,
-    /// Source location of the call site.
-    pub location: Option<SourceLocation>,
-    /// Set of local variables at the stack frame location.
-    /// Note that this might not be populated for all stack frames.
-    pub locals: Option<Vec<Variable>>,
     /// Set of arguments passed to this function.
     /// Note that this might not be populated for all stack frames.
     pub arguments: Option<Vec<Variable>>,
+    /// Set of local variables at the stack frame location.
+    /// Note that this might not be populated for all stack frames.
+    pub locals: Option<Vec<Variable>>,
+    /// Source location of the call site.
+    pub location: Option<SourceLocation>,
 }
 
 impl Part for StackFrame {}
@@ -682,7 +682,7 @@ impl Part for GerritSourceContext {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegisterDebuggeeResponse {
     /// Debuggee resource.
-    /// The field `id` is guranteed to be set (in addition to the echoed fields).
+    /// The field `id` is guaranteed to be set (in addition to the echoed fields).
     /// If the field `is_disabled` is set to `true`, the agent should disable
     /// itself by removing all breakpoints and detaching from the application.
     /// It should however continue to poll `RegisterDebuggee` until reenabled.
@@ -778,10 +778,10 @@ pub struct Debuggee {
     /// A set of custom debuggee properties, populated by the agent, to be
     /// displayed to the user.
     pub labels: Option<HashMap<String, String>>,
-    /// Uniquifier to further distiguish the application.
+    /// Uniquifier to further distinguish the application.
     /// It is possible that different applications might have identical values in
     /// the debuggee message, thus, incorrectly identified as a single application
-    /// by the Controller service. This field adds salt to further distiguish the
+    /// by the Controller service. This field adds salt to further distinguish the
     /// application. Agents should consider seeding this field with value that
     /// identifies the code, binary, configuration and environment.
     pub uniquifier: Option<String>,
@@ -861,12 +861,12 @@ impl Part for GitSourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudWorkspaceId {
-    /// The ID of the repo containing the workspace.
-    #[serde(rename="repoId")]
-    pub repo_id: Option<RepoId>,
     /// The unique name of the workspace within the repo.  This is the name
     /// chosen by the client in the Source API's CreateWorkspace method.
     pub name: Option<String>,
+    /// The ID of the repo containing the workspace.
+    #[serde(rename="repoId")]
+    pub repo_id: Option<RepoId>,
 }
 
 impl Part for CloudWorkspaceId {}
@@ -1162,14 +1162,14 @@ impl ResponseResult for SetBreakpointResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StatusMessage {
-    /// Distinguishes errors from informational messages.
-    #[serde(rename="isError")]
-    pub is_error: Option<bool>,
+    /// Status message text.
+    pub description: Option<FormatMessage>,
     /// Reference to which the message applies.
     #[serde(rename="refersTo")]
     pub refers_to: Option<String>,
-    /// Status message text.
-    pub description: Option<FormatMessage>,
+    /// Distinguishes errors from informational messages.
+    #[serde(rename="isError")]
+    pub is_error: Option<bool>,
 }
 
 impl Part for StatusMessage {}
@@ -1586,10 +1586,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1621,7 +1618,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1721,7 +1718,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1860,10 +1857,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1895,7 +1889,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1975,7 +1969,7 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2143,10 +2137,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2166,7 +2157,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2266,7 +2257,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2419,10 +2410,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2442,7 +2430,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2538,7 +2526,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2691,10 +2679,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2714,7 +2699,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2810,7 +2795,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2948,10 +2933,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2971,7 +2953,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3062,7 +3044,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3220,10 +3202,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3255,7 +3234,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3353,7 +3332,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3529,10 +3508,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3552,7 +3528,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3680,7 +3656,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

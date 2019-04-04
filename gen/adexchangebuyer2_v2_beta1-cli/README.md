@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdExchangeBuyerII* API at revision *20181011*. The CLI is at version *1.0.8*.
+This documentation was generated from the *AdExchangeBuyerII* API at revision *20190403*. The CLI is at version *1.0.8*.
 
 ```bash
 adexchangebuyer2-v2-beta1 [options]

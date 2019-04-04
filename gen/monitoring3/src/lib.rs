@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Monitoring* crate version *1.0.8+20181009*, where *20181009* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Monitoring* crate version *1.0.8+20190331*, where *20190331* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Monitoring* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/api/).
@@ -234,14 +234,14 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// Publish metric data to your Google Cloud projects
-    Write,
+    /// View monitoring data for all of your Google Cloud and third-party projects
+    Read,
 
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
 
-    /// View monitoring data for all of your Google Cloud and third-party projects
-    Read,
+    /// Publish metric data to your Google Cloud projects
+    Write,
 
     /// View and write monitoring data for all of your Google and third-party Cloud and API projects
     Full,
@@ -250,9 +250,9 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::Write => "https://www.googleapis.com/auth/monitoring.write",
-            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::Read => "https://www.googleapis.com/auth/monitoring.read",
+            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::Write => "https://www.googleapis.com/auth/monitoring.write",
             Scope::Full => "https://www.googleapis.com/auth/monitoring",
         }
     }
@@ -461,29 +461,29 @@ impl RequestValue for Group {}
 impl ResponseResult for Group {}
 
 
-/// A collection of data points that describes the time-varying values of a metric. A time series is identified by a combination of a fully-specified monitored resource and a fully-specified metric. This type is used for both listing and creating time series.
+/// The protocol for the ListUptimeCheckConfigs response.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [uptime check configs list projects](struct.ProjectUptimeCheckConfigListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TimeSeries {
-    /// The data points of this time series. When listing time series, points are returned in reverse time order.When creating a time series, this field must contain exactly one point and the point's type must be the same as the value type of the associated metric. If the associated metric's descriptor must be auto-created, then the value type of the descriptor is determined by the point's type, which must be BOOL, INT64, DOUBLE, or DISTRIBUTION.
-    pub points: Option<Vec<Point>>,
-    /// The associated monitored resource. Custom metrics can use only certain monitored resource types in their time series data.
-    pub resource: Option<MonitoredResource>,
-    /// The metric kind of the time series. When listing time series, this metric kind might be different from the metric kind of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the metric kind of the associated metric. If the associated metric's descriptor must be auto-created, then this field specifies the metric kind of the new descriptor and must be either GAUGE (the default) or CUMULATIVE.
-    #[serde(rename="metricKind")]
-    pub metric_kind: Option<String>,
-    /// The value type of the time series. When listing time series, this value type might be different from the value type of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the type of the data in the points field.
-    #[serde(rename="valueType")]
-    pub value_type: Option<String>,
-    /// The associated metric. A fully-specified metric used to identify the time series.
-    pub metric: Option<Metric>,
-    /// Output only. The associated monitored resource metadata. When reading a a timeseries, this field will include metadata labels that are explicitly named in the reduction. When creating a timeseries, this field is ignored.
-    pub metadata: Option<MonitoredResourceMetadata>,
+pub struct ListUptimeCheckConfigsResponse {
+    /// This field represents the pagination token to retrieve the next page of results. If the value is empty, it means no further results for the request. To retrieve the next page of results, the value of the next_page_token is passed to the subsequent List method call (in the request message's page_token field).
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The total number of uptime check configurations for the project, irrespective of any pagination.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
+    /// The returned uptime check configurations.
+    #[serde(rename="uptimeCheckConfigs")]
+    pub uptime_check_configs: Option<Vec<UptimeCheckConfig>>,
 }
 
-impl Part for TimeSeries {}
+impl ResponseResult for ListUptimeCheckConfigsResponse {}
 
 
 /// BucketOptions describes the bucket boundaries used to create a histogram for the distribution. The buckets can be in a linear sequence, an exponential sequence, or each bucket can be specified explicitly. BucketOptions does not include the number of values in each bucket.A bucket has an inclusive lower bound and exclusive upper bound for the values that are counted for that bucket. The upper bound of a bucket must be strictly greater than the lower bound. The sequence of N buckets for a distribution consists of an underflow bucket (number 0), zero or more finite buckets (number 1 through N - 2) and an overflow bucket (number N - 1). The buckets are contiguous: the lower bound of bucket i (i > 0) is the same as the upper bound of bucket i - 1. The buckets span the whole range of finite values: lower bound of the underflow bucket is -infinity and the upper bound of the overflow bucket is +infinity. The finite buckets are so-called because both bounds are finite.
@@ -573,32 +573,29 @@ impl Part for CollectdValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UptimeCheckConfig {
-    /// The group resource associated with the configuration.
-    #[serde(rename="resourceGroup")]
-    pub resource_group: Option<ResourceGroup>,
+    /// The monitored resource (https://cloud.google.com/monitoring/api/resources) associated with the configuration. The following monitored resource types are supported for uptime checks:  uptime_url  gce_instance  gae_app  aws_ec2_instance  aws_elb_load_balancer
+    #[serde(rename="monitoredResource")]
+    pub monitored_resource: Option<MonitoredResource>,
     /// A human-friendly name for the uptime check configuration. The display name should be unique within a Stackdriver Workspace in order to make it easier to identify; however, uniqueness is not enforced. Required.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// A unique resource name for this UptimeCheckConfig. The format is:projects/[PROJECT_ID]/uptimeCheckConfigs/[UPTIME_CHECK_ID].This field should be omitted when creating the uptime check configuration; on create, the resource name is assigned by the server and included in the response.
     pub name: Option<String>,
-    /// Denotes whether this is a check that egresses from InternalCheckers.
-    #[serde(rename="isInternal")]
-    pub is_internal: Option<bool>,
     /// Contains information needed to make a TCP check.
     #[serde(rename="tcpCheck")]
     pub tcp_check: Option<TcpCheck>,
-    /// How often, in seconds, the uptime check is performed. Currently, the only supported values are 60s (1 minute), 300s (5 minutes), 600s (10 minutes), and 900s (15 minutes). Optional, defaults to 300s.
-    pub period: Option<String>,
-    /// The list of regions from which the check will be run. If this field is specified, enough regions to include a minimum of 3 locations must be provided, or an error message is returned. Not specifying this field will result in uptime checks running from all regions.
+    /// The list of regions from which the check will be run. Some regions contain one location, and others contain more than one. If this field is specified, enough regions to include a minimum of 3 locations must be provided, or an error message is returned. Not specifying this field will result in uptime checks running from all regions.
     #[serde(rename="selectedRegions")]
     pub selected_regions: Option<Vec<String>>,
-    /// The monitored resource (https://cloud.google.com/monitoring/api/resources) associated with the configuration. The following monitored resource types are supported for uptime checks:  uptime_url  gce_instance  gae_app  aws_ec2_instance  aws_elb_load_balancer
-    #[serde(rename="monitoredResource")]
-    pub monitored_resource: Option<MonitoredResource>,
+    /// How often, in seconds, the uptime check is performed. Currently, the only supported values are 60s (1 minute), 300s (5 minutes), 600s (10 minutes), and 900s (15 minutes). Optional, defaults to 60s.
+    pub period: Option<String>,
+    /// The group resource associated with the configuration.
+    #[serde(rename="resourceGroup")]
+    pub resource_group: Option<ResourceGroup>,
     /// Contains information needed to make an HTTP or HTTPS check.
     #[serde(rename="httpCheck")]
     pub http_check: Option<HttpCheck>,
-    /// The internal checkers that this check will egress from. If is_internal is true and this list is empty, the check will egress from all InternalCheckers configured for the project that owns this CheckConfig.
+    /// The internal checkers that this check will egress from. If is_internal is true and this list is empty, the check will egress from all the InternalCheckers configured for the project that owns this CheckConfig.
     #[serde(rename="internalCheckers")]
     pub internal_checkers: Option<Vec<InternalChecker>>,
     /// The maximum amount of time to wait for the request to complete (must be between 1 and 60 seconds). Required.
@@ -630,6 +627,36 @@ pub struct MetricDescriptorMetadata {
 }
 
 impl Part for MetricDescriptorMetadata {}
+
+
+/// Distribution contains summary statistics for a population of values. It optionally contains a histogram representing the distribution of those values across a set of buckets.The summary statistics are the count, mean, sum of the squared deviation from the mean, the minimum, and the maximum of the set of population of values. The histogram is based on a sequence of buckets and gives a count of values that fall into each bucket. The boundaries of the buckets are given either explicitly or by formulas for buckets of fixed or exponentially increasing widths.Although it is not forbidden, it is generally a bad idea to include non-finite values (infinities or NaNs) in the population of values, as this will render the mean and sum_of_squared_deviation fields meaningless.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Distribution {
+    /// The number of values in the population. Must be non-negative. This value must equal the sum of the values in bucket_counts if a histogram is provided.
+    pub count: Option<String>,
+    /// Required in the Stackdriver Monitoring API v3. The values for each bucket specified in bucket_options. The sum of the values in bucketCounts must equal the value in the count field of the Distribution object. The order of the bucket counts follows the numbering schemes described for the three bucket types. The underflow bucket has number 0; the finite buckets, if any, have numbers 1 through N-2; and the overflow bucket has number N-1. The size of bucket_counts must not be greater than N. If the size is less than N, then the remaining buckets are assigned values of zero.
+    #[serde(rename="bucketCounts")]
+    pub bucket_counts: Option<Vec<i64>>,
+    /// The sum of squared deviations from the mean of the values in the population. For values x_i this is:
+    /// Sum[i=1..n]((x_i - mean)^2)
+    /// Knuth, "The Art of Computer Programming", Vol. 2, page 323, 3rd edition describes Welford's method for accumulating this sum in one pass.If count is zero then this field must be zero.
+    #[serde(rename="sumOfSquaredDeviation")]
+    pub sum_of_squared_deviation: Option<f64>,
+    /// If specified, contains the range of the population values. The field must not be present if the count is zero. This field is presently ignored by the Stackdriver Monitoring API v3.
+    pub range: Option<Range>,
+    /// Required in the Stackdriver Monitoring API v3. Defines the histogram bucket boundaries.
+    #[serde(rename="bucketOptions")]
+    pub bucket_options: Option<BucketOptions>,
+    /// Must be in increasing order of value field.
+    pub exemplars: Option<Vec<Exemplar>>,
+    /// The arithmetic mean of the values in the population. If count is zero then this field must be zero.
+    pub mean: Option<f64>,
+}
+
+impl Part for Distribution {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance:
@@ -720,10 +747,10 @@ impl Part for Linear {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricAbsence {
-    /// A filter that identifies which time series should be compared with the threshold.The filter is similar to the one that is specified in the MetricService.ListTimeSeries request (that call is useful to verify the time series that will be retrieved / processed) and must specify the metric type and optionally may contain restrictions on resource type, resource labels, and metric labels. This field may not exceed 2048 Unicode characters in length.
-    pub filter: Option<String>,
     /// The amount of time that a time series must fail to report new data to be considered failing. Currently, only values that are a multiple of a minute--e.g. 60, 120, or 300 seconds--are supported. If an invalid value is given, an error will be returned. The Duration.nanos field is ignored.
     pub duration: Option<String>,
+    /// A filter that identifies which time series should be compared with the threshold.The filter is similar to the one that is specified in the MetricService.ListTimeSeries request (that call is useful to verify the time series that will be retrieved / processed) and must specify the metric type and optionally may contain restrictions on resource type, resource labels, and metric labels. This field may not exceed 2048 Unicode characters in length.
+    pub filter: Option<String>,
     /// The number/percent of time series for which the comparison must hold in order for the condition to trigger. If unspecified, then the condition will trigger if the comparison is true for any of the time series that have been identified by filter and aggregations.
     pub trigger: Option<Trigger>,
     /// Specifies the alignment of data points in individual time series as well as how to combine the retrieved time series together (such as when aggregating multiple streams on each resource to a single stream for each resource or when aggregating streams across all members of a group of resrouces). Multiple aggregations are applied in the order specified.This field is similar to the one in the MetricService.ListTimeSeries request. It is advisable to use the ListTimeSeries method when debugging this field.
@@ -739,15 +766,15 @@ impl Part for MetricAbsence {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Aggregation {
-    /// The approach to be used to align individual time series. Not all alignment functions may be applied to all time series, depending on the metric type and value type of the original time series. Alignment may change the metric type or the value type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If crossSeriesReducer is specified, then perSeriesAligner must be specified and not equal ALIGN_NONE and alignmentPeriod must be specified; otherwise, an error is returned.
-    #[serde(rename="perSeriesAligner")]
-    pub per_series_aligner: Option<String>,
-    /// The alignment period for per-time series alignment. If present, alignmentPeriod must be at least 60 seconds. After per-time series alignment, each time series will contain data points only on the period boundaries. If perSeriesAligner is not specified or equals ALIGN_NONE, then this field is ignored. If perSeriesAligner is specified and does not equal ALIGN_NONE, then this field must be defined; otherwise an error is returned.
-    #[serde(rename="alignmentPeriod")]
-    pub alignment_period: Option<String>,
     /// The set of fields to preserve when crossSeriesReducer is specified. The groupByFields determine how the time series are partitioned into subsets prior to applying the aggregation function. Each subset contains time series that have the same value for each of the grouping fields. Each individual time series is a member of exactly one subset. The crossSeriesReducer is applied to each subset of time series. It is not possible to reduce across different resource types, so this field implicitly contains resource.type. Fields not specified in groupByFields are aggregated away. If groupByFields is not specified and all the time series have the same resource type, then the time series are aggregated into a single output time series. If crossSeriesReducer is not defined, this field is ignored.
     #[serde(rename="groupByFields")]
     pub group_by_fields: Option<Vec<String>>,
+    /// The alignment period for per-time series alignment. If present, alignmentPeriod must be at least 60 seconds. After per-time series alignment, each time series will contain data points only on the period boundaries. If perSeriesAligner is not specified or equals ALIGN_NONE, then this field is ignored. If perSeriesAligner is specified and does not equal ALIGN_NONE, then this field must be defined; otherwise an error is returned.
+    #[serde(rename="alignmentPeriod")]
+    pub alignment_period: Option<String>,
+    /// The approach to be used to align individual time series. Not all alignment functions may be applied to all time series, depending on the metric type and value type of the original time series. Alignment may change the metric type or the value type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If crossSeriesReducer is specified, then perSeriesAligner must be specified and not equal ALIGN_NONE and alignmentPeriod must be specified; otherwise, an error is returned.
+    #[serde(rename="perSeriesAligner")]
+    pub per_series_aligner: Option<String>,
     /// The approach to be used to combine time series. Not all reducer functions may be applied to all time series, depending on the metric type and the value type of the original time series. Reduction may change the metric type of value type of the time series.Time series data must be aligned in order to perform cross-time series reduction. If crossSeriesReducer is specified, then perSeriesAligner must be specified and not equal ALIGN_NONE and alignmentPeriod must be specified; otherwise, an error is returned.
     #[serde(rename="crossSeriesReducer")]
     pub cross_series_reducer: Option<String>,
@@ -773,7 +800,7 @@ pub struct NotificationChannel {
     /// An optional human-readable name for this notification channel. It is recommended that you specify a non-empty and unique name in order to make it easier to identify the channels in your project, though this is not enforced. The display name is limited to 512 Unicode characters.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// An optional human-readable description of this notification channel. This description may provide additional details, beyond the display name, for the channel. This may not exceeed 1024 Unicode characters.
+    /// An optional human-readable description of this notification channel. This description may provide additional details, beyond the display name, for the channel. This may not exceed 1024 Unicode characters.
     pub description: Option<String>,
     /// Configuration fields that define the channel and its behavior. The permissible and required labels are specified in the NotificationChannelDescriptor.labels of the NotificationChannelDescriptor corresponding to the type field.
     pub labels: Option<HashMap<String, String>>,
@@ -827,6 +854,9 @@ pub struct AlertPolicy {
     pub documentation: Option<Documentation>,
     /// Whether or not the policy is enabled. On write, the default interpretation if unset is that the policy is enabled. On read, clients should not make any assumption about the state if it has not been populated. The field should always be populated on List and Get operations, unless a field projection has been specified that strips it out.
     pub enabled: Option<bool>,
+    /// A read-only record of the most recent change to the alerting policy. If provided in a call to create or update, this field will be ignored.
+    #[serde(rename="mutationRecord")]
+    pub mutation_record: Option<MutationRecord>,
     /// User-supplied key/value data to be used for organizing and identifying the AlertPolicy objects.The field can contain up to 64 entries. Each key and value is limited to 63 Unicode characters or 128 bytes, whichever is smaller. Labels and values can contain only lowercase letters, numerals, underscores, and dashes. Keys must begin with a letter.
     #[serde(rename="userLabels")]
     pub user_labels: Option<HashMap<String, String>>,
@@ -835,9 +865,6 @@ pub struct AlertPolicy {
     /// 
     #[serde(rename="notificationChannels")]
     pub notification_channels: Option<Vec<String>>,
-    /// A read-only record of the most recent change to the alerting policy. If provided in a call to create or update, this field will be ignored.
-    #[serde(rename="mutationRecord")]
-    pub mutation_record: Option<MutationRecord>,
     /// A list of conditions for the policy. The conditions are combined by AND or OR according to the combiner field. If the combined conditions evaluate to true, then an incident is created. A policy can have from one to six conditions.
     pub conditions: Option<Vec<Condition>>,
 }
@@ -870,7 +897,7 @@ pub struct Condition {
 impl Part for Condition {}
 
 
-/// A time interval extending just after a start time through an end time. If the start time is the same as the end time, then the interval represents a single point in time.
+/// A time interval extending just after a start time through an end time. The start time must not be later than the end time. The default start time is the end time, making the startTime value technically optional. Whether this is useful depends on the MetricKind. If the start and end times are the same, the interval represents a point in time. This is appropriate for GAUGE metrics, but not for DELTA and CUMULATIVE metrics, which cover a span of time.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1141,12 +1168,12 @@ impl Part for MetricThreshold {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListUptimeCheckIpsResponse {
-    /// The returned list of IP addresses (including region and location) that the checkers run from.
-    #[serde(rename="uptimeCheckIps")]
-    pub uptime_check_ips: Option<Vec<UptimeCheckIp>>,
     /// This field represents the pagination token to retrieve the next page of results. If the value is empty, it means no further results for the request. To retrieve the next page of results, the value of the next_page_token is passed to the subsequent List method call (in the request message's page_token field). NOTE: this field is not yet implemented
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The returned list of IP addresses (including region and location) that the checkers run from.
+    #[serde(rename="uptimeCheckIps")]
+    pub uptime_check_ips: Option<Vec<UptimeCheckIp>>,
 }
 
 impl ResponseResult for ListUptimeCheckIpsResponse {}
@@ -1453,10 +1480,10 @@ pub struct MonitoredResourceDescriptor {
     /// Required. The monitored resource type. For example, the type "cloudsql_database" represents databases in Google Cloud SQL. The maximum length of this value is 256 characters.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Optional. The resource name of the monitored resource descriptor: "projects/{project_id}/monitoredResourceDescriptors/{type}" where {type} is the value of the type field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format "monitoredResourceDescriptors/{type}".
-    pub name: Option<String>,
     /// Optional. A detailed description of the monitored resource type that might be used in documentation.
     pub description: Option<String>,
+    /// Optional. The resource name of the monitored resource descriptor: "projects/{project_id}/monitoredResourceDescriptors/{type}" where {type} is the value of the type field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format "monitoredResourceDescriptors/{type}".
+    pub name: Option<String>,
 }
 
 impl ResponseResult for MonitoredResourceDescriptor {}
@@ -1538,11 +1565,11 @@ impl ResponseResult for ListNotificationChannelDescriptorsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Documentation {
+    /// The text of the documentation, interpreted according to mime_type. The content may not exceed 8,192 Unicode characters and may not exceed more than 10,240 bytes when encoded in UTF-8 format, whichever is smaller.
+    pub content: Option<String>,
     /// The format of the content field. Presently, only the value "text/markdown" is supported. See Markdown (https://en.wikipedia.org/wiki/Markdown) for more information.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
-    /// The text of the documentation, interpreted according to mime_type. The content may not exceed 8,192 Unicode characters and may not exceed more than 10,240 bytes when encoded in UTF-8 format, whichever is smaller.
-    pub content: Option<String>,
 }
 
 impl Part for Documentation {}
@@ -1565,7 +1592,7 @@ pub struct HttpCheck {
     /// Boolean specifiying whether to encrypt the header information. Encryption should be specified for any headers related to authentication that you do not wish to be seen when retrieving the configuration. The server will be responsible for encrypting the headers. On Get/List calls, if mask_headers is set to True then the headers will be obscured with ******.
     #[serde(rename="maskHeaders")]
     pub mask_headers: Option<bool>,
-    /// The path to the page to run the check against. Will be combined with the host (specified within the MonitoredResource) and port to construct the full URL. Optional (defaults to "/").
+    /// The path to the page to run the check against. Will be combined with the host (specified within the MonitoredResource) and port to construct the full URL. Optional (defaults to "/"). If the provided path does not begin with "/", it will be prepended automatically.
     pub path: Option<String>,
     /// The port to the page to run the check against. Will be combined with host (specified within the MonitoredResource) and path to construct the full URL. Optional (defaults to 80 without SSL, or 443 with SSL).
     pub port: Option<i32>,
@@ -1597,7 +1624,7 @@ impl Part for Range {}
 pub struct Exemplar {
     /// The observation (sampling) time of the above value.
     pub timestamp: Option<String>,
-    /// Contextual information about the example value. Examples are:Trace ID: type.googleapis.com/google.devtools.cloudtrace.v1.TraceLiteral string: type.googleapis.com/google.protobuf.StringValueLabels dropped during aggregation:  type.googleapis.com/google.monitoring.v3.DroppedLabelsThere may be only a single attachment of any given message type in a single exemplar, and this is enforced by the system.
+    /// Contextual information about the example value. Examples are:Trace: type.googleapis.com/google.monitoring.v3.SpanContextLiteral string: type.googleapis.com/google.protobuf.StringValueLabels dropped during aggregation:  type.googleapis.com/google.monitoring.v3.DroppedLabelsThere may be only a single attachment of any given message type in a single exemplar, and this is enforced by the system.
     pub attachments: Option<Vec<HashMap<String, String>>>,
     /// Value of the exemplar point. This value determines to which bucket the exemplar belongs.
     pub value: Option<f64>,
@@ -1606,59 +1633,29 @@ pub struct Exemplar {
 impl Part for Exemplar {}
 
 
-/// The protocol for the ListUptimeCheckConfigs response.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [uptime check configs list projects](struct.ProjectUptimeCheckConfigListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListUptimeCheckConfigsResponse {
-    /// This field represents the pagination token to retrieve the next page of results. If the value is empty, it means no further results for the request. To retrieve the next page of results, the value of the next_page_token is passed to the subsequent List method call (in the request message's page_token field).
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The total number of uptime check configurations for the project, irrespective of any pagination.
-    #[serde(rename="totalSize")]
-    pub total_size: Option<i32>,
-    /// The returned uptime check configurations.
-    #[serde(rename="uptimeCheckConfigs")]
-    pub uptime_check_configs: Option<Vec<UptimeCheckConfig>>,
-}
-
-impl ResponseResult for ListUptimeCheckConfigsResponse {}
-
-
-/// Distribution contains summary statistics for a population of values. It optionally contains a histogram representing the distribution of those values across a set of buckets.The summary statistics are the count, mean, sum of the squared deviation from the mean, the minimum, and the maximum of the set of population of values. The histogram is based on a sequence of buckets and gives a count of values that fall into each bucket. The boundaries of the buckets are given either explicitly or by formulas for buckets of fixed or exponentially increasing widths.Although it is not forbidden, it is generally a bad idea to include non-finite values (infinities or NaNs) in the population of values, as this will render the mean and sum_of_squared_deviation fields meaningless.
+/// A collection of data points that describes the time-varying values of a metric. A time series is identified by a combination of a fully-specified monitored resource and a fully-specified metric. This type is used for both listing and creating time series.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Distribution {
-    /// The number of values in the population. Must be non-negative. This value must equal the sum of the values in bucket_counts if a histogram is provided.
-    pub count: Option<String>,
-    /// Required in the Stackdriver Monitoring API v3. The values for each bucket specified in bucket_options. The sum of the values in bucketCounts must equal the value in the count field of the Distribution object. The order of the bucket counts follows the numbering schemes described for the three bucket types. The underflow bucket has number 0; the finite buckets, if any, have numbers 1 through N-2; and the overflow bucket has number N-1. The size of bucket_counts must not be greater than N. If the size is less than N, then the remaining buckets are assigned values of zero.
-    #[serde(rename="bucketCounts")]
-    pub bucket_counts: Option<Vec<i64>>,
-    /// The sum of squared deviations from the mean of the values in the population. For values x_i this is:
-    /// Sum[i=1..n]((x_i - mean)^2)
-    /// Knuth, "The Art of Computer Programming", Vol. 2, page 323, 3rd edition describes Welford's method for accumulating this sum in one pass.If count is zero then this field must be zero.
-    #[serde(rename="sumOfSquaredDeviation")]
-    pub sum_of_squared_deviation: Option<f64>,
-    /// If specified, contains the range of the population values. The field must not be present if the count is zero. This field is presently ignored by the Stackdriver Monitoring API v3.
-    pub range: Option<Range>,
-    /// Required in the Stackdriver Monitoring API v3. Defines the histogram bucket boundaries.
-    #[serde(rename="bucketOptions")]
-    pub bucket_options: Option<BucketOptions>,
-    /// Must be in increasing order of value field.
-    pub exemplars: Option<Vec<Exemplar>>,
-    /// The arithmetic mean of the values in the population. If count is zero then this field must be zero.
-    pub mean: Option<f64>,
+pub struct TimeSeries {
+    /// The data points of this time series. When listing time series, points are returned in reverse time order.When creating a time series, this field must contain exactly one point and the point's type must be the same as the value type of the associated metric. If the associated metric's descriptor must be auto-created, then the value type of the descriptor is determined by the point's type, which must be BOOL, INT64, DOUBLE, or DISTRIBUTION.
+    pub points: Option<Vec<Point>>,
+    /// The associated monitored resource. Custom metrics can use only certain monitored resource types in their time series data.
+    pub resource: Option<MonitoredResource>,
+    /// The metric kind of the time series. When listing time series, this metric kind might be different from the metric kind of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the metric kind of the associated metric. If the associated metric's descriptor must be auto-created, then this field specifies the metric kind of the new descriptor and must be either GAUGE (the default) or CUMULATIVE.
+    #[serde(rename="metricKind")]
+    pub metric_kind: Option<String>,
+    /// The associated metric. A fully-specified metric used to identify the time series.
+    pub metric: Option<Metric>,
+    /// The value type of the time series. When listing time series, this value type might be different from the value type of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the type of the data in the points field.
+    #[serde(rename="valueType")]
+    pub value_type: Option<String>,
+    /// Output only. The associated monitored resource metadata. When reading a a timeseries, this field will include metadata labels that are explicitly named in the reduction. When creating a timeseries, this field is ignored.
+    pub metadata: Option<MonitoredResourceMetadata>,
 }
 
-impl Part for Distribution {}
+impl Part for TimeSeries {}
 
 
 /// A type of authentication to perform against the specified resource or URL that uses username and password. Currently, only Basic authentication is supported in Uptime Monitoring.
@@ -1694,19 +1691,24 @@ pub struct LabelDescriptor {
 impl Part for LabelDescriptor {}
 
 
-/// Nimbus InternalCheckers. The API currently only allows reading of internal checkers, creation of internal checkers is a manual process.
+/// An internal checker allows uptime checks to run on private/internal GCP resources.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InternalChecker {
+    /// The current operational state of the internal checker.
+    pub state: Option<String>,
     /// The checker's human-readable name. The display name should be unique within a Stackdriver Workspace in order to make it easier to identify; however, uniqueness is not enforced.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// The GCP VPC network (https://cloud.google.com/vpc/docs/vpc) where the internal resource lives (ex: "default").
     pub network: Option<String>,
-    /// A unique resource name for this InternalChecker. The format is:projects/[PROJECT_ID]/internalCheckers/[CHECKER_ID].PROJECT_ID is the GCP project ID where the internal resource lives. Not necessarily the same as the project_id for the config.
+    /// A unique resource name for this InternalChecker. The format is:projects/[PROJECT_ID]/internalCheckers/[INTERNAL_CHECKER_ID].PROJECT_ID is the stackdriver workspace project for the uptime check config associated with the internal checker.
     pub name: Option<String>,
+    /// The GCP project_id where the internal checker lives. Not necessary the same as the workspace project.
+    #[serde(rename="peerProjectId")]
+    pub peer_project_id: Option<String>,
     /// The GCP zone the uptime check should egress from. Only respected for internal uptime checks, where internal_network is specified.
     #[serde(rename="gcpZone")]
     pub gcp_zone: Option<String>,
@@ -1772,7 +1774,7 @@ impl Part for Metric {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateTimeSeriesRequest {
-    /// The new data to be added to a list of time series. Adds at most one data point to each of several time series. The new data point must be more recent than any other point in its time series. Each TimeSeries value must fully specify a unique time series by supplying all label values for the metric and the monitored resource.
+    /// The new data to be added to a list of time series. Adds at most one data point to each of several time series. The new data point must be more recent than any other point in its time series. Each TimeSeries value must fully specify a unique time series by supplying all label values for the metric and the monitored resource.The maximum number of TimeSeries objects per Create request is 200.
     #[serde(rename="timeSeries")]
     pub time_series: Option<Vec<TimeSeries>>,
 }
@@ -1901,13 +1903,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single metric descriptor. This method does not require a Stackdriver account.
+    /// Gets a single notification channel. The channel includes the relevant configuration details with which the channel was created. However, the response may truncate or omit passwords, API keys, or other private key matter and thus the response may not be 100% identical to the information that was supplied in the call to the create method.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count".
-    pub fn metric_descriptors_get(&self, name: &str) -> ProjectMetricDescriptorGetCall<'a, C, A> {
-        ProjectMetricDescriptorGetCall {
+    /// * `name` - The channel for which to execute the request. The format is projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID].
+    pub fn notification_channels_get(&self, name: &str) -> ProjectNotificationChannelGetCall<'a, C, A> {
+        ProjectNotificationChannelGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -1918,20 +1920,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an alerting policy. You can either replace the entire policy with a new one or replace only certain fields in the current alerting policy by specifying the fields to be updated via updateMask. Returns the updated alerting policy.
+    /// Gets a single metric descriptor. This method does not require a Stackdriver account.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - Required if the policy exists. The resource name for this policy. The syntax is:
-    ///            projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
-    ///            [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request.
-    pub fn alert_policies_patch(&self, request: AlertPolicy, name: &str) -> ProjectAlertPolicyPatchCall<'a, C, A> {
-        ProjectAlertPolicyPatchCall {
+    /// * `name` - The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count".
+    pub fn metric_descriptors_get(&self, name: &str) -> ProjectMetricDescriptorGetCall<'a, C, A> {
+        ProjectMetricDescriptorGetCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
-            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2262,17 +2259,20 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single alerting policy.
+    /// Updates an alerting policy. You can either replace the entire policy with a new one or replace only certain fields in the current alerting policy by specifying the fields to be updated via updateMask. Returns the updated alerting policy.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The alerting policy to retrieve. The format is
+    /// * `request` - No description provided.
+    /// * `name` - Required if the policy exists. The resource name for this policy. The syntax is:
     ///            projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
-    ///            
-    pub fn alert_policies_get(&self, name: &str) -> ProjectAlertPolicyGetCall<'a, C, A> {
-        ProjectAlertPolicyGetCall {
+    ///            [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request.
+    pub fn alert_policies_patch(&self, request: AlertPolicy, name: &str) -> ProjectAlertPolicyPatchCall<'a, C, A> {
+        ProjectAlertPolicyPatchCall {
             hub: self.hub,
+            _request: request,
             _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2456,13 +2456,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single notification channel. The channel includes the relevant configuration details with which the channel was created. However, the response may truncate or omit passwords, API keys, or other private key matter and thus the response may not be 100% identical to the information that was supplied in the call to the create method.
+    /// Gets a single alerting policy.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The channel for which to execute the request. The format is projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID].
-    pub fn notification_channels_get(&self, name: &str) -> ProjectNotificationChannelGetCall<'a, C, A> {
-        ProjectNotificationChannelGetCall {
+    /// * `name` - The alerting policy to retrieve. The format is
+    ///            projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
+    ///            
+    pub fn alert_policies_get(&self, name: &str) -> ProjectAlertPolicyGetCall<'a, C, A> {
+        ProjectAlertPolicyGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -2501,6 +2503,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectGroupDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _recursive: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2656,10 +2659,7 @@ impl<'a, C, A> UptimeCheckIpListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2679,7 +2679,7 @@ impl<'a, C, A> UptimeCheckIpListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2761,7 +2761,7 @@ impl<'a, C, A> UptimeCheckIpListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2902,7 +2902,7 @@ impl<'a, C, A> ProjectNotificationChannelGetVerificationCodeCall<'a, C, A> where
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2918,10 +2918,7 @@ impl<'a, C, A> ProjectNotificationChannelGetVerificationCodeCall<'a, C, A> where
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2953,7 +2950,7 @@ impl<'a, C, A> ProjectNotificationChannelGetVerificationCodeCall<'a, C, A> where
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3043,7 +3040,7 @@ impl<'a, C, A> ProjectNotificationChannelGetVerificationCodeCall<'a, C, A> where
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3080,6 +3077,254 @@ impl<'a, C, A> ProjectNotificationChannelGetVerificationCodeCall<'a, C, A> where
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectNotificationChannelGetVerificationCodeCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets a single notification channel. The channel includes the relevant configuration details with which the channel was created. However, the response may truncate or omit passwords, API keys, or other private key matter and thus the response may not be 100% identical to the information that was supplied in the call to the create method.
+///
+/// A builder for the *notificationChannels.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_monitoring3 as monitoring3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use monitoring3::Monitoring;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Monitoring::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().notification_channels_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectNotificationChannelGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Monitoring<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectNotificationChannelGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, NotificationChannel)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "monitoring.projects.notificationChannels.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The channel for which to execute the request. The format is projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID].
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectNotificationChannelGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNotificationChannelGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectNotificationChannelGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectNotificationChannelGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3177,7 +3422,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3193,10 +3438,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3216,7 +3458,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3294,7 +3536,7 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3331,304 +3573,6 @@ impl<'a, C, A> ProjectMetricDescriptorGetCall<'a, C, A> where C: BorrowMut<hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectMetricDescriptorGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates an alerting policy. You can either replace the entire policy with a new one or replace only certain fields in the current alerting policy by specifying the fields to be updated via updateMask. Returns the updated alerting policy.
-///
-/// A builder for the *alertPolicies.patch* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_monitoring3 as monitoring3;
-/// use monitoring3::AlertPolicy;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use monitoring3::Monitoring;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Monitoring::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AlertPolicy::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().alert_policies_patch(req, "name")
-///              .update_mask("erat")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectAlertPolicyPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Monitoring<C, A>,
-    _request: AlertPolicy,
-    _name: String,
-    _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectAlertPolicyPatchCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectAlertPolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AlertPolicy)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "monitoring.projects.alertPolicies.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
-        }
-        for &field in ["alt", "name", "updateMask"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v3/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AlertPolicy) -> ProjectAlertPolicyPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Required if the policy exists. The resource name for this policy. The syntax is:
-    /// projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
-    /// [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAlertPolicyPatchCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// Optional. A list of alerting policy field names. If this field is not empty, each listed field in the existing alerting policy is set to the value of the corresponding field in the supplied policy (alert_policy), or to the field's default value if the field is not in the supplied alerting policy. Fields not listed retain their previous value.Examples of valid field masks include display_name, documentation, documentation.content, documentation.mime_type, user_labels, user_label.nameofkey, enabled, conditions, combiner, etc.If this field is empty, then the supplied alerting policy replaces the existing policy. It is the same as deleting the existing policy and adding the supplied policy, except for the following:
-    /// The new policy will have the same [ALERT_POLICY_ID] as the former policy. This gives you continuity with the former policy in your notifications and incidents.
-    /// Conditions in the new policy will keep their former [CONDITION_ID] if the supplied condition includes the name field with that [CONDITION_ID]. If the supplied condition omits the name field, then a new [CONDITION_ID] is created.
-    ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAlertPolicyPatchCall<'a, C, A> {
-        self._update_mask = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectAlertPolicyPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAlertPolicyPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAlertPolicyPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3733,7 +3677,7 @@ impl<'a, C, A> ProjectNotificationChannelCreateCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3749,10 +3693,7 @@ impl<'a, C, A> ProjectNotificationChannelCreateCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3784,7 +3725,7 @@ impl<'a, C, A> ProjectNotificationChannelCreateCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3876,7 +3817,7 @@ impl<'a, C, A> ProjectNotificationChannelCreateCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3958,7 +3899,7 @@ impl<'a, C, A> ProjectNotificationChannelCreateCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().notification_channels_patch(req, "name")
-///              .update_mask("nonumy")
+///              .update_mask("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -4022,7 +3963,7 @@ impl<'a, C, A> ProjectNotificationChannelPatchCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4038,10 +3979,7 @@ impl<'a, C, A> ProjectNotificationChannelPatchCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4073,7 +4011,7 @@ impl<'a, C, A> ProjectNotificationChannelPatchCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4172,7 +4110,7 @@ impl<'a, C, A> ProjectNotificationChannelPatchCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4248,11 +4186,11 @@ impl<'a, C, A> ProjectNotificationChannelPatchCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().groups_list("name")
-///              .page_token("gubergren")
-///              .page_size(-95)
-///              .descendants_of_group("aliquyam")
-///              .children_of_group("ea")
-///              .ancestors_of_group("no")
+///              .page_token("dolores")
+///              .page_size(-61)
+///              .descendants_of_group("sadipscing")
+///              .children_of_group("aliquyam")
+///              .ancestors_of_group("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -4331,7 +4269,7 @@ impl<'a, C, A> ProjectGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4347,10 +4285,7 @@ impl<'a, C, A> ProjectGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4370,7 +4305,7 @@ impl<'a, C, A> ProjectGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4483,7 +4418,7 @@ impl<'a, C, A> ProjectGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4629,7 +4564,7 @@ impl<'a, C, A> ProjectGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4645,10 +4580,7 @@ impl<'a, C, A> ProjectGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4680,7 +4612,7 @@ impl<'a, C, A> ProjectGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4777,7 +4709,7 @@ impl<'a, C, A> ProjectGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4911,7 +4843,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4927,10 +4859,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4950,7 +4879,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5028,7 +4957,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5104,8 +5033,8 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().notification_channel_descriptors_list("name")
-///              .page_token("diam")
-///              .page_size(-55)
+///              .page_token("et")
+///              .page_size(-41)
 ///              .doit();
 /// # }
 /// ```
@@ -5172,7 +5101,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorListCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5188,10 +5117,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorListCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5211,7 +5137,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorListCall<'a, C, A> where C: B
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5305,7 +5231,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorListCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5446,7 +5372,7 @@ impl<'a, C, A> ProjectTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5462,10 +5388,7 @@ impl<'a, C, A> ProjectTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5497,7 +5420,7 @@ impl<'a, C, A> ProjectTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5587,7 +5510,7 @@ impl<'a, C, A> ProjectTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5663,9 +5586,9 @@ impl<'a, C, A> ProjectTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().metric_descriptors_list("name")
-///              .page_token("duo")
-///              .page_size(-32)
-///              .filter("sea")
+///              .page_token("et")
+///              .page_size(-70)
+///              .filter("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -5736,7 +5659,7 @@ impl<'a, C, A> ProjectMetricDescriptorListCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5752,10 +5675,7 @@ impl<'a, C, A> ProjectMetricDescriptorListCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5775,7 +5695,7 @@ impl<'a, C, A> ProjectMetricDescriptorListCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5876,7 +5796,7 @@ impl<'a, C, A> ProjectMetricDescriptorListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5952,9 +5872,9 @@ impl<'a, C, A> ProjectMetricDescriptorListCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().monitored_resource_descriptors_list("name")
-///              .page_token("eos")
-///              .page_size(-81)
-///              .filter("sadipscing")
+///              .page_token("Lorem")
+///              .page_size(-75)
+///              .filter("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -6025,7 +5945,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorListCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6041,10 +5961,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorListCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6064,7 +5981,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorListCall<'a, C, A> where C: Bor
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6165,7 +6082,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorListCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6299,7 +6216,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigGetCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6315,10 +6232,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigGetCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6338,7 +6252,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6416,7 +6330,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6550,7 +6464,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorGetCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6566,10 +6480,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorGetCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6589,7 +6500,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorGetCall<'a, C, A> where C: Bo
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6667,7 +6578,7 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorGetCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6743,17 +6654,17 @@ impl<'a, C, A> ProjectNotificationChannelDescriptorGetCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().time_series_list("name")
-///              .view("amet")
-///              .page_token("no")
-///              .page_size(-36)
-///              .order_by("eirmod")
-///              .interval_start_time("dolore")
-///              .interval_end_time("invidunt")
-///              .filter("aliquyam")
-///              .aggregation_per_series_aligner("accusam")
-///              .add_aggregation_group_by_fields("Lorem")
-///              .aggregation_cross_series_reducer("sea")
-///              .aggregation_alignment_period("et")
+///              .view("elitr")
+///              .page_token("amet")
+///              .page_size(-60)
+///              .order_by("labore")
+///              .interval_start_time("eirmod")
+///              .interval_end_time("dolore")
+///              .filter("invidunt")
+///              .aggregation_per_series_aligner("aliquyam")
+///              .add_aggregation_group_by_fields("accusam")
+///              .aggregation_cross_series_reducer("Lorem")
+///              .aggregation_alignment_period("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -6858,7 +6769,7 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6874,10 +6785,7 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6897,7 +6805,7 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7056,7 +6964,7 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7132,10 +7040,10 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().alert_policies_list("name")
-///              .page_token("et")
-///              .page_size(-40)
-///              .order_by("sanctus")
-///              .filter("et")
+///              .page_token("duo")
+///              .page_size(-21)
+///              .order_by("eirmod")
+///              .filter("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -7210,7 +7118,7 @@ impl<'a, C, A> ProjectAlertPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7226,10 +7134,7 @@ impl<'a, C, A> ProjectAlertPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7249,7 +7154,7 @@ impl<'a, C, A> ProjectAlertPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7357,7 +7262,7 @@ impl<'a, C, A> ProjectAlertPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7491,7 +7396,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7507,10 +7412,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7530,7 +7432,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7608,7 +7510,7 @@ impl<'a, C, A> ProjectMetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7749,7 +7651,7 @@ impl<'a, C, A> ProjectCollectdTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7765,10 +7667,7 @@ impl<'a, C, A> ProjectCollectdTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7800,7 +7699,7 @@ impl<'a, C, A> ProjectCollectdTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7890,7 +7789,7 @@ impl<'a, C, A> ProjectCollectdTimeSeryCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8031,7 +7930,7 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8047,10 +7946,7 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8082,7 +7978,7 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8172,7 +8068,7 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8220,9 +8116,9 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Gets a single alerting policy.
+/// Updates an alerting policy. You can either replace the entire policy with a new one or replace only certain fields in the current alerting policy by specifying the fields to be updated via updateMask. Returns the updated alerting policy.
 ///
-/// A builder for the *alertPolicies.get* method supported by a *project* resource.
+/// A builder for the *alertPolicies.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -8234,6 +8130,7 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_monitoring3 as monitoring3;
+/// use monitoring3::AlertPolicy;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8244,26 +8141,34 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Monitoring::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AlertPolicy::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().alert_policies_get("name")
+/// let result = hub.projects().alert_policies_patch(req, "name")
+///              .update_mask("ut")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectAlertPolicyGetCall<'a, C, A>
+pub struct ProjectAlertPolicyPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Monitoring<C, A>,
+    _request: AlertPolicy,
     _name: String,
+    _update_mask: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectAlertPolicyGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectAlertPolicyPatchCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectAlertPolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8276,11 +8181,14 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "monitoring.projects.alertPolicies.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "monitoring.projects.alertPolicies.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8306,7 +8214,7 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8322,11 +8230,19 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -8343,11 +8259,15 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -8398,16 +8318,34 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The alerting policy to retrieve. The format is
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AlertPolicy) -> ProjectAlertPolicyPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required if the policy exists. The resource name for this policy. The syntax is:
     /// projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
-    /// 
+    /// [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAlertPolicyGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectAlertPolicyPatchCall<'a, C, A> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Optional. A list of alerting policy field names. If this field is not empty, each listed field in the existing alerting policy is set to the value of the corresponding field in the supplied policy (alert_policy), or to the field's default value if the field is not in the supplied alerting policy. Fields not listed retain their previous value.Examples of valid field masks include display_name, documentation, documentation.content, documentation.mime_type, user_labels, user_label.nameofkey, enabled, conditions, combiner, etc.If this field is empty, then the supplied alerting policy replaces the existing policy. It is the same as deleting the existing policy and adding the supplied policy, except for the following:
+    /// The new policy will have the same [ALERT_POLICY_ID] as the former policy. This gives you continuity with the former policy in your notifications and incidents.
+    /// Conditions in the new policy will keep their former [CONDITION_ID] if the supplied condition includes the name field with that [CONDITION_ID]. If the supplied condition omits the name field, then a new [CONDITION_ID] is created.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAlertPolicyPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8416,7 +8354,7 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectAlertPolicyGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectAlertPolicyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8425,7 +8363,7 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8441,7 +8379,7 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAlertPolicyGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAlertPolicyPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8461,7 +8399,7 @@ impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAlertPolicyGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAlertPolicyPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8579,7 +8517,7 @@ impl<'a, C, A> ProjectNotificationChannelListCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8595,10 +8533,7 @@ impl<'a, C, A> ProjectNotificationChannelListCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8618,7 +8553,7 @@ impl<'a, C, A> ProjectNotificationChannelListCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8724,7 +8659,7 @@ impl<'a, C, A> ProjectNotificationChannelListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8870,7 +8805,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8886,10 +8821,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8921,7 +8853,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9018,7 +8950,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9159,7 +9091,7 @@ impl<'a, C, A> ProjectNotificationChannelSendVerificationCodeCall<'a, C, A> wher
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9175,10 +9107,7 @@ impl<'a, C, A> ProjectNotificationChannelSendVerificationCodeCall<'a, C, A> wher
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9210,7 +9139,7 @@ impl<'a, C, A> ProjectNotificationChannelSendVerificationCodeCall<'a, C, A> wher
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9300,7 +9229,7 @@ impl<'a, C, A> ProjectNotificationChannelSendVerificationCodeCall<'a, C, A> wher
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9446,7 +9375,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigPatchCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9462,10 +9391,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigPatchCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9497,7 +9423,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigPatchCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9594,7 +9520,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigPatchCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9735,7 +9661,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigCreateCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9751,10 +9677,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigCreateCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9786,7 +9709,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigCreateCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9876,7 +9799,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigCreateCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10010,7 +9933,7 @@ impl<'a, C, A> ProjectAlertPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10026,10 +9949,7 @@ impl<'a, C, A> ProjectAlertPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10049,7 +9969,7 @@ impl<'a, C, A> ProjectAlertPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10129,7 +10049,7 @@ impl<'a, C, A> ProjectAlertPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10263,7 +10183,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigDeleteCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10279,10 +10199,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigDeleteCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10302,7 +10219,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigDeleteCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10380,7 +10297,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10519,7 +10436,7 @@ impl<'a, C, A> ProjectNotificationChannelDeleteCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10535,10 +10452,7 @@ impl<'a, C, A> ProjectNotificationChannelDeleteCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10558,7 +10472,7 @@ impl<'a, C, A> ProjectNotificationChannelDeleteCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10643,7 +10557,7 @@ impl<'a, C, A> ProjectNotificationChannelDeleteCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10802,7 +10716,7 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10818,10 +10732,7 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10841,7 +10752,7 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10956,7 +10867,7 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11004,9 +10915,9 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Gets a single notification channel. The channel includes the relevant configuration details with which the channel was created. However, the response may truncate or omit passwords, API keys, or other private key matter and thus the response may not be 100% identical to the information that was supplied in the call to the create method.
+/// Gets a single alerting policy.
 ///
-/// A builder for the *notificationChannels.get* method supported by a *project* resource.
+/// A builder for the *alertPolicies.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -11031,11 +10942,11 @@ impl<'a, C, A> ProjectGroupMemberListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().notification_channels_get("name")
+/// let result = hub.projects().alert_policies_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectNotificationChannelGetCall<'a, C, A>
+pub struct ProjectAlertPolicyGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Monitoring<C, A>,
@@ -11045,13 +10956,13 @@ pub struct ProjectNotificationChannelGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectNotificationChannelGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectAlertPolicyGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectAlertPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, NotificationChannel)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AlertPolicy)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -11060,7 +10971,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "monitoring.projects.notificationChannels.get",
+        dlg.begin(MethodInfo { id: "monitoring.projects.alertPolicies.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
@@ -11090,7 +11001,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11106,10 +11017,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11129,7 +11037,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11182,13 +11090,15 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The channel for which to execute the request. The format is projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID].
+    /// The alerting policy to retrieve. The format is
+    /// projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
+    /// 
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectNotificationChannelGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectAlertPolicyGetCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -11198,7 +11108,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNotificationChannelGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectAlertPolicyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11207,7 +11117,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11223,7 +11133,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectNotificationChannelGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAlertPolicyGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11243,7 +11153,7 @@ impl<'a, C, A> ProjectNotificationChannelGetCall<'a, C, A> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectNotificationChannelGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAlertPolicyGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11348,7 +11258,7 @@ impl<'a, C, A> ProjectMetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11364,10 +11274,7 @@ impl<'a, C, A> ProjectMetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11399,7 +11306,7 @@ impl<'a, C, A> ProjectMetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11489,7 +11396,7 @@ impl<'a, C, A> ProjectMetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11565,6 +11472,7 @@ impl<'a, C, A> ProjectMetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().groups_delete("name")
+///              .recursive(false)
 ///              .doit();
 /// # }
 /// ```
@@ -11573,6 +11481,7 @@ pub struct ProjectGroupDeleteCall<'a, C, A>
 
     hub: &'a Monitoring<C, A>,
     _name: String,
+    _recursive: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11595,9 +11504,12 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "monitoring.projects.groups.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._recursive {
+            params.push(("recursive", value.to_string()));
+        }
+        for &field in ["alt", "name", "recursive"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11623,7 +11535,7 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11639,10 +11551,7 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11662,7 +11571,7 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11725,6 +11634,13 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._name = new_value.to_string();
         self
     }
+    /// If this field is true, then the request means to delete a group with all its descendants. Otherwise, the request means to delete a group only when it has no descendants. The default value is false.
+    ///
+    /// Sets the *recursive* query property to the given value.
+    pub fn recursive(mut self, new_value: bool) -> ProjectGroupDeleteCall<'a, C, A> {
+        self._recursive = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11740,7 +11656,7 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11816,8 +11732,8 @@ impl<'a, C, A> ProjectGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().uptime_check_configs_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-17)
+///              .page_token("et")
+///              .page_size(-13)
 ///              .doit();
 /// # }
 /// ```
@@ -11884,7 +11800,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11900,10 +11816,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11923,7 +11836,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12015,7 +11928,7 @@ impl<'a, C, A> ProjectUptimeCheckConfigListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12149,7 +12062,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorGetCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12165,10 +12078,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorGetCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12188,7 +12098,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorGetCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12266,7 +12176,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorGetCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12407,7 +12317,7 @@ impl<'a, C, A> ProjectNotificationChannelVerifyCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12423,10 +12333,7 @@ impl<'a, C, A> ProjectNotificationChannelVerifyCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12458,7 +12365,7 @@ impl<'a, C, A> ProjectNotificationChannelVerifyCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12548,7 +12455,7 @@ impl<'a, C, A> ProjectNotificationChannelVerifyCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

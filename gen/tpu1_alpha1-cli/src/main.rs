@@ -305,7 +305,7 @@ impl<'n> Engine<'n> {
                     "health-description" => Some(("healthDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tensorflow-version" => Some(("tensorflowVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -313,7 +313,7 @@ impl<'n> Engine<'n> {
                     "health" => Some(("health", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "accelerator-type" => Some(("acceleratorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cidr-block" => Some(("cidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "cidr-block", "create-time", "description", "health", "health-description", "ip-address", "labels", "name", "network", "port", "preemptible", "scheduling-config", "service-account", "state", "tensorflow-version"]);
@@ -1708,7 +1708,7 @@ fn main() {
     
     let mut app = App::new("tpu1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181010")
+           .version("1.0.8+20190312")
            .about("TPU API provides customers with access to Google TPU technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tpu1_alpha1_cli")
            .arg(Arg::with_name("url")

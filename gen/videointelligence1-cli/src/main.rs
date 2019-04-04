@@ -323,17 +323,28 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "video-context.shot-change-detection-config.model" => Some(("videoContext.shotChangeDetectionConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video-context.text-detection-config.language-hints" => Some(("videoContext.textDetectionConfig.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "video-context.explicit-content-detection-config.model" => Some(("videoContext.explicitContentDetectionConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video-context.speech-transcription-config.language-code" => Some(("videoContext.speechTranscriptionConfig.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video-context.speech-transcription-config.filter-profanity" => Some(("videoContext.speechTranscriptionConfig.filterProfanity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "video-context.speech-transcription-config.enable-automatic-punctuation" => Some(("videoContext.speechTranscriptionConfig.enableAutomaticPunctuation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "video-context.speech-transcription-config.enable-speaker-diarization" => Some(("videoContext.speechTranscriptionConfig.enableSpeakerDiarization", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "video-context.speech-transcription-config.max-alternatives" => Some(("videoContext.speechTranscriptionConfig.maxAlternatives", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "video-context.speech-transcription-config.audio-tracks" => Some(("videoContext.speechTranscriptionConfig.audioTracks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "video-context.speech-transcription-config.diarization-speaker-count" => Some(("videoContext.speechTranscriptionConfig.diarizationSpeakerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "video-context.speech-transcription-config.enable-word-confidence" => Some(("videoContext.speechTranscriptionConfig.enableWordConfidence", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "video-context.label-detection-config.label-detection-mode" => Some(("videoContext.labelDetectionConfig.labelDetectionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-context.label-detection-config.model" => Some(("videoContext.labelDetectionConfig.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-context.label-detection-config.stationary-camera" => Some(("videoContext.labelDetectionConfig.stationaryCamera", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "video-context.label-detection-config.frame-confidence-threshold" => Some(("videoContext.labelDetectionConfig.frameConfidenceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "video-context.label-detection-config.video-confidence-threshold" => Some(("videoContext.labelDetectionConfig.videoConfidenceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "features" => Some(("features", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "input-content" => Some(("inputContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "input-uri" => Some(("inputUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-uri" => Some(("outputUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["explicit-content-detection-config", "features", "input-content", "input-uri", "label-detection-config", "label-detection-mode", "location-id", "model", "output-uri", "shot-change-detection-config", "stationary-camera", "video-context"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-tracks", "diarization-speaker-count", "enable-automatic-punctuation", "enable-speaker-diarization", "enable-word-confidence", "explicit-content-detection-config", "features", "filter-profanity", "frame-confidence-threshold", "input-content", "input-uri", "label-detection-config", "label-detection-mode", "language-code", "language-hints", "location-id", "max-alternatives", "model", "output-uri", "shot-change-detection-config", "speech-transcription-config", "stationary-camera", "text-detection-config", "video-confidence-threshold", "video-context"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -660,8 +671,8 @@ fn main() {
     
     let mut app = App::new("videointelligence1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180920")
-           .about("Cloud Video Intelligence API.")
+           .version("1.0.8+20190308")
+           .about("Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_videointelligence1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

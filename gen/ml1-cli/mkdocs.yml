@@ -1,4 +1,4 @@
-site_name: Cloud Machine Learning Engine v1.0.8+20181009
+site_name: Cloud Machine Learning Engine v1.0.8+20190325
 site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
 site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['operations_delete.md', 'Operations', 'Delete']
 - ['projects_get-config.md', 'Projects', 'Get Config']
 - ['projects_jobs-cancel.md', 'Projects', 'Jobs Cancel']
 - ['projects_jobs-create.md', 'Projects', 'Jobs Create']
@@ -35,7 +36,6 @@ pages:
 - ['projects_models-versions-patch.md', 'Projects', 'Models Versions Patch']
 - ['projects_models-versions-set-default.md', 'Projects', 'Models Versions Set Default']
 - ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
-- ['projects_operations-delete.md', 'Projects', 'Operations Delete']
 - ['projects_operations-get.md', 'Projects', 'Operations Get']
 - ['projects_operations-list.md', 'Projects', 'Operations List']
 - ['projects_predict.md', 'Projects', 'Predict']

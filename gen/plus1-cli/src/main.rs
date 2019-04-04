@@ -711,7 +711,7 @@ fn main() {
     let arg_data = [
         ("activities", "methods: 'get', 'list' and 'search'", vec![
             ("get",
-                    Some(r##"Get an activity."##),
+                    Some(r##"Shut down. See https://developers.google.com/+/api-shutdown for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/activities_get",
                   vec![
                     (Some(r##"activity-id"##),
@@ -733,7 +733,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all of the activities in the specified collection for a particular user."##),
+                    Some(r##"Shut down. See https://developers.google.com/+/api-shutdown for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/activities_list",
                   vec![
                     (Some(r##"user-id"##),
@@ -761,7 +761,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Search public activities."##),
+                    Some(r##"Shut down. See https://developers.google.com/+/api-shutdown for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/activities_search",
                   vec![
                     (Some(r##"query"##),
@@ -786,7 +786,7 @@ fn main() {
         
         ("comments", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Get a comment."##),
+                    Some(r##"Shut down. See https://developers.google.com/+/api-shutdown for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/comments_get",
                   vec![
                     (Some(r##"comment-id"##),
@@ -808,7 +808,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all of the comments for an activity."##),
+                    Some(r##"Shut down. See https://developers.google.com/+/api-shutdown for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/comments_list",
                   vec![
                     (Some(r##"activity-id"##),
@@ -883,7 +883,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-by-activity",
-                    Some(r##"List all of the people in the specified collection for a particular activity."##),
+                    Some(r##"Shut down. See https://developers.google.com/+/api-shutdown for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/people_list-by-activity",
                   vec![
                     (Some(r##"activity-id"##),
@@ -911,7 +911,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Search all public profiles."##),
+                    Some(r##"Shut down. See https://developers.google.com/+/api-shutdown for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/people_search",
                   vec![
                     (Some(r##"query"##),
@@ -938,7 +938,7 @@ fn main() {
     
     let mut app = App::new("plus1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181007")
+           .version("1.0.8+20190328")
            .about("Builds on top of the Google+ platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_plus1_cli")
            .arg(Arg::with_name("url")

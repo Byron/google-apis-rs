@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Abusive Experience Report* crate version *1.0.8+20180904*, where *20180904* is the exact revision of the *abusiveexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Abusive Experience Report* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *abusiveexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Abusive Experience Report* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/abusive-experience-report/).
@@ -364,7 +364,6 @@ impl<'a, C, A> AbusiveExperienceReport<C, A>
 // SCHEMAS ###
 // ##########
 /// Response message for GetSiteSummary.
-/// Do not confuse with same message in google.ads.experiencereport.v1
 /// 
 /// # Activities
 /// 
@@ -387,15 +386,15 @@ pub struct SiteSummaryResponse {
     /// The name of the site reviewed.
     #[serde(rename="reviewedSite")]
     pub reviewed_site: Option<String>,
-    /// A link that leads to a full abusive experience report.
-    #[serde(rename="reportUrl")]
-    pub report_url: Option<String>,
-    /// The status of the site reviewed for the abusive experiences.
-    #[serde(rename="abusiveStatus")]
-    pub abusive_status: Option<String>,
     /// The abusive experience enforcement status of the site.
     #[serde(rename="filterStatus")]
     pub filter_status: Option<String>,
+    /// The status of the site reviewed for the abusive experiences.
+    #[serde(rename="abusiveStatus")]
+    pub abusive_status: Option<String>,
+    /// A link that leads to a full abusive experience report.
+    #[serde(rename="reportUrl")]
+    pub report_url: Option<String>,
 }
 
 impl ResponseResult for SiteSummaryResponse {}
@@ -637,7 +636,7 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -653,10 +652,7 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -676,7 +672,7 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -761,7 +757,7 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -884,10 +880,7 @@ impl<'a, C, A> ViolatingSiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -907,7 +900,7 @@ impl<'a, C, A> ViolatingSiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -975,7 +968,7 @@ impl<'a, C, A> ViolatingSiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

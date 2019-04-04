@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *TPU* crate version *1.0.8+20181010*, where *20181010* is the exact revision of the *tpu:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *TPU* crate version *1.0.8+20190312*, where *20190312* is the exact revision of the *tpu:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *TPU* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/tpu/).
@@ -377,17 +377,17 @@ impl<'a, C, A> TPU<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -462,172 +462,6 @@ pub struct NetworkEndpoint {
 }
 
 impl Part for NetworkEndpoint {}
-
-
-/// The response message for Locations.ListLocations.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations list projects](struct.ProjectLocationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListLocationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of locations that matches the specified filter in the request.
-    pub locations: Option<Vec<Location>>,
-}
-
-impl ResponseResult for ListLocationsResponse {}
-
-
-/// A resource that represents Google Cloud Platform location.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations get projects](struct.ProjectLocationGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Location {
-    /// The canonical id for this location. For example: `"us-east1"`.
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
-    /// Cross-service attributes for the location. For example
-    /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
-    pub labels: Option<HashMap<String, String>>,
-    /// The friendly name for this location, typically a nearby city name.
-    /// For example, "Tokyo".
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Resource name for the location, which may vary between implementations.
-    /// For example: `"projects/example-project/locations/us-east1"`
-    pub name: Option<String>,
-    /// Service-specific metadata. For example the available capacity at the given
-    /// location.
-    pub metadata: Option<HashMap<String, String>>,
-}
-
-impl ResponseResult for Location {}
-
-
-/// Response for ListNodes.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations nodes list projects](struct.ProjectLocationNodeListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListNodesResponse {
-    /// The next page token or empty if none.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Locations that could not be reached.
-    pub unreachable: Option<Vec<String>>,
-    /// The listed nodes.
-    pub nodes: Option<Vec<Node>>,
-}
-
-impl ResponseResult for ListNodesResponse {}
-
-
-/// This resource represents a long-running operation that is the result of a
-/// network API call.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
-/// * [locations nodes reimage projects](struct.ProjectLocationNodeReimageCall.html) (response)
-/// * [locations nodes delete projects](struct.ProjectLocationNodeDeleteCall.html) (response)
-/// * [locations nodes stop projects](struct.ProjectLocationNodeStopCall.html) (response)
-/// * [locations nodes start projects](struct.ProjectLocationNodeStartCall.html) (response)
-/// * [locations nodes create projects](struct.ProjectLocationNodeCreateCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
-    /// If the value is `false`, it means the operation is still in progress.
-    /// If `true`, the operation is completed, and either `error` or `response` is
-    /// available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success.  If the original
-    /// method returns no data on success, such as `Delete`, the response is
-    /// `google.protobuf.Empty`.  If the original method is standard
-    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
-    /// methods, the response should have the type `XxxResponse`, where `Xxx`
-    /// is the original method name.  For example, if the original method name
-    /// is `TakeSnapshot()`, the inferred response type is
-    /// `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that
-    /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
-    pub name: Option<String>,
-    /// Service-specific metadata associated with the operation.  It typically
-    /// contains progress information and common metadata such as create time.
-    /// Some services might not provide such metadata.  Any method that returns a
-    /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
-}
-
-impl ResponseResult for Operation {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
-/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
-
-
-/// Request for ReimageNode.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations nodes reimage projects](struct.ProjectLocationNodeReimageCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReimageNodeRequest {
-    /// The version for reimage to create.
-    #[serde(rename="tensorflowVersion")]
-    pub tensorflow_version: Option<String>,
-}
-
-impl RequestValue for ReimageNodeRequest {}
 
 
 /// A TPU instance.
@@ -717,6 +551,160 @@ impl RequestValue for Node {}
 impl ResponseResult for Node {}
 
 
+/// The response message for Locations.ListLocations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations list projects](struct.ProjectLocationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListLocationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of locations that matches the specified filter in the request.
+    pub locations: Option<Vec<Location>>,
+}
+
+impl ResponseResult for ListLocationsResponse {}
+
+
+/// A resource that represents Google Cloud Platform location.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations get projects](struct.ProjectLocationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Location {
+    /// The friendly name for this location, typically a nearby city name.
+    /// For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Cross-service attributes for the location. For example
+    /// 
+    ///     {"cloud.googleapis.com/region": "us-east1"}
+    pub labels: Option<HashMap<String, String>>,
+    /// The canonical id for this location. For example: `"us-east1"`.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
+    /// Resource name for the location, which may vary between implementations.
+    /// For example: `"projects/example-project/locations/us-east1"`
+    pub name: Option<String>,
+    /// Service-specific metadata. For example the available capacity at the given
+    /// location.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for Location {}
+
+
+/// Response for ListNodes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations nodes list projects](struct.ProjectLocationNodeListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListNodesResponse {
+    /// The next page token or empty if none.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Locations that could not be reached.
+    pub unreachable: Option<Vec<String>>,
+    /// The listed nodes.
+    pub nodes: Option<Vec<Node>>,
+}
+
+impl ResponseResult for ListNodesResponse {}
+
+
+/// A accelerator type that a Node can be configured with.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations accelerator types get projects](struct.ProjectLocationAcceleratorTypeGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AcceleratorType {
+    /// the accelerator type.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The resource name.
+    pub name: Option<String>,
+}
+
+impl ResponseResult for AcceleratorType {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// Request for ReimageNode.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations nodes reimage projects](struct.ProjectLocationNodeReimageCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReimageNodeRequest {
+    /// The version for reimage to create.
+    #[serde(rename="tensorflowVersion")]
+    pub tensorflow_version: Option<String>,
+}
+
+impl RequestValue for ReimageNodeRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SchedulingConfig {
+    /// no description provided
+    pub preemptible: Option<bool>,
+}
+
+impl Part for SchedulingConfig {}
+
+
 /// Request for StopNode.
 /// 
 /// # Activities
@@ -765,11 +753,11 @@ impl ResponseResult for ListTensorFlowVersionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
     /// The standard List next-page token.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
 }
 
 impl ResponseResult for ListOperationsResponse {}
@@ -817,19 +805,6 @@ pub struct TensorFlowVersion {
 impl ResponseResult for TensorFlowVersion {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SchedulingConfig {
-    /// no description provided
-    pub preemptible: Option<bool>,
-}
-
-impl Part for SchedulingConfig {}
-
-
 /// Request for StartNode.
 /// 
 /// # Activities
@@ -845,25 +820,50 @@ pub struct StartNodeRequest { _never_set: Option<bool> }
 impl RequestValue for StartNodeRequest {}
 
 
-/// A accelerator type that a Node can be configured with.
+/// This resource represents a long-running operation that is the result of a
+/// network API call.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations accelerator types get projects](struct.ProjectLocationAcceleratorTypeGetCall.html) (response)
+/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
+/// * [locations nodes reimage projects](struct.ProjectLocationNodeReimageCall.html) (response)
+/// * [locations nodes delete projects](struct.ProjectLocationNodeDeleteCall.html) (response)
+/// * [locations nodes stop projects](struct.ProjectLocationNodeStopCall.html) (response)
+/// * [locations nodes start projects](struct.ProjectLocationNodeStartCall.html) (response)
+/// * [locations nodes create projects](struct.ProjectLocationNodeCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AcceleratorType {
-    /// the accelerator type.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The resource name.
+pub struct Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is `false`, it means the operation is still in progress.
+    /// If `true`, the operation is completed, and either `error` or `response` is
+    /// available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success.  If the original
+    /// method returns no data on success, such as `Delete`, the response is
+    /// `google.protobuf.Empty`.  If the original method is standard
+    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
+    /// methods, the response should have the type `XxxResponse`, where `Xxx`
+    /// is the original method name.  For example, if the original method name
+    /// is `TakeSnapshot()`, the inferred response type is
+    /// `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that
+    /// originally returns it. If you use the default HTTP mapping, the
+    /// `name` should have the format of `operations/some/unique/name`.
     pub name: Option<String>,
+    /// Service-specific metadata associated with the operation.  It typically
+    /// contains progress information and common metadata such as create time.
+    /// Some services might not provide such metadata.  Any method that returns a
+    /// long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
 }
 
-impl ResponseResult for AcceleratorType {}
+impl ResponseResult for Operation {}
 
 
 
@@ -1172,17 +1172,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists nodes.
+    /// List TensorFlow versions supported by this API.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The parent resource name.
-    pub fn locations_nodes_list(&self, parent: &str) -> ProjectLocationNodeListCall<'a, C, A> {
-        ProjectLocationNodeListCall {
+    pub fn locations_tensorflow_versions_list(&self, parent: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
+        ProjectLocationTensorflowVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1228,19 +1230,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List TensorFlow versions supported by this API.
+    /// Lists nodes.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The parent resource name.
-    pub fn locations_tensorflow_versions_list(&self, parent: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
-        ProjectLocationTensorflowVersionListCall {
+    pub fn locations_nodes_list(&self, parent: &str) -> ProjectLocationNodeListCall<'a, C, A> {
+        ProjectLocationNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
-            _order_by: Default::default(),
-            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1366,7 +1366,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1382,10 +1382,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1405,7 +1402,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1504,7 +1501,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1638,7 +1635,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeGetCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1654,10 +1651,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeGetCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1677,7 +1671,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeGetCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1755,7 +1749,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeGetCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1909,7 +1903,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeListCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1925,10 +1919,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeListCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1948,7 +1939,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeListCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2054,7 +2045,7 @@ impl<'a, C, A> ProjectLocationAcceleratorTypeListCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2203,7 +2194,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2219,10 +2210,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2242,7 +2230,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2341,7 +2329,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2482,7 +2470,7 @@ impl<'a, C, A> ProjectLocationNodeReimageCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2498,10 +2486,7 @@ impl<'a, C, A> ProjectLocationNodeReimageCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2533,7 +2518,7 @@ impl<'a, C, A> ProjectLocationNodeReimageCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2623,7 +2608,7 @@ impl<'a, C, A> ProjectLocationNodeReimageCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2757,7 +2742,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionGetCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2773,10 +2758,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionGetCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2796,7 +2778,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionGetCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2874,7 +2856,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionGetCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3010,7 +2992,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3026,10 +3008,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3049,7 +3028,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3127,7 +3106,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3261,7 +3240,7 @@ impl<'a, C, A> ProjectLocationNodeDeleteCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3277,10 +3256,7 @@ impl<'a, C, A> ProjectLocationNodeDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3300,7 +3276,7 @@ impl<'a, C, A> ProjectLocationNodeDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3378,7 +3354,7 @@ impl<'a, C, A> ProjectLocationNodeDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3515,7 +3491,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3531,10 +3507,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3554,7 +3527,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3632,7 +3605,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3773,7 +3746,7 @@ impl<'a, C, A> ProjectLocationNodeStopCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3789,10 +3762,7 @@ impl<'a, C, A> ProjectLocationNodeStopCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3824,7 +3794,7 @@ impl<'a, C, A> ProjectLocationNodeStopCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3914,7 +3884,7 @@ impl<'a, C, A> ProjectLocationNodeStopCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4057,7 +4027,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4073,10 +4043,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4096,7 +4063,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4174,7 +4141,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4308,7 +4275,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4324,10 +4291,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4347,7 +4311,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4425,7 +4389,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4566,7 +4530,7 @@ impl<'a, C, A> ProjectLocationNodeStartCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4582,10 +4546,7 @@ impl<'a, C, A> ProjectLocationNodeStartCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4617,7 +4578,7 @@ impl<'a, C, A> ProjectLocationNodeStartCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4707,7 +4668,7 @@ impl<'a, C, A> ProjectLocationNodeStartCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4755,9 +4716,9 @@ impl<'a, C, A> ProjectLocationNodeStartCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Lists nodes.
+/// List TensorFlow versions supported by this API.
 ///
-/// A builder for the *locations.nodes.list* method supported by a *project* resource.
+/// A builder for the *locations.tensorflowVersions.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -4782,31 +4743,35 @@ impl<'a, C, A> ProjectLocationNodeStartCall<'a, C, A> where C: BorrowMut<hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_nodes_list("parent")
+/// let result = hub.projects().locations_tensorflow_versions_list("parent")
 ///              .page_token("aliquyam")
 ///              .page_size(-9)
+///              .order_by("Lorem")
+///              .filter("eos")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationNodeListCall<'a, C, A>
+pub struct ProjectLocationTensorflowVersionListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TPU<C, A>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationNodeListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationTensorflowVersionListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListNodesResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListTensorFlowVersionsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -4815,9 +4780,9 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "tpu.projects.locations.nodes.list",
+        dlg.begin(MethodInfo { id: "tpu.projects.locations.tensorflowVersions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4825,7 +4790,13 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        if let Some(value) = self._order_by {
+            params.push(("orderBy", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4837,7 +4808,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/nodes";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/tensorflowVersions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -4851,7 +4822,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4867,10 +4838,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4890,7 +4858,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4949,22 +4917,36 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationNodeListCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNodeListCall<'a, C, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNodeListCall<'a, C, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
         self._page_size = Some(new_value);
+        self
+    }
+    /// Sort results.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// List filter.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4973,7 +4955,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationNodeListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4982,7 +4964,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4998,7 +4980,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNodeListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTensorflowVersionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5018,7 +5000,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNodeListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationTensorflowVersionListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5064,7 +5046,7 @@ impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_nodes_create(req, "parent")
-///              .node_id("eos")
+///              .node_id("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -5128,7 +5110,7 @@ impl<'a, C, A> ProjectLocationNodeCreateCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5144,10 +5126,7 @@ impl<'a, C, A> ProjectLocationNodeCreateCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5179,7 +5158,7 @@ impl<'a, C, A> ProjectLocationNodeCreateCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5276,7 +5255,7 @@ impl<'a, C, A> ProjectLocationNodeCreateCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5410,7 +5389,7 @@ impl<'a, C, A> ProjectLocationNodeGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5426,10 +5405,7 @@ impl<'a, C, A> ProjectLocationNodeGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5449,7 +5425,7 @@ impl<'a, C, A> ProjectLocationNodeGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5527,7 +5503,7 @@ impl<'a, C, A> ProjectLocationNodeGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5575,9 +5551,9 @@ impl<'a, C, A> ProjectLocationNodeGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// List TensorFlow versions supported by this API.
+/// Lists nodes.
 ///
-/// A builder for the *locations.tensorflowVersions.list* method supported by a *project* resource.
+/// A builder for the *locations.nodes.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -5602,35 +5578,31 @@ impl<'a, C, A> ProjectLocationNodeGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_tensorflow_versions_list("parent")
-///              .page_token("dolor")
-///              .page_size(-39)
-///              .order_by("elitr")
-///              .filter("amet")
+/// let result = hub.projects().locations_nodes_list("parent")
+///              .page_token("elitr")
+///              .page_size(-97)
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationTensorflowVersionListCall<'a, C, A>
+pub struct ProjectLocationNodeListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TPU<C, A>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _order_by: Option<String>,
-    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationTensorflowVersionListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationNodeListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationNodeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListTensorFlowVersionsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListNodesResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -5639,9 +5611,9 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "tpu.projects.locations.tensorflowVersions.list",
+        dlg.begin(MethodInfo { id: "tpu.projects.locations.nodes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5649,13 +5621,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        if let Some(value) = self._order_by {
-            params.push(("orderBy", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5667,7 +5633,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/tensorflowVersions";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/nodes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5681,7 +5647,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5697,10 +5663,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5720,7 +5683,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5779,36 +5742,22 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationNodeListCall<'a, C, A> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNodeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNodeListCall<'a, C, A> {
         self._page_size = Some(new_value);
-        self
-    }
-    /// Sort results.
-    ///
-    /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
-        self._order_by = Some(new_value.to_string());
-        self
-    }
-    /// List filter.
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
-        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5817,7 +5766,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationTensorflowVersionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationNodeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5826,7 +5775,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5842,7 +5791,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTensorflowVersionListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNodeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5862,7 +5811,7 @@ impl<'a, C, A> ProjectLocationTensorflowVersionListCall<'a, C, A> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationTensorflowVersionListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNodeListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

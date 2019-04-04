@@ -1148,27 +1148,27 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "response-view" => Some(("responseView", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.status.last-attempt-status.schedule-time" => Some(("task.status.lastAttemptStatus.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.last-attempt-status.dispatch-time" => Some(("task.status.lastAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.last-attempt-status.response-time" => Some(("task.status.lastAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.status.last-attempt-status.response-status.message" => Some(("task.status.lastAttemptStatus.responseStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.status.last-attempt-status.response-status.code" => Some(("task.status.lastAttemptStatus.responseStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "task.status.last-attempt-status.response-time" => Some(("task.status.lastAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.status.last-attempt-status.dispatch-time" => Some(("task.status.lastAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.status.first-attempt-status.schedule-time" => Some(("task.status.firstAttemptStatus.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.first-attempt-status.dispatch-time" => Some(("task.status.firstAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.first-attempt-status.response-time" => Some(("task.status.firstAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.status.first-attempt-status.response-status.message" => Some(("task.status.firstAttemptStatus.responseStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.status.first-attempt-status.response-status.code" => Some(("task.status.firstAttemptStatus.responseStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "task.status.first-attempt-status.response-time" => Some(("task.status.firstAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.status.first-attempt-status.dispatch-time" => Some(("task.status.firstAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.status.attempt-dispatch-count" => Some(("task.status.attemptDispatchCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "task.status.attempt-response-count" => Some(("task.status.attemptResponseCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "task.pull-message.tag" => Some(("task.pullMessage.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.pull-message.payload" => Some(("task.pullMessage.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.relative-url" => Some(("task.appEngineHttpRequest.relativeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-http-request.http-method" => Some(("task.appEngineHttpRequest.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.app-engine-http-request.headers" => Some(("task.appEngineHttpRequest.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "task.app-engine-http-request.app-engine-routing.instance" => Some(("task.appEngineHttpRequest.appEngineRouting.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.app-engine-routing.host" => Some(("task.appEngineHttpRequest.appEngineRouting.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.app-engine-routing.version" => Some(("task.appEngineHttpRequest.appEngineRouting.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.app-engine-routing.service" => Some(("task.appEngineHttpRequest.appEngineRouting.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.payload" => Some(("task.appEngineHttpRequest.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-http-request.headers" => Some(("task.appEngineHttpRequest.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "task.app-engine-http-request.http-method" => Some(("task.appEngineHttpRequest.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.name" => Some(("task.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.schedule-time" => Some(("task.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.create-time" => Some(("task.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2158,7 +2158,8 @@ fn main() {
         * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
            hyphens (-), colons (:), or periods (.).
            For more information, see
-           [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+           [Identifying
+           projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
         * `LOCATION_ID` is the canonical ID for the queue's location.
            The list of available locations can be obtained by calling
            ListLocations.
@@ -2730,7 +2731,7 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180913")
+           .version("1.0.8+20190326")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli")
            .arg(Arg::with_name("url")

@@ -2,15 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Asset* crate version *1.0.8+20181008*, where *20181008* is the exact revision of the *cloudasset:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Asset* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *cloudasset:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Asset* *v1_beta1* API can be found at the
-//! [official documentation site](https://console.cloud.google.com/apis/api/cloudasset.googleapis.com/overview).
+//! [official documentation site](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudasset1_beta1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudAsset.html) ... 
 //! 
+//! * folders
+//!  * [*export assets*](struct.FolderExportAssetCall.html) and [*operations get*](struct.FolderOperationGetCall.html)
 //! * organizations
 //!  * [*batch get assets history*](struct.OrganizationBatchGetAssetsHistoryCall.html), [*export assets*](struct.OrganizationExportAssetCall.html) and [*operations get*](struct.OrganizationOperationGetCall.html)
 //! * projects
@@ -49,10 +51,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.organizations().operations_get(...).doit()
+//! let r = hub.folders().export_assets(...).doit()
+//! let r = hub.folders().operations_get(...).doit()
 //! let r = hub.projects().operations_get(...).doit()
 //! let r = hub.projects().export_assets(...).doit()
 //! let r = hub.organizations().export_assets(...).doit()
+//! let r = hub.organizations().operations_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -113,7 +117,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().export_assets(req, "parent")
+//! let result = hub.folders().export_assets(req, "parent")
 //!              .doit();
 //! 
 //! match result {
@@ -298,7 +302,7 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().export_assets(req, "parent")
+/// let result = hub.folders().export_assets(req, "parent")
 ///              .doit();
 /// 
 /// match result {
@@ -342,6 +346,9 @@ impl<'a, C, A> CloudAsset<C, A>
         }
     }
 
+    pub fn folders(&'a self) -> FolderMethods<'a, C, A> {
+        FolderMethods { hub: &self }
+    }
     pub fn organizations(&'a self) -> OrganizationMethods<'a, C, A> {
         OrganizationMethods { hub: &self }
     }
@@ -378,17 +385,17 @@ impl<'a, C, A> CloudAsset<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -502,12 +509,14 @@ pub struct ResourceType {
     #[serde(rename="resourceUrl")]
     pub resource_url: Option<String>,
     /// The full name of the immediate parent of this resource. See
-    /// [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
+    /// [Resource
+    /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
     /// for more information.
     /// 
     /// For GCP assets, it is the parent resource defined in the [Cloud IAM policy
     /// hierarchy](https://cloud.google.com/iam/docs/overview#policy_hierarchy).
-    /// For example: `"//cloudresourcemanager.googleapis.com/projects/my_project_123"`.
+    /// For example:
+    /// `"//cloudresourcemanager.googleapis.com/projects/my_project_123"`.
     /// 
     /// For third-party assets, it is up to the users to define.
     pub parent: Option<String>,
@@ -538,22 +547,19 @@ impl Part for ResourceType {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [export assets folders](struct.FolderExportAssetCall.html) (request)
 /// * [export assets projects](struct.ProjectExportAssetCall.html) (request)
 /// * [export assets organizations](struct.OrganizationExportAssetCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportAssetsRequest {
     /// A list of asset types of which to take a snapshot for. For example:
-    /// "google.compute.disk". If specified, only matching assets will be returned.
+    /// "google.compute.Disk". If specified, only matching assets will be returned.
+    /// See [Introduction to Cloud Asset
+    /// Inventory](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview)
+    /// for all supported asset types.
     #[serde(rename="assetTypes")]
     pub asset_types: Option<Vec<String>>,
-    /// Timestamp to take an asset snapshot. This can only be set to a timestamp
-    /// between 2018-10-02 UTC (inclusive) and the current time. If not specified,
-    /// the current time will be used. Due to delays in resource data collection
-    /// and indexing, there is a volatile window during which running the same
-    /// query may get different results.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
     /// Asset content type. If not specified, no content but the asset name will be
     /// returned.
     #[serde(rename="contentType")]
@@ -562,6 +568,13 @@ pub struct ExportAssetsRequest {
     /// to. All results will be in newline delimited JSON format.
     #[serde(rename="outputConfig")]
     pub output_config: Option<OutputConfig>,
+    /// Timestamp to take an asset snapshot. This can only be set to a timestamp
+    /// between 2018-10-02 UTC (inclusive) and the current time. If not specified,
+    /// the current time will be used. Due to delays in resource data collection
+    /// and indexing, there is a volatile window during which running the same
+    /// query may get different results.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
 }
 
 impl RequestValue for ExportAssetsRequest {}
@@ -577,10 +590,9 @@ impl RequestValue for ExportAssetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
     /// Textual representation of an expression in
     /// Common Expression Language syntax.
     /// 
@@ -590,9 +602,10 @@ pub struct Expr {
     /// An optional string indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
 }
 
 impl Part for Expr {}
@@ -625,6 +638,11 @@ pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
+    /// The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
     /// 
@@ -645,16 +663,11 @@ pub struct Binding {
     ///    For example, `admins@example.com`.
     /// 
     /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
     /// 
     pub members: Option<Vec<String>>,
-    /// Unimplemented. The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
-    pub condition: Option<Expr>,
 }
 
 impl Part for Binding {}
@@ -677,24 +690,6 @@ pub struct BatchGetAssetsHistoryResponse {
 }
 
 impl ResponseResult for BatchGetAssetsHistoryResponse {}
-
-
-/// A time window of [start_time, end_time).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TimeWindow {
-    /// End time of the time window (exclusive).
-    /// Current timestamp if not specified.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// Start time of the time window (inclusive).
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-}
-
-impl Part for TimeWindow {}
 
 
 /// Specifies the audit configuration for a service.
@@ -772,17 +767,19 @@ impl Part for AuditConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Asset {
-    /// Representation of the actual Cloud IAM policy set on a cloud resource. For each
-    /// resource, there must be at most one Cloud IAM policy set on it.
+    /// Representation of the actual Cloud IAM policy set on a cloud resource. For
+    /// each resource, there must be at most one Cloud IAM policy set on it.
     #[serde(rename="iamPolicy")]
     pub iam_policy: Option<Policy>,
-    /// Type of the asset. Example: "google.compute.disk".
+    /// Type of the asset. Example: "google.compute.Disk".
     #[serde(rename="assetType")]
     pub asset_type: Option<String>,
     /// Representation of the resource.
     pub resource: Option<ResourceType>,
-    /// The full name of the asset. For example: `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
-    /// See [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
+    /// The full name of the asset. For example:
+    /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
+    /// See [Resource
+    /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
     /// for more information.
     pub name: Option<String>,
 }
@@ -802,6 +799,24 @@ pub struct OutputConfig {
 }
 
 impl Part for OutputConfig {}
+
+
+/// A time window of (start_time, end_time].
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TimeWindow {
+    /// End time of the time window (inclusive).
+    /// Current timestamp if not specified.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// Start time of the time window (exclusive).
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+}
+
+impl Part for TimeWindow {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
@@ -854,9 +869,9 @@ impl Part for OutputConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -868,9 +883,9 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
     /// Deprecated.
     pub version: Option<i32>,
 }
@@ -886,10 +901,12 @@ impl Part for Policy {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [operations get organizations](struct.OrganizationOperationGetCall.html) (response)
+/// * [export assets folders](struct.FolderExportAssetCall.html) (response)
+/// * [operations get folders](struct.FolderOperationGetCall.html) (response)
 /// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
 /// * [export assets projects](struct.ProjectExportAssetCall.html) (response)
 /// * [export assets organizations](struct.OrganizationExportAssetCall.html) (response)
+/// * [operations get organizations](struct.OrganizationOperationGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
@@ -928,8 +945,10 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GcsDestination {
-    /// The path of the Cloud Storage objects. It's the same path that is used by
-    ///  gsutil. For example: "gs://bucket_name/object_path". See [Viewing and Editing Object Metadata](https://cloud.google.com/storage/docs/viewing-editing-metadata)
+    /// The uri of the Cloud Storage object. It's the same uri that is used by
+    /// gsutil. For example: "gs://bucket_name/object_name". See [Viewing and
+    /// Editing Object
+    /// Metadata](https://cloud.google.com/storage/docs/viewing-editing-metadata)
     /// for more information.
     pub uri: Option<String>,
 }
@@ -941,6 +960,92 @@ impl Part for GcsDestination {}
 // ###################
 // MethodBuilders ###
 // #################
+
+/// A builder providing access to all methods supported on *folder* resources.
+/// It is not used directly, but through the `CloudAsset` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_cloudasset1_beta1 as cloudasset1_beta1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use cloudasset1_beta1::CloudAsset;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = CloudAsset::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `export_assets(...)` and `operations_get(...)`
+/// // to build up your call.
+/// let rb = hub.folders();
+/// # }
+/// ```
+pub struct FolderMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudAsset<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for FolderMethods<'a, C, A> {}
+
+impl<'a, C, A> FolderMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Exports assets with time and resource types to a given Cloud Storage
+    /// location. The output format is newline-delimited JSON.
+    /// This API implements the google.longrunning.Operation API allowing you
+    /// to keep track of the export.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The relative name of the root asset. This can only be an
+    ///              organization number (such as "organizations/123"), a project ID (such as
+    ///              "projects/my-project-id"), a project number (such as "projects/12345"), or
+    ///              a folder number (such as "folders/123").
+    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> FolderExportAssetCall<'a, C, A> {
+        FolderExportAssetCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the latest state of a long-running operation.  Clients can use this
+    /// method to poll the operation result at intervals as recommended by the API
+    /// service.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource.
+    pub fn operations_get(&self, name: &str) -> FolderOperationGetCall<'a, C, A> {
+        FolderOperationGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
 
 /// A builder providing access to all methods supported on *organization* resources.
 /// It is not used directly, but through the `CloudAsset` hub.
@@ -988,6 +1093,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// non-delete or deleted status.
     /// For IAM_POLICY content, this API outputs history when the asset and its
     /// attached IAM POLICY both exist. This can create gaps in the output history.
+    /// If a specified asset does not exist, this API returns an INVALID_ARGUMENT
+    /// error.
     /// 
     /// # Arguments
     ///
@@ -1018,9 +1125,10 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The relative name of the root asset. This can only be an organization
-    ///              number (such as "organizations/123"), a project ID (such as
-    ///              "projects/my-project-id"), or a project number (such as "projects/12345").
+    /// * `parent` - Required. The relative name of the root asset. This can only be an
+    ///              organization number (such as "organizations/123"), a project ID (such as
+    ///              "projects/my-project-id"), a project number (such as "projects/12345"), or
+    ///              a folder number (such as "folders/123").
     pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> OrganizationExportAssetCall<'a, C, A> {
         OrganizationExportAssetCall {
             hub: self.hub,
@@ -1100,6 +1208,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// non-delete or deleted status.
     /// For IAM_POLICY content, this API outputs history when the asset and its
     /// attached IAM POLICY both exist. This can create gaps in the output history.
+    /// If a specified asset does not exist, this API returns an INVALID_ARGUMENT
+    /// error.
     /// 
     /// # Arguments
     ///
@@ -1149,9 +1259,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The relative name of the root asset. This can only be an organization
-    ///              number (such as "organizations/123"), a project ID (such as
-    ///              "projects/my-project-id"), or a project number (such as "projects/12345").
+    /// * `parent` - Required. The relative name of the root asset. This can only be an
+    ///              organization number (such as "organizations/123"), a project ID (such as
+    ///              "projects/my-project-id"), a project number (such as "projects/12345"), or
+    ///              a folder number (such as "folders/123").
     pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> ProjectExportAssetCall<'a, C, A> {
         ProjectExportAssetCall {
             hub: self.hub,
@@ -1172,11 +1283,548 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
+/// Exports assets with time and resource types to a given Cloud Storage
+/// location. The output format is newline-delimited JSON.
+/// This API implements the google.longrunning.Operation API allowing you
+/// to keep track of the export.
+///
+/// A builder for the *exportAssets* method supported by a *folder* resource.
+/// It is not used directly, but through a `FolderMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudasset1_beta1 as cloudasset1_beta1;
+/// use cloudasset1_beta1::ExportAssetsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudasset1_beta1::CloudAsset;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudAsset::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ExportAssetsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.folders().export_assets(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct FolderExportAssetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudAsset<C, A>,
+    _request: ExportAssetsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for FolderExportAssetCall<'a, C, A> {}
+
+impl<'a, C, A> FolderExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudasset.folders.exportAssets",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}:exportAssets";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ExportAssetsRequest) -> FolderExportAssetCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The relative name of the root asset. This can only be an
+    /// organization number (such as "organizations/123"), a project ID (such as
+    /// "projects/my-project-id"), a project number (such as "projects/12345"), or
+    /// a folder number (such as "folders/123").
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> FolderExportAssetCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderExportAssetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> FolderExportAssetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderExportAssetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *operations.get* method supported by a *folder* resource.
+/// It is not used directly, but through a `FolderMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudasset1_beta1 as cloudasset1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudasset1_beta1::CloudAsset;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudAsset::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.folders().operations_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct FolderOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudAsset<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for FolderOperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> FolderOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudasset.folders.operations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> FolderOperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> FolderOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderOperationGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Batch gets the update history of assets that overlap a time window.
 /// For RESOURCE content, this API outputs history with asset in both
 /// non-delete or deleted status.
 /// For IAM_POLICY content, this API outputs history when the asset and its
 /// attached IAM POLICY both exist. This can create gaps in the output history.
+/// If a specified asset does not exist, this API returns an INVALID_ARGUMENT
+/// error.
 ///
 /// A builder for the *batchGetAssetsHistory* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -1204,10 +1852,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().batch_get_assets_history("parent")
-///              .read_time_window_start_time("et")
-///              .read_time_window_end_time("dolores")
-///              .content_type("kasd")
-///              .add_asset_names("accusam")
+///              .read_time_window_start_time("kasd")
+///              .read_time_window_end_time("accusam")
+///              .content_type("takimata")
+///              .add_asset_names("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -1284,7 +1932,7 @@ impl<'a, C, A> OrganizationBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1300,10 +1948,7 @@ impl<'a, C, A> OrganizationBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1323,7 +1968,7 @@ impl<'a, C, A> OrganizationBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1388,14 +2033,14 @@ impl<'a, C, A> OrganizationBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMu
         self._parent = new_value.to_string();
         self
     }
-    /// Start time of the time window (inclusive).
+    /// Start time of the time window (exclusive).
     ///
     /// Sets the *read time window.start time* query property to the given value.
     pub fn read_time_window_start_time(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, C, A> {
         self._read_time_window_start_time = Some(new_value.to_string());
         self
     }
-    /// End time of the time window (exclusive).
+    /// End time of the time window (inclusive).
     /// Current timestamp if not specified.
     ///
     /// Sets the *read time window.end time* query property to the given value.
@@ -1412,7 +2057,8 @@ impl<'a, C, A> OrganizationBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMu
     }
     /// A list of the full names of the assets. For example:
     /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
-    /// See [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
+    /// See [Resource
+    /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
     /// for more info.
     /// 
     /// The request becomes a no-op if the asset name list is empty, and the max
@@ -1439,7 +2085,7 @@ impl<'a, C, A> OrganizationBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1447,12 +2093,12 @@ impl<'a, C, A> OrganizationBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationBatchGetAssetsHistoryCall<'a, C, A>
@@ -1583,7 +2229,7 @@ impl<'a, C, A> OrganizationExportAssetCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1599,10 +2245,7 @@ impl<'a, C, A> OrganizationExportAssetCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1634,7 +2277,7 @@ impl<'a, C, A> OrganizationExportAssetCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1699,9 +2342,10 @@ impl<'a, C, A> OrganizationExportAssetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Required. The relative name of the root asset. This can only be an organization
-    /// number (such as "organizations/123"), a project ID (such as
-    /// "projects/my-project-id"), or a project number (such as "projects/12345").
+    /// Required. The relative name of the root asset. This can only be an
+    /// organization number (such as "organizations/123"), a project ID (such as
+    /// "projects/my-project-id"), a project number (such as "projects/12345"), or
+    /// a folder number (such as "folders/123").
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -1726,7 +2370,7 @@ impl<'a, C, A> OrganizationExportAssetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1734,12 +2378,12 @@ impl<'a, C, A> OrganizationExportAssetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationExportAssetCall<'a, C, A>
@@ -1862,7 +2506,7 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1878,10 +2522,7 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1901,7 +2542,7 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1979,7 +2620,7 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1987,12 +2628,12 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationOperationGetCall<'a, C, A>
@@ -2032,6 +2673,8 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// non-delete or deleted status.
 /// For IAM_POLICY content, this API outputs history when the asset and its
 /// attached IAM POLICY both exist. This can create gaps in the output history.
+/// If a specified asset does not exist, this API returns an INVALID_ARGUMENT
+/// error.
 ///
 /// A builder for the *batchGetAssetsHistory* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2059,10 +2702,10 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().batch_get_assets_history("parent")
-///              .read_time_window_start_time("erat")
-///              .read_time_window_end_time("labore")
-///              .content_type("sea")
-///              .add_asset_names("nonumy")
+///              .read_time_window_start_time("sea")
+///              .read_time_window_end_time("nonumy")
+///              .content_type("dolores")
+///              .add_asset_names("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -2139,7 +2782,7 @@ impl<'a, C, A> ProjectBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2155,10 +2798,7 @@ impl<'a, C, A> ProjectBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2178,7 +2818,7 @@ impl<'a, C, A> ProjectBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2243,14 +2883,14 @@ impl<'a, C, A> ProjectBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hyp
         self._parent = new_value.to_string();
         self
     }
-    /// Start time of the time window (inclusive).
+    /// Start time of the time window (exclusive).
     ///
     /// Sets the *read time window.start time* query property to the given value.
     pub fn read_time_window_start_time(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a, C, A> {
         self._read_time_window_start_time = Some(new_value.to_string());
         self
     }
-    /// End time of the time window (exclusive).
+    /// End time of the time window (inclusive).
     /// Current timestamp if not specified.
     ///
     /// Sets the *read time window.end time* query property to the given value.
@@ -2267,7 +2907,8 @@ impl<'a, C, A> ProjectBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hyp
     }
     /// A list of the full names of the assets. For example:
     /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
-    /// See [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
+    /// See [Resource
+    /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
     /// for more info.
     /// 
     /// The request becomes a no-op if the asset name list is empty, and the max
@@ -2294,7 +2935,7 @@ impl<'a, C, A> ProjectBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2302,12 +2943,12 @@ impl<'a, C, A> ProjectBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectBatchGetAssetsHistoryCall<'a, C, A>
@@ -2430,7 +3071,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2446,10 +3087,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2469,7 +3107,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2547,7 +3185,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2555,12 +3193,12 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, C, A>
@@ -2691,7 +3329,7 @@ impl<'a, C, A> ProjectExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2707,10 +3345,7 @@ impl<'a, C, A> ProjectExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2742,7 +3377,7 @@ impl<'a, C, A> ProjectExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2807,9 +3442,10 @@ impl<'a, C, A> ProjectExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Required. The relative name of the root asset. This can only be an organization
-    /// number (such as "organizations/123"), a project ID (such as
-    /// "projects/my-project-id"), or a project number (such as "projects/12345").
+    /// Required. The relative name of the root asset. This can only be an
+    /// organization number (such as "organizations/123"), a project ID (such as
+    /// "projects/my-project-id"), a project number (such as "projects/12345"), or
+    /// a folder number (such as "folders/123").
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2834,7 +3470,7 @@ impl<'a, C, A> ProjectExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2842,12 +3478,12 @@ impl<'a, C, A> ProjectExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectExportAssetCall<'a, C, A>

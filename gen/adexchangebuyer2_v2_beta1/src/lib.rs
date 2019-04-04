@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.8+20181011*, where *20181011* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.8+20190403*, where *20190403* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *AdExchangeBuyerII* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/reference/rest/).
@@ -400,27 +400,36 @@ pub struct Image {
 impl Part for Image {}
 
 
-/// A metric value, with an expected value and a variance; represents a count
-/// that may be either exact or estimated (i.e. when sampled).
+/// Response message for listing all details associated with a given filtered bid
+/// reason.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [accounts filter sets filtered bids details list bidders](struct.BidderAccountFilterSetFilteredBidDetailListCall.html) (response)
+/// * [filter sets filtered bids details list bidders](struct.BidderFilterSetFilteredBidDetailListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MetricValue {
-    /// The variance (i.e. square of the standard deviation) of the metric value.
-    /// If value is exact, variance is 0.
-    /// Can be used to calculate margin of error as a percentage of value, using
-    /// the following formula, where Z is the standard constant that depends on the
-    /// desired size of the confidence interval (e.g. for 90% confidence interval,
-    /// use Z = 1.645):
-    /// 
-    ///   marginOfError = 100 * Z * sqrt(variance) / value
-    pub variance: Option<String>,
-    /// The expected value of the metric.
-    pub value: Option<String>,
+pub struct ListCreativeStatusBreakdownByDetailResponse {
+    /// A token to retrieve the next page of results.
+    /// Pass this value in the
+    /// ListCreativeStatusBreakdownByDetailRequest.pageToken
+    /// field in the subsequent call to the filteredBids.details.list
+    /// method to retrieve the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The type of detail that the detail IDs represent.
+    #[serde(rename="detailType")]
+    pub detail_type: Option<String>,
+    /// List of rows, with counts of bids with a given creative status aggregated
+    /// by detail.
+    #[serde(rename="filteredBidDetailRows")]
+    pub filtered_bid_detail_rows: Option<Vec<FilteredBidDetailRow>>,
 }
 
-impl Part for MetricValue {}
+impl ResponseResult for ListCreativeStatusBreakdownByDetailResponse {}
 
 
 /// @OutputOnly The reason and details for a disapproval.
@@ -482,14 +491,14 @@ pub struct Note {
     /// @OutputOnly
     #[serde(rename="proposalRevision")]
     pub proposal_revision: Option<String>,
-    /// The timestamp for when this note was created.
-    /// @OutputOnly
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
     /// The unique ID for the note.
     /// @OutputOnly
     #[serde(rename="noteId")]
     pub note_id: Option<String>,
+    /// The timestamp for when this note was created.
+    /// @OutputOnly
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
 }
 
 impl ResponseResult for Note {}
@@ -537,6 +546,11 @@ pub struct RowDimensions {
     /// The time interval that this row represents.
     #[serde(rename="timeInterval")]
     pub time_interval: Option<TimeInterval>,
+    /// The publisher identifier for this row, if a breakdown by
+    /// [BreakdownDimension.PUBLISHER_IDENTIFIER](https://developers.google.com/authorized-buyers/apis/reference/rest/v2beta1/bidders.accounts.filterSets#FilterSet.BreakdownDimension)
+    /// was requested.
+    #[serde(rename="publisherIdentifier")]
+    pub publisher_identifier: Option<String>,
 }
 
 impl Part for RowDimensions {}
@@ -557,36 +571,27 @@ pub struct CompleteSetupRequest { _never_set: Option<bool> }
 impl RequestValue for CompleteSetupRequest {}
 
 
-/// Response message for listing all details associated with a given filtered bid
-/// reason.
+/// A metric value, with an expected value and a variance; represents a count
+/// that may be either exact or estimated (i.e. when sampled).
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [accounts filter sets filtered bids details list bidders](struct.BidderAccountFilterSetFilteredBidDetailListCall.html) (response)
-/// * [filter sets filtered bids details list bidders](struct.BidderFilterSetFilteredBidDetailListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListCreativeStatusBreakdownByDetailResponse {
-    /// A token to retrieve the next page of results.
-    /// Pass this value in the
-    /// ListCreativeStatusBreakdownByDetailRequest.pageToken
-    /// field in the subsequent call to the filteredBids.details.list
-    /// method to retrieve the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The type of detail that the detail IDs represent.
-    #[serde(rename="detailType")]
-    pub detail_type: Option<String>,
-    /// List of rows, with counts of bids with a given creative status aggregated
-    /// by detail.
-    #[serde(rename="filteredBidDetailRows")]
-    pub filtered_bid_detail_rows: Option<Vec<FilteredBidDetailRow>>,
+pub struct MetricValue {
+    /// The variance (i.e. square of the standard deviation) of the metric value.
+    /// If value is exact, variance is 0.
+    /// Can be used to calculate margin of error as a percentage of value, using
+    /// the following formula, where Z is the standard constant that depends on the
+    /// desired size of the confidence interval (e.g. for 90% confidence interval,
+    /// use Z = 1.645):
+    /// 
+    ///   marginOfError = 100 * Z * sqrt(variance) / value
+    pub variance: Option<String>,
+    /// The expected value of the metric.
+    pub value: Option<String>,
 }
 
-impl ResponseResult for ListCreativeStatusBreakdownByDetailResponse {}
+impl Part for MetricValue {}
 
 
 /// Request message to resume (unpause) serving for an already-finalized
@@ -690,13 +695,13 @@ impl ResponseResult for ListBidResponseErrorsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalloutStatusRow {
-    /// The values of all dimensions associated with metric values in this row.
-    #[serde(rename="rowDimensions")]
-    pub row_dimensions: Option<RowDimensions>,
     /// The ID of the callout status.
     /// See [callout-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/callout-status-codes).
     #[serde(rename="calloutStatusId")]
     pub callout_status_id: Option<i32>,
+    /// The values of all dimensions associated with metric values in this row.
+    #[serde(rename="rowDimensions")]
+    pub row_dimensions: Option<RowDimensions>,
     /// The number of impressions for which there was a bid request or bid response
     /// with the specified callout status.
     #[serde(rename="impressionCount")]
@@ -761,13 +766,13 @@ impl Part for NonGuaranteedFixedPriceTerms {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reason {
+    /// The number of times the creative was filtered for the status. The
+    /// count is aggregated across all publishers on the exchange.
+    pub count: Option<String>,
     /// The filtering status code. Please refer to the
     /// [creative-status-codes.txt](https://storage.googleapis.com/adx-rtb-dictionaries/creative-status-codes.txt)
     /// file for different statuses.
     pub status: Option<i32>,
-    /// The number of times the creative was filtered for the status. The
-    /// count is aggregated across all publishers on the exchange.
-    pub count: Option<String>,
 }
 
 impl Part for Reason {}
@@ -851,25 +856,26 @@ pub struct RemoveDealAssociationRequest {
 impl RequestValue for RemoveDealAssociationRequest {}
 
 
-/// The number of filtered bids with the specified dimension values that have the
-/// specified creative.
+/// The number of impressions with the specified dimension values that were
+/// considered to have no applicable bids, as described by the specified status.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FilteredBidCreativeRow {
-    /// The ID of the creative.
-    #[serde(rename="creativeId")]
-    pub creative_id: Option<String>,
+pub struct BidResponseWithoutBidsStatusRow {
+    /// The status specifying why the bid responses were considered to have no
+    /// applicable bids.
+    pub status: Option<String>,
     /// The values of all dimensions associated with metric values in this row.
     #[serde(rename="rowDimensions")]
     pub row_dimensions: Option<RowDimensions>,
-    /// The number of bids with the specified creative.
-    #[serde(rename="bidCount")]
-    pub bid_count: Option<MetricValue>,
+    /// The number of impressions for which there was a bid response with the
+    /// specified status.
+    #[serde(rename="impressionCount")]
+    pub impression_count: Option<MetricValue>,
 }
 
-impl Part for FilteredBidCreativeRow {}
+impl Part for BidResponseWithoutBidsStatusRow {}
 
 
 /// Represents a buyer of inventory. Each buyer is identified by a unique
@@ -957,23 +963,25 @@ pub struct LocationContext {
 impl Part for LocationContext {}
 
 
-/// An interval of time, with an absolute start and end.
+/// Represents a list of targeted and excluded URLs (e.g., google.com).
+/// For Private Auction and AdX Preferred Deals, URLs are either included or
+/// excluded.
+/// For Programmatic Guaranteed and Preferred Deals, this doesn't
+/// apply.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TimeInterval {
-    /// The timestamp marking the end of the range (exclusive) for which data is
-    /// included.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// The timestamp marking the start of the range (inclusive) for which data is
-    /// included.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
+pub struct UrlTargeting {
+    /// A list of URLs to be excluded.
+    #[serde(rename="excludedUrls")]
+    pub excluded_urls: Option<Vec<String>>,
+    /// A list of URLs to be included.
+    #[serde(rename="targetedUrls")]
+    pub targeted_urls: Option<Vec<String>>,
 }
 
-impl Part for TimeInterval {}
+impl Part for UrlTargeting {}
 
 
 /// Represents information for a creative that is associated with a Programmatic
@@ -1076,48 +1084,33 @@ impl RequestValue for WatchCreativeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
+    pub month: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year by itself or a year and month where the day is not
     /// significant.
     pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
-    /// month and day.
-    pub month: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
 impl Part for Date {}
 
 
-/// Response message for listing all creatives associated with a given filtered
-/// bid reason.
+/// @OutputOnly The auction type the restriction applies to.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [accounts filter sets filtered bids creatives list bidders](struct.BidderAccountFilterSetFilteredBidCreativeListCall.html) (response)
-/// * [filter sets filtered bids creatives list bidders](struct.BidderFilterSetFilteredBidCreativeListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListCreativeStatusBreakdownByCreativeResponse {
-    /// A token to retrieve the next page of results.
-    /// Pass this value in the
-    /// ListCreativeStatusBreakdownByCreativeRequest.pageToken
-    /// field in the subsequent call to the filteredBids.creatives.list
-    /// method to retrieve the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of rows, with counts of bids with a given creative status aggregated
-    /// by creative.
-    #[serde(rename="filteredBidCreativeRows")]
-    pub filtered_bid_creative_rows: Option<Vec<FilteredBidCreativeRow>>,
+pub struct AuctionContext {
+    /// The auction types this restriction applies to.
+    #[serde(rename="auctionTypes")]
+    pub auction_types: Option<Vec<String>>,
 }
 
-impl ResponseResult for ListCreativeStatusBreakdownByCreativeResponse {}
+impl Part for AuctionContext {}
 
 
 /// A client resource represents a client buyer&mdash;an agency, a brand, or an
@@ -1208,24 +1201,22 @@ impl ResponseResult for Client {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeStatusRow {
-    /// The values of all dimensions associated with metric values in this row.
-    #[serde(rename="rowDimensions")]
-    pub row_dimensions: Option<RowDimensions>,
+    /// The number of bids with the specified status.
+    #[serde(rename="bidCount")]
+    pub bid_count: Option<MetricValue>,
     /// The ID of the creative status.
     /// See [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes).
     #[serde(rename="creativeStatusId")]
     pub creative_status_id: Option<i32>,
-    /// The number of bids with the specified status.
-    #[serde(rename="bidCount")]
-    pub bid_count: Option<MetricValue>,
+    /// The values of all dimensions associated with metric values in this row.
+    #[serde(rename="rowDimensions")]
+    pub row_dimensions: Option<RowDimensions>,
 }
 
 impl Part for CreativeStatusRow {}
 
 
 /// A creative and its classification data.
-/// 
-/// Next ID: 38
 /// 
 /// # Activities
 /// 
@@ -1247,6 +1238,9 @@ pub struct Creative {
     #[serde(rename="agencyId")]
     pub agency_id: Option<String>,
     /// @OutputOnly The filtering stats for this creative.
+    /// Deprecated; please use
+    /// bidders.accounts.filterSets.filteredBids.creatives.list
+    /// method instead.
     #[serde(rename="filteringStats")]
     pub filtering_stats: Option<FilteringStats>,
     /// The set of declared destination URLs for the creative.
@@ -1280,6 +1274,11 @@ pub struct Creative {
     /// excluded-sensitive-category field in the bid request to filter your bids.
     #[serde(rename="detectedSensitiveCategories")]
     pub detected_sensitive_categories: Option<Vec<i32>>,
+    /// All attributes for the ads that may be shown from this creative.
+    /// Can be used to filter the response of the
+    /// creatives.list
+    /// method.
+    pub attributes: Option<Vec<String>>,
     /// @OutputOnly The top-level deals status of this creative.
     /// If disapproved, an entry for 'auctionType=DIRECT_DEALS' (or 'ALL') in
     /// serving_restrictions will also exist. Note
@@ -1302,19 +1301,13 @@ pub struct Creative {
     /// The link to AdChoices destination page.
     #[serde(rename="adChoicesDestinationUrl")]
     pub ad_choices_destination_url: Option<String>,
-    /// The account that this creative belongs to.
-    /// Can be used to filter the response of the
-    /// creatives.list
-    /// method.
-    #[serde(rename="accountId")]
-    pub account_id: Option<String>,
+    /// A native creative.
+    pub native: Option<NativeContent>,
     /// All vendor IDs for the ads that may be shown from this creative.
     /// See https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt
     /// for possible values.
     #[serde(rename="vendorIds")]
     pub vendor_ids: Option<Vec<i32>>,
-    /// A video creative.
-    pub video: Option<VideoContent>,
     /// @OutputOnly Detected product categories, if any.
     /// See the ad-product-categories.txt file in the technical documentation
     /// for a list of IDs.
@@ -1340,13 +1333,14 @@ pub struct Creative {
     /// The detected domains for this creative.
     #[serde(rename="detectedDomains")]
     pub detected_domains: Option<Vec<String>>,
-    /// All attributes for the ads that may be shown from this creative.
+    /// A video creative.
+    pub video: Option<VideoContent>,
+    /// The account that this creative belongs to.
     /// Can be used to filter the response of the
     /// creatives.list
     /// method.
-    pub attributes: Option<Vec<String>>,
-    /// A native creative.
-    pub native: Option<NativeContent>,
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
 }
 
 impl RequestValue for Creative {}
@@ -1428,28 +1422,24 @@ pub struct PlacementTargeting {
 impl Part for PlacementTargeting {}
 
 
-/// Terms for Programmatic Guaranteed Deals.
+/// The number of winning bids with the specified dimension values for which the
+/// buyer was not billed, as described by the specified status.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GuaranteedFixedPriceTerms {
-    /// Guaranteed impressions as a percentage. This is the percentage
-    /// of guaranteed looks that the buyer is guaranteeing to buy.
-    #[serde(rename="guaranteedImpressions")]
-    pub guaranteed_impressions: Option<String>,
-    /// Fixed price for the specified buyer.
-    #[serde(rename="fixedPrices")]
-    pub fixed_prices: Option<Vec<PricePerBuyer>>,
-    /// Daily minimum looks for CPD deal types.
-    #[serde(rename="minimumDailyLooks")]
-    pub minimum_daily_looks: Option<String>,
-    /// Count of guaranteed looks. Required for deal, optional for product.
-    #[serde(rename="guaranteedLooks")]
-    pub guaranteed_looks: Option<String>,
+pub struct NonBillableWinningBidStatusRow {
+    /// The status specifying why the winning bids were not billed.
+    pub status: Option<String>,
+    /// The number of bids with the specified status.
+    #[serde(rename="bidCount")]
+    pub bid_count: Option<MetricValue>,
+    /// The values of all dimensions associated with metric values in this row.
+    #[serde(rename="rowDimensions")]
+    pub row_dimensions: Option<RowDimensions>,
 }
 
-impl Part for GuaranteedFixedPriceTerms {}
+impl Part for NonBillableWinningBidStatusRow {}
 
 
 /// The serving context for this restriction.
@@ -1526,24 +1516,28 @@ pub struct VideoTargeting {
 impl Part for VideoTargeting {}
 
 
-/// The number of winning bids with the specified dimension values for which the
-/// buyer was not billed, as described by the specified status.
+/// Terms for Programmatic Guaranteed Deals.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NonBillableWinningBidStatusRow {
-    /// The status specifying why the winning bids were not billed.
-    pub status: Option<String>,
-    /// The values of all dimensions associated with metric values in this row.
-    #[serde(rename="rowDimensions")]
-    pub row_dimensions: Option<RowDimensions>,
-    /// The number of bids with the specified status.
-    #[serde(rename="bidCount")]
-    pub bid_count: Option<MetricValue>,
+pub struct GuaranteedFixedPriceTerms {
+    /// Guaranteed impressions as a percentage. This is the percentage
+    /// of guaranteed looks that the buyer is guaranteeing to buy.
+    #[serde(rename="guaranteedImpressions")]
+    pub guaranteed_impressions: Option<String>,
+    /// Fixed price for the specified buyer.
+    #[serde(rename="fixedPrices")]
+    pub fixed_prices: Option<Vec<PricePerBuyer>>,
+    /// Daily minimum looks for CPD deal types.
+    #[serde(rename="minimumDailyLooks")]
+    pub minimum_daily_looks: Option<String>,
+    /// Count of guaranteed looks. Required for deal, optional for product.
+    #[serde(rename="guaranteedLooks")]
+    pub guaranteed_looks: Option<String>,
 }
 
-impl Part for NonBillableWinningBidStatusRow {}
+impl Part for GuaranteedFixedPriceTerms {}
 
 
 /// Response message for listing all reasons that bids lost in the auction.
@@ -1631,8 +1625,9 @@ impl ResponseResult for ListClientUsersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DealTerms {
-    /// Publisher provided description for the terms.
-    pub description: Option<String>,
+    /// Visibility of the URL in bid requests. (default: BRANDED)
+    #[serde(rename="brandingType")]
+    pub branding_type: Option<String>,
     /// Non-binding estimate of the estimated gross spend for this deal.
     /// Can be set by buyer or seller.
     #[serde(rename="estimatedGrossSpend")]
@@ -1656,49 +1651,123 @@ pub struct DealTerms {
     /// The terms for non-guaranteed auction deals.
     #[serde(rename="nonGuaranteedAuctionTerms")]
     pub non_guaranteed_auction_terms: Option<NonGuaranteedAuctionTerms>,
-    /// Visibility of the URL in bid requests. (default: BRANDED)
-    #[serde(rename="brandingType")]
-    pub branding_type: Option<String>,
+    /// Publisher provided description for the terms.
+    pub description: Option<String>,
 }
 
 impl Part for DealTerms {}
 
 
-/// Message depicting the size of the creative. The units of width and
-/// height depend on the type of the targeting.
+/// A set of filters that is applied to a request for data.
+/// Within a filter set, an AND operation is performed across the filters
+/// represented by each field. An OR operation is performed across the filters
+/// represented by the multiple values of a repeated field, e.g.,
+/// "format=VIDEO AND deal_id=12 AND (seller_network_id=34 OR
+/// seller_network_id=56)".
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [accounts filter sets create bidders](struct.BidderAccountFilterSetCreateCall.html) (request|response)
+/// * [filter sets get bidders](struct.BidderFilterSetGetCall.html) (response)
+/// * [accounts filter sets get bidders](struct.BidderAccountFilterSetGetCall.html) (response)
+/// * [filter sets create bidders](struct.BidderFilterSetCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FilterSet {
+    /// A user-defined name of the filter set. Filter set names must be unique
+    /// globally and match one of the patterns:
+    /// 
+    /// - `bidders/*/filterSets/*` (for accessing bidder-level troubleshooting
+    /// data)
+    /// - `bidders/*/accounts/*/filterSets/*` (for accessing account-level
+    /// troubleshooting data)
+    /// 
+    /// This field is required in create operations.
+    pub name: Option<String>,
+    /// For Authorized Buyers only.
+    /// The list of IDs of the seller (publisher) networks on which to filter;
+    /// may be empty. The filters represented by multiple seller network IDs are
+    /// ORed together (i.e., if non-empty, results must match any one of the
+    /// publisher networks). See
+    /// [seller-network-ids](https://developers.google.com/authorized-buyers/rtb/downloads/seller-network-ids)
+    /// file for the set of existing seller network IDs.
+    #[serde(rename="sellerNetworkIds")]
+    pub seller_network_ids: Option<Vec<i32>>,
+    /// A relative date range, defined by an offset from today and a duration.
+    /// Interpreted relative to Pacific time zone.
+    #[serde(rename="relativeDateRange")]
+    pub relative_date_range: Option<RelativeDateRange>,
+    /// For Open Bidding partners only.
+    /// The list of publisher identifiers on which to filter; may be empty.
+    /// The filters represented by multiple publisher identifiers are ORed
+    /// together.
+    #[serde(rename="publisherIdentifiers")]
+    pub publisher_identifiers: Option<Vec<String>>,
+    /// The set of dimensions along which to break down the response; may be empty.
+    /// If multiple dimensions are requested, the breakdown is along the Cartesian
+    /// product of the requested dimensions.
+    #[serde(rename="breakdownDimensions")]
+    pub breakdown_dimensions: Option<Vec<String>>,
+    /// An open-ended realtime time range, defined by the aggregation start
+    /// timestamp.
+    #[serde(rename="realtimeTimeRange")]
+    pub realtime_time_range: Option<RealtimeTimeRange>,
+    /// The ID of the deal on which to filter; optional. This field may be set
+    /// only for a filter set that accesses account-level troubleshooting data,
+    /// i.e., one whose name matches the `bidders/*/accounts/*/filterSets/*`
+    /// pattern.
+    #[serde(rename="dealId")]
+    pub deal_id: Option<String>,
+    /// The environment on which to filter; optional.
+    pub environment: Option<String>,
+    /// The list of platforms on which to filter; may be empty. The filters
+    /// represented by multiple platforms are ORed together (i.e., if non-empty,
+    /// results must match any one of the platforms).
+    pub platforms: Option<Vec<String>>,
+    /// An absolute date range, defined by a start date and an end date.
+    /// Interpreted relative to Pacific time zone.
+    #[serde(rename="absoluteDateRange")]
+    pub absolute_date_range: Option<AbsoluteDateRange>,
+    /// The list of formats on which to filter; may be empty. The filters
+    /// represented by multiple formats are ORed together (i.e., if non-empty,
+    /// results must match any one of the formats).
+    pub formats: Option<Vec<String>>,
+    /// The ID of the creative on which to filter; optional. This field may be set
+    /// only for a filter set that accesses account-level troubleshooting data,
+    /// i.e., one whose name matches the `bidders/*/accounts/*/filterSets/*`
+    /// pattern.
+    #[serde(rename="creativeId")]
+    pub creative_id: Option<String>,
+    /// The granularity of time intervals if a time series breakdown is desired;
+    /// optional.
+    #[serde(rename="timeSeriesGranularity")]
+    pub time_series_granularity: Option<String>,
+}
+
+impl RequestValue for FilterSet {}
+impl ResponseResult for FilterSet {}
+
+
+/// An interval of time, with an absolute start and end.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Size {
-    /// The width of the creative
-    pub width: Option<i32>,
-    /// The height of the creative.
-    pub height: Option<i32>,
+pub struct TimeInterval {
+    /// The timestamp marking the end of the range (exclusive) for which data is
+    /// included.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The timestamp marking the start of the range (inclusive) for which data is
+    /// included.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
 }
 
-impl Part for Size {}
-
-
-/// Represents a list of targeted and excluded URLs (e.g., google.com).
-/// For Private Auction and AdX Preferred Deals, URLs are either included or
-/// excluded.
-/// For Programmatic Guaranteed and Preferred Deals, this doesn't
-/// apply.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UrlTargeting {
-    /// A list of URLs to be excluded.
-    #[serde(rename="excludedUrls")]
-    pub excluded_urls: Option<Vec<String>>,
-    /// A list of URLs to be included.
-    #[serde(rename="targetedUrls")]
-    pub targeted_urls: Option<Vec<String>>,
-}
-
-impl Part for UrlTargeting {}
+impl Part for TimeInterval {}
 
 
 /// Response message for listing all reasons that bid requests were filtered and
@@ -1749,26 +1818,25 @@ pub struct AcceptProposalRequest {
 impl RequestValue for AcceptProposalRequest {}
 
 
-/// The number of impressions with the specified dimension values that were
-/// considered to have no applicable bids, as described by the specified status.
+/// The number of filtered bids with the specified dimension values that have the
+/// specified creative.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BidResponseWithoutBidsStatusRow {
-    /// The status specifying why the bid responses were considered to have no
-    /// applicable bids.
-    pub status: Option<String>,
+pub struct FilteredBidCreativeRow {
+    /// The ID of the creative.
+    #[serde(rename="creativeId")]
+    pub creative_id: Option<String>,
+    /// The number of bids with the specified creative.
+    #[serde(rename="bidCount")]
+    pub bid_count: Option<MetricValue>,
     /// The values of all dimensions associated with metric values in this row.
     #[serde(rename="rowDimensions")]
     pub row_dimensions: Option<RowDimensions>,
-    /// The number of impressions for which there was a bid response with the
-    /// specified status.
-    #[serde(rename="impressionCount")]
-    pub impression_count: Option<MetricValue>,
 }
 
-impl Part for BidResponseWithoutBidsStatusRow {}
+impl Part for FilteredBidCreativeRow {}
 
 
 /// Buyers are allowed to store certain types of private data in a proposal/deal.
@@ -2184,40 +2252,32 @@ impl RequestValue for AddDealAssociationRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilteringStats {
-    /// The set of filtering reasons for this date.
-    pub reasons: Option<Vec<Reason>>,
     /// The day during which the data was collected.
     /// The data is collected from 00:00:00 to 23:59:59 PT.
     /// During switches from PST to PDT and back, the day may
     /// contain 23 or 25 hours of data instead of the usual 24.
     pub date: Option<Date>,
+    /// The set of filtering reasons for this date.
+    pub reasons: Option<Vec<Reason>>,
 }
 
 impl Part for FilteringStats {}
 
 
-/// A relative date range, specified by an offset and a duration.
-/// The supported range of dates begins 30 days before today and ends today,
-/// i.e., the limits for these values are:
-/// offset_days >= 0
-/// duration_days >= 1
-/// offset_days + duration_days <= 30
+/// Represents a price and a pricing type for a product / deal.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RelativeDateRange {
-    /// The number of days in the requested date range, e.g., for a range spanning
-    /// today: 1. For a range spanning the last 7 days: 7.
-    #[serde(rename="durationDays")]
-    pub duration_days: Option<i32>,
-    /// The end date of the filter set, specified as the number of days before
-    /// today, e.g., for a range where the last date is today: 0.
-    #[serde(rename="offsetDays")]
-    pub offset_days: Option<i32>,
+pub struct Price {
+    /// The pricing type for the deal/product. (default: CPM)
+    #[serde(rename="pricingType")]
+    pub pricing_type: Option<String>,
+    /// The actual price with currency specified.
+    pub amount: Option<Money>,
 }
 
-impl Part for RelativeDateRange {}
+impl Part for Price {}
 
 
 /// Contains information on how a buyer or seller can be reached.
@@ -2279,12 +2339,12 @@ pub struct NativeContent {
     pub headline: Option<String>,
     /// A large image.
     pub image: Option<Image>,
+    /// The URL to use for click tracking.
+    #[serde(rename="clickTrackingUrl")]
+    pub click_tracking_url: Option<String>,
     /// The app rating in the app store. Must be in the range [0-5].
     #[serde(rename="starRating")]
     pub star_rating: Option<f64>,
-    /// The URL to the app store to purchase/download the promoted app.
-    #[serde(rename="storeUrl")]
-    pub store_url: Option<String>,
     /// The name of the advertiser or sponsor, to be displayed in the ad creative.
     #[serde(rename="advertiserName")]
     pub advertiser_name: Option<String>,
@@ -2299,9 +2359,9 @@ pub struct NativeContent {
     pub app_icon: Option<Image>,
     /// A smaller image, for the advertiser's logo.
     pub logo: Option<Image>,
-    /// The URL to use for click tracking.
-    #[serde(rename="clickTrackingUrl")]
-    pub click_tracking_url: Option<String>,
+    /// The URL to the app store to purchase/download the promoted app.
+    #[serde(rename="storeUrl")]
+    pub store_url: Option<String>,
     /// The URL that the browser/SDK will load when the user clicks the ad.
     #[serde(rename="clickLinkUrl")]
     pub click_link_url: Option<String>,
@@ -2486,6 +2546,9 @@ impl ResponseResult for ListProposalsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListImpressionMetricsResponse {
+    /// List of rows, each containing a set of impression metrics.
+    #[serde(rename="impressionMetricsRows")]
+    pub impression_metrics_rows: Option<Vec<ImpressionMetricsRow>>,
     /// A token to retrieve the next page of results.
     /// Pass this value in the
     /// ListImpressionMetricsRequest.pageToken
@@ -2493,9 +2556,6 @@ pub struct ListImpressionMetricsResponse {
     /// method to retrieve the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// List of rows, each containing a set of impression metrics.
-    #[serde(rename="impressionMetricsRows")]
-    pub impression_metrics_rows: Option<Vec<ImpressionMetricsRow>>,
 }
 
 impl ResponseResult for ListImpressionMetricsResponse {}
@@ -2822,12 +2882,12 @@ pub struct FilteredBidDetailRow {
     /// dictionary file corresponding to the DetailType in the response message.
     #[serde(rename="detailId")]
     pub detail_id: Option<i32>,
-    /// The values of all dimensions associated with metric values in this row.
-    #[serde(rename="rowDimensions")]
-    pub row_dimensions: Option<RowDimensions>,
     /// The number of bids with the specified detail.
     #[serde(rename="bidCount")]
     pub bid_count: Option<MetricValue>,
+    /// The values of all dimensions associated with metric values in this row.
+    #[serde(rename="rowDimensions")]
+    pub row_dimensions: Option<RowDimensions>,
 }
 
 impl Part for FilteredBidDetailRow {}
@@ -2839,22 +2899,22 @@ impl Part for FilteredBidDetailRow {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetingValue {
-    /// The string value to include/exclude.
-    #[serde(rename="stringValue")]
-    pub string_value: Option<String>,
-    /// The long value to include/exclude.
-    #[serde(rename="longValue")]
-    pub long_value: Option<String>,
     /// The daypart targeting to include / exclude.
     /// Filled in when the key is GOOG_DAYPART_TARGETING.
     /// The definition of this targeting is derived from the structure
     /// used by Ad Manager.
     #[serde(rename="dayPartTargetingValue")]
     pub day_part_targeting_value: Option<DayPartTargeting>,
+    /// The long value to include/exclude.
+    #[serde(rename="longValue")]
+    pub long_value: Option<String>,
     /// The creative size value to include/exclude.
     /// Filled in when key = GOOG_CREATIVE_SIZE
     #[serde(rename="creativeSizeValue")]
     pub creative_size_value: Option<CreativeSize>,
+    /// The string value to include/exclude.
+    #[serde(rename="stringValue")]
+    pub string_value: Option<String>,
 }
 
 impl Part for TargetingValue {}
@@ -3031,9 +3091,6 @@ impl Part for Deal {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Money {
-    /// The whole units of the amount.
-    /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
-    pub units: Option<String>,
     /// Number of nano (10^-9) units of the amount.
     /// The value must be between -999,999,999 and +999,999,999 inclusive.
     /// If `units` is positive, `nanos` must be positive or zero.
@@ -3041,6 +3098,9 @@ pub struct Money {
     /// If `units` is negative, `nanos` must be negative or zero.
     /// For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
     pub nanos: Option<i32>,
+    /// The whole units of the amount.
+    /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
+    pub units: Option<String>,
     /// The 3-letter currency code defined in ISO 4217.
     #[serde(rename="currencyCode")]
     pub currency_code: Option<String>,
@@ -3067,18 +3127,33 @@ pub struct Correction {
 impl Part for Correction {}
 
 
-/// @OutputOnly The auction type the restriction applies to.
+/// Response message for listing all creatives associated with a given filtered
+/// bid reason.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [accounts filter sets filtered bids creatives list bidders](struct.BidderAccountFilterSetFilteredBidCreativeListCall.html) (response)
+/// * [filter sets filtered bids creatives list bidders](struct.BidderFilterSetFilteredBidCreativeListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AuctionContext {
-    /// The auction types this restriction applies to.
-    #[serde(rename="auctionTypes")]
-    pub auction_types: Option<Vec<String>>,
+pub struct ListCreativeStatusBreakdownByCreativeResponse {
+    /// A token to retrieve the next page of results.
+    /// Pass this value in the
+    /// ListCreativeStatusBreakdownByCreativeRequest.pageToken
+    /// field in the subsequent call to the filteredBids.creatives.list
+    /// method to retrieve the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of rows, with counts of bids with a given creative status aggregated
+    /// by creative.
+    #[serde(rename="filteredBidCreativeRows")]
+    pub filtered_bid_creative_rows: Option<Vec<FilteredBidCreativeRow>>,
 }
 
-impl Part for AuctionContext {}
+impl ResponseResult for ListCreativeStatusBreakdownByCreativeResponse {}
 
 
 /// Response message for profiles visible to the buyer.
@@ -3168,7 +3243,7 @@ impl Part for BidMetricsRow {}
 pub struct PauseProposalRequest {
     /// The reason why the proposal is being paused.
     /// This human readable message will be displayed in the seller's UI.
-    /// (Max length: 100 unicode code units.)
+    /// (Max length: 1000 unicode code units.)
     pub reason: Option<String>,
 }
 
@@ -3191,108 +3266,44 @@ pub struct RealtimeTimeRange {
 impl Part for RealtimeTimeRange {}
 
 
-/// A set of filters that is applied to a request for data.
-/// Within a filter set, an AND operation is performed across the filters
-/// represented by each field. An OR operation is performed across the filters
-/// represented by the multiple values of a repeated field, e.g.,
-/// "format=VIDEO AND deal_id=12 AND (seller_network_id=34 OR
-/// seller_network_id=56)".
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [accounts filter sets create bidders](struct.BidderAccountFilterSetCreateCall.html) (request|response)
-/// * [filter sets get bidders](struct.BidderFilterSetGetCall.html) (response)
-/// * [accounts filter sets get bidders](struct.BidderAccountFilterSetGetCall.html) (response)
-/// * [filter sets create bidders](struct.BidderFilterSetCreateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FilterSet {
-    /// A user-defined name of the filter set. Filter set names must be unique
-    /// globally and match one of the patterns:
-    /// 
-    /// - `bidders/*/filterSets/*` (for accessing bidder-level troubleshooting
-    /// data)
-    /// - `bidders/*/accounts/*/filterSets/*` (for accessing account-level
-    /// troubleshooting data)
-    /// 
-    /// This field is required in create operations.
-    pub name: Option<String>,
-    /// For Authorized Buyers only.
-    /// The list of IDs of the seller (publisher) networks on which to filter;
-    /// may be empty. The filters represented by multiple seller network IDs are
-    /// ORed together (i.e., if non-empty, results must match any one of the
-    /// publisher networks). See
-    /// [seller-network-ids](https://developers.google.com/authorized-buyers/rtb/downloads/seller-network-ids)
-    /// file for the set of existing seller network IDs.
-    #[serde(rename="sellerNetworkIds")]
-    pub seller_network_ids: Option<Vec<i32>>,
-    /// A relative date range, defined by an offset from today and a duration.
-    /// Interpreted relative to Pacific time zone.
-    #[serde(rename="relativeDateRange")]
-    pub relative_date_range: Option<RelativeDateRange>,
-    /// For Open Bidding partners only.
-    /// The list of publisher identifiers on which to filter; may be empty.
-    /// The filters represented by multiple publisher identifiers are ORed
-    /// together.
-    #[serde(rename="publisherIdentifiers")]
-    pub publisher_identifiers: Option<Vec<String>>,
-    /// An open-ended realtime time range, defined by the aggregation start
-    /// timestamp.
-    #[serde(rename="realtimeTimeRange")]
-    pub realtime_time_range: Option<RealtimeTimeRange>,
-    /// The ID of the deal on which to filter; optional. This field may be set
-    /// only for a filter set that accesses account-level troubleshooting data,
-    /// i.e., one whose name matches the `bidders/*/accounts/*/filterSets/*`
-    /// pattern.
-    #[serde(rename="dealId")]
-    pub deal_id: Option<String>,
-    /// The environment on which to filter; optional.
-    pub environment: Option<String>,
-    /// The list of platforms on which to filter; may be empty. The filters
-    /// represented by multiple platforms are ORed together (i.e., if non-empty,
-    /// results must match any one of the platforms).
-    pub platforms: Option<Vec<String>>,
-    /// An absolute date range, defined by a start date and an end date.
-    /// Interpreted relative to Pacific time zone.
-    #[serde(rename="absoluteDateRange")]
-    pub absolute_date_range: Option<AbsoluteDateRange>,
-    /// The list of formats on which to filter; may be empty. The filters
-    /// represented by multiple formats are ORed together (i.e., if non-empty,
-    /// results must match any one of the formats).
-    pub formats: Option<Vec<String>>,
-    /// The ID of the creative on which to filter; optional. This field may be set
-    /// only for a filter set that accesses account-level troubleshooting data,
-    /// i.e., one whose name matches the `bidders/*/accounts/*/filterSets/*`
-    /// pattern.
-    #[serde(rename="creativeId")]
-    pub creative_id: Option<String>,
-    /// The granularity of time intervals if a time series breakdown is desired;
-    /// optional.
-    #[serde(rename="timeSeriesGranularity")]
-    pub time_series_granularity: Option<String>,
-}
-
-impl RequestValue for FilterSet {}
-impl ResponseResult for FilterSet {}
-
-
-/// Represents a price and a pricing type for a product / deal.
+/// Message depicting the size of the creative. The units of width and
+/// height depend on the type of the targeting.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Price {
-    /// The pricing type for the deal/product. (default: CPM)
-    #[serde(rename="pricingType")]
-    pub pricing_type: Option<String>,
-    /// The actual price with currency specified.
-    pub amount: Option<Money>,
+pub struct Size {
+    /// The width of the creative
+    pub width: Option<i32>,
+    /// The height of the creative.
+    pub height: Option<i32>,
 }
 
-impl Part for Price {}
+impl Part for Size {}
+
+
+/// A relative date range, specified by an offset and a duration.
+/// The supported range of dates begins 30 days before today and ends today,
+/// i.e., the limits for these values are:
+/// offset_days >= 0
+/// duration_days >= 1
+/// offset_days + duration_days <= 30
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RelativeDateRange {
+    /// The number of days in the requested date range, e.g., for a range spanning
+    /// today: 1. For a range spanning the last 7 days: 7.
+    #[serde(rename="durationDays")]
+    pub duration_days: Option<i32>,
+    /// The end date of the filter set, specified as the number of days before
+    /// today, e.g., for a range where the last date is today: 0.
+    #[serde(rename="offsetDays")]
+    pub offset_days: Option<i32>,
+}
+
+impl Part for RelativeDateRange {}
 
 
 /// Terms for Private Auctions. Note that Private Auctions can be created only
@@ -4188,6 +4199,37 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Update the given proposal to resume serving.
+    /// This method will set the
+    /// `DealServingMetadata.DealPauseStatus.has_buyer_paused` bit to false for all
+    /// deals in the proposal.
+    /// 
+    /// Note that if the `has_seller_paused` bit is also set, serving will not
+    /// resume until the seller also resumes.
+    /// 
+    /// It is a no-op to resume an already-running proposal.
+    /// It is an error to call ResumeProposal for a proposal that is not
+    /// finalized or renegotiating.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID of the buyer.
+    /// * `proposalId` - The ID of the proposal to resume.
+    pub fn proposals_resume(&self, request: ResumeProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalResumeCall<'a, C, A> {
+        AccountProposalResumeCall {
+            hub: self.hub,
+            _request: request,
+            _account_id: account_id.to_string(),
+            _proposal_id: proposal_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Create a new note and attach it to the proposal. The note is assigned
     /// a unique ID by the server.
     /// The proposal revision number will not increase when associated with a
@@ -4204,30 +4246,6 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _request: request,
             _account_id: account_id.to_string(),
             _proposal_id: proposal_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// List all creative-deal associations.
-    /// 
-    /// # Arguments
-    ///
-    /// * `accountId` - The account to list the associations from.
-    ///                 Specify "-" to list all creatives the current user has access to.
-    /// * `creativeId` - The creative ID to list the associations from.
-    ///                  Specify "-" to list all creatives under the above account.
-    pub fn creatives_deal_associations_list(&self, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
-        AccountCreativeDealAssociationListCall {
-            hub: self.hub,
-            _account_id: account_id.to_string(),
-            _creative_id: creative_id.to_string(),
-            _query: Default::default(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4257,29 +4275,19 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the given proposal to resume serving.
-    /// This method will set the
-    /// `DealServingMetadata.DealPauseStatus.has_buyer_paused` bit to false for all
-    /// deals in the proposal.
-    /// 
-    /// Note that if the `has_seller_paused` bit is also set, serving will not
-    /// resume until the seller also resumes.
-    /// 
-    /// It is a no-op to resume an already-running proposal.
-    /// It is an error to call ResumeProposal for a proposal that is not
-    /// finalized or renegotiating.
+    /// Lists creatives.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `accountId` - Account ID of the buyer.
-    /// * `proposalId` - The ID of the proposal to resume.
-    pub fn proposals_resume(&self, request: ResumeProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalResumeCall<'a, C, A> {
-        AccountProposalResumeCall {
+    /// * `accountId` - The account to list the creatives from.
+    ///                 Specify "-" to list all creatives the current user has access to.
+    pub fn creatives_list(&self, account_id: &str) -> AccountCreativeListCall<'a, C, A> {
+        AccountCreativeListCall {
             hub: self.hub,
-            _request: request,
             _account_id: account_id.to_string(),
-            _proposal_id: proposal_id.to_string(),
+            _query: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4381,17 +4389,16 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists creatives.
+    /// Lists all the clients for the current sponsor buyer.
     /// 
     /// # Arguments
     ///
-    /// * `accountId` - The account to list the creatives from.
-    ///                 Specify "-" to list all creatives the current user has access to.
-    pub fn creatives_list(&self, account_id: &str) -> AccountCreativeListCall<'a, C, A> {
-        AccountCreativeListCall {
+    /// * `accountId` - Unique numerical account ID of the sponsor buyer to list the clients for.
+    pub fn clients_list(&self, account_id: &str) -> AccountClientListCall<'a, C, A> {
+        AccountClientListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
-            _query: Default::default(),
+            _partner_client_id: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -4446,16 +4453,22 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a proposal given its ID. The proposal is returned at its head
-    /// revision.
+    /// Update the given proposal to indicate that setup has been completed.
+    /// This method is called by the buyer when the line items have been created
+    /// on their end for a finalized proposal and all the required creatives
+    /// have been uploaded using the creatives API. This call updates the
+    /// `is_setup_completed` bit on the proposal and also notifies the seller.
+    /// The server will advance the revision number of the most recent proposal.
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
-    /// * `proposalId` - The unique ID of the proposal
-    pub fn proposals_get(&self, account_id: &str, proposal_id: &str) -> AccountProposalGetCall<'a, C, A> {
-        AccountProposalGetCall {
+    /// * `proposalId` - The ID of the proposal to mark as setup completed.
+    pub fn proposals_complete_setup(&self, request: CompleteSetupRequest, account_id: &str, proposal_id: &str) -> AccountProposalCompleteSetupCall<'a, C, A> {
+        AccountProposalCompleteSetupCall {
             hub: self.hub,
+            _request: request,
             _account_id: account_id.to_string(),
             _proposal_id: proposal_id.to_string(),
             _delegate: Default::default(),
@@ -4489,37 +4502,21 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the clients for the current sponsor buyer.
+    /// Creates and sends out an email invitation to access
+    /// an Ad Exchange client buyer account.
     /// 
     /// # Arguments
     ///
-    /// * `accountId` - Unique numerical account ID of the sponsor buyer to list the clients for.
-    pub fn clients_list(&self, account_id: &str) -> AccountClientListCall<'a, C, A> {
-        AccountClientListCall {
+    /// * `request` - No description provided.
+    /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
+    /// * `clientAccountId` - Numerical account ID of the client buyer that the user
+    ///                       should be associated with. (required)
+    pub fn clients_invitations_create(&self, request: ClientUserInvitation, account_id: &str, client_account_id: &str) -> AccountClientInvitationCreateCall<'a, C, A> {
+        AccountClientInvitationCreateCall {
             hub: self.hub,
+            _request: request,
             _account_id: account_id.to_string(),
-            _partner_client_id: Default::default(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Gets a creative.
-    /// 
-    /// # Arguments
-    ///
-    /// * `accountId` - The account the creative belongs to.
-    /// * `creativeId` - The ID of the creative to retrieve.
-    pub fn creatives_get(&self, account_id: &str, creative_id: &str) -> AccountCreativeGetCall<'a, C, A> {
-        AccountCreativeGetCall {
-            hub: self.hub,
-            _account_id: account_id.to_string(),
-            _creative_id: creative_id.to_string(),
+            _client_account_id: client_account_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4655,21 +4652,17 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates and sends out an email invitation to access
-    /// an Ad Exchange client buyer account.
+    /// Gets a creative.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
-    /// * `clientAccountId` - Numerical account ID of the client buyer that the user
-    ///                       should be associated with. (required)
-    pub fn clients_invitations_create(&self, request: ClientUserInvitation, account_id: &str, client_account_id: &str) -> AccountClientInvitationCreateCall<'a, C, A> {
-        AccountClientInvitationCreateCall {
+    /// * `accountId` - The account the creative belongs to.
+    /// * `creativeId` - The ID of the creative to retrieve.
+    pub fn creatives_get(&self, account_id: &str, creative_id: &str) -> AccountCreativeGetCall<'a, C, A> {
+        AccountCreativeGetCall {
             hub: self.hub,
-            _request: request,
             _account_id: account_id.to_string(),
-            _client_account_id: client_account_id.to_string(),
+            _creative_id: creative_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4821,24 +4814,22 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the given proposal to indicate that setup has been completed.
-    /// This method is called by the buyer when the line items have been created
-    /// on their end for a finalized proposal and all the required creatives
-    /// have been uploaded using the creatives API. This call updates the
-    /// `is_setup_completed` bit on the proposal and also notifies the seller.
-    /// The server will advance the revision number of the most recent proposal.
+    /// List all creative-deal associations.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `accountId` - Account ID of the buyer.
-    /// * `proposalId` - The ID of the proposal to mark as setup completed.
-    pub fn proposals_complete_setup(&self, request: CompleteSetupRequest, account_id: &str, proposal_id: &str) -> AccountProposalCompleteSetupCall<'a, C, A> {
-        AccountProposalCompleteSetupCall {
+    /// * `accountId` - The account to list the associations from.
+    ///                 Specify "-" to list all creatives the current user has access to.
+    /// * `creativeId` - The creative ID to list the associations from.
+    ///                  Specify "-" to list all creatives under the above account.
+    pub fn creatives_deal_associations_list(&self, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
+        AccountCreativeDealAssociationListCall {
             hub: self.hub,
-            _request: request,
             _account_id: account_id.to_string(),
-            _proposal_id: proposal_id.to_string(),
+            _creative_id: creative_id.to_string(),
+            _query: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4973,6 +4964,26 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a proposal given its ID. The proposal is returned at its head
+    /// revision.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID of the buyer.
+    /// * `proposalId` - The unique ID of the proposal
+    pub fn proposals_get(&self, account_id: &str, proposal_id: &str) -> AccountProposalGetCall<'a, C, A> {
+        AccountProposalGetCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _proposal_id: proposal_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -5070,7 +5081,7 @@ impl<'a, C, A> BidderAccountFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5086,10 +5097,7 @@ impl<'a, C, A> BidderAccountFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5109,7 +5117,7 @@ impl<'a, C, A> BidderAccountFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5197,7 +5205,7 @@ impl<'a, C, A> BidderAccountFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5342,7 +5350,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidListCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5358,10 +5366,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidListCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5381,7 +5386,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidListCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5488,7 +5493,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5632,7 +5637,7 @@ impl<'a, C, A> BidderFilterSetListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5648,10 +5653,7 @@ impl<'a, C, A> BidderFilterSetListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5671,7 +5673,7 @@ impl<'a, C, A> BidderFilterSetListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5778,7 +5780,7 @@ impl<'a, C, A> BidderFilterSetListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5924,7 +5926,7 @@ impl<'a, C, A> BidderAccountFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5940,10 +5942,7 @@ impl<'a, C, A> BidderAccountFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5975,7 +5974,7 @@ impl<'a, C, A> BidderAccountFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6083,7 +6082,7 @@ impl<'a, C, A> BidderAccountFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6227,7 +6226,7 @@ impl<'a, C, A> BidderAccountFilterSetBidMetricListCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6243,10 +6242,7 @@ impl<'a, C, A> BidderAccountFilterSetBidMetricListCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6266,7 +6262,7 @@ impl<'a, C, A> BidderAccountFilterSetBidMetricListCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6373,7 +6369,7 @@ impl<'a, C, A> BidderAccountFilterSetBidMetricListCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6520,7 +6516,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidCreativeListCall<'a, C, A> where
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6536,10 +6532,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidCreativeListCall<'a, C, A> where
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6559,7 +6552,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidCreativeListCall<'a, C, A> where
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6679,7 +6672,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidCreativeListCall<'a, C, A> where
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6814,7 +6807,7 @@ impl<'a, C, A> BidderAccountFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6830,10 +6823,7 @@ impl<'a, C, A> BidderAccountFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6853,7 +6843,7 @@ impl<'a, C, A> BidderAccountFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6941,7 +6931,7 @@ impl<'a, C, A> BidderAccountFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7081,7 +7071,7 @@ impl<'a, C, A> BidderAccountCreativeDeleteCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7097,10 +7087,7 @@ impl<'a, C, A> BidderAccountCreativeDeleteCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7120,7 +7107,7 @@ impl<'a, C, A> BidderAccountCreativeDeleteCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7215,7 +7202,7 @@ impl<'a, C, A> BidderAccountCreativeDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7360,7 +7347,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidRequestListCall<'a, C, A> where 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7376,10 +7363,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidRequestListCall<'a, C, A> where 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7399,7 +7383,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidRequestListCall<'a, C, A> where 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7506,7 +7490,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidRequestListCall<'a, C, A> where 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7653,7 +7637,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidCreativeListCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7669,10 +7653,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidCreativeListCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7692,7 +7673,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidCreativeListCall<'a, C, A> where C: Bor
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7812,7 +7793,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidCreativeListCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7947,7 +7928,7 @@ impl<'a, C, A> BidderFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7963,10 +7944,7 @@ impl<'a, C, A> BidderFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7986,7 +7964,7 @@ impl<'a, C, A> BidderFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8074,7 +8052,7 @@ impl<'a, C, A> BidderFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8218,7 +8196,7 @@ impl<'a, C, A> BidderAccountFilterSetListCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8234,10 +8212,7 @@ impl<'a, C, A> BidderAccountFilterSetListCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8257,7 +8232,7 @@ impl<'a, C, A> BidderAccountFilterSetListCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8364,7 +8339,7 @@ impl<'a, C, A> BidderAccountFilterSetListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8509,7 +8484,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponseErrorListCall<'a, C, A> where C:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8525,10 +8500,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponseErrorListCall<'a, C, A> where C:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8548,7 +8520,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponseErrorListCall<'a, C, A> where C:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8655,7 +8627,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponseErrorListCall<'a, C, A> where C:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8790,7 +8762,7 @@ impl<'a, C, A> BidderFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8806,10 +8778,7 @@ impl<'a, C, A> BidderFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8829,7 +8798,7 @@ impl<'a, C, A> BidderFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8917,7 +8886,7 @@ impl<'a, C, A> BidderFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9061,7 +9030,7 @@ impl<'a, C, A> BidderAccountFilterSetImpressionMetricListCall<'a, C, A> where C:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9077,10 +9046,7 @@ impl<'a, C, A> BidderAccountFilterSetImpressionMetricListCall<'a, C, A> where C:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9100,7 +9066,7 @@ impl<'a, C, A> BidderAccountFilterSetImpressionMetricListCall<'a, C, A> where C:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9207,7 +9173,7 @@ impl<'a, C, A> BidderAccountFilterSetImpressionMetricListCall<'a, C, A> where C:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9352,7 +9318,7 @@ impl<'a, C, A> BidderFilterSetLosingBidListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9368,10 +9334,7 @@ impl<'a, C, A> BidderFilterSetLosingBidListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9391,7 +9354,7 @@ impl<'a, C, A> BidderFilterSetLosingBidListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9498,7 +9461,7 @@ impl<'a, C, A> BidderFilterSetLosingBidListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9645,7 +9608,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidDetailListCall<'a, C, A> where C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9661,10 +9624,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidDetailListCall<'a, C, A> where C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9684,7 +9644,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidDetailListCall<'a, C, A> where C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9804,7 +9764,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidDetailListCall<'a, C, A> where C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9949,7 +9909,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidListCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9965,10 +9925,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidListCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9988,7 +9945,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidListCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10095,7 +10052,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidListCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10240,7 +10197,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidRequestListCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10256,10 +10213,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidRequestListCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10279,7 +10233,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidRequestListCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10386,7 +10340,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidRequestListCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10531,7 +10485,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, C, A> wh
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10547,10 +10501,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, C, A> wh
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10570,7 +10521,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, C, A> wh
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10677,7 +10628,7 @@ impl<'a, C, A> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, C, A> wh
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10822,7 +10773,7 @@ impl<'a, C, A> BidderAccountFilterSetLosingBidListCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10838,10 +10789,7 @@ impl<'a, C, A> BidderAccountFilterSetLosingBidListCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10861,7 +10809,7 @@ impl<'a, C, A> BidderAccountFilterSetLosingBidListCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10968,7 +10916,7 @@ impl<'a, C, A> BidderAccountFilterSetLosingBidListCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11113,7 +11061,7 @@ impl<'a, C, A> BidderFilterSetNonBillableWinningBidListCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11129,10 +11077,7 @@ impl<'a, C, A> BidderFilterSetNonBillableWinningBidListCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11152,7 +11097,7 @@ impl<'a, C, A> BidderFilterSetNonBillableWinningBidListCall<'a, C, A> where C: B
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11259,7 +11204,7 @@ impl<'a, C, A> BidderFilterSetNonBillableWinningBidListCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11403,7 +11348,7 @@ impl<'a, C, A> BidderFilterSetImpressionMetricListCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11419,10 +11364,7 @@ impl<'a, C, A> BidderFilterSetImpressionMetricListCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11442,7 +11384,7 @@ impl<'a, C, A> BidderFilterSetImpressionMetricListCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11549,7 +11491,7 @@ impl<'a, C, A> BidderFilterSetImpressionMetricListCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11696,7 +11638,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidDetailListCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11712,10 +11654,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidDetailListCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11735,7 +11674,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidDetailListCall<'a, C, A> where C: Borro
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11855,7 +11794,7 @@ impl<'a, C, A> BidderFilterSetFilteredBidDetailListCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12000,7 +11939,7 @@ impl<'a, C, A> BidderFilterSetBidResponseErrorListCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12016,10 +11955,7 @@ impl<'a, C, A> BidderFilterSetBidResponseErrorListCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12039,7 +11975,7 @@ impl<'a, C, A> BidderFilterSetBidResponseErrorListCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12146,7 +12082,7 @@ impl<'a, C, A> BidderFilterSetBidResponseErrorListCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12291,7 +12227,7 @@ impl<'a, C, A> BidderAccountFilterSetNonBillableWinningBidListCall<'a, C, A> whe
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12307,10 +12243,7 @@ impl<'a, C, A> BidderAccountFilterSetNonBillableWinningBidListCall<'a, C, A> whe
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12330,7 +12263,7 @@ impl<'a, C, A> BidderAccountFilterSetNonBillableWinningBidListCall<'a, C, A> whe
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12437,7 +12370,7 @@ impl<'a, C, A> BidderAccountFilterSetNonBillableWinningBidListCall<'a, C, A> whe
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12581,7 +12514,7 @@ impl<'a, C, A> BidderFilterSetBidMetricListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12597,10 +12530,7 @@ impl<'a, C, A> BidderFilterSetBidMetricListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12620,7 +12550,7 @@ impl<'a, C, A> BidderFilterSetBidMetricListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12727,7 +12657,7 @@ impl<'a, C, A> BidderFilterSetBidMetricListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12872,7 +12802,7 @@ impl<'a, C, A> BidderFilterSetBidResponsesWithoutBidListCall<'a, C, A> where C: 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12888,10 +12818,7 @@ impl<'a, C, A> BidderFilterSetBidResponsesWithoutBidListCall<'a, C, A> where C: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12911,7 +12838,7 @@ impl<'a, C, A> BidderFilterSetBidResponsesWithoutBidListCall<'a, C, A> where C: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13018,7 +12945,7 @@ impl<'a, C, A> BidderFilterSetBidResponsesWithoutBidListCall<'a, C, A> where C: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13164,7 +13091,7 @@ impl<'a, C, A> BidderFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13180,10 +13107,7 @@ impl<'a, C, A> BidderFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13215,7 +13139,7 @@ impl<'a, C, A> BidderFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13323,7 +13247,7 @@ impl<'a, C, A> BidderFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13360,902 +13284,6 @@ impl<'a, C, A> BidderFilterSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetCreateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Create a new note and attach it to the proposal. The note is assigned
-/// a unique ID by the server.
-/// The proposal revision number will not increase when associated with a
-/// new note.
-///
-/// A builder for the *proposals.addNote* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// use adexchangebuyer2_v2_beta1::AddNoteRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AddNoteRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().proposals_add_note(req, "accountId", "proposalId")
-///              .doit();
-/// # }
-/// ```
-pub struct AccountProposalAddNoteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AdExchangeBuyerII<C, A>,
-    _request: AddNoteRequest,
-    _account_id: String,
-    _proposal_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccountProposalAddNoteCall<'a, C, A> {}
-
-impl<'a, C, A> AccountProposalAddNoteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Note)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.proposals.addNote",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        params.push(("proposalId", self._proposal_id.to_string()));
-        for &field in ["alt", "accountId", "proposalId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/proposals/{proposalId}:addNote";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{proposalId}", "proposalId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["proposalId", "accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddNoteRequest) -> AccountProposalAddNoteCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Account ID of the buyer.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// The ID of the proposal to attach the note to.
-    ///
-    /// Sets the *proposal id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a, C, A> {
-        self._proposal_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProposalAddNoteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalAddNoteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AdexchangeBuyer`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalAddNoteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// List all creative-deal associations.
-///
-/// A builder for the *creatives.dealAssociations.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().creatives_deal_associations_list("accountId", "creativeId")
-///              .query("kasd")
-///              .page_token("sanctus")
-///              .page_size(-58)
-///              .doit();
-/// # }
-/// ```
-pub struct AccountCreativeDealAssociationListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AdExchangeBuyerII<C, A>,
-    _account_id: String,
-    _creative_id: String,
-    _query: Option<String>,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccountCreativeDealAssociationListCall<'a, C, A> {}
-
-impl<'a, C, A> AccountCreativeDealAssociationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDealAssociationsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.dealAssociations.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        params.push(("creativeId", self._creative_id.to_string()));
-        if let Some(value) = self._query {
-            params.push(("query", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "accountId", "creativeId", "query", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives/{creativeId}/dealAssociations";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{creativeId}", "creativeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["creativeId", "accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The account to list the associations from.
-    /// Specify "-" to list all creatives the current user has access to.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// The creative ID to list the associations from.
-    /// Specify "-" to list all creatives under the above account.
-    ///
-    /// Sets the *creative id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
-        self._creative_id = new_value.to_string();
-        self
-    }
-    /// An optional query string to filter deal associations. If no filter is
-    /// specified, all associations will be returned.
-    /// Supported queries are:
-    /// <ul>
-    /// <li>accountId=<i>account_id_string</i>
-    /// <li>creativeId=<i>creative_id_string</i>
-    /// <li>dealsId=<i>deals_id_string</i>
-    /// <li>dealsStatus:{approved, conditionally_approved, disapproved,
-    ///                   not_checked}
-    /// <li>openAuctionStatus:{approved, conditionally_approved, disapproved,
-    ///                          not_checked}
-    /// </ul>
-    /// Example: 'dealsId=12345 AND dealsStatus:disapproved'
-    ///
-    /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
-        self._query = Some(new_value.to_string());
-        self
-    }
-    /// A token identifying a page of results the server should return.
-    /// Typically, this is the value of
-    /// ListDealAssociationsResponse.next_page_token
-    /// returned from the previous call to 'ListDealAssociations' method.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Requested page size. Server may return fewer associations than requested.
-    /// If unspecified, server will pick an appropriate default.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCreativeDealAssociationListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeDealAssociationListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AdexchangeBuyer`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeDealAssociationListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Associate an existing deal with a creative.
-///
-/// A builder for the *creatives.dealAssociations.add* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// use adexchangebuyer2_v2_beta1::AddDealAssociationRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AddDealAssociationRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().creatives_deal_associations_add(req, "accountId", "creativeId")
-///              .doit();
-/// # }
-/// ```
-pub struct AccountCreativeDealAssociationAddCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AdExchangeBuyerII<C, A>,
-    _request: AddDealAssociationRequest,
-    _account_id: String,
-    _creative_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccountCreativeDealAssociationAddCall<'a, C, A> {}
-
-impl<'a, C, A> AccountCreativeDealAssociationAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.dealAssociations.add",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        params.push(("creativeId", self._creative_id.to_string()));
-        for &field in ["alt", "accountId", "creativeId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives/{creativeId}/dealAssociations:add";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{creativeId}", "creativeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["creativeId", "accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddDealAssociationRequest) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The account the creative belongs to.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// The ID of the creative associated with the deal.
-    ///
-    /// Sets the *creative id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
-        self._creative_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationAddCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AdexchangeBuyer`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeDealAssociationAddCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14384,10 +13412,7 @@ impl<'a, C, A> AccountProposalResumeCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14419,7 +13444,7 @@ impl<'a, C, A> AccountProposalResumeCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14519,7 +13544,7 @@ impl<'a, C, A> AccountProposalResumeCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14556,6 +13581,885 @@ impl<'a, C, A> AccountProposalResumeCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalResumeCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Create a new note and attach it to the proposal. The note is assigned
+/// a unique ID by the server.
+/// The proposal revision number will not increase when associated with a
+/// new note.
+///
+/// A builder for the *proposals.addNote* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
+/// use adexchangebuyer2_v2_beta1::AddNoteRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddNoteRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().proposals_add_note(req, "accountId", "proposalId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountProposalAddNoteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AdExchangeBuyerII<C, A>,
+    _request: AddNoteRequest,
+    _account_id: String,
+    _proposal_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountProposalAddNoteCall<'a, C, A> {}
+
+impl<'a, C, A> AccountProposalAddNoteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Note)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.proposals.addNote",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("proposalId", self._proposal_id.to_string()));
+        for &field in ["alt", "accountId", "proposalId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/proposals/{proposalId}:addNote";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{proposalId}", "proposalId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["proposalId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddNoteRequest) -> AccountProposalAddNoteCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Account ID of the buyer.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The ID of the proposal to attach the note to.
+    ///
+    /// Sets the *proposal id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a, C, A> {
+        self._proposal_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProposalAddNoteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalAddNoteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeBuyer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalAddNoteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Associate an existing deal with a creative.
+///
+/// A builder for the *creatives.dealAssociations.add* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
+/// use adexchangebuyer2_v2_beta1::AddDealAssociationRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddDealAssociationRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().creatives_deal_associations_add(req, "accountId", "creativeId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountCreativeDealAssociationAddCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AdExchangeBuyerII<C, A>,
+    _request: AddDealAssociationRequest,
+    _account_id: String,
+    _creative_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountCreativeDealAssociationAddCall<'a, C, A> {}
+
+impl<'a, C, A> AccountCreativeDealAssociationAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.dealAssociations.add",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("creativeId", self._creative_id.to_string()));
+        for &field in ["alt", "accountId", "creativeId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives/{creativeId}/dealAssociations:add";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{creativeId}", "creativeId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["creativeId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddDealAssociationRequest) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The account the creative belongs to.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The ID of the creative associated with the deal.
+    ///
+    /// Sets the *creative id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
+        self._creative_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeDealAssociationAddCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationAddCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeBuyer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeDealAssociationAddCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists creatives.
+///
+/// A builder for the *creatives.list* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().creatives_list("accountId")
+///              .query("At")
+///              .page_token("labore")
+///              .page_size(-37)
+///              .doit();
+/// # }
+/// ```
+pub struct AccountCreativeListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AdExchangeBuyerII<C, A>,
+    _account_id: String,
+    _query: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountCreativeListCall<'a, C, A> {}
+
+impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListCreativesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("accountId", self._account_id.to_string()));
+        if let Some(value) = self._query {
+            params.push(("query", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "accountId", "query", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The account to list the creatives from.
+    /// Specify "-" to list all creatives the current user has access to.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeListCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// An optional query string to filter creatives. If no filter is specified,
+    /// all active creatives will be returned.
+    /// <p>Supported queries are:
+    /// <ul>
+    /// <li>accountId=<i>account_id_string</i>
+    /// <li>creativeId=<i>creative_id_string</i>
+    /// <li>dealsStatus: {approved, conditionally_approved, disapproved,
+    ///                    not_checked}
+    /// <li>openAuctionStatus: {approved, conditionally_approved, disapproved,
+    ///                           not_checked}
+    /// <li>attribute: {a numeric attribute from the list of attributes}
+    /// <li>disapprovalReason: {a reason from
+    /// DisapprovalReason}
+    /// </ul>
+    /// Example: 'accountId=12345 AND (dealsStatus:disapproved AND
+    /// disapprovalReason:unacceptable_content) OR attribute:47'
+    ///
+    /// Sets the *query* query property to the given value.
+    pub fn query(mut self, new_value: &str) -> AccountCreativeListCall<'a, C, A> {
+        self._query = Some(new_value.to_string());
+        self
+    }
+    /// A token identifying a page of results the server should return.
+    /// Typically, this is the value of
+    /// ListCreativesResponse.next_page_token
+    /// returned from the previous call to 'ListCreatives' method.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccountCreativeListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Requested page size. The server may return fewer creatives than requested
+    /// (due to timeout constraint) even if more are available via another call.
+    /// If unspecified, server will pick an appropriate default.
+    /// Acceptable values are 1 to 1000, inclusive.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AccountCreativeListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeBuyer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14675,10 +14579,7 @@ impl<'a, C, A> AccountCreativeWatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14710,7 +14611,7 @@ impl<'a, C, A> AccountCreativeWatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14814,7 +14715,7 @@ impl<'a, C, A> AccountCreativeWatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14972,10 +14873,7 @@ impl<'a, C, A> AccountProposalAcceptCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15007,7 +14905,7 @@ impl<'a, C, A> AccountProposalAcceptCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15107,7 +15005,7 @@ impl<'a, C, A> AccountProposalAcceptCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15262,10 +15160,7 @@ impl<'a, C, A> AccountClientUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15297,7 +15192,7 @@ impl<'a, C, A> AccountClientUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15398,7 +15293,7 @@ impl<'a, C, A> AccountClientUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15475,9 +15370,9 @@ impl<'a, C, A> AccountClientUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().products_list("accountId")
-///              .page_token("eirmod")
-///              .page_size(-46)
-///              .filter("labore")
+///              .page_token("sit")
+///              .page_size(-40)
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -15560,10 +15455,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15583,7 +15475,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15688,7 +15580,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15736,9 +15628,9 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists creatives.
+/// Lists all the clients for the current sponsor buyer.
 ///
-/// A builder for the *creatives.list* method supported by a *account* resource.
+/// A builder for the *clients.list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -15763,19 +15655,19 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().creatives_list("accountId")
-///              .query("ea")
-///              .page_token("gubergren")
-///              .page_size(-82)
+/// let result = hub.accounts().clients_list("accountId")
+///              .partner_client_id("sed")
+///              .page_token("ea")
+///              .page_size(-62)
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountCreativeListCall<'a, C, A>
+pub struct AccountClientListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AdExchangeBuyerII<C, A>,
     _account_id: String,
-    _query: Option<String>,
+    _partner_client_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -15783,13 +15675,13 @@ pub struct AccountCreativeListCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountCreativeListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountClientListCall<'a, C, A> {}
 
-impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountClientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListCreativesResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClientsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -15797,12 +15689,12 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.list",
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.clients.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._query {
-            params.push(("query", value.to_string()));
+        if let Some(value) = self._partner_client_id {
+            params.push(("partnerClientId", value.to_string()));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -15810,7 +15702,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "accountId", "query", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "accountId", "partnerClientId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15822,7 +15714,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives";
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/clients";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -15849,10 +15741,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15872,7 +15761,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15925,56 +15814,42 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The account to list the creatives from.
-    /// Specify "-" to list all creatives the current user has access to.
+    /// Unique numerical account ID of the sponsor buyer to list the clients for.
     ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeListCall<'a, C, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// An optional query string to filter creatives. If no filter is specified,
-    /// all active creatives will be returned.
-    /// <p>Supported queries are:
-    /// <ul>
-    /// <li>accountId=<i>account_id_string</i>
-    /// <li>creativeId=<i>creative_id_string</i>
-    /// <li>dealsStatus: {approved, conditionally_approved, disapproved,
-    ///                    not_checked}
-    /// <li>openAuctionStatus: {approved, conditionally_approved, disapproved,
-    ///                           not_checked}
-    /// <li>attribute: {a numeric attribute from the list of attributes}
-    /// <li>disapprovalReason: {a reason from
-    /// DisapprovalReason}
-    /// </ul>
-    /// Example: 'accountId=12345 AND (dealsStatus:disapproved AND
-    /// disapprovalReason:unacceptable_content) OR attribute:47'
+    /// Optional unique identifier (from the standpoint of an Ad Exchange sponsor
+    /// buyer partner) of the client to return.
+    /// If specified, at most one client will be returned in the response.
     ///
-    /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> AccountCreativeListCall<'a, C, A> {
-        self._query = Some(new_value.to_string());
+    /// Sets the *partner client id* query property to the given value.
+    pub fn partner_client_id(mut self, new_value: &str) -> AccountClientListCall<'a, C, A> {
+        self._partner_client_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return.
     /// Typically, this is the value of
-    /// ListCreativesResponse.next_page_token
-    /// returned from the previous call to 'ListCreatives' method.
+    /// ListClientsResponse.nextPageToken
+    /// returned from the previous call to the
+    /// accounts.clients.list
+    /// method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCreativeListCall<'a, C, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountClientListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Requested page size. The server may return fewer creatives than requested
-    /// (due to timeout constraint) even if more are available via another call.
-    /// If unspecified, server will pick an appropriate default.
-    /// Acceptable values are 1 to 1000, inclusive.
+    /// Requested page size. The server may return fewer clients than requested.
+    /// If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCreativeListCall<'a, C, A> {
+    pub fn page_size(mut self, new_value: i32) -> AccountClientListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -15984,7 +15859,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountClientListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15993,7 +15868,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16009,7 +15884,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16029,7 +15904,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16143,10 +16018,7 @@ impl<'a, C, A> AccountClientUserGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16166,7 +16038,7 @@ impl<'a, C, A> AccountClientUserGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16265,7 +16137,7 @@ impl<'a, C, A> AccountClientUserGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16415,10 +16287,7 @@ impl<'a, C, A> AccountClientInvitationGetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16438,7 +16307,7 @@ impl<'a, C, A> AccountClientInvitationGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16537,7 +16406,7 @@ impl<'a, C, A> AccountClientInvitationGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16585,10 +16454,14 @@ impl<'a, C, A> AccountClientInvitationGetCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Gets a proposal given its ID. The proposal is returned at its head
-/// revision.
+/// Update the given proposal to indicate that setup has been completed.
+/// This method is called by the buyer when the line items have been created
+/// on their end for a finalized proposal and all the required creatives
+/// have been uploaded using the creatives API. This call updates the
+/// `is_setup_completed` bit on the proposal and also notifies the seller.
+/// The server will advance the revision number of the most recent proposal.
 ///
-/// A builder for the *proposals.get* method supported by a *account* resource.
+/// A builder for the *proposals.completeSetup* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -16600,6 +16473,7 @@ impl<'a, C, A> AccountClientInvitationGetCall<'a, C, A> where C: BorrowMut<hyper
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
+/// use adexchangebuyer2_v2_beta1::CompleteSetupRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16610,17 +16484,23 @@ impl<'a, C, A> AccountClientInvitationGetCall<'a, C, A> where C: BorrowMut<hyper
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CompleteSetupRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().proposals_get("accountId", "proposalId")
+/// let result = hub.accounts().proposals_complete_setup(req, "accountId", "proposalId")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountProposalGetCall<'a, C, A>
+pub struct AccountProposalCompleteSetupCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AdExchangeBuyerII<C, A>,
+    _request: CompleteSetupRequest,
     _account_id: String,
     _proposal_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -16628,9 +16508,9 @@ pub struct AccountProposalGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountProposalGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountProposalCompleteSetupCall<'a, C, A> {}
 
-impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16642,9 +16522,9 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.proposals.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.proposals.completeSetup",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
         params.push(("proposalId", self._proposal_id.to_string()));
         for &field in ["alt", "accountId", "proposalId"].iter() {
@@ -16659,7 +16539,7 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/proposals/{proposalId}";
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/proposals/{proposalId}:completeSetup";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
@@ -16686,11 +16566,19 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -16707,11 +16595,15 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -16762,23 +16654,32 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CompleteSetupRequest) -> AccountProposalCompleteSetupCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// Account ID of the buyer.
     ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalGetCall<'a, C, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// The unique ID of the proposal
+    /// The ID of the proposal to mark as setup completed.
     ///
     /// Sets the *proposal id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalGetCall<'a, C, A> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a, C, A> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -16788,7 +16689,7 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProposalGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProposalCompleteSetupCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16797,7 +16698,7 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16813,7 +16714,7 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCompleteSetupCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16833,7 +16734,7 @@ impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalCompleteSetupCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16954,10 +16855,7 @@ impl<'a, C, A> AccountProposalCancelNegotiationCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16989,7 +16887,7 @@ impl<'a, C, A> AccountProposalCancelNegotiationCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17089,7 +16987,7 @@ impl<'a, C, A> AccountProposalCancelNegotiationCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17137,9 +17035,10 @@ impl<'a, C, A> AccountProposalCancelNegotiationCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Lists all the clients for the current sponsor buyer.
+/// Creates and sends out an email invitation to access
+/// an Ad Exchange client buyer account.
 ///
-/// A builder for the *clients.list* method supported by a *account* resource.
+/// A builder for the *clients.invitations.create* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -17151,6 +17050,7 @@ impl<'a, C, A> AccountProposalCancelNegotiationCall<'a, C, A> where C: BorrowMut
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
+/// use adexchangebuyer2_v2_beta1::ClientUserInvitation;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -17161,36 +17061,37 @@ impl<'a, C, A> AccountProposalCancelNegotiationCall<'a, C, A> where C: BorrowMut
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ClientUserInvitation::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().clients_list("accountId")
-///              .partner_client_id("est")
-///              .page_token("amet")
-///              .page_size(-23)
+/// let result = hub.accounts().clients_invitations_create(req, "accountId", "clientAccountId")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountClientListCall<'a, C, A>
+pub struct AccountClientInvitationCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AdExchangeBuyerII<C, A>,
+    _request: ClientUserInvitation,
     _account_id: String,
-    _partner_client_id: Option<String>,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
+    _client_account_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountClientListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountClientInvitationCreateCall<'a, C, A> {}
 
-impl<'a, C, A> AccountClientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClientsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ClientUserInvitation)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -17198,20 +17099,12 @@ impl<'a, C, A> AccountClientListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.clients.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.clients.invitations.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._partner_client_id {
-            params.push(("partnerClientId", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "accountId", "partnerClientId", "pageToken", "pageSize"].iter() {
+        params.push(("clientAccountId", self._client_account_id.to_string()));
+        for &field in ["alt", "accountId", "clientAccountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17223,290 +17116,12 @@ impl<'a, C, A> AccountClientListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/clients";
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/clients/{clientAccountId}/invitations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Unique numerical account ID of the sponsor buyer to list the clients for.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientListCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// Optional unique identifier (from the standpoint of an Ad Exchange sponsor
-    /// buyer partner) of the client to return.
-    /// If specified, at most one client will be returned in the response.
-    ///
-    /// Sets the *partner client id* query property to the given value.
-    pub fn partner_client_id(mut self, new_value: &str) -> AccountClientListCall<'a, C, A> {
-        self._partner_client_id = Some(new_value.to_string());
-        self
-    }
-    /// A token identifying a page of results the server should return.
-    /// Typically, this is the value of
-    /// ListClientsResponse.nextPageToken
-    /// returned from the previous call to the
-    /// accounts.clients.list
-    /// method.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountClientListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Requested page size. The server may return fewer clients than requested.
-    /// If unspecified, the server will pick an appropriate default.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountClientListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountClientListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AdexchangeBuyer`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Gets a creative.
-///
-/// A builder for the *creatives.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().creatives_get("accountId", "creativeId")
-///              .doit();
-/// # }
-/// ```
-pub struct AccountCreativeGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AdExchangeBuyerII<C, A>,
-    _account_id: String,
-    _creative_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccountCreativeGetCall<'a, C, A> {}
-
-impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Creative)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        params.push(("creativeId", self._creative_id.to_string()));
-        for &field in ["alt", "accountId", "creativeId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives/{creativeId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{creativeId}", "creativeId")].iter() {
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{clientAccountId}", "clientAccountId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -17518,7 +17133,7 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["creativeId", "accountId"].iter() {
+            for param_name in ["clientAccountId", "accountId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -17528,11 +17143,19 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -17549,11 +17172,15 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -17604,24 +17231,34 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The account the creative belongs to.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ClientUserInvitation) -> AccountClientInvitationCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Numerical account ID of the client's sponsor buyer. (required)
     ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a, C, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// The ID of the creative to retrieve.
+    /// Numerical account ID of the client buyer that the user
+    /// should be associated with. (required)
     ///
-    /// Sets the *creative id* path property to the given value.
+    /// Sets the *client account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a, C, A> {
-        self._creative_id = new_value.to_string();
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a, C, A> {
+        self._client_account_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -17630,7 +17267,7 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountClientInvitationCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17639,7 +17276,7 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17655,7 +17292,7 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17675,7 +17312,7 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientInvitationCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17721,7 +17358,7 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().creatives_create(req, "accountId")
-///              .duplicate_id_mode("est")
+///              .duplicate_id_mode("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -17797,10 +17434,7 @@ impl<'a, C, A> AccountCreativeCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -17832,7 +17466,7 @@ impl<'a, C, A> AccountCreativeCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17933,7 +17567,7 @@ impl<'a, C, A> AccountCreativeCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18089,10 +17723,7 @@ impl<'a, C, A> AccountCreativeStopWatchingCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18124,7 +17755,7 @@ impl<'a, C, A> AccountCreativeStopWatchingCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18225,7 +17856,7 @@ impl<'a, C, A> AccountCreativeStopWatchingCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18392,10 +18023,7 @@ impl<'a, C, A> AccountProposalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18427,7 +18055,7 @@ impl<'a, C, A> AccountProposalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18527,7 +18155,7 @@ impl<'a, C, A> AccountProposalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18685,10 +18313,7 @@ impl<'a, C, A> AccountClientUserUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18720,7 +18345,7 @@ impl<'a, C, A> AccountClientUserUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18831,7 +18456,7 @@ impl<'a, C, A> AccountClientUserUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18909,10 +18534,10 @@ impl<'a, C, A> AccountClientUserUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().finalized_proposals_list("accountId")
-///              .page_token("aliquyam")
-///              .page_size(-67)
-///              .filter_syntax("ea")
-///              .filter("et")
+///              .page_token("dolores")
+///              .page_size(-24)
+///              .filter_syntax("voluptua.")
+///              .filter("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -18999,10 +18624,7 @@ impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -19022,7 +18644,7 @@ impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19133,7 +18755,7 @@ impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19181,10 +18803,9 @@ impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Creates and sends out an email invitation to access
-/// an Ad Exchange client buyer account.
+/// Gets a creative.
 ///
-/// A builder for the *clients.invitations.create* method supported by a *account* resource.
+/// A builder for the *creatives.get* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -19196,7 +18817,6 @@ impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyp
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// use adexchangebuyer2_v2_beta1::ClientUserInvitation;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -19207,37 +18827,31 @@ impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyp
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ClientUserInvitation::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().clients_invitations_create(req, "accountId", "clientAccountId")
+/// let result = hub.accounts().creatives_get("accountId", "creativeId")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountClientInvitationCreateCall<'a, C, A>
+pub struct AccountCreativeGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AdExchangeBuyerII<C, A>,
-    _request: ClientUserInvitation,
     _account_id: String,
-    _client_account_id: String,
+    _creative_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountClientInvitationCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountCreativeGetCall<'a, C, A> {}
 
-impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ClientUserInvitation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Creative)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -19245,12 +18859,12 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.clients.invitations.create",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
-        params.push(("clientAccountId", self._client_account_id.to_string()));
-        for &field in ["alt", "accountId", "clientAccountId"].iter() {
+        params.push(("creativeId", self._creative_id.to_string()));
+        for &field in ["alt", "accountId", "creativeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -19262,12 +18876,12 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/clients/{clientAccountId}/invitations";
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives/{creativeId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{clientAccountId}", "clientAccountId")].iter() {
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{creativeId}", "creativeId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -19279,7 +18893,7 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["clientAccountId", "accountId"].iter() {
+            for param_name in ["creativeId", "accountId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -19289,22 +18903,8 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -19321,15 +18921,11 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -19380,34 +18976,24 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClientUserInvitation) -> AccountClientInvitationCreateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Numerical account ID of the client's sponsor buyer. (required)
+    /// The account the creative belongs to.
     ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a, C, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// Numerical account ID of the client buyer that the user
-    /// should be associated with. (required)
+    /// The ID of the creative to retrieve.
     ///
-    /// Sets the *client account id* path property to the given value.
+    /// Sets the *creative id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a, C, A> {
-        self._client_account_id = new_value.to_string();
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a, C, A> {
+        self._creative_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -19416,7 +19002,7 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountClientInvitationCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19425,7 +19011,7 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19441,7 +19027,7 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationCreateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19461,7 +19047,7 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientInvitationCreateCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19502,8 +19088,8 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().clients_users_list("accountId", "clientAccountId")
-///              .page_token("rebum.")
-///              .page_size(-51)
+///              .page_token("et")
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -19584,10 +19170,7 @@ impl<'a, C, A> AccountClientUserListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -19607,7 +19190,7 @@ impl<'a, C, A> AccountClientUserListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19719,7 +19302,7 @@ impl<'a, C, A> AccountClientUserListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19795,8 +19378,8 @@ impl<'a, C, A> AccountClientUserListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().publisher_profiles_list("accountId")
-///              .page_token("invidunt")
-///              .page_size(-90)
+///              .page_token("kasd")
+///              .page_size(-87)
 ///              .doit();
 /// # }
 /// ```
@@ -19875,10 +19458,7 @@ impl<'a, C, A> AccountPublisherProfileListCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -19898,7 +19478,7 @@ impl<'a, C, A> AccountPublisherProfileListCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19990,7 +19570,7 @@ impl<'a, C, A> AccountPublisherProfileListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20144,10 +19724,7 @@ impl<'a, C, A> AccountProposalCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -20179,7 +19756,7 @@ impl<'a, C, A> AccountProposalCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20269,7 +19846,7 @@ impl<'a, C, A> AccountProposalCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20422,10 +19999,7 @@ impl<'a, C, A> AccountClientCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -20457,7 +20031,7 @@ impl<'a, C, A> AccountClientCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20548,7 +20122,7 @@ impl<'a, C, A> AccountClientCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20696,10 +20270,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -20719,7 +20290,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20807,7 +20378,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20955,10 +20526,7 @@ impl<'a, C, A> AccountPublisherProfileGetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -20978,7 +20546,7 @@ impl<'a, C, A> AccountPublisherProfileGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21066,7 +20634,7 @@ impl<'a, C, A> AccountPublisherProfileGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21214,10 +20782,7 @@ impl<'a, C, A> AccountClientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -21237,7 +20802,7 @@ impl<'a, C, A> AccountClientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21325,7 +20890,7 @@ impl<'a, C, A> AccountClientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21373,14 +20938,9 @@ impl<'a, C, A> AccountClientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Update the given proposal to indicate that setup has been completed.
-/// This method is called by the buyer when the line items have been created
-/// on their end for a finalized proposal and all the required creatives
-/// have been uploaded using the creatives API. This call updates the
-/// `is_setup_completed` bit on the proposal and also notifies the seller.
-/// The server will advance the revision number of the most recent proposal.
+/// List all creative-deal associations.
 ///
-/// A builder for the *proposals.completeSetup* method supported by a *account* resource.
+/// A builder for the *creatives.dealAssociations.list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -21392,7 +20952,6 @@ impl<'a, C, A> AccountClientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// use adexchangebuyer2_v2_beta1::CompleteSetupRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -21403,37 +20962,37 @@ impl<'a, C, A> AccountClientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = CompleteSetupRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().proposals_complete_setup(req, "accountId", "proposalId")
+/// let result = hub.accounts().creatives_deal_associations_list("accountId", "creativeId")
+///              .query("takimata")
+///              .page_token("elitr")
+///              .page_size(-91)
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountProposalCompleteSetupCall<'a, C, A>
+pub struct AccountCreativeDealAssociationListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AdExchangeBuyerII<C, A>,
-    _request: CompleteSetupRequest,
     _account_id: String,
-    _proposal_id: String,
+    _creative_id: String,
+    _query: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountProposalCompleteSetupCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountCreativeDealAssociationListCall<'a, C, A> {}
 
-impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountCreativeDealAssociationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Proposal)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDealAssociationsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -21441,12 +21000,21 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.proposals.completeSetup",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.creatives.dealAssociations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
-        params.push(("proposalId", self._proposal_id.to_string()));
-        for &field in ["alt", "accountId", "proposalId"].iter() {
+        params.push(("creativeId", self._creative_id.to_string()));
+        if let Some(value) = self._query {
+            params.push(("query", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "accountId", "creativeId", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -21458,12 +21026,12 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/proposals/{proposalId}:completeSetup";
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/creatives/{creativeId}/dealAssociations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{proposalId}", "proposalId")].iter() {
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{creativeId}", "creativeId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -21475,7 +21043,7 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["proposalId", "accountId"].iter() {
+            for param_name in ["creativeId", "accountId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -21485,22 +21053,8 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -21517,15 +21071,11 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -21576,33 +21126,63 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CompleteSetupRequest) -> AccountProposalCompleteSetupCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Account ID of the buyer.
+    /// The account to list the associations from.
+    /// Specify "-" to list all creatives the current user has access to.
     ///
     /// Sets the *account id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a, C, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
-    /// The ID of the proposal to mark as setup completed.
+    /// The creative ID to list the associations from.
+    /// Specify "-" to list all creatives under the above account.
     ///
-    /// Sets the *proposal id* path property to the given value.
+    /// Sets the *creative id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a, C, A> {
-        self._proposal_id = new_value.to_string();
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
+        self._creative_id = new_value.to_string();
+        self
+    }
+    /// An optional query string to filter deal associations. If no filter is
+    /// specified, all associations will be returned.
+    /// Supported queries are:
+    /// <ul>
+    /// <li>accountId=<i>account_id_string</i>
+    /// <li>creativeId=<i>creative_id_string</i>
+    /// <li>dealsId=<i>deals_id_string</i>
+    /// <li>dealsStatus:{approved, conditionally_approved, disapproved,
+    ///                   not_checked}
+    /// <li>openAuctionStatus:{approved, conditionally_approved, disapproved,
+    ///                          not_checked}
+    /// </ul>
+    /// Example: 'dealsId=12345 AND dealsStatus:disapproved'
+    ///
+    /// Sets the *query* query property to the given value.
+    pub fn query(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
+        self._query = Some(new_value.to_string());
+        self
+    }
+    /// A token identifying a page of results the server should return.
+    /// Typically, this is the value of
+    /// ListDealAssociationsResponse.next_page_token
+    /// returned from the previous call to 'ListDealAssociations' method.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Requested page size. Server may return fewer associations than requested.
+    /// If unspecified, server will pick an appropriate default.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AccountCreativeDealAssociationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -21611,7 +21191,7 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProposalCompleteSetupCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCreativeDealAssociationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21620,7 +21200,7 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21636,7 +21216,7 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCompleteSetupCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21656,7 +21236,7 @@ impl<'a, C, A> AccountProposalCompleteSetupCall<'a, C, A> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalCompleteSetupCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeDealAssociationListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21775,10 +21355,7 @@ impl<'a, C, A> AccountCreativeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -21810,7 +21387,7 @@ impl<'a, C, A> AccountCreativeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -21916,7 +21493,7 @@ impl<'a, C, A> AccountCreativeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22071,10 +21648,7 @@ impl<'a, C, A> AccountCreativeDealAssociationRemoveCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -22106,7 +21680,7 @@ impl<'a, C, A> AccountCreativeDealAssociationRemoveCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -22206,7 +21780,7 @@ impl<'a, C, A> AccountCreativeDealAssociationRemoveCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22368,10 +21942,7 @@ impl<'a, C, A> AccountProposalPauseCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -22403,7 +21974,7 @@ impl<'a, C, A> AccountProposalPauseCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -22503,7 +22074,7 @@ impl<'a, C, A> AccountProposalPauseCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22584,10 +22155,10 @@ impl<'a, C, A> AccountProposalPauseCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().proposals_list("accountId")
-///              .page_token("dolor")
-///              .page_size(-9)
-///              .filter_syntax("ut")
-///              .filter("eirmod")
+///              .page_token("ipsum")
+///              .page_size(-87)
+///              .filter_syntax("dolor")
+///              .filter("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -22674,10 +22245,7 @@ impl<'a, C, A> AccountProposalListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -22697,7 +22265,7 @@ impl<'a, C, A> AccountProposalListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22808,7 +22376,7 @@ impl<'a, C, A> AccountProposalListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22885,8 +22453,8 @@ impl<'a, C, A> AccountProposalListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().clients_invitations_list("accountId", "clientAccountId")
-///              .page_token("dolor")
-///              .page_size(-22)
+///              .page_token("sanctus")
+///              .page_size(-27)
 ///              .doit();
 /// # }
 /// ```
@@ -22967,10 +22535,7 @@ impl<'a, C, A> AccountClientInvitationListCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -22990,7 +22555,7 @@ impl<'a, C, A> AccountClientInvitationListCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -23103,7 +22668,7 @@ impl<'a, C, A> AccountClientInvitationListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -23140,6 +22705,263 @@ impl<'a, C, A> AccountClientInvitationListCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientInvitationListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets a proposal given its ID. The proposal is returned at its head
+/// revision.
+///
+/// A builder for the *proposals.get* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().proposals_get("accountId", "proposalId")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountProposalGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AdExchangeBuyerII<C, A>,
+    _account_id: String,
+    _proposal_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountProposalGetCall<'a, C, A> {}
+
+impl<'a, C, A> AccountProposalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Proposal)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.proposals.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("accountId", self._account_id.to_string()));
+        params.push(("proposalId", self._proposal_id.to_string()));
+        for &field in ["alt", "accountId", "proposalId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/proposals/{proposalId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId"), ("{proposalId}", "proposalId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["proposalId", "accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Account ID of the buyer.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalGetCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The unique ID of the proposal
+    ///
+    /// Sets the *proposal id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalGetCall<'a, C, A> {
+        self._proposal_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProposalGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeBuyer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

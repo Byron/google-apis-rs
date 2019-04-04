@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dataproc* crate version *1.0.8+20181005*, where *20181005* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Dataproc* crate version *1.0.8+20190313*, where *20190313* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Dataproc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc/).
@@ -439,9 +439,9 @@ pub struct InstanceGroupConfig {
     /// Output only. The list of instance names. Cloud Dataproc derives the names from cluster_name, num_instances, and the instance group.
     #[serde(rename="instanceNames")]
     pub instance_names: Option<Vec<String>>,
-    /// Optional. Disk option config settings.
-    #[serde(rename="diskConfig")]
-    pub disk_config: Option<DiskConfig>,
+    /// Optional. The Compute Engine image resource used for cluster instances. It can be specified or may be inferred from SoftwareConfig.image_version.
+    #[serde(rename="imageUri")]
+    pub image_uri: Option<String>,
     /// Optional. The Compute Engine accelerator configuration for these instances.Beta Feature: This feature is still under development. It may be changed before final release.
     pub accelerators: Option<Vec<AcceleratorConfig>>,
     /// Output only. The config for Compute Engine Instance Group Manager that manages this group. This is only used for preemptible instance groups.
@@ -450,9 +450,9 @@ pub struct InstanceGroupConfig {
     /// Optional. The number of VM instances in the instance group. For master instance groups, must be set to 1.
     #[serde(rename="numInstances")]
     pub num_instances: Option<i32>,
-    /// Optional. The Compute Engine image resource used for cluster instances. It can be specified or may be inferred from SoftwareConfig.image_version.
-    #[serde(rename="imageUri")]
-    pub image_uri: Option<String>,
+    /// Optional. Disk option config settings.
+    #[serde(rename="diskConfig")]
+    pub disk_config: Option<DiskConfig>,
 }
 
 impl Part for InstanceGroupConfig {}
@@ -464,38 +464,38 @@ impl Part for InstanceGroupConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TemplateParameter {
-    /// Required. Paths to all fields that the parameter replaces. A field is allowed to appear in at most one parameter's list of field paths.A field path is similar in syntax to a google.protobuf.FieldMask. For example, a field path that references the zone field of a workflow template's cluster selector would be specified as <code>placement.clusterSelector.zone</code>.Also, field paths can reference fields using the following syntax:
-    /// Values in maps can be referenced by key. Examples<br>
+    /// Required. Paths to all fields that the parameter replaces. A field is allowed to appear in at most one parameter's list of field paths.A field path is similar in syntax to a google.protobuf.FieldMask. For example, a field path that references the zone field of a workflow template's cluster selector would be specified as placement.clusterSelector.zone.Also, field paths can reference fields using the following syntax:
+    /// Values in maps can be referenced by key:
     /// labels'key'
     /// placement.clusterSelector.clusterLabels'key'
     /// placement.managedCluster.labels'key'
     /// placement.clusterSelector.clusterLabels'key'
-    /// jobsstep-id.labels'key'
-    /// Jobs in the jobs list can be referenced by step-id. Examples:<br>
-    /// jobsstep-id.hadoopJob.mainJarFileUri
-    /// jobsstep-id.hiveJob.queryFileUri
-    /// jobsstep-id.pySparkJob.mainPythonFileUri
-    /// jobsstep-id.hadoopJob.jarFileUris0
-    /// jobsstep-id.hadoopJob.archiveUris0
-    /// jobsstep-id.hadoopJob.fileUris0
-    /// jobsstep-id.pySparkJob.pythonFileUris0
-    /// Items in repeated fields can be referenced by a zero-based index. Example:<br>
-    /// jobsstep-id.sparkJob.args0
+    /// jobs'step-id'.labels'key'
+    /// Jobs in the jobs list can be referenced by step-id:
+    /// jobs'step-id'.hadoopJob.mainJarFileUri
+    /// jobs'step-id'.hiveJob.queryFileUri
+    /// jobs'step-id'.pySparkJob.mainPythonFileUri
+    /// jobs'step-id'.hadoopJob.jarFileUris0
+    /// jobs'step-id'.hadoopJob.archiveUris0
+    /// jobs'step-id'.hadoopJob.fileUris0
+    /// jobs'step-id'.pySparkJob.pythonFileUris0
+    /// Items in repeated fields can be referenced by a zero-based index:
+    /// jobs'step-id'.sparkJob.args0
     /// Other examples:
-    /// jobsstep-id.hadoopJob.properties'key'
-    /// jobsstep-id.hadoopJob.args0
-    /// jobsstep-id.hiveJob.scriptVariables'key'
-    /// jobsstep-id.hadoopJob.mainJarFileUri
+    /// jobs'step-id'.hadoopJob.properties'key'
+    /// jobs'step-id'.hadoopJob.args0
+    /// jobs'step-id'.hiveJob.scriptVariables'key'
+    /// jobs'step-id'.hadoopJob.mainJarFileUri
     /// placement.clusterSelector.zoneIt may not be possible to parameterize maps and repeated fields in their entirety since only individual map values and individual items in repeated fields can be referenced. For example, the following field paths are invalid:
     /// placement.clusterSelector.clusterLabels
-    /// jobsstep-id.sparkJob.args
+    /// jobs'step-id'.sparkJob.args
     pub fields: Option<Vec<String>>,
     /// Optional. Validation rules to be applied to this parameter's value.
     pub validation: Option<ParameterValidation>,
-    /// Required. Parameter name. The parameter name is used as the key, and paired with the parameter value, which are passed to the template when the template is instantiated. The name must contain only capital letters (A-Z), numbers (0-9), and underscores (_), and must not start with a number. The maximum length is 40 characters.
-    pub name: Option<String>,
     /// Optional. Brief description of the parameter. Must not exceed 1024 characters.
     pub description: Option<String>,
+    /// Required. Parameter name. The parameter name is used as the key, and paired with the parameter value, which are passed to the template when the template is instantiated. The name must contain only capital letters (A-Z), numbers (0-9), and underscores (_), and must not start with a number. The maximum length is 40 characters.
+    pub name: Option<String>,
 }
 
 impl Part for TemplateParameter {}
@@ -659,7 +659,7 @@ pub struct JobReference {
     /// Required. The ID of the Google Cloud Platform project that the job belongs to.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// Optional. The job ID, which must be unique within the project. The job ID is generated by the server upon job submission or provided by the user as a means to perform retries without creating duplicate jobs. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or hyphens (-). The maximum length is 100 characters.
+    /// Optional. The job ID, which must be unique within the project.The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or hyphens (-). The maximum length is 100 characters.If not specified by the caller, the job ID will be provided by the server.
     #[serde(rename="jobId")]
     pub job_id: Option<String>,
 }
@@ -747,10 +747,10 @@ pub struct ClusterConfig {
     /// Optional. The config settings for software inside the cluster.
     #[serde(rename="softwareConfig")]
     pub software_config: Option<SoftwareConfig>,
-    /// Optional. A Cloud Storage staging bucket used for sharing generated SSH keys and config. If you do not specify a staging bucket, Cloud Dataproc will determine an appropriate Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Google Compute Engine zone where your cluster is deployed, and then it will create and manage this project-level, per-location bucket for you.
+    /// Optional. A Google Cloud Storage bucket used to stage job dependencies, config files, and job driver console output. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Google Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket (see Cloud Dataproc staging bucket).
     #[serde(rename="configBucket")]
     pub config_bucket: Option<String>,
-    /// Required. The shared Compute Engine config settings for all instances in a cluster.
+    /// Optional. The shared Compute Engine config settings for all instances in a cluster.
     #[serde(rename="gceClusterConfig")]
     pub gce_cluster_config: Option<GceClusterConfig>,
     /// Optional. The Compute Engine config settings for worker instances in a cluster.
@@ -873,15 +873,15 @@ pub struct WorkflowTemplate {
     pub parameters: Option<Vec<TemplateParameter>>,
     /// Optional. The labels to associate with this template. These labels will be propagated to all jobs and clusters created by the workflow instance.Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).No more than 32 labels can be associated with a template.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. The template id.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
-    pub id: Option<String>,
+    /// Output only. The time template was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
     /// Optional. Used to perform a consistent read-modify-write.This field should be left blank for a CreateWorkflowTemplate request. It is required for an UpdateWorkflowTemplate request, and must match the current server version. A typical update template flow would fetch the current template with a GetWorkflowTemplate request, which will return the current template with the version field filled in with the current server version. The user updates other fields in the template, then returns it as part of the UpdateWorkflowTemplate request.
     pub version: Option<i32>,
     /// Required. WorkflowTemplate scheduling information.
     pub placement: Option<WorkflowTemplatePlacement>,
-    /// Output only. The time template was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+    /// Required. The template id.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
+    pub id: Option<String>,
 }
 
 impl RequestValue for WorkflowTemplate {}
@@ -904,38 +904,41 @@ impl ResponseResult for WorkflowTemplate {}
 pub struct Job {
     /// Output only. The job status. Additional application-specific status information may be contained in the <code>type_job</code> and <code>yarn_applications</code> fields.
     pub status: Option<JobStatus>,
-    /// Job is a SparkSql job.
-    #[serde(rename="sparkSqlJob")]
-    pub spark_sql_job: Option<SparkSqlJob>,
-    /// Optional. The labels to associate with this job. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a job.
-    pub labels: Option<HashMap<String, String>>,
-    /// Required. Job information, including how, when, and where to run the job.
-    pub placement: Option<JobPlacement>,
-    /// Optional. The fully qualified reference to the job, which can be used to obtain the equivalent REST path of the job resource. If this property is not specified when a job is created, the server generates a <code>job_id</code>.
-    pub reference: Option<JobReference>,
     /// Job is a Hadoop job.
     #[serde(rename="hadoopJob")]
     pub hadoop_job: Option<HadoopJob>,
+    /// Optional. The labels to associate with this job. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a job.
+    pub labels: Option<HashMap<String, String>>,
+    /// Output only. The collection of YARN applications spun up by this job.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
+    #[serde(rename="yarnApplications")]
+    pub yarn_applications: Option<Vec<YarnApplication>>,
+    /// Optional. The fully qualified reference to the job, which can be used to obtain the equivalent REST path of the job resource. If this property is not specified when a job is created, the server generates a <code>job_id</code>.
+    pub reference: Option<JobReference>,
     /// Job is a Pig job.
     #[serde(rename="pigJob")]
     pub pig_job: Option<PigJob>,
     /// Output only. A URI pointing to the location of the stdout of the job's driver program.
     #[serde(rename="driverOutputResourceUri")]
     pub driver_output_resource_uri: Option<String>,
-    /// Output only. If present, the location of miscellaneous control files which may be used as part of job setup and handling. If not present, control files may be placed in the same location as driver_output_uri.
-    #[serde(rename="driverControlFilesUri")]
-    pub driver_control_files_uri: Option<String>,
     /// Job is a Spark job.
     #[serde(rename="sparkJob")]
     pub spark_job: Option<SparkJob>,
-    /// Output only. The collection of YARN applications spun up by this job.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
-    #[serde(rename="yarnApplications")]
-    pub yarn_applications: Option<Vec<YarnApplication>>,
+    /// Output only. A UUID that uniquely identifies a job within the project over time. This is in contrast to a user-settable reference.job_id that may be reused over time.
+    #[serde(rename="jobUuid")]
+    pub job_uuid: Option<String>,
     /// Optional. Job scheduling configuration.
     pub scheduling: Option<JobScheduling>,
     /// Output only. The previous job status.
     #[serde(rename="statusHistory")]
     pub status_history: Option<Vec<JobStatus>>,
+    /// Job is a SparkSql job.
+    #[serde(rename="sparkSqlJob")]
+    pub spark_sql_job: Option<SparkSqlJob>,
+    /// Required. Job information, including how, when, and where to run the job.
+    pub placement: Option<JobPlacement>,
+    /// Output only. If present, the location of miscellaneous control files which may be used as part of job setup and handling. If not present, control files may be placed in the same location as driver_output_uri.
+    #[serde(rename="driverControlFilesUri")]
+    pub driver_control_files_uri: Option<String>,
     /// Job is a Pyspark job.
     #[serde(rename="pysparkJob")]
     pub pyspark_job: Option<PySparkJob>,
@@ -1190,14 +1193,14 @@ impl RequestValue for InstantiateWorkflowTemplateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.
-    pub title: Option<String>,
+    /// An optional description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
     /// Textual representation of an expression in Common Expression Language syntax.The application context of the containing message determines which well-known feature set of CEL is supported.
     pub expression: Option<String>,
     /// An optional string indicating the location of the expression for error reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.
+    pub title: Option<String>,
 }
 
 impl Part for Expr {}
@@ -1271,10 +1274,10 @@ pub struct JobStatus {
     /// Output only. The time when this state was entered.
     #[serde(rename="stateStartTime")]
     pub state_start_time: Option<String>,
-    /// Output only. Additional state information, which includes status reported by the agent.
-    pub substate: Option<String>,
     /// Output only. Optional job state details, such as an error description if the state is <code>ERROR</code>.
     pub details: Option<String>,
+    /// Output only. Additional state information, which includes status reported by the agent.
+    pub substate: Option<String>,
 }
 
 impl Part for JobStatus {}
@@ -1297,24 +1300,18 @@ pub struct JobPlacement {
 impl Part for JobPlacement {}
 
 
-/// The status of a cluster and its instances.
+/// Encryption settings for the cluster.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClusterStatus {
-    /// Output only. The cluster's state.
-    pub state: Option<String>,
-    /// Output only. Time when this state was entered.
-    #[serde(rename="stateStartTime")]
-    pub state_start_time: Option<String>,
-    /// Output only. Additional state information that includes status reported by the agent.
-    pub substate: Option<String>,
-    /// Output only. Optional details of cluster's state.
-    pub detail: Option<String>,
+pub struct EncryptionConfig {
+    /// Optional. The Cloud KMS key name to use for PD disk encryption for all instances in the cluster.
+    #[serde(rename="gcePdKmsKeyName")]
+    pub gce_pd_kms_key_name: Option<String>,
 }
 
-impl Part for ClusterStatus {}
+impl Part for EncryptionConfig {}
 
 
 /// The runtime logging config of the job.
@@ -1447,7 +1444,10 @@ pub struct SoftwareConfig {
     /// Optional. The version of software inside the cluster. It must be one of the supported Cloud Dataproc Versions, such as "1.2" (including a subminor version, such as "1.2.29"), or the "preview" version. If unspecified, it defaults to the latest version.
     #[serde(rename="imageVersion")]
     pub image_version: Option<String>,
-    /// Optional. The properties to set on daemon config files.Property keys are specified in prefix:property format, such as core:fs.defaultFS. The following are supported prefixes and their mappings:
+    /// The set of optional components to activate on the cluster.
+    #[serde(rename="optionalComponents")]
+    pub optional_components: Option<Vec<String>>,
+    /// Optional. The properties to set on daemon config files.Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. The following are supported prefixes and their mappings:
     /// capacity-scheduler: capacity-scheduler.xml
     /// core: core-site.xml
     /// distcp: distcp-default.xml
@@ -1531,7 +1531,7 @@ pub struct Binding {
     /// user:{emailid}: An email address that represents a specific Google  account. For example, alice@gmail.com .
     /// serviceAccount:{emailid}: An email address that represents a service  account. For example, my-other-app@appspot.gserviceaccount.com.
     /// group:{emailid}: An email address that represents a Google group.  For example, admins@example.com.
-    /// domain:{domain}: A Google Apps domain name that represents all the  users of that domain. For example, google.com or example.com.
+    /// domain:{domain}: The G Suite domain (primary) that represents all the  users of that domain. For example, google.com or example.com.
     pub members: Option<Vec<String>>,
 }
 
@@ -1643,18 +1643,24 @@ pub struct SparkJob {
 impl Part for SparkJob {}
 
 
-/// Encryption settings for the cluster.
+/// The status of a cluster and its instances.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EncryptionConfig {
-    /// Optional. The Cloud KMS key name to use for PD disk encryption for all instances in the cluster.
-    #[serde(rename="gcePdKmsKeyName")]
-    pub gce_pd_kms_key_name: Option<String>,
+pub struct ClusterStatus {
+    /// Output only. The cluster's state.
+    pub state: Option<String>,
+    /// Output only. Time when this state was entered.
+    #[serde(rename="stateStartTime")]
+    pub state_start_time: Option<String>,
+    /// Output only. Optional details of cluster's state.
+    pub detail: Option<String>,
+    /// Output only. Additional state information that includes status reported by the agent.
+    pub substate: Option<String>,
 }
 
-impl Part for EncryptionConfig {}
+impl Part for ClusterStatus {}
 
 
 /// This resource represents a long-running operation that is the result of a network API call.
@@ -2756,7 +2762,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, C, A> wher
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2772,10 +2778,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, C, A> wher
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2807,7 +2810,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, C, A> wher
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2897,7 +2900,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, C, A> wher
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2905,12 +2908,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, C, A> wher
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, C, A>
@@ -3047,10 +3050,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3070,7 +3070,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3168,7 +3168,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3176,12 +3176,12 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterGetCall<'a, C, A>
@@ -3309,7 +3309,7 @@ impl<'a, C, A> ProjectRegionOperationTestIamPermissionCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3325,10 +3325,7 @@ impl<'a, C, A> ProjectRegionOperationTestIamPermissionCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3360,7 +3357,7 @@ impl<'a, C, A> ProjectRegionOperationTestIamPermissionCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3450,7 +3447,7 @@ impl<'a, C, A> ProjectRegionOperationTestIamPermissionCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3458,12 +3455,12 @@ impl<'a, C, A> ProjectRegionOperationTestIamPermissionCall<'a, C, A> where C: Bo
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationTestIamPermissionCall<'a, C, A>
@@ -3594,7 +3591,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateListCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3610,10 +3607,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateListCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3633,7 +3627,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateListCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3725,7 +3719,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateListCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3733,12 +3727,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateListCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateListCall<'a, C, A>
@@ -3859,7 +3853,7 @@ impl<'a, C, A> ProjectRegionOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3875,10 +3869,7 @@ impl<'a, C, A> ProjectRegionOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3898,7 +3889,7 @@ impl<'a, C, A> ProjectRegionOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3976,7 +3967,7 @@ impl<'a, C, A> ProjectRegionOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3984,12 +3975,12 @@ impl<'a, C, A> ProjectRegionOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationGetCall<'a, C, A>
@@ -4120,7 +4111,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4136,10 +4127,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4159,7 +4147,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4251,7 +4239,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4259,12 +4247,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateListCall<'a, C, A>
@@ -4392,7 +4380,7 @@ impl<'a, C, A> ProjectRegionOperationSetIamPolicyCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4408,10 +4396,7 @@ impl<'a, C, A> ProjectRegionOperationSetIamPolicyCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4443,7 +4428,7 @@ impl<'a, C, A> ProjectRegionOperationSetIamPolicyCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4533,7 +4518,7 @@ impl<'a, C, A> ProjectRegionOperationSetIamPolicyCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4541,12 +4526,12 @@ impl<'a, C, A> ProjectRegionOperationSetIamPolicyCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationSetIamPolicyCall<'a, C, A>
@@ -4672,7 +4657,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4688,10 +4673,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4711,7 +4693,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4796,7 +4778,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4804,12 +4786,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateGetCall<'a, C, A>
@@ -4958,10 +4940,7 @@ impl<'a, C, A> ProjectRegionJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4993,7 +4972,7 @@ impl<'a, C, A> ProjectRegionJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5110,7 +5089,7 @@ impl<'a, C, A> ProjectRegionJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5118,12 +5097,12 @@ impl<'a, C, A> ProjectRegionJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobPatchCall<'a, C, A>
@@ -5251,7 +5230,7 @@ impl<'a, C, A> ProjectRegionJobTestIamPermissionCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5267,10 +5246,7 @@ impl<'a, C, A> ProjectRegionJobTestIamPermissionCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5302,7 +5278,7 @@ impl<'a, C, A> ProjectRegionJobTestIamPermissionCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5392,7 +5368,7 @@ impl<'a, C, A> ProjectRegionJobTestIamPermissionCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5400,12 +5376,12 @@ impl<'a, C, A> ProjectRegionJobTestIamPermissionCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobTestIamPermissionCall<'a, C, A>
@@ -5533,7 +5509,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5549,10 +5525,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5584,7 +5557,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A> where C: B
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5674,7 +5647,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5682,12 +5655,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A> where C: B
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A>
@@ -5815,7 +5788,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A> wh
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5831,10 +5804,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A> wh
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5866,7 +5836,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A> wh
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5956,7 +5926,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A> wh
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5964,12 +5934,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A> wh
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A>
@@ -6097,7 +6067,7 @@ impl<'a, C, A> ProjectRegionClusterSetIamPolicyCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6113,10 +6083,7 @@ impl<'a, C, A> ProjectRegionClusterSetIamPolicyCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6148,7 +6115,7 @@ impl<'a, C, A> ProjectRegionClusterSetIamPolicyCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6238,7 +6205,7 @@ impl<'a, C, A> ProjectRegionClusterSetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6246,12 +6213,12 @@ impl<'a, C, A> ProjectRegionClusterSetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterSetIamPolicyCall<'a, C, A>
@@ -6379,7 +6346,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateCreateCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6395,10 +6362,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateCreateCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6430,7 +6394,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateCreateCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6520,7 +6484,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateCreateCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6528,12 +6492,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateCreateCall<'a, C, A> where C: Borr
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateCreateCall<'a, C, A>
@@ -6661,7 +6625,7 @@ impl<'a, C, A> ProjectRegionClusterTestIamPermissionCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6677,10 +6641,7 @@ impl<'a, C, A> ProjectRegionClusterTestIamPermissionCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6712,7 +6673,7 @@ impl<'a, C, A> ProjectRegionClusterTestIamPermissionCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6802,7 +6763,7 @@ impl<'a, C, A> ProjectRegionClusterTestIamPermissionCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6810,12 +6771,12 @@ impl<'a, C, A> ProjectRegionClusterTestIamPermissionCall<'a, C, A> where C: Borr
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterTestIamPermissionCall<'a, C, A>
@@ -6974,10 +6935,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7009,7 +6967,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7156,7 +7114,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7164,12 +7122,12 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterPatchCall<'a, C, A>
@@ -7290,7 +7248,7 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7306,10 +7264,7 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7329,7 +7284,7 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7407,7 +7362,7 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7415,12 +7370,12 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationDeleteCall<'a, C, A>
@@ -7562,10 +7517,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7597,7 +7549,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7697,7 +7649,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7705,12 +7657,12 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSubmitCall<'a, C, A>
@@ -7857,10 +7809,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7892,7 +7841,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7999,7 +7948,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8007,12 +7956,12 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterCreateCall<'a, C, A>
@@ -8140,7 +8089,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A> where C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8156,10 +8105,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A> where C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8191,7 +8137,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A> where C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8281,7 +8227,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A> where C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8289,12 +8235,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A> where C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A>
@@ -8427,7 +8373,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A> wh
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8443,10 +8389,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A> wh
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8478,7 +8421,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A> wh
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8575,7 +8518,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A> wh
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8583,12 +8526,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A> wh
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A>
@@ -8716,7 +8659,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8732,10 +8675,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8767,7 +8707,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8857,7 +8797,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8865,12 +8805,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A>
@@ -8998,7 +8938,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A> where C:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9014,10 +8954,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A> where C:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9049,7 +8986,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A> where C:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9139,7 +9076,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A> where C:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9147,12 +9084,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A> where C:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A>
@@ -9280,7 +9217,7 @@ impl<'a, C, A> ProjectRegionClusterGetIamPolicyCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9296,10 +9233,7 @@ impl<'a, C, A> ProjectRegionClusterGetIamPolicyCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9331,7 +9265,7 @@ impl<'a, C, A> ProjectRegionClusterGetIamPolicyCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9421,7 +9355,7 @@ impl<'a, C, A> ProjectRegionClusterGetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9429,12 +9363,12 @@ impl<'a, C, A> ProjectRegionClusterGetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterGetIamPolicyCall<'a, C, A>
@@ -9584,10 +9518,7 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9607,7 +9538,7 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9716,7 +9647,7 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9724,12 +9655,12 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterListCall<'a, C, A>
@@ -9889,10 +9820,7 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9912,7 +9840,7 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10035,7 +9963,7 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10043,12 +9971,12 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobListCall<'a, C, A>
@@ -10176,7 +10104,7 @@ impl<'a, C, A> ProjectRegionJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10192,10 +10120,7 @@ impl<'a, C, A> ProjectRegionJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10227,7 +10152,7 @@ impl<'a, C, A> ProjectRegionJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10317,7 +10242,7 @@ impl<'a, C, A> ProjectRegionJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10325,12 +10250,12 @@ impl<'a, C, A> ProjectRegionJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobGetIamPolicyCall<'a, C, A>
@@ -10451,7 +10376,7 @@ impl<'a, C, A> ProjectRegionOperationCancelCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10467,10 +10392,7 @@ impl<'a, C, A> ProjectRegionOperationCancelCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10490,7 +10412,7 @@ impl<'a, C, A> ProjectRegionOperationCancelCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10568,7 +10490,7 @@ impl<'a, C, A> ProjectRegionOperationCancelCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10576,12 +10498,12 @@ impl<'a, C, A> ProjectRegionOperationCancelCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationCancelCall<'a, C, A>
@@ -10725,10 +10647,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10760,7 +10679,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10870,7 +10789,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10878,12 +10797,12 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterDiagnoseCall<'a, C, A>
@@ -11011,7 +10930,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11027,10 +10946,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11062,7 +10978,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11152,7 +11068,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11160,12 +11076,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A>
@@ -11301,7 +11217,7 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11317,10 +11233,7 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11340,7 +11253,7 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11439,7 +11352,7 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11447,12 +11360,12 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationListCall<'a, C, A>
@@ -11578,7 +11491,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11594,10 +11507,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11617,7 +11527,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11702,7 +11612,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11710,12 +11620,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> where C: Borr
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A>
@@ -11843,7 +11753,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A> where C: 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11859,10 +11769,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A> where C: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11894,7 +11801,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A> where C: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11984,7 +11891,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A> where C: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11992,12 +11899,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A> where C: 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A>
@@ -12125,7 +12032,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A> where C: 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12141,10 +12048,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A> where C: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12176,7 +12080,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A> where C: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12266,7 +12170,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A> where C: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12274,12 +12178,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A> where C: 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A>
@@ -12416,10 +12320,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12439,7 +12340,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12537,7 +12438,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12545,12 +12446,12 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobGetCall<'a, C, A>
@@ -12678,7 +12579,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A> where C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12694,10 +12595,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A> where C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12729,7 +12627,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A> where C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12819,7 +12717,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A> where C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12827,12 +12725,12 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A> where C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A>
@@ -12979,10 +12877,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13002,7 +12897,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13114,7 +13009,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13122,12 +13017,12 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterDeleteCall<'a, C, A>
@@ -13260,7 +13155,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A> wher
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13276,10 +13171,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A> wher
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13311,7 +13203,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A> wher
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13408,7 +13300,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A> wher
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13416,12 +13308,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A> wher
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A>
@@ -13547,7 +13439,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13563,10 +13455,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13586,7 +13475,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13671,7 +13560,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13679,12 +13568,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A>
@@ -13812,7 +13701,7 @@ impl<'a, C, A> ProjectRegionOperationGetIamPolicyCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13828,10 +13717,7 @@ impl<'a, C, A> ProjectRegionOperationGetIamPolicyCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13863,7 +13749,7 @@ impl<'a, C, A> ProjectRegionOperationGetIamPolicyCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13953,7 +13839,7 @@ impl<'a, C, A> ProjectRegionOperationGetIamPolicyCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13961,12 +13847,12 @@ impl<'a, C, A> ProjectRegionOperationGetIamPolicyCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationGetIamPolicyCall<'a, C, A>
@@ -14092,7 +13978,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14108,10 +13994,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14131,7 +14014,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14216,7 +14099,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14224,12 +14107,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateGetCall<'a, C, A>
@@ -14357,7 +14240,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateCreateCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14373,10 +14256,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateCreateCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14408,7 +14288,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateCreateCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14498,7 +14378,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateCreateCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14506,12 +14386,12 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateCreateCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateCreateCall<'a, C, A>
@@ -14648,10 +14528,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14671,7 +14548,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14769,7 +14646,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14777,12 +14654,12 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobDeleteCall<'a, C, A>
@@ -14910,7 +14787,7 @@ impl<'a, C, A> ProjectRegionJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14926,10 +14803,7 @@ impl<'a, C, A> ProjectRegionJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14961,7 +14835,7 @@ impl<'a, C, A> ProjectRegionJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15051,7 +14925,7 @@ impl<'a, C, A> ProjectRegionJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15059,12 +14933,12 @@ impl<'a, C, A> ProjectRegionJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSetIamPolicyCall<'a, C, A>
@@ -15208,10 +15082,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15243,7 +15114,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15353,7 +15224,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15361,12 +15232,12 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobCancelCall<'a, C, A>

@@ -6869,14 +6869,10 @@ impl<'n> Engine<'n> {
                     "webproperty-name" => Some(("webpropertyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-name" => Some(("accountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-name" => Some(("profileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-settings.share-with-specialists" => Some(("accountSettings.shareWithSpecialists", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "account-settings.share-with-support" => Some(("accountSettings.shareWithSupport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "account-settings.share-anonymously-with-others" => Some(("accountSettings.shareAnonymouslyWithOthers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "account-settings.share-with-google-products" => Some(("accountSettings.shareWithGoogleProducts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-settings", "kind", "profile-name", "share-anonymously-with-others", "share-with-google-products", "share-with-specialists", "share-with-support", "timezone", "webproperty-name", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "kind", "profile-name", "timezone", "webproperty-name", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9805,7 +9801,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-property-ad-words-links-delete",
-                    Some(r##"Deletes a web property-AdWords link."##),
+                    Some(r##"Deletes a web property-Google Ads link."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_web-property-ad-words-links-delete",
                   vec![
                     (Some(r##"account-id"##),
@@ -9816,13 +9812,13 @@ fn main() {
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID to delete the AdWords link for."##),
+                     Some(r##"Web property ID to delete the Google Ads link for."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-ad-words-link-id"##),
                      None,
-                     Some(r##"Web property AdWords link ID."##),
+                     Some(r##"Web property Google Ads link ID."##),
                      Some(true),
                      Some(false)),
         
@@ -9833,7 +9829,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("web-property-ad-words-links-get",
-                    Some(r##"Returns a web property-AdWords link to which the user has access."##),
+                    Some(r##"Returns a web property-Google Ads link to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_web-property-ad-words-links-get",
                   vec![
                     (Some(r##"account-id"##),
@@ -9844,13 +9840,13 @@ fn main() {
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID to retrieve the AdWords link for."##),
+                     Some(r##"Web property ID to retrieve the Google Ads link for."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-ad-words-link-id"##),
                      None,
-                     Some(r##"Web property-AdWords link ID."##),
+                     Some(r##"Web property-Google Ads link ID."##),
                      Some(true),
                      Some(false)),
         
@@ -9867,7 +9863,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-property-ad-words-links-insert",
-                    Some(r##"Creates a webProperty-AdWords link."##),
+                    Some(r##"Creates a webProperty-Google Ads link."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_web-property-ad-words-links-insert",
                   vec![
                     (Some(r##"account-id"##),
@@ -9901,7 +9897,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-property-ad-words-links-list",
-                    Some(r##"Lists webProperty-AdWords links for a given web property."##),
+                    Some(r##"Lists webProperty-Google Ads links for a given web property."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_web-property-ad-words-links-list",
                   vec![
                     (Some(r##"account-id"##),
@@ -9912,7 +9908,7 @@ fn main() {
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID to retrieve the AdWords links for."##),
+                     Some(r##"Web property ID to retrieve the Google Ads links for."##),
                      Some(true),
                      Some(false)),
         
@@ -9929,7 +9925,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-property-ad-words-links-patch",
-                    Some(r##"Updates an existing webProperty-AdWords link. This method supports patch semantics."##),
+                    Some(r##"Updates an existing webProperty-Google Ads link. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_web-property-ad-words-links-patch",
                   vec![
                     (Some(r##"account-id"##),
@@ -9940,13 +9936,13 @@ fn main() {
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID to retrieve the AdWords link for."##),
+                     Some(r##"Web property ID to retrieve the Google Ads link for."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-ad-words-link-id"##),
                      None,
-                     Some(r##"Web property-AdWords link ID."##),
+                     Some(r##"Web property-Google Ads link ID."##),
                      Some(true),
                      Some(false)),
         
@@ -9969,7 +9965,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-property-ad-words-links-update",
-                    Some(r##"Updates an existing webProperty-AdWords link."##),
+                    Some(r##"Updates an existing webProperty-Google Ads link."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_web-property-ad-words-links-update",
                   vec![
                     (Some(r##"account-id"##),
@@ -9980,13 +9976,13 @@ fn main() {
         
                     (Some(r##"web-property-id"##),
                      None,
-                     Some(r##"Web property ID to retrieve the AdWords link for."##),
+                     Some(r##"Web property ID to retrieve the Google Ads link for."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"web-property-ad-words-link-id"##),
                      None,
-                     Some(r##"Web property-AdWords link ID."##),
+                     Some(r##"Web property-Google Ads link ID."##),
                      Some(true),
                      Some(false)),
         
@@ -10387,7 +10383,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180622")
+           .version("1.0.8+20180730")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

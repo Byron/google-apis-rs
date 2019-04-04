@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *1.0.8+20181003*, where *20181003* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Android Enterprise* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Android Enterprise* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/work/play/emm-api).
@@ -14,7 +14,7 @@
 //! * [devices](struct.Device.html)
 //!  * [*get*](struct.DeviceGetCall.html), [*get state*](struct.DeviceGetStateCall.html), [*list*](struct.DeviceListCall.html), [*patch*](struct.DevicePatchCall.html), [*set state*](struct.DeviceSetStateCall.html) and [*update*](struct.DeviceUpdateCall.html)
 //! * [enterprises](struct.Enterprise.html)
-//!  * [*acknowledge notification set*](struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](struct.EnterpriseCompleteSignupCall.html), [*create web token*](struct.EnterpriseCreateWebTokenCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*generate signup url*](struct.EnterpriseGenerateSignupUrlCall.html), [*get*](struct.EnterpriseGetCall.html), [*get android device policy config*](struct.EnterpriseGetAndroidDevicePolicyConfigCall.html), [*get service account*](struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](struct.EnterpriseGetStoreLayoutCall.html), [*list*](struct.EnterpriseListCall.html), [*pull notification set*](struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html), [*set android device policy config*](struct.EnterpriseSetAndroidDevicePolicyConfigCall.html), [*set store layout*](struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
+//!  * [*acknowledge notification set*](struct.EnterpriseAcknowledgeNotificationSetCall.html), [*complete signup*](struct.EnterpriseCompleteSignupCall.html), [*create web token*](struct.EnterpriseCreateWebTokenCall.html), [*enroll*](struct.EnterpriseEnrollCall.html), [*generate signup url*](struct.EnterpriseGenerateSignupUrlCall.html), [*get*](struct.EnterpriseGetCall.html), [*get service account*](struct.EnterpriseGetServiceAccountCall.html), [*get store layout*](struct.EnterpriseGetStoreLayoutCall.html), [*list*](struct.EnterpriseListCall.html), [*pull notification set*](struct.EnterprisePullNotificationSetCall.html), [*send test push notification*](struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](struct.EnterpriseSetAccountCall.html), [*set store layout*](struct.EnterpriseSetStoreLayoutCall.html) and [*unenroll*](struct.EnterpriseUnenrollCall.html)
 //! * [entitlements](struct.Entitlement.html)
 //!  * [*delete*](struct.EntitlementDeleteCall.html), [*get*](struct.EntitlementGetCall.html), [*list*](struct.EntitlementListCall.html), [*patch*](struct.EntitlementPatchCall.html) and [*update*](struct.EntitlementUpdateCall.html)
 //! * grouplicenses
@@ -41,6 +41,8 @@
 //!  * [*delete*](struct.StorelayoutpageDeleteCall.html), [*get*](struct.StorelayoutpageGetCall.html), [*insert*](struct.StorelayoutpageInsertCall.html), [*list*](struct.StorelayoutpageListCall.html), [*patch*](struct.StorelayoutpagePatchCall.html) and [*update*](struct.StorelayoutpageUpdateCall.html)
 //! * [users](struct.User.html)
 //!  * [*delete*](struct.UserDeleteCall.html), [*generate authentication token*](struct.UserGenerateAuthenticationTokenCall.html), [*generate token*](struct.UserGenerateTokenCall.html), [*get*](struct.UserGetCall.html), [*get available product set*](struct.UserGetAvailableProductSetCall.html), [*insert*](struct.UserInsertCall.html), [*list*](struct.UserListCall.html), [*patch*](struct.UserPatchCall.html), [*revoke device access*](struct.UserRevokeDeviceAccesCall.html), [*revoke token*](struct.UserRevokeTokenCall.html), [*set available product set*](struct.UserSetAvailableProductSetCall.html) and [*update*](struct.UserUpdateCall.html)
+//! * webapps
+//!  * [*delete*](struct.WebappDeleteCall.html), [*get*](struct.WebappGetCall.html), [*insert*](struct.WebappInsertCall.html), [*list*](struct.WebappListCall.html), [*patch*](struct.WebappPatchCall.html) and [*update*](struct.WebappUpdateCall.html)
 //! 
 //! 
 //! 
@@ -76,21 +78,19 @@
 //! 
 //! ```ignore
 //! let r = hub.enterprises().send_test_push_notification(...).doit()
-//! let r = hub.enterprises().generate_signup_url(...).doit()
-//! let r = hub.enterprises().get_android_device_policy_config(...).doit()
+//! let r = hub.enterprises().get_store_layout(...).doit()
+//! let r = hub.enterprises().get_service_account(...).doit()
 //! let r = hub.enterprises().acknowledge_notification_set(...).doit()
 //! let r = hub.enterprises().set_store_layout(...).doit()
-//! let r = hub.enterprises().set_android_device_policy_config(...).doit()
-//! let r = hub.enterprises().get_store_layout(...).doit()
-//! let r = hub.enterprises().pull_notification_set(...).doit()
-//! let r = hub.enterprises().list(...).doit()
 //! let r = hub.enterprises().complete_signup(...).doit()
+//! let r = hub.enterprises().list(...).doit()
+//! let r = hub.enterprises().unenroll(...).doit()
 //! let r = hub.enterprises().set_account(...).doit()
+//! let r = hub.enterprises().pull_notification_set(...).doit()
 //! let r = hub.enterprises().enroll(...).doit()
 //! let r = hub.enterprises().create_web_token(...).doit()
 //! let r = hub.enterprises().get(...).doit()
-//! let r = hub.enterprises().unenroll(...).doit()
-//! let r = hub.enterprises().get_service_account(...).doit()
+//! let r = hub.enterprises().generate_signup_url(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -124,7 +124,6 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_androidenterprise1 as androidenterprise1;
-//! use androidenterprise1::StoreLayout;
 //! use androidenterprise1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -143,15 +142,11 @@
 //!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = StoreLayout::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.enterprises().set_store_layout(req, "enterpriseId")
+//! let result = hub.enterprises().get_service_account("enterpriseId")
+//!              .key_type("sed")
 //!              .doit();
 //! 
 //! match result {
@@ -309,7 +304,6 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_androidenterprise1 as androidenterprise1;
-/// use androidenterprise1::StoreLayout;
 /// use androidenterprise1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -328,15 +322,11 @@ impl Default for Scope {
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = StoreLayout::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().set_store_layout(req, "enterpriseId")
+/// let result = hub.enterprises().get_service_account("enterpriseId")
+///              .key_type("dolores")
 ///              .doit();
 /// 
 /// match result {
@@ -425,6 +415,9 @@ impl<'a, C, A> AndroidEnterprise<C, A>
     pub fn users(&'a self) -> UserMethods<'a, C, A> {
         UserMethods { hub: &self }
     }
+    pub fn webapps(&'a self) -> WebappMethods<'a, C, A> {
+        WebappMethods { hub: &self }
+    }
 
     /// Set the user-agent header field to use in all requests to the server.
     /// It defaults to `google-api-rust-client/1.0.8`.
@@ -481,24 +474,47 @@ pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
 impl Part for AppRestrictionsSchemaRestrictionRestrictionValue {}
 
 
-/// The matching enterprise resources.
+/// The existence of an Installs resource indicates that an app is installed on a particular device (or that an install is pending).
+/// 
+/// The API can be used to create an install resource using the update method. This triggers the actual install of the app on the device. If the user does not already have an entitlement for the app, then an attempt is made to create one. If this fails (for example, because the app is not free and there is no available license), then the creation of the install fails.
+/// 
+/// The API can also be used to update an installed app. If the update method is used on an existing install, then the app will be updated to the latest available version.
+/// 
+/// Note that it is not possible to force the installation of a specific version of an app: the version code is read-only.
+/// 
+/// If a user installs an app themselves (as permitted by the enterprise), then again an install resource and possibly an entitlement resource are automatically created.
+/// 
+/// The API can also be used to delete an install resource, which triggers the removal of the app from the device. Note that deleting an install does not automatically remove the corresponding entitlement, even if there are no remaining installs. The install resource will also be deleted if the user uninstalls the app themselves.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list enterprises](struct.EnterpriseListCall.html) (response)
+/// * [patch installs](struct.InstallPatchCall.html) (request|response)
+/// * [list installs](struct.InstallListCall.html) (none)
+/// * [delete installs](struct.InstallDeleteCall.html) (none)
+/// * [update installs](struct.InstallUpdateCall.html) (request|response)
+/// * [get installs](struct.InstallGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnterprisesListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".
+pub struct Install {
+    /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
+    #[serde(rename="installState")]
+    pub install_state: Option<String>,
+    /// The version of the installed product. Guaranteed to be set only if the install state is "installed".
+    #[serde(rename="versionCode")]
+    pub version_code: Option<i32>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#install".
     pub kind: Option<String>,
-    /// An enterprise.
-    pub enterprise: Option<Vec<Enterprise>>,
+    /// The ID of the product that the install is for. For example, "app:com.google.android.gm".
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
 }
 
-impl ResponseResult for EnterprisesListResponse {}
+impl RequestValue for Install {}
+impl Resource for Install {}
+impl ResponseResult for Install {}
 
 
 /// The presence of an Entitlements resource indicates that a user has the right to use a particular app. Entitlements are user specific, not device specific. This allows a user with an entitlement to an app to install the app on all their devices. It's also possible for a user to hold an entitlement to an app without installing the app on any device.
@@ -635,6 +651,54 @@ pub struct NewDeviceEvent {
 impl Part for NewDeviceEvent {}
 
 
+/// A WebApps resource represents a web app created for an enterprise. Web apps are published to managed Google Play and can be distributed like other Android apps. On a user's device, a web app opens its specified URL.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert webapps](struct.WebappInsertCall.html) (request|response)
+/// * [update webapps](struct.WebappUpdateCall.html) (request|response)
+/// * [patch webapps](struct.WebappPatchCall.html) (request|response)
+/// * [get webapps](struct.WebappGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WebApp {
+    /// The ID of the application. A string of the form "app:<package name>" where the package name always starts with the prefix "com.google.enterprise.webapp." followed by a random id.
+    #[serde(rename="webAppId")]
+    pub web_app_id: Option<String>,
+    /// A list of icons representing this website. If absent, a default icon (for create) or the current icon (for update) will be used.
+    pub icons: Option<Vec<WebAppIcon>>,
+    /// The current version of the app.
+    /// 
+    /// 
+    /// Note that the version can automatically increase during the lifetime of the web app, while Google does internal housekeeping to keep the web app up-to-date.
+    #[serde(rename="versionCode")]
+    pub version_code: Option<String>,
+    /// The title of the web app as displayed to the user (e.g., amongst a list of other applications, or as a label for an icon).
+    pub title: Option<String>,
+    /// The display mode of the web app.
+    /// 
+    /// Possible values include: 
+    /// - "minimalUi", the device's status bar, navigation bar, the app's URL, and a refresh button are visible when the app is open. For HTTP URLs, you can only select this option.
+    /// - "standalone", the device's status bar and navigation bar are visible when the app is open.
+    /// - "fullScreen", the app opens in full screen mode, hiding the device's status and navigation bars. All browser UI elements, page URL, system status bar and back button are not visible, and the web app takes up the entirety of the available display area.
+    #[serde(rename="displayMode")]
+    pub display_mode: Option<String>,
+    /// A flag whether the app has been published to the Play store yet.
+    #[serde(rename="isPublished")]
+    pub is_published: Option<bool>,
+    /// The start URL, i.e. the URL that should load when the user opens the application.
+    #[serde(rename="startUrl")]
+    pub start_url: Option<String>,
+}
+
+impl RequestValue for WebApp {}
+impl Resource for WebApp {}
+impl ResponseResult for WebApp {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -648,39 +712,64 @@ pub struct AdministratorWebTokenSpecPrivateApps {
 impl Part for AdministratorWebTokenSpecPrivateApps {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AdministratorWebTokenSpecStoreBuilder {
-    /// Whether the Store Builder page is displayed. Default is true.
-    pub enabled: Option<bool>,
-}
-
-impl Part for AdministratorWebTokenSpecStoreBuilder {}
-
-
-/// Deprecated and unused.
+/// Specification for a token used to generate iframes. The token specifies what data the admin is allowed to modify and the URI the iframe is allowed to communiate with.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set android device policy config enterprises](struct.EnterpriseSetAndroidDevicePolicyConfigCall.html) (request|response)
-/// * [get android device policy config enterprises](struct.EnterpriseGetAndroidDevicePolicyConfigCall.html) (response)
+/// * [create web token enterprises](struct.EnterpriseCreateWebTokenCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidDevicePolicyConfig {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#androidDevicePolicyConfig".
+pub struct AdministratorWebTokenSpec {
+    /// Options for displaying the Organize apps page.
+    #[serde(rename="storeBuilder")]
+    pub store_builder: Option<AdministratorWebTokenSpecStoreBuilder>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#administratorWebTokenSpec".
     pub kind: Option<String>,
-    /// Deprecated and unused.
-    pub state: Option<String>,
+    /// Options for displaying the managed Play Search apps page.
+    #[serde(rename="playSearch")]
+    pub play_search: Option<AdministratorWebTokenSpecPlaySearch>,
+    /// The URI of the parent frame hosting the iframe. To prevent XSS, the iframe may not be hosted at other URIs. This URI must be https.
+    pub parent: Option<String>,
+    /// Options for displaying the Private Apps page.
+    #[serde(rename="privateApps")]
+    pub private_apps: Option<AdministratorWebTokenSpecPrivateApps>,
+    /// Deprecated. Use PlaySearch.approveApps.
+    pub permission: Option<Vec<String>>,
+    /// Options for displaying the Web Apps page.
+    #[serde(rename="webApps")]
+    pub web_apps: Option<AdministratorWebTokenSpecWebApps>,
+    /// Options for displaying the Managed Configuration page.
+    #[serde(rename="managedConfigurations")]
+    pub managed_configurations: Option<AdministratorWebTokenSpecManagedConfigurations>,
 }
 
-impl RequestValue for AndroidDevicePolicyConfig {}
-impl ResponseResult for AndroidDevicePolicyConfig {}
+impl RequestValue for AdministratorWebTokenSpec {}
+
+
+/// The state of a user's device, as accessed by the getState and setState methods on device resources.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get state devices](struct.DeviceGetStateCall.html) (response)
+/// * [set state devices](struct.DeviceSetStateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceState {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#deviceState".
+    pub kind: Option<String>,
+    /// The state of the Google account on the device. "enabled" indicates that the Google account on the device can be used to access Google services (including Google Play), while "disabled" means that it cannot. A new device is initially in the "disabled" state.
+    #[serde(rename="accountState")]
+    pub account_state: Option<String>,
+}
+
+impl RequestValue for DeviceState {}
+impl ResponseResult for DeviceState {}
 
 
 /// A managed configurations settings resource contains the set of managed properties that have been configured for an Android app to be applied to a set of users. The app's developer would have defined configurable properties in the managed configurations schema.
@@ -780,6 +869,23 @@ pub struct Notification {
 impl Part for Notification {}
 
 
+/// Icon for a web app.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WebAppIcon {
+    /// The actual bytes of the image in a base64url encoded string (c.f. RFC4648, section 5 "Base 64 Encoding with URL and Filename Safe Alphabet").  
+    /// - The image type can be png or jpg.
+    /// - The image should ideally be square.
+    /// - The image should ideally have a size of 512x512.
+    #[serde(rename="imageData")]
+    pub image_data: Option<String>,
+}
+
+impl Part for WebAppIcon {}
+
+
 /// An event generated whenever a product's availability changes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -821,15 +927,19 @@ impl Part for ProductSigningCertificate {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [generate approval url products](struct.ProductGenerateApprovalUrlCall.html) (response)
+/// * [send test push notification enterprises](struct.EnterpriseSendTestPushNotificationCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProductsGenerateApprovalUrlResponse {
-    /// A URL that can be rendered in an iframe to display the permissions (if any) of a product. This URL can be used to approve the product only once and only within 24 hours of being generated, using the Products.approve call. If the product is currently unapproved and has no permissions, this URL will point to an empty page. If the product is currently approved, a URL will only be generated if that product has added permissions since it was last approved, and the URL will only display those new permissions that have not yet been accepted.
-    pub url: Option<String>,
+pub struct EnterprisesSendTestPushNotificationResponse {
+    /// The name of the Cloud Pub/Sub topic to which notifications for this enterprise's enrolled account will be sent.
+    #[serde(rename="topicName")]
+    pub topic_name: Option<String>,
+    /// The message ID of the test push notification that was sent.
+    #[serde(rename="messageId")]
+    pub message_id: Option<String>,
 }
 
-impl ResponseResult for ProductsGenerateApprovalUrlResponse {}
+impl ResponseResult for EnterprisesSendTestPushNotificationResponse {}
 
 
 /// A localized string with its locale.
@@ -892,19 +1002,15 @@ impl Part for VariableSet {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [send test push notification enterprises](struct.EnterpriseSendTestPushNotificationCall.html) (response)
+/// * [generate approval url products](struct.ProductGenerateApprovalUrlCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnterprisesSendTestPushNotificationResponse {
-    /// The name of the Cloud Pub/Sub topic to which notifications for this enterprise's enrolled account will be sent.
-    #[serde(rename="topicName")]
-    pub topic_name: Option<String>,
-    /// The message ID of the test push notification that was sent.
-    #[serde(rename="messageId")]
-    pub message_id: Option<String>,
+pub struct ProductsGenerateApprovalUrlResponse {
+    /// A URL that can be rendered in an iframe to display the permissions (if any) of a product. This URL can be used to approve the product only once and only within 24 hours of being generated, using the Products.approve call. If the product is currently unapproved and has no permissions, this URL will point to an empty page. If the product is currently approved, a URL will only be generated if that product has added permissions since it was last approved, and the URL will only display those new permissions that have not yet been accepted.
+    pub url: Option<String>,
 }
 
-impl ResponseResult for EnterprisesSendTestPushNotificationResponse {}
+impl ResponseResult for ProductsGenerateApprovalUrlResponse {}
 
 
 /// A restriction in the App Restriction Schema represents a piece of configuration that may be pre-applied.
@@ -1094,9 +1200,10 @@ impl ResponseResult for ServiceAccountKeysListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductVisibility {
-    /// Grants visibility to the specified track(s) of the product to the user. The track available to the user is based on the following order of preference: alpha, beta, production. For example, if an app has a prod version, a beta version and an alpha version and the enterprise has been granted visibility to both the alpha and beta tracks, if tracks is {"beta", "production"} the user will be able to install the app and they will get the beta version of the app. If there are no app versions in the specified track adding the "alpha" and "beta" values to the list of tracks will have no effect. Note that the enterprise requires access to alpha and/or beta tracks before users can be granted visibility to apps in those tracks.
-    /// 
-    /// The allowed sets are: {} (considered equivalent to {"production"}) {"production"} {"beta", "production"} {"alpha", "beta", "production"} The order of elements is not relevant. Any other set of tracks will be rejected with an error.
+    /// Grants the user visibility to the specified product track(s), identified by trackIds.
+    #[serde(rename="trackIds")]
+    pub track_ids: Option<Vec<String>>,
+    /// Deprecated. Use trackIds instead.
     pub tracks: Option<Vec<String>>,
     /// The product ID to make visible to the user. Required for each item in the productVisibility list.
     #[serde(rename="productId")]
@@ -1154,47 +1261,24 @@ pub struct DevicesListResponse {
 impl ResponseResult for DevicesListResponse {}
 
 
-/// The existence of an Installs resource indicates that an app is installed on a particular device (or that an install is pending).
-/// 
-/// The API can be used to create an install resource using the update method. This triggers the actual install of the app on the device. If the user does not already have an entitlement for the app, then an attempt is made to create one. If this fails (for example, because the app is not free and there is no available license), then the creation of the install fails.
-/// 
-/// The API can also be used to update an installed app. If the update method is used on an existing install, then the app will be updated to the latest available version.
-/// 
-/// Note that it is not possible to force the installation of a specific version of an app: the version code is read-only.
-/// 
-/// If a user installs an app themselves (as permitted by the enterprise), then again an install resource and possibly an entitlement resource are automatically created.
-/// 
-/// The API can also be used to delete an install resource, which triggers the removal of the app from the device. Note that deleting an install does not automatically remove the corresponding entitlement, even if there are no remaining installs. The install resource will also be deleted if the user uninstalls the app themselves.
+/// The matching enterprise resources.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [patch installs](struct.InstallPatchCall.html) (request|response)
-/// * [list installs](struct.InstallListCall.html) (none)
-/// * [delete installs](struct.InstallDeleteCall.html) (none)
-/// * [update installs](struct.InstallUpdateCall.html) (request|response)
-/// * [get installs](struct.InstallGetCall.html) (response)
+/// * [list enterprises](struct.EnterpriseListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Install {
-    /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
-    #[serde(rename="installState")]
-    pub install_state: Option<String>,
-    /// The version of the installed product. Guaranteed to be set only if the install state is "installed".
-    #[serde(rename="versionCode")]
-    pub version_code: Option<i32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#install".
+pub struct EnterprisesListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".
     pub kind: Option<String>,
-    /// The ID of the product that the install is for. For example, "app:com.google.android.gm".
-    #[serde(rename="productId")]
-    pub product_id: Option<String>,
+    /// An enterprise.
+    pub enterprise: Option<Vec<Enterprise>>,
 }
 
-impl RequestValue for Install {}
-impl Resource for Install {}
-impl ResponseResult for Install {}
+impl ResponseResult for EnterprisesListResponse {}
 
 
 /// An Enterprises resource represents the binding between an EMM and a specific organization. That binding can be instantiated in one of two different ways using this API as follows: 
@@ -1207,21 +1291,19 @@ impl ResponseResult for Install {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [send test push notification enterprises](struct.EnterpriseSendTestPushNotificationCall.html) (none)
-/// * [generate signup url enterprises](struct.EnterpriseGenerateSignupUrlCall.html) (none)
-/// * [get android device policy config enterprises](struct.EnterpriseGetAndroidDevicePolicyConfigCall.html) (none)
+/// * [get store layout enterprises](struct.EnterpriseGetStoreLayoutCall.html) (none)
+/// * [get service account enterprises](struct.EnterpriseGetServiceAccountCall.html) (none)
 /// * [acknowledge notification set enterprises](struct.EnterpriseAcknowledgeNotificationSetCall.html) (none)
 /// * [set store layout enterprises](struct.EnterpriseSetStoreLayoutCall.html) (none)
-/// * [set android device policy config enterprises](struct.EnterpriseSetAndroidDevicePolicyConfigCall.html) (none)
-/// * [get store layout enterprises](struct.EnterpriseGetStoreLayoutCall.html) (none)
-/// * [pull notification set enterprises](struct.EnterprisePullNotificationSetCall.html) (none)
-/// * [list enterprises](struct.EnterpriseListCall.html) (none)
 /// * [complete signup enterprises](struct.EnterpriseCompleteSignupCall.html) (response)
+/// * [list enterprises](struct.EnterpriseListCall.html) (none)
+/// * [unenroll enterprises](struct.EnterpriseUnenrollCall.html) (none)
 /// * [set account enterprises](struct.EnterpriseSetAccountCall.html) (none)
+/// * [pull notification set enterprises](struct.EnterprisePullNotificationSetCall.html) (none)
 /// * [enroll enterprises](struct.EnterpriseEnrollCall.html) (request|response)
 /// * [create web token enterprises](struct.EnterpriseCreateWebTokenCall.html) (none)
 /// * [get enterprises](struct.EnterpriseGetCall.html) (response)
-/// * [unenroll enterprises](struct.EnterpriseUnenrollCall.html) (none)
-/// * [get service account enterprises](struct.EnterpriseGetServiceAccountCall.html) (none)
+/// * [generate signup url enterprises](struct.EnterpriseGenerateSignupUrlCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Enterprise {
@@ -1269,38 +1351,17 @@ pub struct InstallFailureEvent {
 impl Part for InstallFailureEvent {}
 
 
-/// Specification for a token used to generate iframes. The token specifies what data the admin is allowed to modify and the URI the iframe is allowed to communiate with.
+/// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [create web token enterprises](struct.EnterpriseCreateWebTokenCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AdministratorWebTokenSpec {
-    /// Options for displaying the Store Builder page.
-    #[serde(rename="storeBuilder")]
-    pub store_builder: Option<AdministratorWebTokenSpecStoreBuilder>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#administratorWebTokenSpec".
-    pub kind: Option<String>,
-    /// Options for displaying the Play Search page.
-    #[serde(rename="playSearch")]
-    pub play_search: Option<AdministratorWebTokenSpecPlaySearch>,
-    /// The URI of the parent frame hosting the iframe. To prevent XSS, the iframe may not be hosted at other URIs. This URI must be https.
-    pub parent: Option<String>,
-    /// Options for displaying the Private Apps page.
-    #[serde(rename="privateApps")]
-    pub private_apps: Option<AdministratorWebTokenSpecPrivateApps>,
-    /// Deprecated. Use PlaySearch.approveApps.
-    pub permission: Option<Vec<String>>,
-    /// Options for displaying the Web Apps page.
-    #[serde(rename="webApps")]
-    pub web_apps: Option<AdministratorWebTokenSpecWebApps>,
+pub struct AdministratorWebTokenSpecStoreBuilder {
+    /// Whether the Organize apps page is displayed. Default is true.
+    pub enabled: Option<bool>,
 }
 
-impl RequestValue for AdministratorWebTokenSpec {}
+impl Part for AdministratorWebTokenSpecStoreBuilder {}
 
 
 /// Maintenance window for managed Google Play Accounts. This allows Play store to update the apps on the foreground in the designated window.
@@ -1349,7 +1410,7 @@ pub struct AdministratorWebTokenSpecPlaySearch {
     /// Allow access to the iframe in approve mode. Default is false.
     #[serde(rename="approveApps")]
     pub approve_apps: Option<bool>,
-    /// Whether the Play Search page is displayed. Default is true.
+    /// Whether the managed Play Search apps page is displayed. Default is true.
     pub enabled: Option<bool>,
 }
 
@@ -1362,13 +1423,20 @@ impl Part for AdministratorWebTokenSpecPlaySearch {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductPolicy {
-    /// Grants visibility to the specified track(s) of the product to the device. The track available to the device is based on the following order of preference: alpha, beta, production. For example, if an app has a prod version, a beta version and an alpha version and the enterprise has been granted visibility to both the alpha and beta tracks, if tracks is {"beta", "production"} then the beta version of the app is made available to the device. If there are no app versions in the specified track adding the "alpha" and "beta" values to the list of tracks will have no effect. Note that the enterprise requires access to alpha and/or beta tracks before users can be granted visibility to apps in those tracks.
-    /// 
-    /// The allowed sets are: {} (considered equivalent to {"production"}) {"production"} {"beta", "production"} {"alpha", "beta", "production"} The order of elements is not relevant. Any other set of tracks will be rejected with an error.
+    /// The auto-install policy for the product.
+    #[serde(rename="autoInstallPolicy")]
+    pub auto_install_policy: Option<AutoInstallPolicy>,
+    /// Deprecated. Use trackIds instead.
     pub tracks: Option<Vec<String>>,
+    /// The managed configuration for the product.
+    #[serde(rename="managedConfiguration")]
+    pub managed_configuration: Option<ManagedConfiguration>,
     /// The ID of the product. For example, "app:com.google.android.gm".
     #[serde(rename="productId")]
     pub product_id: Option<String>,
+    /// Grants the device visibility to the specified product release track(s), identified by trackIds. The list of release tracks of a product can be obtained by calling Products.Get.
+    #[serde(rename="trackIds")]
+    pub track_ids: Option<Vec<String>>,
 }
 
 impl Part for ProductPolicy {}
@@ -1386,6 +1454,26 @@ pub struct ManagedPropertyBundle {
 }
 
 impl Part for ManagedPropertyBundle {}
+
+
+/// The auto-install constraint. Defines a set of restrictions for installation. At least one of the fields must be set.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutoInstallConstraint {
+    /// Charging state constraint.
+    #[serde(rename="chargingStateConstraint")]
+    pub charging_state_constraint: Option<String>,
+    /// Device idle state constraint.
+    #[serde(rename="deviceIdleStateConstraint")]
+    pub device_idle_state_constraint: Option<String>,
+    /// Network type constraint.
+    #[serde(rename="networkTypeConstraint")]
+    pub network_type_constraint: Option<String>,
+}
+
+impl Part for AutoInstallConstraint {}
 
 
 /// An event generated when a new app version is uploaded to Google Play and its app restrictions schema changed. To fetch the app restrictions schema for an app, use Products.getAppRestrictionsSchema on the EMM API.
@@ -1407,31 +1495,25 @@ impl Part for AppRestrictionsSchemaChangeEvent {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AdministratorWebTokenSpecManagedConfigurations {
+    /// Whether the Managed Configuration page is displayed. Default is true.
+    pub enabled: Option<bool>,
+}
+
+impl Part for AdministratorWebTokenSpecManagedConfigurations {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdministratorWebTokenSpecWebApps {
     /// Whether the Web Apps page is displayed. Default is true.
     pub enabled: Option<bool>,
 }
 
 impl Part for AdministratorWebTokenSpecWebApps {}
-
-
-/// A configuration variables resource contains the managed configuration settings ID to be applied to a single user, as well as the variable set that is attributed to the user. The variable set will be used to replace placeholders in the managed configuration settings.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ConfigurationVariables {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#configurationVariables".
-    pub kind: Option<String>,
-    /// The variable set that is attributed to the user.
-    #[serde(rename="variableSet")]
-    pub variable_set: Option<Vec<VariableSet>>,
-    /// The ID of the managed configurations settings.
-    #[serde(rename="mcmId")]
-    pub mcm_id: Option<String>,
-}
-
-impl Part for ConfigurationVariables {}
 
 
 /// The device policy for a given managed device.
@@ -1455,6 +1537,65 @@ pub struct Policy {
 }
 
 impl Part for Policy {}
+
+
+/// A configuration variables resource contains the managed configuration settings ID to be applied to a single user, as well as the variable set that is attributed to the user. The variable set will be used to replace placeholders in the managed configuration settings.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConfigurationVariables {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#configurationVariables".
+    pub kind: Option<String>,
+    /// The variable set that is attributed to the user.
+    #[serde(rename="variableSet")]
+    pub variable_set: Option<Vec<VariableSet>>,
+    /// The ID of the managed configurations settings.
+    #[serde(rename="mcmId")]
+    pub mcm_id: Option<String>,
+}
+
+impl Part for ConfigurationVariables {}
+
+
+/// Id to name association of a track.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TrackInfo {
+    /// A modifiable name for a track. This is the visible name in the play developer console.
+    #[serde(rename="trackAlias")]
+    pub track_alias: Option<String>,
+    /// Unmodifiable, unique track identifier. This identifier is the releaseTrackId in the url of the play developer console page that displays the track information.
+    #[serde(rename="trackId")]
+    pub track_id: Option<String>,
+}
+
+impl Part for TrackInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutoInstallPolicy {
+    /// The auto-install mode. If unset defaults to "doNotAutoInstall".
+    #[serde(rename="autoInstallMode")]
+    pub auto_install_mode: Option<String>,
+    /// The constraints for auto-installing the app. You can specify a maximum of one constraint.
+    #[serde(rename="autoInstallConstraint")]
+    pub auto_install_constraint: Option<Vec<AutoInstallConstraint>>,
+    /// The priority of the install, as an unsigned integer. A lower number means higher priority.
+    #[serde(rename="autoInstallPriority")]
+    pub auto_install_priority: Option<i32>,
+    /// The minimum version of the app. If a lower version of the app is installed, then the app will be auto-updated according to the auto-install constraints, instead of waiting for the regular auto-update.
+    #[serde(rename="minimumVersionCode")]
+    pub minimum_version_code: Option<i32>,
+}
+
+impl Part for AutoInstallPolicy {}
 
 
 /// A Products resource represents an app in the Google Play store that is available to at least some users in the enterprise. (Some apps are restricted to a single enterprise, and no information about them is made available outside that enterprise.)
@@ -1522,7 +1663,10 @@ pub struct Product {
     /// The content rating for this app.
     #[serde(rename="contentRating")]
     pub content_rating: Option<String>,
-    /// The tracks that are visible to the enterprise.
+    /// The tracks visible to the enterprise.
+    #[serde(rename="appTracks")]
+    pub app_tracks: Option<Vec<TrackInfo>>,
+    /// Deprecated, use appTracks instead.
     #[serde(rename="availableTracks")]
     pub available_tracks: Option<Vec<String>>,
     /// The name of the author of the product (for example, the app developer).
@@ -1650,29 +1794,6 @@ impl RequestValue for ManagedConfiguration {}
 impl ResponseResult for ManagedConfiguration {}
 
 
-/// The state of a user's device, as accessed by the getState and setState methods on device resources.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get state devices](struct.DeviceGetStateCall.html) (response)
-/// * [set state devices](struct.DeviceSetStateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceState {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#deviceState".
-    pub kind: Option<String>,
-    /// The state of the Google account on the device. "enabled" indicates that the Google account on the device can be used to access Google services (including Google Play), while "disabled" means that it cannot. A new device is initially in the "disabled" state.
-    #[serde(rename="accountState")]
-    pub account_state: Option<String>,
-}
-
-impl RequestValue for DeviceState {}
-impl ResponseResult for DeviceState {}
-
-
 /// The user resources for the group license.
 /// 
 /// # Activities
@@ -1729,6 +1850,27 @@ pub struct AppRestrictionsSchema {
 impl ResponseResult for AppRestrictionsSchema {}
 
 
+/// The web app details for an enterprise.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list webapps](struct.WebappListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WebAppsListResponse {
+    /// The manifest describing a web app.
+    #[serde(rename="webApp")]
+    pub web_app: Option<Vec<WebApp>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#webAppsListResponse".
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for WebAppsListResponse {}
+
+
 /// The store page resources for the enterprise.
 /// 
 /// # Activities
@@ -1772,14 +1914,20 @@ impl Part for TokenPagination {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppVersion {
-    /// The track that this app was published in. For example if track is "alpha", this is an alpha version of the app.
+    /// Deprecated, use trackId instead.
     pub track: Option<String>,
-    /// Unique increasing identifier for the app version.
-    #[serde(rename="versionCode")]
-    pub version_code: Option<i32>,
+    /// Track ids that the app version is published in. Replaces the track field (deprecated), but doesn't include the production track (see isProduction instead).
+    #[serde(rename="trackId")]
+    pub track_id: Option<Vec<String>>,
     /// The string used in the Play store by the app developer to identify the version. The string is not necessarily unique or localized (for example, the string could be "1.4").
     #[serde(rename="versionString")]
     pub version_string: Option<String>,
+    /// True if this version is a production APK.
+    #[serde(rename="isProduction")]
+    pub is_production: Option<bool>,
+    /// Unique increasing identifier for the app version.
+    #[serde(rename="versionCode")]
+    pub version_code: Option<i32>,
 }
 
 impl Part for AppVersion {}
@@ -2611,6 +2759,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     ///
     /// Generates an authentication token which the device policy client can use to provision the given EMM-managed user account on a device. The generated token is single-use and expires after a few minutes.
     /// 
+    /// You can provision a maximum of 10 devices per user.
+    /// 
     /// This call only works with EMM-managed accounts.
     /// 
     /// # Arguments
@@ -2915,7 +3065,7 @@ impl<'a, C, A> InstallMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *grouplicense* resources.
+/// A builder providing access to all methods supported on *webapp* resources.
 /// It is not used directly, but through the `AndroidEnterprise` hub.
 ///
 /// # Example
@@ -2939,34 +3089,34 @@ impl<'a, C, A> InstallMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)` and `list(...)`
+/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.grouplicenses();
+/// let rb = hub.webapps();
 /// # }
 /// ```
-pub struct GrouplicenseMethods<'a, C, A>
+pub struct WebappMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AndroidEnterprise<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for GrouplicenseMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for WebappMethods<'a, C, A> {}
 
-impl<'a, C, A> GrouplicenseMethods<'a, C, A> {
+impl<'a, C, A> WebappMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of an enterprise's group license for a product.
+    /// Creates a new web app for the enterprise.
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `enterpriseId` - The ID of the enterprise.
-    /// * `groupLicenseId` - The ID of the product the group license is for, e.g. "app:com.google.android.gm".
-    pub fn get(&self, enterprise_id: &str, group_license_id: &str) -> GrouplicenseGetCall<'a, C, A> {
-        GrouplicenseGetCall {
+    pub fn insert(&self, request: WebApp, enterprise_id: &str) -> WebappInsertCall<'a, C, A> {
+        WebappInsertCall {
             hub: self.hub,
+            _request: request,
             _enterprise_id: enterprise_id.to_string(),
-            _group_license_id: group_license_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2975,15 +3125,95 @@ impl<'a, C, A> GrouplicenseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves IDs of all products for which the enterprise has a group license.
+    /// Retrieves the details of all web apps for a given enterprise.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
-    pub fn list(&self, enterprise_id: &str) -> GrouplicenseListCall<'a, C, A> {
-        GrouplicenseListCall {
+    pub fn list(&self, enterprise_id: &str) -> WebappListCall<'a, C, A> {
+        WebappListCall {
             hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets an existing web app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `webAppId` - The ID of the web app.
+    pub fn get(&self, enterprise_id: &str, web_app_id: &str) -> WebappGetCall<'a, C, A> {
+        WebappGetCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _web_app_id: web_app_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an existing web app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `webAppId` - The ID of the web app.
+    pub fn delete(&self, enterprise_id: &str, web_app_id: &str) -> WebappDeleteCall<'a, C, A> {
+        WebappDeleteCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _web_app_id: web_app_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an existing web app. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `webAppId` - The ID of the web app.
+    pub fn patch(&self, request: WebApp, enterprise_id: &str, web_app_id: &str) -> WebappPatchCall<'a, C, A> {
+        WebappPatchCall {
+            hub: self.hub,
+            _request: request,
+            _enterprise_id: enterprise_id.to_string(),
+            _web_app_id: web_app_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an existing web app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `webAppId` - The ID of the web app.
+    pub fn update(&self, request: WebApp, enterprise_id: &str, web_app_id: &str) -> WebappUpdateCall<'a, C, A> {
+        WebappUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _enterprise_id: enterprise_id.to_string(),
+            _web_app_id: web_app_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3143,6 +3373,84 @@ impl<'a, C, A> ManagedconfigurationsfordeviceMethods<'a, C, A> {
             _user_id: user_id.to_string(),
             _device_id: device_id.to_string(),
             _managed_configuration_for_device_id: managed_configuration_for_device_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *grouplicense* resources.
+/// It is not used directly, but through the `AndroidEnterprise` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_androidenterprise1 as androidenterprise1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use androidenterprise1::AndroidEnterprise;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)` and `list(...)`
+/// // to build up your call.
+/// let rb = hub.grouplicenses();
+/// # }
+/// ```
+pub struct GrouplicenseMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for GrouplicenseMethods<'a, C, A> {}
+
+impl<'a, C, A> GrouplicenseMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves details of an enterprise's group license for a product.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `groupLicenseId` - The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    pub fn get(&self, enterprise_id: &str, group_license_id: &str) -> GrouplicenseGetCall<'a, C, A> {
+        GrouplicenseGetCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _group_license_id: group_license_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves IDs of all products for which the enterprise has a group license.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    pub fn list(&self, enterprise_id: &str) -> GrouplicenseListCall<'a, C, A> {
+        GrouplicenseListCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3350,7 +3658,7 @@ impl<'a, C, A> DeviceMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `acknowledge_notification_set(...)`, `complete_signup(...)`, `create_web_token(...)`, `enroll(...)`, `generate_signup_url(...)`, `get(...)`, `get_android_device_policy_config(...)`, `get_service_account(...)`, `get_store_layout(...)`, `list(...)`, `pull_notification_set(...)`, `send_test_push_notification(...)`, `set_account(...)`, `set_android_device_policy_config(...)`, `set_store_layout(...)` and `unenroll(...)`
+/// // like `acknowledge_notification_set(...)`, `complete_signup(...)`, `create_web_token(...)`, `enroll(...)`, `generate_signup_url(...)`, `get(...)`, `get_service_account(...)`, `get_store_layout(...)`, `list(...)`, `pull_notification_set(...)`, `send_test_push_notification(...)`, `set_account(...)`, `set_store_layout(...)` and `unenroll(...)`
 /// // to build up your call.
 /// let rb = hub.enterprises();
 /// # }
@@ -3467,23 +3775,6 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deprecated and unused.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    pub fn get_android_device_policy_config(&self, enterprise_id: &str) -> EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A> {
-        EnterpriseGetAndroidDevicePolicyConfigCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Sets the store layout for the enterprise. By default, storeLayoutType is set to "basic" and the basic store layout is enabled. The basic layout only contains apps approved by the admin, and that have been added to the available product set for a user (using the  setAvailableProductSet call). Apps on the page are sorted in order of their product ID value. If you create a custom store layout (by setting storeLayoutType = "custom" and setting a homepage), the basic store layout is disabled.
     /// 
     /// # Arguments
@@ -3509,25 +3800,6 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
             hub: self.hub,
             _enterprise_token: Default::default(),
             _completion_token: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deprecated and unused.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `enterpriseId` - The ID of the enterprise.
-    pub fn set_android_device_policy_config(&self, request: AndroidDevicePolicyConfig, enterprise_id: &str) -> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A> {
-        EnterpriseSetAndroidDevicePolicyConfigCall {
-            hub: self.hub,
-            _request: request,
-            _enterprise_id: enterprise_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3729,27 +4001,6 @@ impl<'a, C, A> StorelayoutclusterMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a cluster.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `pageId` - The ID of the page.
-    /// * `clusterId` - The ID of the cluster.
-    pub fn delete(&self, enterprise_id: &str, page_id: &str, cluster_id: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
-        StorelayoutclusterDeleteCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _page_id: page_id.to_string(),
-            _cluster_id: cluster_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Updates a cluster.
     /// 
     /// # Arguments
@@ -3762,27 +4013,6 @@ impl<'a, C, A> StorelayoutclusterMethods<'a, C, A> {
         StorelayoutclusterUpdateCall {
             hub: self.hub,
             _request: request,
-            _enterprise_id: enterprise_id.to_string(),
-            _page_id: page_id.to_string(),
-            _cluster_id: cluster_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieves details of a cluster.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `pageId` - The ID of the page.
-    /// * `clusterId` - The ID of the cluster.
-    pub fn get(&self, enterprise_id: &str, page_id: &str, cluster_id: &str) -> StorelayoutclusterGetCall<'a, C, A> {
-        StorelayoutclusterGetCall {
-            hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
             _page_id: page_id.to_string(),
             _cluster_id: cluster_id.to_string(),
@@ -3807,6 +4037,48 @@ impl<'a, C, A> StorelayoutclusterMethods<'a, C, A> {
             _request: request,
             _enterprise_id: enterprise_id.to_string(),
             _page_id: page_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a cluster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `pageId` - The ID of the page.
+    /// * `clusterId` - The ID of the cluster.
+    pub fn delete(&self, enterprise_id: &str, page_id: &str, cluster_id: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
+        StorelayoutclusterDeleteCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _page_id: page_id.to_string(),
+            _cluster_id: cluster_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves details of a cluster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `pageId` - The ID of the page.
+    /// * `clusterId` - The ID of the cluster.
+    pub fn get(&self, enterprise_id: &str, page_id: &str, cluster_id: &str) -> StorelayoutclusterGetCall<'a, C, A> {
+        StorelayoutclusterGetCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _page_id: page_id.to_string(),
+            _cluster_id: cluster_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3857,6 +4129,26 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Retrieves details of a product for display to an enterprise admin.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `productId` - The ID of the product, e.g. "app:com.google.android.gm".
+    pub fn get(&self, enterprise_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
+        ProductGetCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _product_id: product_id.to_string(),
+            _language: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves the Android app permissions required by this app.
     /// 
     /// # Arguments
@@ -3876,6 +4168,28 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
+    /// 
+    /// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `productId` - The ID of the product.
+    pub fn generate_approval_url(&self, enterprise_id: &str, product_id: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
+        ProductGenerateApprovalUrlCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _product_id: product_id.to_string(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Unapproves the specified product (and the relevant app permissions, if any)
     /// 
     /// # Arguments
@@ -3887,26 +4201,6 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
             hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
             _product_id: product_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieves details of a product for display to an enterprise admin.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `productId` - The ID of the product, e.g. "app:com.google.android.gm".
-    pub fn get(&self, enterprise_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
-        ProductGetCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _product_id: product_id.to_string(),
-            _language: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3972,28 +4266,6 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
             _max_results: Default::default(),
             _language: Default::default(),
             _approved: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
-    /// 
-    /// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `productId` - The ID of the product.
-    pub fn generate_approval_url(&self, enterprise_id: &str, product_id: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
-        ProductGenerateApprovalUrlCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _product_id: product_id.to_string(),
-            _language_code: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4067,6 +4339,29 @@ impl<'a, C, A> ManagedconfigurationsforuserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    pub fn update(&self, request: ManagedConfiguration, enterprise_id: &str, user_id: &str, managed_configuration_for_user_id: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
+        ManagedconfigurationsforuserUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _enterprise_id: enterprise_id.to_string(),
+            _user_id: user_id.to_string(),
+            _managed_configuration_for_user_id: managed_configuration_for_user_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Removes a per-user managed configuration for an app for the specified user.
     /// 
     /// # Arguments
@@ -4099,29 +4394,6 @@ impl<'a, C, A> ManagedconfigurationsforuserMethods<'a, C, A> {
             hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
             _user_id: user_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `userId` - The ID of the user.
-    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
-    pub fn update(&self, request: ManagedConfiguration, enterprise_id: &str, user_id: &str, managed_configuration_for_user_id: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
-        ManagedconfigurationsforuserUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _enterprise_id: enterprise_id.to_string(),
-            _user_id: user_id.to_string(),
-            _managed_configuration_for_user_id: managed_configuration_for_user_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4254,46 +4526,6 @@ impl<'a, C, A> EntitlementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes an entitlement to an app for a user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `userId` - The ID of the user.
-    /// * `entitlementId` - The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm".
-    pub fn delete(&self, enterprise_id: &str, user_id: &str, entitlement_id: &str) -> EntitlementDeleteCall<'a, C, A> {
-        EntitlementDeleteCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _user_id: user_id.to_string(),
-            _entitlement_id: entitlement_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists all entitlements for the specified user. Only the ID is set.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `userId` - The ID of the user.
-    pub fn list(&self, enterprise_id: &str, user_id: &str) -> EntitlementListCall<'a, C, A> {
-        EntitlementListCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _user_id: user_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Adds or updates an entitlement to an app for a user.
     /// 
     /// # Arguments
@@ -4327,6 +4559,46 @@ impl<'a, C, A> EntitlementMethods<'a, C, A> {
     /// * `entitlementId` - The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, user_id: &str, entitlement_id: &str) -> EntitlementGetCall<'a, C, A> {
         EntitlementGetCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _user_id: user_id.to_string(),
+            _entitlement_id: entitlement_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all entitlements for the specified user. Only the ID is set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    pub fn list(&self, enterprise_id: &str, user_id: &str) -> EntitlementListCall<'a, C, A> {
+        EntitlementListCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _user_id: user_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Removes an entitlement to an app for a user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `entitlementId` - The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm".
+    pub fn delete(&self, enterprise_id: &str, user_id: &str, entitlement_id: &str) -> EntitlementDeleteCall<'a, C, A> {
+        EntitlementDeleteCall {
             hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
             _user_id: user_id.to_string(),
@@ -4629,10 +4901,7 @@ impl<'a, C, A> ManagedconfigurationssettingListCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4652,7 +4921,7 @@ impl<'a, C, A> ManagedconfigurationssettingListCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4740,7 +5009,7 @@ impl<'a, C, A> ManagedconfigurationssettingListCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4882,10 +5151,7 @@ impl<'a, C, A> StorelayoutpageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4905,7 +5171,7 @@ impl<'a, C, A> StorelayoutpageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4983,7 +5249,7 @@ impl<'a, C, A> StorelayoutpageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5126,10 +5392,7 @@ impl<'a, C, A> StorelayoutpageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5149,7 +5412,7 @@ impl<'a, C, A> StorelayoutpageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5227,7 +5490,7 @@ impl<'a, C, A> StorelayoutpageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5371,10 +5634,7 @@ impl<'a, C, A> StorelayoutpageGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5394,7 +5654,7 @@ impl<'a, C, A> StorelayoutpageGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5482,7 +5742,7 @@ impl<'a, C, A> StorelayoutpageGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5631,10 +5891,7 @@ impl<'a, C, A> StorelayoutpageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5666,7 +5923,7 @@ impl<'a, C, A> StorelayoutpageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5756,7 +6013,7 @@ impl<'a, C, A> StorelayoutpageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5907,10 +6164,7 @@ impl<'a, C, A> StorelayoutpagePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5942,7 +6196,7 @@ impl<'a, C, A> StorelayoutpagePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6042,7 +6296,7 @@ impl<'a, C, A> StorelayoutpagePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6193,10 +6447,7 @@ impl<'a, C, A> StorelayoutpageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6228,7 +6479,7 @@ impl<'a, C, A> StorelayoutpageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6328,7 +6579,7 @@ impl<'a, C, A> StorelayoutpageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6471,10 +6722,7 @@ impl<'a, C, A> UserRevokeTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6494,7 +6742,7 @@ impl<'a, C, A> UserRevokeTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6572,7 +6820,7 @@ impl<'a, C, A> UserRevokeTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6725,10 +6973,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6760,7 +7005,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6860,7 +7105,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7004,10 +7249,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7027,7 +7269,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7115,7 +7357,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7260,10 +7502,7 @@ impl<'a, C, A> UserRevokeDeviceAccesCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7283,7 +7522,7 @@ impl<'a, C, A> UserRevokeDeviceAccesCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7361,7 +7600,7 @@ impl<'a, C, A> UserRevokeDeviceAccesCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7504,10 +7743,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7527,7 +7763,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7605,7 +7841,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7650,6 +7886,8 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
 /// Generates an authentication token which the device policy client can use to provision the given EMM-managed user account on a device. The generated token is single-use and expires after a few minutes.
+/// 
+/// You can provision a maximum of 10 devices per user.
 /// 
 /// This call only works with EMM-managed accounts.
 ///
@@ -7751,10 +7989,7 @@ impl<'a, C, A> UserGenerateAuthenticationTokenCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7774,7 +8009,7 @@ impl<'a, C, A> UserGenerateAuthenticationTokenCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7862,7 +8097,7 @@ impl<'a, C, A> UserGenerateAuthenticationTokenCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8006,10 +8241,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8029,7 +8261,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8117,7 +8349,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8270,10 +8502,7 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8305,7 +8534,7 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8405,7 +8634,7 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8557,10 +8786,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8592,7 +8818,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8682,7 +8908,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8828,10 +9054,7 @@ impl<'a, C, A> UserGenerateTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8851,7 +9074,7 @@ impl<'a, C, A> UserGenerateTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8939,7 +9162,7 @@ impl<'a, C, A> UserGenerateTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9090,10 +9313,7 @@ impl<'a, C, A> UserSetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9125,7 +9345,7 @@ impl<'a, C, A> UserSetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9225,7 +9445,7 @@ impl<'a, C, A> UserSetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9369,10 +9589,7 @@ impl<'a, C, A> UserGetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9392,7 +9609,7 @@ impl<'a, C, A> UserGetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9480,7 +9697,7 @@ impl<'a, C, A> UserGetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9635,10 +9852,7 @@ impl<'a, C, A> InstallPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9670,7 +9884,7 @@ impl<'a, C, A> InstallPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9790,7 +10004,7 @@ impl<'a, C, A> InstallPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9938,10 +10152,7 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9961,7 +10172,7 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10069,7 +10280,7 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10215,10 +10426,7 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10238,7 +10446,7 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10336,7 +10544,7 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10483,10 +10691,7 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10506,7 +10711,7 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10604,7 +10809,7 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10759,10 +10964,7 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10794,7 +10996,7 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10914,7 +11116,7 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10958,10 +11160,10 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves details of an enterprise's group license for a product.
+/// Creates a new web app for the enterprise.
 ///
-/// A builder for the *get* method supported by a *grouplicense* resource.
-/// It is not used directly, but through a `GrouplicenseMethods` instance.
+/// A builder for the *insert* method supported by a *webapp* resource.
+/// It is not used directly, but through a `WebappMethods` instance.
 ///
 /// # Example
 ///
@@ -10972,6 +11174,7 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_androidenterprise1 as androidenterprise1;
+/// use androidenterprise1::WebApp;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10982,31 +11185,36 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WebApp::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.grouplicenses().get("enterpriseId", "groupLicenseId")
+/// let result = hub.webapps().insert(req, "enterpriseId")
 ///              .doit();
 /// # }
 /// ```
-pub struct GrouplicenseGetCall<'a, C, A>
+pub struct WebappInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AndroidEnterprise<C, A>,
+    _request: WebApp,
     _enterprise_id: String,
-    _group_license_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for GrouplicenseGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for WebappInsertCall<'a, C, A> {}
 
-impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> WebappInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GroupLicense)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, WebApp)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -11014,263 +11222,9 @@ impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "androidenterprise.grouplicenses.get",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "androidenterprise.webapps.insert",
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("groupLicenseId", self._group_license_id.to_string()));
-        for &field in ["alt", "enterpriseId", "groupLicenseId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/groupLicenses/{groupLicenseId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{groupLicenseId}", "groupLicenseId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["groupLicenseId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
-    ///
-    /// Sets the *group license id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn group_license_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, A> {
-        self._group_license_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GrouplicenseGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GrouplicenseGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GrouplicenseGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieves IDs of all products for which the enterprise has a group license.
-///
-/// A builder for the *list* method supported by a *grouplicense* resource.
-/// It is not used directly, but through a `GrouplicenseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.grouplicenses().list("enterpriseId")
-///              .doit();
-/// # }
-/// ```
-pub struct GrouplicenseListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for GrouplicenseListCall<'a, C, A> {}
-
-impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GroupLicensesListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.grouplicenses.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("enterpriseId", self._enterprise_id.to_string()));
         for &field in ["alt", "enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11284,7 +11238,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/groupLicenses";
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11311,10 +11265,271 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
         }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: WebApp) -> WebappInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> WebappInsertCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebappInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> WebappInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebappInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves the details of all web apps for a given enterprise.
+///
+/// A builder for the *list* method supported by a *webapp* resource.
+/// It is not used directly, but through a `WebappMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.webapps().list("enterpriseId")
+///              .doit();
+/// # }
+/// ```
+pub struct WebappListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for WebappListCall<'a, C, A> {}
+
+impl<'a, C, A> WebappListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, WebAppsListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.webapps.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        for &field in ["alt", "enterpriseId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11334,7 +11549,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11393,7 +11608,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseListCall<'a, C, A> {
+    pub fn enterprise_id(mut self, new_value: &str) -> WebappListCall<'a, C, A> {
         self._enterprise_id = new_value.to_string();
         self
     }
@@ -11403,7 +11618,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GrouplicenseListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebappListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11412,7 +11627,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11424,7 +11639,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GrouplicenseListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebappListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11444,7 +11659,1066 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GrouplicenseListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebappListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets an existing web app.
+///
+/// A builder for the *get* method supported by a *webapp* resource.
+/// It is not used directly, but through a `WebappMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.webapps().get("enterpriseId", "webAppId")
+///              .doit();
+/// # }
+/// ```
+pub struct WebappGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _web_app_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for WebappGetCall<'a, C, A> {}
+
+impl<'a, C, A> WebappGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, WebApp)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.webapps.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("webAppId", self._web_app_id.to_string()));
+        for &field in ["alt", "enterpriseId", "webAppId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps/{webAppId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{webAppId}", "webAppId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["webAppId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> WebappGetCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the web app.
+    ///
+    /// Sets the *web app id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn web_app_id(mut self, new_value: &str) -> WebappGetCall<'a, C, A> {
+        self._web_app_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebappGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> WebappGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebappGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes an existing web app.
+///
+/// A builder for the *delete* method supported by a *webapp* resource.
+/// It is not used directly, but through a `WebappMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.webapps().delete("enterpriseId", "webAppId")
+///              .doit();
+/// # }
+/// ```
+pub struct WebappDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _web_app_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for WebappDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> WebappDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.webapps.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("webAppId", self._web_app_id.to_string()));
+        for &field in ["enterpriseId", "webAppId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps/{webAppId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{webAppId}", "webAppId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["webAppId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> WebappDeleteCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the web app.
+    ///
+    /// Sets the *web app id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn web_app_id(mut self, new_value: &str) -> WebappDeleteCall<'a, C, A> {
+        self._web_app_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebappDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> WebappDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebappDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates an existing web app. This method supports patch semantics.
+///
+/// A builder for the *patch* method supported by a *webapp* resource.
+/// It is not used directly, but through a `WebappMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// use androidenterprise1::WebApp;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WebApp::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.webapps().patch(req, "enterpriseId", "webAppId")
+///              .doit();
+/// # }
+/// ```
+pub struct WebappPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _request: WebApp,
+    _enterprise_id: String,
+    _web_app_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for WebappPatchCall<'a, C, A> {}
+
+impl<'a, C, A> WebappPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, WebApp)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.webapps.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("webAppId", self._web_app_id.to_string()));
+        for &field in ["alt", "enterpriseId", "webAppId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps/{webAppId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{webAppId}", "webAppId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["webAppId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: WebApp) -> WebappPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> WebappPatchCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the web app.
+    ///
+    /// Sets the *web app id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn web_app_id(mut self, new_value: &str) -> WebappPatchCall<'a, C, A> {
+        self._web_app_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebappPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> WebappPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebappPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates an existing web app.
+///
+/// A builder for the *update* method supported by a *webapp* resource.
+/// It is not used directly, but through a `WebappMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// use androidenterprise1::WebApp;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WebApp::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.webapps().update(req, "enterpriseId", "webAppId")
+///              .doit();
+/// # }
+/// ```
+pub struct WebappUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _request: WebApp,
+    _enterprise_id: String,
+    _web_app_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for WebappUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> WebappUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, WebApp)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.webapps.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("webAppId", self._web_app_id.to_string()));
+        for &field in ["alt", "enterpriseId", "webAppId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps/{webAppId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{webAppId}", "webAppId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["webAppId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: WebApp) -> WebappUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> WebappUpdateCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the web app.
+    ///
+    /// Sets the *web app id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn web_app_id(mut self, new_value: &str) -> WebappUpdateCall<'a, C, A> {
+        self._web_app_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebappUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> WebappUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebappUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11559,10 +12833,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11582,7 +12853,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> where C: Borro
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11680,7 +12951,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11826,10 +13097,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceListCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11849,7 +13117,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceListCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11947,7 +13215,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceListCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12102,10 +13370,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12137,7 +13402,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12257,7 +13522,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12405,10 +13670,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceGetCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12428,7 +13690,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceGetCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12536,7 +13798,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceGetCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12691,10 +13953,7 @@ impl<'a, C, A> ManagedconfigurationsfordevicePatchCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12726,7 +13985,7 @@ impl<'a, C, A> ManagedconfigurationsfordevicePatchCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12846,7 +14105,7 @@ impl<'a, C, A> ManagedconfigurationsfordevicePatchCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12879,6 +14138,498 @@ impl<'a, C, A> ManagedconfigurationsfordevicePatchCall<'a, C, A> where C: Borrow
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ManagedconfigurationsfordevicePatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves details of an enterprise's group license for a product.
+///
+/// A builder for the *get* method supported by a *grouplicense* resource.
+/// It is not used directly, but through a `GrouplicenseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.grouplicenses().get("enterpriseId", "groupLicenseId")
+///              .doit();
+/// # }
+/// ```
+pub struct GrouplicenseGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _group_license_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GrouplicenseGetCall<'a, C, A> {}
+
+impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GroupLicense)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.grouplicenses.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("groupLicenseId", self._group_license_id.to_string()));
+        for &field in ["alt", "enterpriseId", "groupLicenseId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/groupLicenses/{groupLicenseId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{groupLicenseId}", "groupLicenseId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["groupLicenseId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    ///
+    /// Sets the *group license id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_license_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, A> {
+        self._group_license_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GrouplicenseGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GrouplicenseGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GrouplicenseGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves IDs of all products for which the enterprise has a group license.
+///
+/// A builder for the *list* method supported by a *grouplicense* resource.
+/// It is not used directly, but through a `GrouplicenseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.grouplicenses().list("enterpriseId")
+///              .doit();
+/// # }
+/// ```
+pub struct GrouplicenseListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GrouplicenseListCall<'a, C, A> {}
+
+impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GroupLicensesListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.grouplicenses.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        for &field in ["alt", "enterpriseId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/groupLicenses";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseListCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GrouplicenseListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GrouplicenseListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GrouplicenseListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12999,10 +14750,7 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13034,7 +14782,7 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13144,7 +14892,7 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13290,10 +15038,7 @@ impl<'a, C, A> DeviceGetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13313,7 +15058,7 @@ impl<'a, C, A> DeviceGetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13411,7 +15156,7 @@ impl<'a, C, A> DeviceGetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13555,10 +15300,7 @@ impl<'a, C, A> DeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13578,7 +15320,7 @@ impl<'a, C, A> DeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13666,7 +15408,7 @@ impl<'a, C, A> DeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13812,10 +15554,7 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13835,7 +15574,7 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13933,7 +15672,7 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14011,7 +15750,7 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.devices().update(req, "enterpriseId", "userId", "deviceId")
-///              .update_mask("At")
+///              .update_mask("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -14091,10 +15830,7 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14126,7 +15862,7 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14245,7 +15981,7 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14323,7 +16059,7 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.devices().patch(req, "enterpriseId", "userId", "deviceId")
-///              .update_mask("sadipscing")
+///              .update_mask("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -14403,10 +16139,7 @@ impl<'a, C, A> DevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14438,7 +16171,7 @@ impl<'a, C, A> DevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14557,7 +16290,7 @@ impl<'a, C, A> DevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14629,7 +16362,7 @@ impl<'a, C, A> DevicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().acknowledge_notification_set()
-///              .notification_set_id("rebum.")
+///              .notification_set_id("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -14680,10 +16413,7 @@ impl<'a, C, A> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> where C: Borro
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14703,7 +16433,7 @@ impl<'a, C, A> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> where C: Borro
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14768,7 +16498,7 @@ impl<'a, C, A> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14909,10 +16639,7 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14932,7 +16659,7 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15000,7 +16727,7 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15149,10 +16876,7 @@ impl<'a, C, A> EnterpriseCreateWebTokenCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15184,7 +16908,7 @@ impl<'a, C, A> EnterpriseCreateWebTokenCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15274,7 +16998,7 @@ impl<'a, C, A> EnterpriseCreateWebTokenCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15416,10 +17140,7 @@ impl<'a, C, A> EnterpriseSendTestPushNotificationCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15439,7 +17160,7 @@ impl<'a, C, A> EnterpriseSendTestPushNotificationCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15517,7 +17238,7 @@ impl<'a, C, A> EnterpriseSendTestPushNotificationCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15638,10 +17359,7 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15661,7 +17379,7 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15739,7 +17457,7 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15881,10 +17599,7 @@ impl<'a, C, A> EnterpriseGetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15904,7 +17619,7 @@ impl<'a, C, A> EnterpriseGetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15982,7 +17697,7 @@ impl<'a, C, A> EnterpriseGetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16015,249 +17730,6 @@ impl<'a, C, A> EnterpriseGetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseGetStoreLayoutCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deprecated and unused.
-///
-/// A builder for the *getAndroidDevicePolicyConfig* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().get_android_device_policy_config("enterpriseId")
-///              .doit();
-/// # }
-/// ```
-pub struct EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A> {}
-
-impl<'a, C, A> EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AndroidDevicePolicyConfig)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.enterprises.getAndroidDevicePolicyConfig",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        for &field in ["alt", "enterpriseId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/androidDevicePolicyConfig";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseGetAndroidDevicePolicyConfigCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16374,10 +17846,7 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16409,7 +17878,7 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16499,7 +17968,7 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16571,8 +18040,8 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().complete_signup()
-///              .enterprise_token("labore")
-///              .completion_token("sed")
+///              .enterprise_token("sit")
+///              .completion_token("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -16628,10 +18097,7 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16651,7 +18117,7 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16733,7 +18199,7 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16777,280 +18243,6 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Deprecated and unused.
-///
-/// A builder for the *setAndroidDevicePolicyConfig* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// use androidenterprise1::AndroidDevicePolicyConfig;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AndroidDevicePolicyConfig::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().set_android_device_policy_config(req, "enterpriseId")
-///              .doit();
-/// # }
-/// ```
-pub struct EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _request: AndroidDevicePolicyConfig,
-    _enterprise_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A> {}
-
-impl<'a, C, A> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AndroidDevicePolicyConfig)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.enterprises.setAndroidDevicePolicyConfig",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        for &field in ["alt", "enterpriseId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/androidDevicePolicyConfig";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AndroidDevicePolicyConfig) -> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Pulls and returns a notification set for the enterprises associated with the service account authenticated for the request. The notification set may be empty if no notification are pending.
 /// A notification set returned needs to be acknowledged within 20 seconds by calling Enterprises.AcknowledgeNotificationSet, unless the notification set is empty.
 /// Notifications that are not acknowledged within the 20 seconds will eventually be included again in the response to another PullNotificationSet request, and those that are never acknowledged will ultimately be deleted according to the Google Cloud Platform Pub/Sub system policy.
@@ -17083,7 +18275,7 @@ impl<'a, C, A> EnterpriseSetAndroidDevicePolicyConfigCall<'a, C, A> where C: Bor
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().pull_notification_set()
-///              .request_mode("gubergren")
+///              .request_mode("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -17135,10 +18327,7 @@ impl<'a, C, A> EnterprisePullNotificationSetCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17158,7 +18347,7 @@ impl<'a, C, A> EnterprisePullNotificationSetCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17236,7 +18425,7 @@ impl<'a, C, A> EnterprisePullNotificationSetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17364,10 +18553,7 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -17399,7 +18585,7 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17489,7 +18675,7 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17631,10 +18817,7 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17654,7 +18837,7 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17732,7 +18915,7 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17810,7 +18993,7 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().get_service_account("enterpriseId")
-///              .key_type("sea")
+///              .key_type("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -17885,10 +19068,7 @@ impl<'a, C, A> EnterpriseGetServiceAccountCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17908,7 +19088,7 @@ impl<'a, C, A> EnterpriseGetServiceAccountCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17993,7 +19173,7 @@ impl<'a, C, A> EnterpriseGetServiceAccountCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18142,10 +19322,7 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18177,7 +19354,7 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18267,7 +19444,7 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18339,7 +19516,7 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().generate_signup_url()
-///              .callback_url("ipsum")
+///              .callback_url("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -18391,10 +19568,7 @@ impl<'a, C, A> EnterpriseGenerateSignupUrlCall<'a, C, A> where C: BorrowMut<hype
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -18414,7 +19588,7 @@ impl<'a, C, A> EnterpriseGenerateSignupUrlCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18490,7 +19664,7 @@ impl<'a, C, A> EnterpriseGenerateSignupUrlCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18643,10 +19817,7 @@ impl<'a, C, A> StorelayoutclusterPatchCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18678,7 +19849,7 @@ impl<'a, C, A> StorelayoutclusterPatchCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18788,7 +19959,7 @@ impl<'a, C, A> StorelayoutclusterPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18932,10 +20103,7 @@ impl<'a, C, A> StorelayoutclusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -18955,7 +20123,7 @@ impl<'a, C, A> StorelayoutclusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19043,7 +20211,7 @@ impl<'a, C, A> StorelayoutclusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19076,262 +20244,6 @@ impl<'a, C, A> StorelayoutclusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deletes a cluster.
-///
-/// A builder for the *delete* method supported by a *storelayoutcluster* resource.
-/// It is not used directly, but through a `StorelayoutclusterMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.storelayoutclusters().delete("enterpriseId", "pageId", "clusterId")
-///              .doit();
-/// # }
-/// ```
-pub struct StorelayoutclusterDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _page_id: String,
-    _cluster_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for StorelayoutclusterDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> StorelayoutclusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.storelayoutclusters.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("pageId", self._page_id.to_string()));
-        params.push(("clusterId", self._cluster_id.to_string()));
-        for &field in ["enterpriseId", "pageId", "clusterId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{pageId}", "pageId"), ("{clusterId}", "clusterId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["clusterId", "pageId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the page.
-    ///
-    /// Sets the *page id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
-        self._page_id = new_value.to_string();
-        self
-    }
-    /// The ID of the cluster.
-    ///
-    /// Sets the *cluster id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
-        self._cluster_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StorelayoutclusterDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19452,10 +20364,7 @@ impl<'a, C, A> StorelayoutclusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -19487,7 +20396,7 @@ impl<'a, C, A> StorelayoutclusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19597,7 +20506,7 @@ impl<'a, C, A> StorelayoutclusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19630,273 +20539,6 @@ impl<'a, C, A> StorelayoutclusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterUpdateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieves details of a cluster.
-///
-/// A builder for the *get* method supported by a *storelayoutcluster* resource.
-/// It is not used directly, but through a `StorelayoutclusterMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.storelayoutclusters().get("enterpriseId", "pageId", "clusterId")
-///              .doit();
-/// # }
-/// ```
-pub struct StorelayoutclusterGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _page_id: String,
-    _cluster_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for StorelayoutclusterGetCall<'a, C, A> {}
-
-impl<'a, C, A> StorelayoutclusterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, StoreCluster)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.storelayoutclusters.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("pageId", self._page_id.to_string()));
-        params.push(("clusterId", self._cluster_id.to_string()));
-        for &field in ["alt", "enterpriseId", "pageId", "clusterId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{pageId}", "pageId"), ("{clusterId}", "clusterId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["clusterId", "pageId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> StorelayoutclusterGetCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the page.
-    ///
-    /// Sets the *page id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> StorelayoutclusterGetCall<'a, C, A> {
-        self._page_id = new_value.to_string();
-        self
-    }
-    /// The ID of the cluster.
-    ///
-    /// Sets the *cluster id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> StorelayoutclusterGetCall<'a, C, A> {
-        self._cluster_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StorelayoutclusterGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20015,10 +20657,7 @@ impl<'a, C, A> StorelayoutclusterInsertCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -20050,7 +20689,7 @@ impl<'a, C, A> StorelayoutclusterInsertCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20150,7 +20789,7 @@ impl<'a, C, A> StorelayoutclusterInsertCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20183,6 +20822,787 @@ impl<'a, C, A> StorelayoutclusterInsertCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a cluster.
+///
+/// A builder for the *delete* method supported by a *storelayoutcluster* resource.
+/// It is not used directly, but through a `StorelayoutclusterMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.storelayoutclusters().delete("enterpriseId", "pageId", "clusterId")
+///              .doit();
+/// # }
+/// ```
+pub struct StorelayoutclusterDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _page_id: String,
+    _cluster_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for StorelayoutclusterDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> StorelayoutclusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.storelayoutclusters.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("pageId", self._page_id.to_string()));
+        params.push(("clusterId", self._cluster_id.to_string()));
+        for &field in ["enterpriseId", "pageId", "clusterId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{pageId}", "pageId"), ("{clusterId}", "clusterId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["clusterId", "pageId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the page.
+    ///
+    /// Sets the *page id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn page_id(mut self, new_value: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
+        self._page_id = new_value.to_string();
+        self
+    }
+    /// The ID of the cluster.
+    ///
+    /// Sets the *cluster id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn cluster_id(mut self, new_value: &str) -> StorelayoutclusterDeleteCall<'a, C, A> {
+        self._cluster_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StorelayoutclusterDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves details of a cluster.
+///
+/// A builder for the *get* method supported by a *storelayoutcluster* resource.
+/// It is not used directly, but through a `StorelayoutclusterMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.storelayoutclusters().get("enterpriseId", "pageId", "clusterId")
+///              .doit();
+/// # }
+/// ```
+pub struct StorelayoutclusterGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _page_id: String,
+    _cluster_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for StorelayoutclusterGetCall<'a, C, A> {}
+
+impl<'a, C, A> StorelayoutclusterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, StoreCluster)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.storelayoutclusters.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("pageId", self._page_id.to_string()));
+        params.push(("clusterId", self._cluster_id.to_string()));
+        for &field in ["alt", "enterpriseId", "pageId", "clusterId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{pageId}", "pageId"), ("{clusterId}", "clusterId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["clusterId", "pageId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> StorelayoutclusterGetCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the page.
+    ///
+    /// Sets the *page id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn page_id(mut self, new_value: &str) -> StorelayoutclusterGetCall<'a, C, A> {
+        self._page_id = new_value.to_string();
+        self
+    }
+    /// The ID of the cluster.
+    ///
+    /// Sets the *cluster id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn cluster_id(mut self, new_value: &str) -> StorelayoutclusterGetCall<'a, C, A> {
+        self._cluster_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StorelayoutclusterGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves details of a product for display to an enterprise admin.
+///
+/// A builder for the *get* method supported by a *product* resource.
+/// It is not used directly, but through a `ProductMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.products().get("enterpriseId", "productId")
+///              .language("rebum.")
+///              .doit();
+/// # }
+/// ```
+pub struct ProductGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _product_id: String,
+    _language: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProductGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Product)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.products.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("productId", self._product_id.to_string()));
+        if let Some(value) = self._language {
+            params.push(("language", value.to_string()));
+        }
+        for &field in ["alt", "enterpriseId", "productId", "language"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{productId}", "productId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["productId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the product, e.g. "app:com.google.android.gm".
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
+    ///
+    /// Sets the *language* query property to the given value.
+    pub fn language(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._language = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20294,10 +21714,7 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -20317,7 +21734,7 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20405,7 +21822,7 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20438,6 +21855,272 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetPermissionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
+/// 
+/// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
+///
+/// A builder for the *generateApprovalUrl* method supported by a *product* resource.
+/// It is not used directly, but through a `ProductMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.products().generate_approval_url("enterpriseId", "productId")
+///              .language_code("At")
+///              .doit();
+/// # }
+/// ```
+pub struct ProductGenerateApprovalUrlCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _product_id: String,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProductGenerateApprovalUrlCall<'a, C, A> {}
+
+impl<'a, C, A> ProductGenerateApprovalUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ProductsGenerateApprovalUrlResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.products.generateApprovalUrl",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("productId", self._product_id.to_string()));
+        if let Some(value) = self._language_code {
+            params.push(("languageCode", value.to_string()));
+        }
+        for &field in ["alt", "enterpriseId", "productId", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/generateApprovalUrl";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{productId}", "productId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["productId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the product.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// The BCP 47 language code used for permission names and descriptions in the returned iframe, for instance "en-US".
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductGenerateApprovalUrlCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ProductGenerateApprovalUrlCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGenerateApprovalUrlCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20548,10 +22231,7 @@ impl<'a, C, A> ProductUnapproveCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -20571,7 +22251,7 @@ impl<'a, C, A> ProductUnapproveCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20649,7 +22329,7 @@ impl<'a, C, A> ProductUnapproveCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20682,273 +22362,6 @@ impl<'a, C, A> ProductUnapproveCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProductUnapproveCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieves details of a product for display to an enterprise admin.
-///
-/// A builder for the *get* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.products().get("enterpriseId", "productId")
-///              .language("ea")
-///              .doit();
-/// # }
-/// ```
-pub struct ProductGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _product_id: String,
-    _language: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProductGetCall<'a, C, A> {}
-
-impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Product)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.products.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("productId", self._product_id.to_string()));
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        for &field in ["alt", "enterpriseId", "productId", "language"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{productId}", "productId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["productId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the product, e.g. "app:com.google.android.gm".
-    ///
-    /// Sets the *product id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._product_id = new_value.to_string();
-        self
-    }
-    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21068,10 +22481,7 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -21103,7 +22513,7 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -21193,7 +22603,7 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21265,7 +22675,7 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().get_app_restrictions_schema("enterpriseId", "productId")
-///              .language("kasd")
+///              .language("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -21342,10 +22752,7 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -21365,7 +22772,7 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21460,7 +22867,7 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21532,11 +22939,11 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().list("enterpriseId")
-///              .token("rebum.")
+///              .token("Lorem")
 ///              .query("Lorem")
-///              .max_results(38)
-///              .language("invidunt")
-///              .approved(false)
+///              .max_results(59)
+///              .language("ut")
+///              .approved(true)
 ///              .doit();
 /// # }
 /// ```
@@ -21627,10 +23034,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -21650,7 +23054,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21713,7 +23117,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// A pagination token is contained in a request''s response when there are more products. The token can be used in a subsequent request to obtain more products, and so forth. This parameter cannot be used in the initial request.
+    /// A pagination token is contained in a request's response when there are more products. The token can be used in a subsequent request to obtain more products, and so forth. This parameter cannot be used in the initial request.
     ///
     /// Sets the *token* query property to the given value.
     pub fn token(mut self, new_value: &str) -> ProductListCall<'a, C, A> {
@@ -21763,7 +23167,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21796,275 +23200,6 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProductListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
-/// 
-/// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
-///
-/// A builder for the *generateApprovalUrl* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.products().generate_approval_url("enterpriseId", "productId")
-///              .language_code("et")
-///              .doit();
-/// # }
-/// ```
-pub struct ProductGenerateApprovalUrlCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _product_id: String,
-    _language_code: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProductGenerateApprovalUrlCall<'a, C, A> {}
-
-impl<'a, C, A> ProductGenerateApprovalUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ProductsGenerateApprovalUrlResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.products.generateApprovalUrl",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("productId", self._product_id.to_string()));
-        if let Some(value) = self._language_code {
-            params.push(("languageCode", value.to_string()));
-        }
-        for &field in ["alt", "enterpriseId", "productId", "languageCode"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/generateApprovalUrl";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{productId}", "productId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["productId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the product.
-    ///
-    /// Sets the *product id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
-        self._product_id = new_value.to_string();
-        self
-    }
-    /// The BCP 47 language code used for permission names and descriptions in the returned iframe, for instance "en-US".
-    ///
-    /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
-        self._language_code = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProductGenerateApprovalUrlCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProductGenerateApprovalUrlCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGenerateApprovalUrlCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22185,10 +23320,7 @@ impl<'a, C, A> ManagedconfigurationsforuserPatchCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -22220,7 +23352,7 @@ impl<'a, C, A> ManagedconfigurationsforuserPatchCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -22330,7 +23462,7 @@ impl<'a, C, A> ManagedconfigurationsforuserPatchCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22363,6 +23495,301 @@ impl<'a, C, A> ManagedconfigurationsforuserPatchCall<'a, C, A> where C: BorrowMu
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ManagedconfigurationsforuserPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties.
+///
+/// A builder for the *update* method supported by a *managedconfigurationsforuser* resource.
+/// It is not used directly, but through a `ManagedconfigurationsforuserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// use androidenterprise1::ManagedConfiguration;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ManagedConfiguration::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.managedconfigurationsforuser().update(req, "enterpriseId", "userId", "managedConfigurationForUserId")
+///              .doit();
+/// # }
+/// ```
+pub struct ManagedconfigurationsforuserUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _request: ManagedConfiguration,
+    _enterprise_id: String,
+    _user_id: String,
+    _managed_configuration_for_user_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ManagedconfigurationsforuserUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> ManagedconfigurationsforuserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ManagedConfiguration)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.managedconfigurationsforuser.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("userId", self._user_id.to_string()));
+        params.push(("managedConfigurationForUserId", self._managed_configuration_for_user_id.to_string()));
+        for &field in ["alt", "enterpriseId", "userId", "managedConfigurationForUserId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId"), ("{managedConfigurationForUserId}", "managedConfigurationForUserId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["managedConfigurationForUserId", "userId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ManagedConfiguration) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the user.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    ///
+    /// Sets the *managed configuration for user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_configuration_for_user_id(mut self, new_value: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
+        self._managed_configuration_for_user_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsforuserUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedconfigurationsforuserUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22475,10 +23902,7 @@ impl<'a, C, A> ManagedconfigurationsforuserDeleteCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -22498,7 +23922,7 @@ impl<'a, C, A> ManagedconfigurationsforuserDeleteCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22586,7 +24010,7 @@ impl<'a, C, A> ManagedconfigurationsforuserDeleteCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22730,10 +24154,7 @@ impl<'a, C, A> ManagedconfigurationsforuserListCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -22753,7 +24174,7 @@ impl<'a, C, A> ManagedconfigurationsforuserListCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22841,7 +24262,7 @@ impl<'a, C, A> ManagedconfigurationsforuserListCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22874,304 +24295,6 @@ impl<'a, C, A> ManagedconfigurationsforuserListCall<'a, C, A> where C: BorrowMut
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ManagedconfigurationsforuserListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties.
-///
-/// A builder for the *update* method supported by a *managedconfigurationsforuser* resource.
-/// It is not used directly, but through a `ManagedconfigurationsforuserMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// use androidenterprise1::ManagedConfiguration;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ManagedConfiguration::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.managedconfigurationsforuser().update(req, "enterpriseId", "userId", "managedConfigurationForUserId")
-///              .doit();
-/// # }
-/// ```
-pub struct ManagedconfigurationsforuserUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _request: ManagedConfiguration,
-    _enterprise_id: String,
-    _user_id: String,
-    _managed_configuration_for_user_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ManagedconfigurationsforuserUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> ManagedconfigurationsforuserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ManagedConfiguration)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.managedconfigurationsforuser.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("userId", self._user_id.to_string()));
-        params.push(("managedConfigurationForUserId", self._managed_configuration_for_user_id.to_string()));
-        for &field in ["alt", "enterpriseId", "userId", "managedConfigurationForUserId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId"), ("{managedConfigurationForUserId}", "managedConfigurationForUserId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["managedConfigurationForUserId", "userId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ManagedConfiguration) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
-    ///
-    /// Sets the *managed configuration for user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_configuration_for_user_id(mut self, new_value: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
-        self._managed_configuration_for_user_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsforuserUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedconfigurationsforuserUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23285,10 +24408,7 @@ impl<'a, C, A> ManagedconfigurationsforuserGetCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -23308,7 +24428,7 @@ impl<'a, C, A> ManagedconfigurationsforuserGetCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -23406,7 +24526,7 @@ impl<'a, C, A> ManagedconfigurationsforuserGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -23550,10 +24670,7 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -23573,7 +24690,7 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -23661,7 +24778,7 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -23694,517 +24811,6 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> GrouplicenseuserListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Removes an entitlement to an app for a user.
-///
-/// A builder for the *delete* method supported by a *entitlement* resource.
-/// It is not used directly, but through a `EntitlementMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.entitlements().delete("enterpriseId", "userId", "entitlementId")
-///              .doit();
-/// # }
-/// ```
-pub struct EntitlementDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _user_id: String,
-    _entitlement_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for EntitlementDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> EntitlementDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.entitlements.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("userId", self._user_id.to_string()));
-        params.push(("entitlementId", self._entitlement_id.to_string()));
-        for &field in ["enterpriseId", "userId", "entitlementId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId"), ("{entitlementId}", "entitlementId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["entitlementId", "userId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm".
-    ///
-    /// Sets the *entitlement id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn entitlement_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
-        self._entitlement_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EntitlementDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EntitlementDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists all entitlements for the specified user. Only the ID is set.
-///
-/// A builder for the *list* method supported by a *entitlement* resource.
-/// It is not used directly, but through a `EntitlementMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.entitlements().list("enterpriseId", "userId")
-///              .doit();
-/// # }
-/// ```
-pub struct EntitlementListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _user_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for EntitlementListCall<'a, C, A> {}
-
-impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, EntitlementsListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.entitlements.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("userId", self._user_id.to_string()));
-        for &field in ["alt", "enterpriseId", "userId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["userId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EntitlementListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EntitlementListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24330,10 +24936,7 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -24365,7 +24968,7 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -24482,7 +25085,7 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -24628,10 +25231,7 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -24651,7 +25251,7 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -24749,7 +25349,7 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -24782,6 +25382,511 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> EntitlementGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists all entitlements for the specified user. Only the ID is set.
+///
+/// A builder for the *list* method supported by a *entitlement* resource.
+/// It is not used directly, but through a `EntitlementMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.entitlements().list("enterpriseId", "userId")
+///              .doit();
+/// # }
+/// ```
+pub struct EntitlementListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _user_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EntitlementListCall<'a, C, A> {}
+
+impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, EntitlementsListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.entitlements.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("userId", self._user_id.to_string()));
+        for &field in ["alt", "enterpriseId", "userId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["userId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the user.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> EntitlementListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> EntitlementListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Removes an entitlement to an app for a user.
+///
+/// A builder for the *delete* method supported by a *entitlement* resource.
+/// It is not used directly, but through a `EntitlementMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.entitlements().delete("enterpriseId", "userId", "entitlementId")
+///              .doit();
+/// # }
+/// ```
+pub struct EntitlementDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _user_id: String,
+    _entitlement_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EntitlementDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> EntitlementDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.entitlements.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("userId", self._user_id.to_string()));
+        params.push(("entitlementId", self._entitlement_id.to_string()));
+        for &field in ["enterpriseId", "userId", "entitlementId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId"), ("{entitlementId}", "entitlementId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["entitlementId", "userId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the user.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The ID of the entitlement (a product ID), e.g. "app:com.google.android.gm".
+    ///
+    /// Sets the *entitlement id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn entitlement_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, A> {
+        self._entitlement_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> EntitlementDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> EntitlementDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24907,10 +26012,7 @@ impl<'a, C, A> EntitlementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -24942,7 +26044,7 @@ impl<'a, C, A> EntitlementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -25059,7 +26161,7 @@ impl<'a, C, A> EntitlementPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25210,10 +26312,7 @@ impl<'a, C, A> ServiceaccountkeyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -25245,7 +26344,7 @@ impl<'a, C, A> ServiceaccountkeyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -25335,7 +26434,7 @@ impl<'a, C, A> ServiceaccountkeyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25477,10 +26576,7 @@ impl<'a, C, A> ServiceaccountkeyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -25500,7 +26596,7 @@ impl<'a, C, A> ServiceaccountkeyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -25578,7 +26674,7 @@ impl<'a, C, A> ServiceaccountkeyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25721,10 +26817,7 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -25744,7 +26837,7 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -25822,7 +26915,7 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25894,7 +26987,7 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("permissionId")
-///              .language("no")
+///              .language("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -25969,10 +27062,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -25992,7 +27082,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -26077,7 +27167,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

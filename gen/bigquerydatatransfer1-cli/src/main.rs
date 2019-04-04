@@ -581,12 +581,15 @@ impl<'n> Engine<'n> {
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disabled", "display-name", "name", "next-run-time", "schedule", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -600,6 +603,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "version-info" => {
+                    call = call.version_info(value.unwrap_or(""));
+                },
                 "authorization-code" => {
                     call = call.authorization_code(value.unwrap_or(""));
                 },
@@ -616,7 +622,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -847,12 +853,15 @@ impl<'n> Engine<'n> {
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disabled", "display-name", "name", "next-run-time", "schedule", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -866,6 +875,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "version-info" => {
+                    call = call.version_info(value.unwrap_or(""));
+                },
                 "update-mask" => {
                     call = call.update_mask(value.unwrap_or(""));
                 },
@@ -885,7 +897,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info", "update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1236,6 +1248,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_transfer_configs_start_manual_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "requested-time-range.end-time" => Some(("requestedTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "requested-time-range.start-time" => Some(("requestedTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "requested-run-time" => Some(("requestedRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["end-time", "requested-run-time", "requested-time-range", "start-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::StartManualTransferRunsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_transfer_configs_start_manual_runs(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_transfer_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1267,12 +1366,15 @@ impl<'n> Engine<'n> {
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disabled", "display-name", "name", "next-run-time", "schedule", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1286,6 +1388,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "version-info" => {
+                    call = call.version_info(value.unwrap_or(""));
+                },
                 "authorization-code" => {
                     call = call.authorization_code(value.unwrap_or(""));
                 },
@@ -1302,7 +1407,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1533,12 +1638,15 @@ impl<'n> Engine<'n> {
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disabled", "display-name", "name", "next-run-time", "schedule", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1552,6 +1660,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "version-info" => {
+                    call = call.version_info(value.unwrap_or(""));
+                },
                 "update-mask" => {
                     call = call.update_mask(value.unwrap_or(""));
                 },
@@ -1571,7 +1682,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info", "update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1922,6 +2033,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_transfer_configs_start_manual_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "requested-time-range.end-time" => Some(("requestedTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "requested-time-range.start-time" => Some(("requestedTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "requested-run-time" => Some(("requestedRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["end-time", "requested-run-time", "requested-time-range", "start-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::StartManualTransferRunsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().transfer_configs_start_manual_runs(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -1983,6 +2181,9 @@ impl<'n> Engine<'n> {
                     ("locations-transfer-configs-schedule-runs", Some(opt)) => {
                         call_result = self._projects_locations_transfer_configs_schedule_runs(opt, dry_run, &mut err);
                     },
+                    ("locations-transfer-configs-start-manual-runs", Some(opt)) => {
+                        call_result = self._projects_locations_transfer_configs_start_manual_runs(opt, dry_run, &mut err);
+                    },
                     ("transfer-configs-create", Some(opt)) => {
                         call_result = self._projects_transfer_configs_create(opt, dry_run, &mut err);
                     },
@@ -2012,6 +2213,9 @@ impl<'n> Engine<'n> {
                     },
                     ("transfer-configs-schedule-runs", Some(opt)) => {
                         call_result = self._projects_transfer_configs_schedule_runs(opt, dry_run, &mut err);
+                    },
+                    ("transfer-configs-start-manual-runs", Some(opt)) => {
+                        call_result = self._projects_transfer_configs_start_manual_runs(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -2104,7 +2308,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'data-sources-check-valid-creds', 'data-sources-get', 'data-sources-list', 'locations-data-sources-check-valid-creds', 'locations-data-sources-get', 'locations-data-sources-list', 'locations-get', 'locations-list', 'locations-transfer-configs-create', 'locations-transfer-configs-delete', 'locations-transfer-configs-get', 'locations-transfer-configs-list', 'locations-transfer-configs-patch', 'locations-transfer-configs-runs-delete', 'locations-transfer-configs-runs-get', 'locations-transfer-configs-runs-list', 'locations-transfer-configs-runs-transfer-logs-list', 'locations-transfer-configs-schedule-runs', 'transfer-configs-create', 'transfer-configs-delete', 'transfer-configs-get', 'transfer-configs-list', 'transfer-configs-patch', 'transfer-configs-runs-delete', 'transfer-configs-runs-get', 'transfer-configs-runs-list', 'transfer-configs-runs-transfer-logs-list' and 'transfer-configs-schedule-runs'", vec![
+        ("projects", "methods: 'data-sources-check-valid-creds', 'data-sources-get', 'data-sources-list', 'locations-data-sources-check-valid-creds', 'locations-data-sources-get', 'locations-data-sources-list', 'locations-get', 'locations-list', 'locations-transfer-configs-create', 'locations-transfer-configs-delete', 'locations-transfer-configs-get', 'locations-transfer-configs-list', 'locations-transfer-configs-patch', 'locations-transfer-configs-runs-delete', 'locations-transfer-configs-runs-get', 'locations-transfer-configs-runs-list', 'locations-transfer-configs-runs-transfer-logs-list', 'locations-transfer-configs-schedule-runs', 'locations-transfer-configs-start-manual-runs', 'transfer-configs-create', 'transfer-configs-delete', 'transfer-configs-get', 'transfer-configs-list', 'transfer-configs-patch', 'transfer-configs-runs-delete', 'transfer-configs-runs-get', 'transfer-configs-runs-list', 'transfer-configs-runs-transfer-logs-list', 'transfer-configs-schedule-runs' and 'transfer-configs-start-manual-runs'", vec![
             ("data-sources-check-valid-creds",
                     Some(r##"Returns true if valid credentials exist for the given data source and
         requesting user.
@@ -2423,7 +2627,7 @@ fn main() {
                      None,
                      Some(r##"The resource name of the transfer config.
         Transfer config names have the form of
-        `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+        `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`.
         The name is automatically generated based on the config_id specified in
         CreateTransferConfigRequest along with project_id and region. If config_id
         is not provided, usually a uuid, even though it is not guaranteed or
@@ -2546,8 +2750,41 @@ fn main() {
                     Some(r##"Creates transfer runs for a time range [start_time, end_time].
         For each date - or whatever granularity the data source supports - in the
         range, one transfer run is created.
-        Note that runs are created per UTC time in the time range."##),
+        Note that runs are created per UTC time in the time range.
+        DEPRECATED: use StartManualTransferRuns instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-transfer-configs-schedule-runs",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Transfer configuration name in the form:
+        `projects/{project_id}/transferConfigs/{config_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-transfer-configs-start-manual-runs",
+                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to
+        current time. The transfer runs can be created for a time range where the
+        run_time is between start_time (inclusive) and end_time (exclusive), or for
+        a specific run_time."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-transfer-configs-start-manual-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
@@ -2684,7 +2921,7 @@ fn main() {
                      None,
                      Some(r##"The resource name of the transfer config.
         Transfer config names have the form of
-        `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+        `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`.
         The name is automatically generated based on the config_id specified in
         CreateTransferConfigRequest along with project_id and region. If config_id
         is not provided, usually a uuid, even though it is not guaranteed or
@@ -2807,8 +3044,41 @@ fn main() {
                     Some(r##"Creates transfer runs for a time range [start_time, end_time].
         For each date - or whatever granularity the data source supports - in the
         range, one transfer run is created.
-        Note that runs are created per UTC time in the time range."##),
+        Note that runs are created per UTC time in the time range.
+        DEPRECATED: use StartManualTransferRuns instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-schedule-runs",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Transfer configuration name in the form:
+        `projects/{project_id}/transferConfigs/{config_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("transfer-configs-start-manual-runs",
+                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to
+        current time. The transfer runs can be created for a time range where the
+        run_time is between start_time (inclusive) and end_time (exclusive), or for
+        a specific run_time."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-start-manual-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
@@ -2841,8 +3111,8 @@ fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181008")
-           .about("Transfers data from partner SaaS applications to Google BigQuery on a scheduled, managed basis.")
+           .version("1.0.8+20190323")
+           .about("Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

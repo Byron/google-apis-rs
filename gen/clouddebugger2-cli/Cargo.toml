@@ -4,7 +4,7 @@
 [package]
 
 name = "google-clouddebugger2-cli"
-version = "1.0.8+20180925"
+version = "1.0.8+20190313"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Debugger (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/clouddebugger2-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-clouddebugger2]
 path = "../clouddebugger2"
-version = "1.0.8+20180925"
+version = "1.0.8+20190313"

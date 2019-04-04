@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *People Service* crate version *1.0.8+20181010*, where *20181010* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *People Service* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *People Service* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/people/).
@@ -236,13 +236,13 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// Know the list of people in your circles, your age range, and language
+    /// View your basic profile info, including your age range and language
     PluLogin,
 
     /// View your complete date of birth
     UserBirthdayRead,
 
-    /// View your contacts
+    /// See and download your contacts
     ContactReadonly,
 
     /// View your email addresses
@@ -251,13 +251,13 @@ pub enum Scope {
     /// View your street addresses
     UserAddresseRead,
 
-    /// Manage your contacts
+    /// See, edit, download, and permanently delete your contacts
     Contact,
 
     /// View your phone numbers
     UserPhonenumberRead,
 
-    /// View your basic profile info
+    /// See your personal info, including any personal info you've made publicly available
     UserinfoProfile,
 
     /// View your email address
@@ -447,11 +447,11 @@ impl ResponseResult for ListContactGroupsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListConnectionsResponse {
+    /// The list of people that the requestor is connected to.
+    pub connections: Option<Vec<Person>>,
     /// The token that can be used to retrieve the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The list of people that the requestor is connected to.
-    pub connections: Option<Vec<Person>>,
     /// The token that can be used to retrieve changes since the last request.
     #[serde(rename="nextSyncToken")]
     pub next_sync_token: Option<String>,
@@ -503,16 +503,6 @@ impl Part for RelationshipStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonResponse {
-    /// The status of the response.
-    pub status: Option<Status>,
-    /// The person.
-    pub person: Option<Person>,
-    /// **DEPRECATED** (Please use status instead)
-    /// 
-    /// [HTTP 1.1 status code]
-    /// (http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html).
-    #[serde(rename="httpStatusCode")]
-    pub http_status_code: Option<i32>,
     /// The original requested resource name. May be different than the resource
     /// name on the returned person.
     /// 
@@ -521,6 +511,16 @@ pub struct PersonResponse {
     /// profile URL.
     #[serde(rename="requestedResourceName")]
     pub requested_resource_name: Option<String>,
+    /// The person.
+    pub person: Option<Person>,
+    /// **DEPRECATED** (Please use status instead)
+    /// 
+    /// [HTTP 1.1 status code]
+    /// (http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html).
+    #[serde(rename="httpStatusCode")]
+    pub http_status_code: Option<i32>,
+    /// The status of the response.
+    pub status: Option<Status>,
 }
 
 impl Part for PersonResponse {}
@@ -532,10 +532,10 @@ impl Part for PersonResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserDefined {
-    /// The end user specified value of the user defined data.
-    pub value: Option<String>,
     /// The end user specified key of the user defined data.
     pub key: Option<String>,
+    /// The end user specified value of the user defined data.
+    pub value: Option<String>,
     /// Metadata about the user defined data.
     pub metadata: Option<FieldMetadata>,
 }
@@ -662,83 +662,42 @@ pub struct CoverPhoto {
 impl Part for CoverPhoto {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
+/// Metadata about a field.
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FieldMetadata {
+    /// The source of the field.
+    pub source: Option<Source>,
+    /// True if the field is verified; false if the field is unverified. A
+    /// verified field is typically a name, email address, phone number, or
+    /// website that has been confirmed to be owned by the person.
+    pub verified: Option<bool>,
+    /// True if the field is the primary field; false if the field is a secondary
+    /// field.
+    pub primary: Option<bool>,
+}
+
+impl Part for FieldMetadata {}
+
+
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [delete contact groups](struct.ContactGroupDeleteCall.html) (response)
-/// * [delete contact people](struct.PeopleDeleteContactCall.html) (response)
+/// * [get batch get people](struct.PeopleGetBatchGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
-
-
-/// A person's name. If the name is a mononym, the family name is empty.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Name {
-    /// The middle name(s) spelled as they sound.
-    #[serde(rename="phoneticMiddleName")]
-    pub phonetic_middle_name: Option<String>,
-    /// The given name spelled as it sounds.
-    #[serde(rename="phoneticGivenName")]
-    pub phonetic_given_name: Option<String>,
-    /// The honorific prefixes, such as `Mrs.` or `Dr.`
-    #[serde(rename="honorificPrefix")]
-    pub honorific_prefix: Option<String>,
-    /// The family name spelled as it sounds.
-    #[serde(rename="phoneticFamilyName")]
-    pub phonetic_family_name: Option<String>,
-    /// The read-only display name formatted according to the locale specified by
-    /// the viewer's account or the `Accept-Language` HTTP header.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The middle name(s).
-    #[serde(rename="middleName")]
-    pub middle_name: Option<String>,
-    /// The honorific prefixes spelled as they sound.
-    #[serde(rename="phoneticHonorificPrefix")]
-    pub phonetic_honorific_prefix: Option<String>,
-    /// The family name.
-    #[serde(rename="familyName")]
-    pub family_name: Option<String>,
-    /// The full name spelled as it sounds.
-    #[serde(rename="phoneticFullName")]
-    pub phonetic_full_name: Option<String>,
-    /// The read-only display name with the last name first formatted according to
-    /// the locale specified by the viewer's account or the
-    /// `Accept-Language` HTTP header.
-    #[serde(rename="displayNameLastFirst")]
-    pub display_name_last_first: Option<String>,
-    /// The honorific suffixes spelled as they sound.
-    #[serde(rename="phoneticHonorificSuffix")]
-    pub phonetic_honorific_suffix: Option<String>,
-    /// The given name.
-    #[serde(rename="givenName")]
-    pub given_name: Option<String>,
-    /// The honorific suffixes, such as `Jr.`
-    #[serde(rename="honorificSuffix")]
-    pub honorific_suffix: Option<String>,
-    /// Metadata about the name.
-    pub metadata: Option<FieldMetadata>,
+pub struct GetPeopleResponse {
+    /// The response for each requested resource name.
+    pub responses: Option<Vec<PersonResponse>>,
 }
 
-impl Part for Name {}
+impl ResponseResult for GetPeopleResponse {}
 
 
 /// A person's read-only relationship interest .
@@ -799,14 +758,14 @@ impl Part for BraggingRights {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContactGroup {
-    /// The read-only contact group type.
-    #[serde(rename="groupType")]
-    pub group_type: Option<String>,
     /// The read-only name translated and formatted in the viewer's account locale
     /// or the `Accept-Language` HTTP header locale for system groups names.
     /// Group names set by the owner are the same as name.
     #[serde(rename="formattedName")]
     pub formatted_name: Option<String>,
+    /// The read-only contact group type.
+    #[serde(rename="groupType")]
+    pub group_type: Option<String>,
     /// The contact group name set by the group owner or a system provided name
     /// for system groups.
     pub name: Option<String>,
@@ -873,24 +832,28 @@ pub struct Birthday {
 impl Part for Birthday {}
 
 
-/// Metadata about a field.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [delete contact groups](struct.ContactGroupDeleteCall.html) (response)
+/// * [delete contact people](struct.PeopleDeleteContactCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FieldMetadata {
-    /// The source of the field.
-    pub source: Option<Source>,
-    /// True if the field is verified; false if the field is unverified. A
-    /// verified field is typically a name, email address, phone number, or
-    /// website that has been confirmed to be owned by the person.
-    pub verified: Option<bool>,
-    /// True if the field is the primary field; false if the field is a secondary
-    /// field.
-    pub primary: Option<bool>,
-}
+pub struct Empty { _never_set: Option<bool> }
 
-impl Part for FieldMetadata {}
+impl ResponseResult for Empty {}
 
 
 /// A person's physical address. May be a P.O. box or street address. All fields
@@ -900,16 +863,16 @@ impl Part for FieldMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Address {
-    /// The read-only type of the address translated and formatted in the viewer's
-    /// account locale or the `Accept-Language` HTTP header locale.
-    #[serde(rename="formattedType")]
-    pub formatted_type: Option<String>,
+    /// The city of the address.
+    pub city: Option<String>,
     /// The [ISO 3166-1 alpha-2](http://www.iso.org/iso/country_codes.htm) country
     /// code of the address.
     #[serde(rename="countryCode")]
     pub country_code: Option<String>,
-    /// The city of the address.
-    pub city: Option<String>,
+    /// The read-only type of the address translated and formatted in the viewer's
+    /// account locale or the `Accept-Language` HTTP header locale.
+    #[serde(rename="formattedType")]
+    pub formatted_type: Option<String>,
     /// The unstructured value of the address. If this is not set by the user it
     /// will be automatically constructed from structured values.
     #[serde(rename="formattedValue")]
@@ -957,16 +920,16 @@ impl Part for Address {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
+    pub month: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year by itself or a year and month where the day is not
     /// significant.
     pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
-    /// month and day.
-    pub month: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
 impl Part for Date {}
@@ -1070,17 +1033,17 @@ pub struct ContactGroupResponse {
 impl Part for ContactGroupResponse {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -1201,22 +1164,59 @@ pub struct AgeRangeType {
 impl Part for AgeRangeType {}
 
 
-/// There is no detailed description.
+/// A person's name. If the name is a mononym, the family name is empty.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get batch get people](struct.PeopleGetBatchGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetPeopleResponse {
-    /// The response for each requested resource name.
-    pub responses: Option<Vec<PersonResponse>>,
+pub struct Name {
+    /// The middle name(s) spelled as they sound.
+    #[serde(rename="phoneticMiddleName")]
+    pub phonetic_middle_name: Option<String>,
+    /// The given name spelled as it sounds.
+    #[serde(rename="phoneticGivenName")]
+    pub phonetic_given_name: Option<String>,
+    /// The honorific prefixes, such as `Mrs.` or `Dr.`
+    #[serde(rename="honorificPrefix")]
+    pub honorific_prefix: Option<String>,
+    /// The read-only display name with the last name first formatted according to
+    /// the locale specified by the viewer's account or the
+    /// `Accept-Language` HTTP header.
+    #[serde(rename="displayNameLastFirst")]
+    pub display_name_last_first: Option<String>,
+    /// The read-only display name formatted according to the locale specified by
+    /// the viewer's account or the `Accept-Language` HTTP header.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The middle name(s).
+    #[serde(rename="middleName")]
+    pub middle_name: Option<String>,
+    /// The honorific prefixes spelled as they sound.
+    #[serde(rename="phoneticHonorificPrefix")]
+    pub phonetic_honorific_prefix: Option<String>,
+    /// The family name.
+    #[serde(rename="familyName")]
+    pub family_name: Option<String>,
+    /// The full name spelled as it sounds.
+    #[serde(rename="phoneticFullName")]
+    pub phonetic_full_name: Option<String>,
+    /// The family name spelled as it sounds.
+    #[serde(rename="phoneticFamilyName")]
+    pub phonetic_family_name: Option<String>,
+    /// The honorific suffixes spelled as they sound.
+    #[serde(rename="phoneticHonorificSuffix")]
+    pub phonetic_honorific_suffix: Option<String>,
+    /// The given name.
+    #[serde(rename="givenName")]
+    pub given_name: Option<String>,
+    /// The honorific suffixes, such as `Jr.`
+    #[serde(rename="honorificSuffix")]
+    pub honorific_suffix: Option<String>,
+    /// Metadata about the name.
+    pub metadata: Option<FieldMetadata>,
 }
 
-impl ResponseResult for GetPeopleResponse {}
+impl Part for Name {}
 
 
 /// A person's associated URLs.
@@ -1450,12 +1450,15 @@ impl Part for Gender {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PhoneNumber {
-    /// The read-only canonicalized [ITU-T E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.1.2008.pdf)
+    /// The read-only canonicalized [ITU-T
+    /// E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.1.2008.pdf)
     /// form of the phone number.
     #[serde(rename="canonicalForm")]
     pub canonical_form: Option<String>,
-    /// Metadata about the phone number.
-    pub metadata: Option<FieldMetadata>,
+    /// The read-only type of the phone number translated and formatted in the
+    /// viewer's account locale or the `Accept-Language` HTTP header locale.
+    #[serde(rename="formattedType")]
+    pub formatted_type: Option<String>,
     /// The type of the phone number. The type can be custom or one of these
     /// predefined values:
     /// 
@@ -1475,10 +1478,8 @@ pub struct PhoneNumber {
     pub type_: Option<String>,
     /// The phone number.
     pub value: Option<String>,
-    /// The read-only type of the phone number translated and formatted in the
-    /// viewer's account locale or the `Accept-Language` HTTP header locale.
-    #[serde(rename="formattedType")]
-    pub formatted_type: Option<String>,
+    /// Metadata about the phone number.
+    pub metadata: Option<FieldMetadata>,
 }
 
 impl Part for PhoneNumber {}
@@ -1495,7 +1496,8 @@ pub struct Organization {
     /// viewer's account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// The domain name associated with the organization; for example, `google.com`.
+    /// The domain name associated with the organization; for example,
+    /// `google.com`.
     pub domain: Option<String>,
     /// The end date when the person left the organization.
     #[serde(rename="endDate")]
@@ -1617,6 +1619,10 @@ impl Part for ContactGroupMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PersonMetadata {
+    /// True if the person resource has been deleted. Populated only for
+    /// [`connections.list`](/people/api/rest/v1/people.connections/list) requests
+    /// that include a sync token.
+    pub deleted: Option<bool>,
     /// Any former resource names this person has had. Populated only for
     /// [`connections.list`](/people/api/rest/v1/people.connections/list) requests
     /// that include a sync token.
@@ -1626,21 +1632,17 @@ pub struct PersonMetadata {
     /// profile URL.
     #[serde(rename="previousResourceNames")]
     pub previous_resource_names: Option<Vec<String>>,
-    /// The sources of data for the person.
-    pub sources: Option<Vec<Source>>,
     /// Resource names of people linked to this resource.
     #[serde(rename="linkedPeopleResourceNames")]
     pub linked_people_resource_names: Option<Vec<String>>,
-    /// True if the person resource has been deleted. Populated only for
-    /// [`connections.list`](/people/api/rest/v1/people.connections/list) requests
-    /// that include a sync token.
-    pub deleted: Option<bool>,
     /// **DEPRECATED** (Please use
     /// `person.metadata.sources.profileMetadata.objectType` instead)
     /// 
     /// The type of the person object.
     #[serde(rename="objectType")]
     pub object_type: Option<String>,
+    /// The sources of data for the person.
+    pub sources: Option<Vec<Source>>,
 }
 
 impl Part for PersonMetadata {}
@@ -1671,12 +1673,12 @@ impl ResponseResult for ModifyContactGroupMembersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Relation {
-    /// The name of the other person this relation refers to.
-    pub person: Option<String>,
     /// The type of the relation translated and formatted in the viewer's account
     /// locale or the locale specified in the Accept-Language HTTP header.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
+    /// Metadata about the relation.
+    pub metadata: Option<FieldMetadata>,
     /// The person's relation to the other person. The type can be custom or one of
     /// these predefined values:
     /// 
@@ -1696,8 +1698,8 @@ pub struct Relation {
     /// * `partner`
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Metadata about the relation.
-    pub metadata: Option<FieldMetadata>,
+    /// The name of the other person this relation refers to.
+    pub person: Option<String>,
 }
 
 impl Part for Relation {}
@@ -1943,6 +1945,10 @@ impl<'a, C, A> ContactGroupMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Modify the members of a contact group owned by the authenticated user.
+    /// <br>
+    /// The only system contact groups that can have members added are
+    /// `contactGroups/myContacts` and `contactGroups/starred`. Other system
+    /// contact groups are deprecated and can only have contacts removed.
     /// 
     /// # Arguments
     ///
@@ -2259,10 +2265,7 @@ impl<'a, C, A> ContactGroupBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2282,7 +2285,7 @@ impl<'a, C, A> ContactGroupBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2365,7 +2368,7 @@ impl<'a, C, A> ContactGroupBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2504,10 +2507,7 @@ impl<'a, C, A> ContactGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2527,7 +2527,7 @@ impl<'a, C, A> ContactGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2619,7 +2619,7 @@ impl<'a, C, A> ContactGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2749,10 +2749,7 @@ impl<'a, C, A> ContactGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2784,7 +2781,7 @@ impl<'a, C, A> ContactGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2864,7 +2861,7 @@ impl<'a, C, A> ContactGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3006,7 +3003,7 @@ impl<'a, C, A> ContactGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3022,10 +3019,7 @@ impl<'a, C, A> ContactGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3057,7 +3051,7 @@ impl<'a, C, A> ContactGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3148,7 +3142,7 @@ impl<'a, C, A> ContactGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3288,7 +3282,7 @@ impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3304,10 +3298,7 @@ impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3327,7 +3318,7 @@ impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3412,7 +3403,7 @@ impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3461,6 +3452,10 @@ impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Modify the members of a contact group owned by the authenticated user.
+/// <br>
+/// The only system contact groups that can have members added are
+/// `contactGroups/myContacts` and `contactGroups/starred`. Other system
+/// contact groups are deprecated and can only have contacts removed.
 ///
 /// A builder for the *members.modify* method supported by a *contactGroup* resource.
 /// It is not used directly, but through a `ContactGroupMethods` instance.
@@ -3553,7 +3548,7 @@ impl<'a, C, A> ContactGroupMemberModifyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3569,10 +3564,7 @@ impl<'a, C, A> ContactGroupMemberModifyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3604,7 +3596,7 @@ impl<'a, C, A> ContactGroupMemberModifyCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3694,7 +3686,7 @@ impl<'a, C, A> ContactGroupMemberModifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3834,7 +3826,7 @@ impl<'a, C, A> ContactGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3850,10 +3842,7 @@ impl<'a, C, A> ContactGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3873,7 +3862,7 @@ impl<'a, C, A> ContactGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3958,7 +3947,7 @@ impl<'a, C, A> ContactGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4130,7 +4119,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4146,10 +4135,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4169,7 +4155,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4337,7 +4323,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4472,10 +4458,7 @@ impl<'a, C, A> PeopleCreateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4507,7 +4490,7 @@ impl<'a, C, A> PeopleCreateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4594,7 +4577,7 @@ impl<'a, C, A> PeopleCreateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4728,7 +4711,7 @@ impl<'a, C, A> PeopleDeleteContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4744,10 +4727,7 @@ impl<'a, C, A> PeopleDeleteContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4767,7 +4747,7 @@ impl<'a, C, A> PeopleDeleteContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4845,7 +4825,7 @@ impl<'a, C, A> PeopleDeleteContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4992,7 +4972,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5008,10 +4988,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5031,7 +5008,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5164,7 +5141,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5321,7 +5298,7 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5337,10 +5314,7 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5372,7 +5346,7 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5493,7 +5467,7 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5637,10 +5611,7 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5660,7 +5631,7 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5793,7 +5764,7 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

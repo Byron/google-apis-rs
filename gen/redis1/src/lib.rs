@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Redis* crate version *1.0.8+20180928*, where *20180928* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Redis* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Redis* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/memorystore/docs/redis/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudRedis.html) ... 
 //! 
 //! * projects
-//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations instances create*](struct.ProjectLocationInstanceCreateCall.html), [*locations instances delete*](struct.ProjectLocationInstanceDeleteCall.html), [*locations instances get*](struct.ProjectLocationInstanceGetCall.html), [*locations instances list*](struct.ProjectLocationInstanceListCall.html), [*locations instances patch*](struct.ProjectLocationInstancePatchCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
+//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations instances create*](struct.ProjectLocationInstanceCreateCall.html), [*locations instances delete*](struct.ProjectLocationInstanceDeleteCall.html), [*locations instances failover*](struct.ProjectLocationInstanceFailoverCall.html), [*locations instances get*](struct.ProjectLocationInstanceGetCall.html), [*locations instances list*](struct.ProjectLocationInstanceListCall.html), [*locations instances patch*](struct.ProjectLocationInstancePatchCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
 //! 
 //! 
 //! 
@@ -49,6 +49,7 @@
 //! ```ignore
 //! let r = hub.projects().locations_instances_create(...).doit()
 //! let r = hub.projects().locations_instances_delete(...).doit()
+//! let r = hub.projects().locations_instances_failover(...).doit()
 //! let r = hub.projects().locations_operations_get(...).doit()
 //! let r = hub.projects().locations_instances_patch(...).doit()
 //! ```
@@ -401,22 +402,24 @@ pub struct ListInstancesResponse {
     /// "status" field set to ERROR and "status_message" field set to "location not
     /// available for ListInstances".
     pub instances: Option<Vec<Instance>>,
+    /// Locations that could not be reached.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl ResponseResult for ListInstancesResponse {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -477,25 +480,24 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// The response message for Operations.ListOperations.
+/// Request for Failover.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// * [locations instances failover projects](struct.ProjectLocationInstanceFailoverCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
+pub struct FailoverInstanceRequest {
+    /// Optional. Available data protection modes that the user can choose. If it's
+    /// unspecified, data protection mode will be LIMITED_DATA_LOSS by default.
+    #[serde(rename="dataProtectionMode")]
+    pub data_protection_mode: Option<String>,
 }
 
-impl ResponseResult for ListOperationsResponse {}
+impl RequestValue for FailoverInstanceRequest {}
 
 
 /// A Google Cloud Redis instance.
@@ -506,8 +508,8 @@ impl ResponseResult for ListOperationsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations instances create projects](struct.ProjectLocationInstanceCreateCall.html) (request)
-/// * [locations instances get projects](struct.ProjectLocationInstanceGetCall.html) (response)
 /// * [locations instances patch projects](struct.ProjectLocationInstancePatchCall.html) (request)
+/// * [locations instances get projects](struct.ProjectLocationInstanceGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
@@ -580,16 +582,16 @@ pub struct Instance {
     pub memory_size_gb: Option<i32>,
     /// Output only. The current state of this instance.
     pub state: Option<String>,
-    /// Output only. Additional information about the current status of this
-    /// instance, if available.
-    #[serde(rename="statusMessage")]
-    pub status_message: Option<String>,
     /// Optional. The full name of the Google Compute Engine
     /// [network](/compute/docs/networks-and-firewalls#networks) to which the
     /// instance is connected. If left unspecified, the `default` network
     /// will be used.
     #[serde(rename="authorizedNetwork")]
     pub authorized_network: Option<String>,
+    /// Output only. Additional information about the current status of this
+    /// instance, if available.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
 }
 
 impl RequestValue for Instance {}
@@ -628,17 +630,17 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
-    /// Resource ID for the region. For example: "us-east1".
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
-    /// Cross-service attributes for the location. For example
-    /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
-    pub labels: Option<HashMap<String, String>>,
     /// The friendly name for this location, typically a nearby city name.
     /// For example, "Tokyo".
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// Cross-service attributes for the location. For example
+    /// 
+    ///     {"cloud.googleapis.com/region": "us-east1"}
+    pub labels: Option<HashMap<String, String>>,
+    /// Resource ID for the region. For example: "us-east1".
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Full resource name for the region. For example: "projects/example-project/locations/us-east1".
     pub name: Option<String>,
     /// Output only. The set of available zones in the location. The map is keyed by the lowercase ID of each zone, as defined by Compute Engine. These keys can be specified in `location_id` or `alternative_location_id` fields when creating a Redis instance.
@@ -658,6 +660,7 @@ impl ResponseResult for Location {}
 /// 
 /// * [locations instances create projects](struct.ProjectLocationInstanceCreateCall.html) (response)
 /// * [locations instances delete projects](struct.ProjectLocationInstanceDeleteCall.html) (response)
+/// * [locations instances failover projects](struct.ProjectLocationInstanceFailoverCall.html) (response)
 /// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
 /// * [locations instances patch projects](struct.ProjectLocationInstancePatchCall.html) (response)
 /// 
@@ -729,6 +732,27 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
+
+
 
 // ###################
 // MethodBuilders ###
@@ -758,7 +782,7 @@ impl ResponseResult for Empty {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudRedis::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_get(...)`, `locations_instances_create(...)`, `locations_instances_delete(...)`, `locations_instances_get(...)`, `locations_instances_list(...)`, `locations_instances_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
+/// // like `locations_get(...)`, `locations_instances_create(...)`, `locations_instances_delete(...)`, `locations_instances_failover(...)`, `locations_instances_get(...)`, `locations_instances_list(...)`, `locations_instances_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -842,6 +866,28 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a, C, A> {
         ProjectLocationInstanceGetCall {
             hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Failover the master role to current replica node against a specific
+    /// STANDARD tier redis instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. Redis instance resource name using the form:
+    ///                `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    ///            where `location_id` refers to a GCP region
+    pub fn locations_instances_failover(&self, request: FailoverInstanceRequest, name: &str) -> ProjectLocationInstanceFailoverCall<'a, C, A> {
+        ProjectLocationInstanceFailoverCall {
+            hub: self.hub,
+            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1131,7 +1177,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1147,10 +1193,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1170,7 +1213,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1250,7 +1293,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1258,12 +1301,12 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDeleteCall<'a, C, A>
@@ -1384,7 +1427,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1400,10 +1443,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1423,7 +1463,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1501,7 +1541,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1509,12 +1549,12 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C, A>
@@ -1638,7 +1678,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1654,10 +1694,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1677,7 +1714,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1755,7 +1792,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1763,12 +1800,12 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationDeleteCall<'a, C, A>
@@ -1889,7 +1926,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1905,10 +1942,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1928,7 +1962,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2008,7 +2042,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2016,12 +2050,12 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceGetCall<'a, C, A>
@@ -2045,6 +2079,288 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Failover the master role to current replica node against a specific
+/// STANDARD tier redis instance.
+///
+/// A builder for the *locations.instances.failover* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_redis1 as redis1;
+/// use redis1::FailoverInstanceRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use redis1::CloudRedis;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudRedis::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = FailoverInstanceRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_instances_failover(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationInstanceFailoverCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudRedis<C, A>,
+    _request: FailoverInstanceRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationInstanceFailoverCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationInstanceFailoverCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "redis.projects.locations.instances.failover",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:failover";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: FailoverInstanceRequest) -> ProjectLocationInstanceFailoverCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Redis instance resource name using the form:
+    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// where `location_id` refers to a GCP region
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceFailoverCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceFailoverCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceFailoverCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceFailoverCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2094,7 +2410,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_patch(req, "name")
-///              .update_mask("erat")
+///              .update_mask("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -2158,7 +2474,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2174,10 +2490,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2209,7 +2522,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2321,7 +2634,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2329,12 +2642,12 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstancePatchCall<'a, C, A>
@@ -2397,9 +2710,9 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("sea")
-///              .page_size(-90)
-///              .filter("dolores")
+///              .page_token("nonumy")
+///              .page_size(-19)
+///              .filter("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -2470,7 +2783,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2486,10 +2799,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2509,7 +2819,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2608,7 +2918,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2616,12 +2926,12 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
@@ -2701,7 +3011,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_create(req, "parent")
-///              .instance_id("sadipscing")
+///              .instance_id("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -2765,7 +3075,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2781,10 +3091,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2816,7 +3123,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2922,7 +3229,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2930,12 +3237,12 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceCreateCall<'a, C, A>
@@ -3058,7 +3365,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3074,10 +3381,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3097,7 +3401,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3175,7 +3479,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3183,12 +3487,12 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, C, A>
@@ -3260,9 +3564,9 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("no")
+///              .page_token("justo")
 ///              .page_size(-21)
-///              .filter("justo")
+///              .filter("et")
 ///              .doit();
 /// # }
 /// ```
@@ -3333,7 +3637,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3349,10 +3653,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3372,7 +3673,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3471,7 +3772,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3479,12 +3780,12 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a, C, A>
@@ -3554,8 +3855,8 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_list("parent")
-///              .page_token("et")
-///              .page_size(-41)
+///              .page_token("diam")
+///              .page_size(-55)
 ///              .doit();
 /// # }
 /// ```
@@ -3622,7 +3923,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3638,10 +3939,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3661,7 +3959,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3762,7 +4060,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3770,12 +4068,12 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceListCall<'a, C, A>
@@ -3905,7 +4203,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3921,10 +4219,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3944,7 +4239,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4022,7 +4317,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4030,12 +4325,12 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a, C, A>

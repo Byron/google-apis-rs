@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *groupssettings* crate version *1.0.8+20180615*, where *20180615* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *groupssettings* crate version *1.0.8+20190315*, where *20190315* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *groupssettings* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).
@@ -385,12 +385,21 @@ impl<'a, C, A> Groupssettings<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
+    /// Permission to ban users. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanBanUsers")]
+    pub who_can_ban_users: Option<String>,
+    /// Permission for content assistants. Possible values are: Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanAssistContent")]
+    pub who_can_assist_content: Option<String>,
     /// Are external members allowed to join the group.
     #[serde(rename="allowExternalMembers")]
     pub allow_external_members: Option<String>,
     /// Permission to enter free form tags for topics in a forum. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
     #[serde(rename="whoCanEnterFreeFormTags")]
     pub who_can_enter_free_form_tags: Option<String>,
+    /// Permission to approve pending messages in the moderation queue. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanApproveMessages")]
+    pub who_can_approve_messages: Option<String>,
     /// Permission to mark a topic as a duplicate of another topic. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
     #[serde(rename="whoCanMarkDuplicate")]
     pub who_can_mark_duplicate: Option<String>,
@@ -403,13 +412,19 @@ pub struct Groups {
     /// Permission to mark a topic as not needing a response. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
     #[serde(rename="whoCanMarkNoResponseNeeded")]
     pub who_can_mark_no_response_needed: Option<String>,
+    /// Permission to unmark any post from a favorite reply. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanUnmarkFavoriteReplyOnAnyTopic")]
+    pub who_can_unmark_favorite_reply_on_any_topic: Option<String>,
+    /// Permission for content moderation. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanModerateContent")]
+    pub who_can_moderate_content: Option<String>,
     /// Primary language for the group.
     #[serde(rename="primaryLanguage")]
     pub primary_language: Option<String>,
     /// Permission to mark a post for a topic they started as a favorite reply. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
     #[serde(rename="whoCanMarkFavoriteReplyOnOwnTopic")]
     pub who_can_mark_favorite_reply_on_own_topic: Option<String>,
-    /// Permissions to view membership. Possible values are: ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
+    /// Permissions to view membership. Possible values are: ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW ALL_OWNERS_CAN_VIEW
     #[serde(rename="whoCanViewMembership")]
     pub who_can_view_membership: Option<String>,
     /// If favorite replies should be displayed above other replies.
@@ -421,6 +436,9 @@ pub struct Groups {
     /// Whether to include custom footer.
     #[serde(rename="includeCustomFooter")]
     pub include_custom_footer: Option<String>,
+    /// Permission to move topics out of the group or forum. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanMoveTopicsOut")]
+    pub who_can_move_topics_out: Option<String>,
     /// Default message deny notification message
     #[serde(rename="defaultMessageDenyNotificationText")]
     pub default_message_deny_notification_text: Option<String>,
@@ -430,20 +448,32 @@ pub struct Groups {
     /// If the group is archive only
     #[serde(rename="archiveOnly")]
     pub archive_only: Option<String>,
+    /// Permission to delete topics. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanDeleteTopics")]
+    pub who_can_delete_topics: Option<String>,
+    /// Permission to delete replies to topics. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanDeleteAnyPost")]
+    pub who_can_delete_any_post: Option<String>,
     /// If the contents of the group are archived.
     #[serde(rename="isArchived")]
     pub is_archived: Option<String>,
     /// Can members post using the group email address.
     #[serde(rename="membersCanPostAsTheGroup")]
     pub members_can_post_as_the_group: Option<String>,
-    /// If posting from web is allowed.
-    #[serde(rename="allowWebPosting")]
-    pub allow_web_posting: Option<String>,
+    /// Permission to make topics appear at the top of the topic list. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanMakeTopicsSticky")]
+    pub who_can_make_topics_sticky: Option<String>,
+    /// If any of the settings that will be merged have custom roles which is anything other than owners, managers, or group scopes.
+    #[serde(rename="customRolesEnabledForSettingsToBeMerged")]
+    pub custom_roles_enabled_for_settings_to_be_merged: Option<String>,
     /// Email id of the group
     pub email: Option<String>,
-    /// Permission to assign topics in a forum to another user. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
-    #[serde(rename="whoCanAssignTopics")]
-    pub who_can_assign_topics: Option<String>,
+    /// Permission for who can discover the group. Possible values are: ALL_MEMBERS_CAN_DISCOVER ALL_IN_DOMAIN_CAN_DISCOVER ANYONE_CAN_DISCOVER
+    #[serde(rename="whoCanDiscoverGroup")]
+    pub who_can_discover_group: Option<String>,
+    /// Permission to modify members (change member roles). Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanModifyMembers")]
+    pub who_can_modify_members: Option<String>,
     /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE
     #[serde(rename="messageModerationLevel")]
     pub message_moderation_level: Option<String>,
@@ -461,6 +491,9 @@ pub struct Groups {
     /// Should the member be notified if his message is denied by owner.
     #[serde(rename="sendMessageDenyNotification")]
     pub send_message_deny_notification: Option<String>,
+    /// If a primary Collab Inbox feature is enabled.
+    #[serde(rename="enableCollaborativeInbox")]
+    pub enable_collaborative_inbox: Option<String>,
     /// Permission to contact owner of the group via web UI. Possible values are: ANYONE_CAN_CONTACT ALL_IN_DOMAIN_CAN_CONTACT ALL_MEMBERS_CAN_CONTACT ALL_MANAGERS_CAN_CONTACT
     #[serde(rename="whoCanContactOwner")]
     pub who_can_contact_owner: Option<String>,
@@ -476,6 +509,9 @@ pub struct Groups {
     /// Permissions to post messages to the group. Possible values are: NONE_CAN_POST ALL_MANAGERS_CAN_POST ALL_MEMBERS_CAN_POST ALL_OWNERS_CAN_POST ALL_IN_DOMAIN_CAN_POST ANYONE_CAN_POST
     #[serde(rename="whoCanPostMessage")]
     pub who_can_post_message: Option<String>,
+    /// Permission to move topics into the group or forum. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanMoveTopicsIn")]
+    pub who_can_move_topics_in: Option<String>,
     /// Permission to take topics in a forum. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
     #[serde(rename="whoCanTakeTopics")]
     pub who_can_take_topics: Option<String>,
@@ -489,9 +525,18 @@ pub struct Groups {
     /// Permissions to invite members. Possible values are: ALL_MEMBERS_CAN_INVITE ALL_MANAGERS_CAN_INVITE ALL_OWNERS_CAN_INVITE NONE_CAN_INVITE
     #[serde(rename="whoCanInvite")]
     pub who_can_invite: Option<String>,
+    /// Permission to approve members. Possible values are: ALL_OWNERS_CAN_APPROVE ALL_MANAGERS_CAN_APPROVE ALL_MEMBERS_CAN_APPROVE NONE_CAN_APPROVE
+    #[serde(rename="whoCanApproveMembers")]
+    pub who_can_approve_members: Option<String>,
     /// Moderation level for messages detected as spam. Possible values are: ALLOW MODERATE SILENTLY_MODERATE REJECT
     #[serde(rename="spamModerationLevel")]
     pub spam_moderation_level: Option<String>,
+    /// If posting from web is allowed.
+    #[serde(rename="allowWebPosting")]
+    pub allow_web_posting: Option<String>,
+    /// Permission for membership moderation. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanModerateMembers")]
+    pub who_can_moderate_members: Option<String>,
     /// Permission to add references to a topic. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
     #[serde(rename="whoCanAddReferences")]
     pub who_can_add_references: Option<String>,
@@ -501,15 +546,24 @@ pub struct Groups {
     /// Is the group listed in groups directory
     #[serde(rename="showInGroupDirectory")]
     pub show_in_group_directory: Option<String>,
-    /// Permission to unmark any post from a favorite reply. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
-    #[serde(rename="whoCanUnmarkFavoriteReplyOnAnyTopic")]
-    pub who_can_unmark_favorite_reply_on_any_topic: Option<String>,
+    /// Permission to post announcements, a special topic type. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanPostAnnouncements")]
+    pub who_can_post_announcements: Option<String>,
+    /// Permission to lock topics. Possible values are: NONE OWNERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanLockTopics")]
+    pub who_can_lock_topics: Option<String>,
+    /// Permission to assign topics in a forum to another user. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanAssignTopics")]
+    pub who_can_assign_topics: Option<String>,
     /// Custom footer text.
     #[serde(rename="customFooterText")]
     pub custom_footer_text: Option<String>,
     /// Is google allowed to contact admins.
     #[serde(rename="allowGoogleCommunication")]
     pub allow_google_communication: Option<String>,
+    /// Permission to hide posts by reporting them as abuse. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanHideAbuse")]
+    pub who_can_hide_abuse: Option<String>,
 }
 
 impl RequestValue for Groups {}
@@ -729,10 +783,7 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -764,7 +815,7 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -854,7 +905,7 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1003,10 +1054,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1038,7 +1086,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1128,7 +1176,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1270,10 +1318,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1293,7 +1338,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1371,7 +1416,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

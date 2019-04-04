@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *1.0.8+20181005*, where *20181005* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *appengine* crate version *1.0.8+20190321*, where *20190321* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *appengine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -475,8 +475,8 @@ pub struct Instance {
     pub vm_ip: Option<String>,
     /// Average queries per second (QPS) over the last minute.@OutputOnly
     pub qps: Option<f32>,
-    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
-    pub id: Option<String>,
+    /// Availability of the instance.@OutputOnly
+    pub availability: Option<String>,
     /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
     pub name: Option<String>,
     /// Number of errors since this instance was started.@OutputOnly
@@ -484,8 +484,8 @@ pub struct Instance {
     /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmStatus")]
     pub vm_status: Option<String>,
-    /// Availability of the instance.@OutputOnly
-    pub availability: Option<String>,
+    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
+    pub id: Option<String>,
     /// Average latency (ms) over the last minute.@OutputOnly
     #[serde(rename="averageLatency")]
     pub average_latency: Option<i32>,
@@ -594,36 +594,6 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StaticFilesHandler {
-    /// MIME type used to serve all files served by this handler.Defaults to file-specific MIME types, which are derived from each file's filename extension.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// Time a static file served by this handler should be cached by web proxies and browsers.
-    pub expiration: Option<String>,
-    /// Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
-    pub path: Option<String>,
-    /// Regular expression that matches the file paths for all files that should be referenced by this handler.
-    #[serde(rename="uploadPathRegex")]
-    pub upload_path_regex: Option<String>,
-    /// Whether this handler should match the request if the file referenced by the handler does not exist.
-    #[serde(rename="requireMatchingFile")]
-    pub require_matching_file: Option<bool>,
-    /// HTTP headers to use for all responses from these URLs.
-    #[serde(rename="httpHeaders")]
-    pub http_headers: Option<HashMap<String, String>>,
-    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
-    #[serde(rename="applicationReadable")]
-    pub application_readable: Option<bool>,
-}
-
-impl Part for StaticFilesHandler {}
-
-
 /// Target scaling by network usage. Only applicable in the App Engine flexible environment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -653,6 +623,9 @@ impl Part for NetworkUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FeatureSettings {
+    /// If true, use Container-Optimized OS (https://cloud.google.com/container-optimized-os/) base image for VMs, rather than a base Debian image.
+    #[serde(rename="useContainerOptimizedOs")]
+    pub use_container_optimized_os: Option<bool>,
     /// Boolean value indicating if split health checks should be used instead of the legacy health checks. At an app.yaml level, this means defaulting to 'readiness_check' and 'liveness_check' values instead of 'health_check' ones. Once the legacy 'health_check' behavior is deprecated, and this value is always true, this setting can be removed.
     #[serde(rename="splitHealthChecks")]
     pub split_health_checks: Option<bool>,
@@ -708,11 +681,11 @@ impl ResponseResult for BatchUpdateIngressRulesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServicesResponse {
-    /// The services belonging to the requested application.
-    pub services: Option<Vec<Service>>,
     /// Continuation token for fetching the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The services belonging to the requested application.
+    pub services: Option<Vec<Service>>,
 }
 
 impl ResponseResult for ListServicesResponse {}
@@ -762,25 +735,19 @@ pub struct IdentityAwareProxy {
 impl Part for IdentityAwareProxy {}
 
 
-/// Response message for AuthorizedDomains.ListAuthorizedDomains.
+/// Request message for 'Applications.RepairApplication'.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [authorized domains list apps](struct.AppAuthorizedDomainListCall.html) (response)
+/// * [repair apps](struct.AppRepairCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListAuthorizedDomainsResponse {
-    /// Continuation token for fetching the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The authorized domains belonging to the user.
-    pub domains: Option<Vec<AuthorizedDomain>>,
-}
+pub struct RepairApplicationRequest { _never_set: Option<bool> }
 
-impl ResponseResult for ListAuthorizedDomainsResponse {}
+impl RequestValue for RepairApplicationRequest {}
 
 
 /// Automatic scaling is based on request rate, response latencies, and other application metrics.
@@ -914,17 +881,21 @@ pub struct ZipInfo {
 impl Part for ZipInfo {}
 
 
-/// Docker image that is used to create a container and start a VM instance for the version that you deploy. Only applicable for instances running in the App Engine flexible environment.
+/// Rules to match an HTTP request and dispatch that request to a service.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ContainerInfo {
-    /// URI to the hosted container image in Google Container Registry. The URI must be fully qualified and include a tag or digest. Examples: "gcr.io/my-project/image:tag" or "gcr.io/my-project/image@digest"
-    pub image: Option<String>,
+pub struct UrlDispatchRule {
+    /// Pathname within the host. Must start with a "/". A single "*" can be included at the end of the path.The sum of the lengths of the domain and path may not exceed 100 characters.
+    pub path: Option<String>,
+    /// Domain name to match against. The wildcard "*" is supported if specified before a period: "*.".Defaults to matching all domains: "*".
+    pub domain: Option<String>,
+    /// Resource ID of a service in this application that should serve the matched request. The service must already exist. Example: default.
+    pub service: Option<String>,
 }
 
-impl Part for ContainerInfo {}
+impl Part for UrlDispatchRule {}
 
 
 /// Third-party Python runtime library that is required by the application.
@@ -965,117 +936,19 @@ pub struct DiskUtilization {
 impl Part for DiskUtilization {}
 
 
-/// A Version resource is a specific set of source code and configuration files that are deployed into a service.
+/// A domain that a user has been authorized to administer. To authorize use of a domain, verify ownership via Webmaster Central (https://www.google.com/webmasters/verification/home).
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [services versions get apps](struct.AppServiceVersionGetCall.html) (response)
-/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (request)
-/// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Version {
-    /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
-    #[serde(rename="endpointsApiService")]
-    pub endpoints_api_service: Option<EndpointsApiService>,
-    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StaticFilesHandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="defaultExpiration")]
-    pub default_expiration: Option<String>,
-    /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
-    #[serde(rename="basicScaling")]
-    pub basic_scaling: Option<BasicScaling>,
-    /// Whether to deploy this version in a container on a virtual machine.
-    pub vm: Option<bool>,
-    /// The Google Compute Engine zones that are supported by this version in the App Engine flexible environment.
-    pub zones: Option<Vec<String>>,
-    /// Instance class that is used to run this version. Valid values are:
-    /// AutomaticScaling: F1, F2, F4, F4_1G
-    /// ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.
-    #[serde(rename="instanceClass")]
-    pub instance_class: Option<String>,
-    /// Custom static error pages. Limited to 10KB per page.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="errorHandlers")]
-    pub error_handlers: Option<Vec<ErrorHandler>>,
-    /// Serving URL for this version. Example: "https://myversion-dot-myservice-dot-myapp.appspot.com"@OutputOnly
-    #[serde(rename="versionUrl")]
-    pub version_url: Option<String>,
-    /// Configures readiness health checking for instances. Unhealthy instances are not put into the backend traffic rotation.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="readinessCheck")]
-    pub readiness_check: Option<ReadinessCheck>,
-    /// Serving configuration for Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/).Only returned in GET requests if view=FULL is set.
-    #[serde(rename="apiConfig")]
-    pub api_config: Option<ApiConfigHandler>,
-    /// Extra network settings. Only applicable in the App Engine flexible environment.
-    pub network: Option<Network>,
-    /// Configures health checking for instances. Unhealthy instances are stopped and replaced with new instances. Only applicable in the App Engine flexible environment.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="healthCheck")]
-    pub health_check: Option<HealthCheck>,
-    /// Relative name of the version within the service. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
+pub struct AuthorizedDomain {
+    /// Fully qualified domain name of the domain authorized for use. Example: example.com.
     pub id: Option<String>,
-    /// Configuration for third-party Python runtime libraries that are required by the application.Only returned in GET requests if view=FULL is set.
-    pub libraries: Option<Vec<Library>>,
-    /// The entrypoint for the application.
-    pub entrypoint: Option<Entrypoint>,
-    /// App Engine execution environment for this version.Defaults to standard.
-    pub env: Option<String>,
-    /// Total size in bytes of all the files that are included in this version and currently hosted on the App Engine disk.@OutputOnly
-    #[serde(rename="diskUsageBytes")]
-    pub disk_usage_bytes: Option<String>,
-    /// Automatic scaling is based on request rate, response latencies, and other application metrics.
-    #[serde(rename="automaticScaling")]
-    pub automatic_scaling: Option<AutomaticScaling>,
-    /// Environment variables available to the application.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="envVariables")]
-    pub env_variables: Option<HashMap<String, String>>,
-    /// Machine resources for this version. Only applicable in the App Engine flexible environment.
-    pub resources: Option<Resources>,
-    /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
-    #[serde(rename="manualScaling")]
-    pub manual_scaling: Option<ManualScaling>,
-    /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
-    #[serde(rename="inboundServices")]
-    pub inbound_services: Option<Vec<String>>,
-    /// The channel of the runtime to use. Only available for some runtimes. Defaults to the default channel.
-    #[serde(rename="runtimeChannel")]
-    pub runtime_channel: Option<String>,
-    /// Metadata settings that are supplied to this version to enable beta runtime features.
-    #[serde(rename="betaSettings")]
-    pub beta_settings: Option<HashMap<String, String>>,
-    /// Email address of the user who created this version.@OutputOnly
-    #[serde(rename="createdBy")]
-    pub created_by: Option<String>,
-    /// Code and application artifacts that make up this version.Only returned in GET requests if view=FULL is set.
-    pub deployment: Option<Deployment>,
-    /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="nobuildFilesRegex")]
-    pub nobuild_files_regex: Option<String>,
-    /// Time that this version was created.@OutputOnly
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Whether multiple requests can be dispatched to this version at once.
-    pub threadsafe: Option<bool>,
-    /// The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/<language>/config/appref
-    #[serde(rename="runtimeApiVersion")]
-    pub runtime_api_version: Option<String>,
-    /// Configures liveness health checking for instances. Unhealthy instances are stopped and replaced with new instancesOnly returned in GET requests if view=FULL is set.
-    #[serde(rename="livenessCheck")]
-    pub liveness_check: Option<LivenessCheck>,
-    /// Full path to the Version resource in the API. Example: apps/myapp/services/default/versions/v1.@OutputOnly
+    /// Full path to the AuthorizedDomain resource in the API. Example: apps/myapp/authorizedDomains/example.com.@OutputOnly
     pub name: Option<String>,
-    /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
-    pub handlers: Option<Vec<UrlMap>>,
-    /// Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.
-    #[serde(rename="servingStatus")]
-    pub serving_status: Option<String>,
-    /// Desired runtime. Example: python27.
-    pub runtime: Option<String>,
 }
 
-impl RequestValue for Version {}
-impl ResponseResult for Version {}
+impl Part for AuthorizedDomain {}
 
 
 /// This resource represents a long-running operation that is the result of a network API call.
@@ -1140,27 +1013,23 @@ pub struct StandardSchedulerSettings {
 impl Part for StandardSchedulerSettings {}
 
 
-/// Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/) configuration for API handlers.
+/// Request message for Firewall.BatchUpdateIngressRules.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [firewall ingress rules batch update apps](struct.AppFirewallIngressRuleBatchUpdateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApiConfigHandler {
-    /// URL to serve the endpoint at.
-    pub url: Option<String>,
-    /// Security (HTTPS) enforcement for this URL.
-    #[serde(rename="securityLevel")]
-    pub security_level: Option<String>,
-    /// Level of login required to access this resource. Defaults to optional.
-    pub login: Option<String>,
-    /// Action to take when users access resources that require authentication. Defaults to redirect.
-    #[serde(rename="authFailAction")]
-    pub auth_fail_action: Option<String>,
-    /// Path to the script from the application root directory.
-    pub script: Option<String>,
+pub struct BatchUpdateIngressRulesRequest {
+    /// A list of FirewallRules to replace the existing set.
+    #[serde(rename="ingressRules")]
+    pub ingress_rules: Option<Vec<FirewallRule>>,
 }
 
-impl Part for ApiConfigHandler {}
+impl RequestValue for BatchUpdateIngressRulesRequest {}
 
 
 /// Response message for Instances.ListInstances.
@@ -1196,6 +1065,9 @@ pub struct Network {
     /// List of ports, or port pairs, to forward from the virtual machine to the application container. Only applicable in the App Engine flexible environment.
     #[serde(rename="forwardedPorts")]
     pub forwarded_ports: Option<Vec<String>>,
+    /// Enable session affinity. Only applicable in the App Engine flexible environment.
+    #[serde(rename="sessionAffinity")]
+    pub session_affinity: Option<bool>,
     /// Google Compute Engine network where the virtual machines are created. Specify the short name, not the resource path.Defaults to default.
     pub name: Option<String>,
     /// Google Cloud Platform sub-network where the virtual machines are created. Specify the short name, not the resource path.If a subnetwork name is specified, a network name will also be required unless it is for the default network.
@@ -1209,19 +1081,25 @@ pub struct Network {
 impl Part for Network {}
 
 
-/// Request message for 'Applications.RepairApplication'.
+/// Response message for AuthorizedDomains.ListAuthorizedDomains.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [repair apps](struct.AppRepairCall.html) (request)
+/// * [authorized domains list apps](struct.AppAuthorizedDomainListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RepairApplicationRequest { _never_set: Option<bool> }
+pub struct ListAuthorizedDomainsResponse {
+    /// The authorized domains belonging to the user.
+    pub domains: Option<Vec<AuthorizedDomain>>,
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+}
 
-impl RequestValue for RepairApplicationRequest {}
+impl ResponseResult for ListAuthorizedDomainsResponse {}
 
 
 /// An Application resource contains the top-level configuration of an App Engine application.
@@ -1242,6 +1120,9 @@ pub struct Application {
     pub default_hostname: Option<String>,
     /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
     pub name: Option<String>,
+    /// The Google Container Registry domain used for storing managed build docker images for this application.
+    #[serde(rename="gcrDomain")]
+    pub gcr_domain: Option<String>,
     /// Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
     #[serde(rename="codeBucket")]
     pub code_bucket: Option<String>,
@@ -1254,44 +1135,145 @@ pub struct Application {
     /// Cookie expiration policy for this application.
     #[serde(rename="defaultCookieExpiration")]
     pub default_cookie_expiration: Option<String>,
-    /// Serving status of this application.
-    #[serde(rename="servingStatus")]
-    pub serving_status: Option<String>,
+    /// no description provided
+    pub iap: Option<IdentityAwareProxy>,
     /// Location from which this application runs. Application instances run out of the data centers in the specified location, which is also where all of the application's end user content is stored.Defaults to us-central.View the list of supported locations (https://cloud.google.com/appengine/docs/locations).
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// The feature specific settings to be used in the application.
     #[serde(rename="featureSettings")]
     pub feature_settings: Option<FeatureSettings>,
-    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
-    pub id: Option<String>,
-    /// no description provided
-    pub iap: Option<IdentityAwareProxy>,
+    /// Serving status of this application.
+    #[serde(rename="servingStatus")]
+    pub serving_status: Option<String>,
     /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
     #[serde(rename="authDomain")]
     pub auth_domain: Option<String>,
-    /// The Google Container Registry domain used for storing managed build docker images for this application.
-    #[serde(rename="gcrDomain")]
-    pub gcr_domain: Option<String>,
+    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
+    pub id: Option<String>,
 }
 
 impl RequestValue for Application {}
 impl ResponseResult for Application {}
 
 
-/// A domain that a user has been authorized to administer. To authorize use of a domain, verify ownership via Webmaster Central (https://www.google.com/webmasters/verification/home).
+/// A Version resource is a specific set of source code and configuration files that are deployed into a service.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (request)
+/// * [services versions get apps](struct.AppServiceVersionGetCall.html) (response)
+/// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AuthorizedDomain {
-    /// Full path to the AuthorizedDomain resource in the API. Example: apps/myapp/authorizedDomains/example.com.@OutputOnly
-    pub name: Option<String>,
-    /// Fully qualified domain name of the domain authorized for use. Example: example.com.
+pub struct Version {
+    /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
+    #[serde(rename="endpointsApiService")]
+    pub endpoints_api_service: Option<EndpointsApiService>,
+    /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
+    #[serde(rename="basicScaling")]
+    pub basic_scaling: Option<BasicScaling>,
+    /// Metadata settings that are supplied to this version to enable beta runtime features.
+    #[serde(rename="betaSettings")]
+    pub beta_settings: Option<HashMap<String, String>>,
+    /// Whether to deploy this version in a container on a virtual machine.
+    pub vm: Option<bool>,
+    /// The Google Compute Engine zones that are supported by this version in the App Engine flexible environment. Deprecated.
+    pub zones: Option<Vec<String>>,
+    /// Instance class that is used to run this version. Valid values are:
+    /// AutomaticScaling: F1, F2, F4, F4_1G
+    /// ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.
+    #[serde(rename="instanceClass")]
+    pub instance_class: Option<String>,
+    /// Custom static error pages. Limited to 10KB per page.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="errorHandlers")]
+    pub error_handlers: Option<Vec<ErrorHandler>>,
+    /// Serving URL for this version. Example: "https://myversion-dot-myservice-dot-myapp.appspot.com"@OutputOnly
+    #[serde(rename="versionUrl")]
+    pub version_url: Option<String>,
+    /// Configures readiness health checking for instances. Unhealthy instances are not put into the backend traffic rotation.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="readinessCheck")]
+    pub readiness_check: Option<ReadinessCheck>,
+    /// The path or name of the app's main executable.
+    #[serde(rename="runtimeMainExecutablePath")]
+    pub runtime_main_executable_path: Option<String>,
+    /// Serving configuration for Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/).Only returned in GET requests if view=FULL is set.
+    #[serde(rename="apiConfig")]
+    pub api_config: Option<ApiConfigHandler>,
+    /// Extra network settings. Only applicable in the App Engine flexible environment.
+    pub network: Option<Network>,
+    /// Configures health checking for instances. Unhealthy instances are stopped and replaced with new instances. Only applicable in the App Engine flexible environment.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="healthCheck")]
+    pub health_check: Option<HealthCheck>,
+    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StaticFilesHandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="defaultExpiration")]
+    pub default_expiration: Option<String>,
+    /// Relative name of the version within the service. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
     pub id: Option<String>,
+    /// Configuration for third-party Python runtime libraries that are required by the application.Only returned in GET requests if view=FULL is set.
+    pub libraries: Option<Vec<Library>>,
+    /// The entrypoint for the application.
+    pub entrypoint: Option<Entrypoint>,
+    /// App Engine execution environment for this version.Defaults to standard.
+    pub env: Option<String>,
+    /// Total size in bytes of all the files that are included in this version and currently hosted on the App Engine disk.@OutputOnly
+    #[serde(rename="diskUsageBytes")]
+    pub disk_usage_bytes: Option<String>,
+    /// Automatic scaling is based on request rate, response latencies, and other application metrics.
+    #[serde(rename="automaticScaling")]
+    pub automatic_scaling: Option<AutomaticScaling>,
+    /// Environment variables available to the application.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="envVariables")]
+    pub env_variables: Option<HashMap<String, String>>,
+    /// Machine resources for this version. Only applicable in the App Engine flexible environment.
+    pub resources: Option<Resources>,
+    /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
+    #[serde(rename="manualScaling")]
+    pub manual_scaling: Option<ManualScaling>,
+    /// Enables VPC connectivity for standard apps.
+    #[serde(rename="vpcAccessConnector")]
+    pub vpc_access_connector: Option<VpcAccessConnector>,
+    /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
+    #[serde(rename="inboundServices")]
+    pub inbound_services: Option<Vec<String>>,
+    /// The channel of the runtime to use. Only available for some runtimes. Defaults to the default channel.
+    #[serde(rename="runtimeChannel")]
+    pub runtime_channel: Option<String>,
+    /// Email address of the user who created this version.@OutputOnly
+    #[serde(rename="createdBy")]
+    pub created_by: Option<String>,
+    /// Code and application artifacts that make up this version.Only returned in GET requests if view=FULL is set.
+    pub deployment: Option<Deployment>,
+    /// Configures liveness health checking for instances. Unhealthy instances are stopped and replaced with new instancesOnly returned in GET requests if view=FULL is set.
+    #[serde(rename="livenessCheck")]
+    pub liveness_check: Option<LivenessCheck>,
+    /// Time that this version was created.@OutputOnly
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Whether multiple requests can be dispatched to this version at once.
+    pub threadsafe: Option<bool>,
+    /// The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/<language>/config/appref
+    #[serde(rename="runtimeApiVersion")]
+    pub runtime_api_version: Option<String>,
+    /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="nobuildFilesRegex")]
+    pub nobuild_files_regex: Option<String>,
+    /// Full path to the Version resource in the API. Example: apps/myapp/services/default/versions/v1.@OutputOnly
+    pub name: Option<String>,
+    /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
+    pub handlers: Option<Vec<UrlMap>>,
+    /// Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.
+    #[serde(rename="servingStatus")]
+    pub serving_status: Option<String>,
+    /// Desired runtime. Example: python27.
+    pub runtime: Option<String>,
 }
 
-impl Part for AuthorizedDomain {}
+impl RequestValue for Version {}
+impl ResponseResult for Version {}
 
 
 /// The response message for Locations.ListLocations.
@@ -1326,16 +1308,16 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
-    /// The canonical id for this location. For example: "us-east1".
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
+    /// The friendly name for this location, typically a nearby city name. For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Cross-service attributes for the location. For example
     /// {"cloud.googleapis.com/region": "us-east1"}
     /// 
     pub labels: Option<HashMap<String, String>>,
-    /// The friendly name for this location, typically a nearby city name. For example, "Tokyo".
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
+    /// The canonical id for this location. For example: "us-east1".
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Resource name for the location, which may vary between implementations. For example: "projects/example-project/locations/us-east1"
     pub name: Option<String>,
     /// Service-specific metadata. For example the available capacity at the given location.
@@ -1400,6 +1382,19 @@ pub struct CloudBuildOptions {
 impl Part for CloudBuildOptions {}
 
 
+/// VPC access connector specification.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VpcAccessConnector {
+    /// Full Serverless VPC Access Connector name e.g. /projects/my-project/locations/us-central1/connectors/c1.
+    pub name: Option<String>,
+}
+
+impl Part for VpcAccessConnector {}
+
+
 /// Response message for Versions.ListVersions.
 /// 
 /// # Activities
@@ -1458,11 +1453,11 @@ pub struct DomainMapping {
     pub ssl_settings: Option<SslSettings>,
     /// Relative name of the domain serving the application. Example: example.com.
     pub id: Option<String>,
+    /// Full path to the DomainMapping resource in the API. Example: apps/myapp/domainMapping/example.com.@OutputOnly
+    pub name: Option<String>,
     /// The resource records required to configure this domain mapping. These records must be added to the domain's DNS configuration in order to serve the application via this domain mapping.@OutputOnly
     #[serde(rename="resourceRecords")]
     pub resource_records: Option<Vec<ResourceRecord>>,
-    /// Full path to the DomainMapping resource in the API. Example: apps/myapp/domainMapping/example.com.@OutputOnly
-    pub name: Option<String>,
 }
 
 impl RequestValue for DomainMapping {}
@@ -1480,11 +1475,11 @@ impl ResponseResult for DomainMapping {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAuthorizedCertificatesResponse {
+    /// The SSL certificates the user is authorized to administer.
+    pub certificates: Option<Vec<AuthorizedCertificate>>,
     /// Continuation token for fetching the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The SSL certificates the user is authorized to administer.
-    pub certificates: Option<Vec<AuthorizedCertificate>>,
 }
 
 impl ResponseResult for ListAuthorizedCertificatesResponse {}
@@ -1496,16 +1491,16 @@ impl ResponseResult for ListAuthorizedCertificatesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Resources {
-    /// User specified volumes.
-    pub volumes: Option<Vec<Volume>>,
+    /// Memory (GB) needed.
+    #[serde(rename="memoryGb")]
+    pub memory_gb: Option<f64>,
     /// Disk size (GB) needed.
     #[serde(rename="diskGb")]
     pub disk_gb: Option<f64>,
     /// Number of CPU cores needed.
     pub cpu: Option<f64>,
-    /// Memory (GB) needed.
-    #[serde(rename="memoryGb")]
-    pub memory_gb: Option<f64>,
+    /// User specified volumes.
+    pub volumes: Option<Vec<Volume>>,
 }
 
 impl Part for Resources {}
@@ -1517,11 +1512,11 @@ impl Part for Resources {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Deployment {
-    /// Manifest of the files stored in Google Cloud Storage that are included as part of this version. All files must be readable using the credentials supplied with this call.
-    pub files: Option<HashMap<String, FileInfo>>,
-    /// Options for any Google Cloud Build builds created as a part of this deployment.Note that this is orthogonal to the build parameter, where the deployment depends on an already existing cloud build. These options will only be used if a new build is created, such as when deploying to the App Engine flexible environment using files or zip.
+    /// Options for any Google Cloud Build builds created as a part of this deployment.These options will only be used if a new build is created, such as when deploying to the App Engine flexible environment using files or zip.
     #[serde(rename="cloudBuildOptions")]
     pub cloud_build_options: Option<CloudBuildOptions>,
+    /// Manifest of the files stored in Google Cloud Storage that are included as part of this version. All files must be readable using the credentials supplied with this call.
+    pub files: Option<HashMap<String, FileInfo>>,
     /// The Docker image for the container that runs the version. Only applicable for instances running in the App Engine flexible environment.
     pub container: Option<ContainerInfo>,
     /// The zip file for this deployment, if this is a zip deployment.
@@ -1545,21 +1540,17 @@ pub struct ScriptHandler {
 impl Part for ScriptHandler {}
 
 
-/// Rules to match an HTTP request and dispatch that request to a service.
+/// Docker image that is used to create a container and start a VM instance for the version that you deploy. Only applicable for instances running in the App Engine flexible environment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UrlDispatchRule {
-    /// Pathname within the host. Must start with a "/". A single "*" can be included at the end of the path.The sum of the lengths of the domain and path may not exceed 100 characters.
-    pub path: Option<String>,
-    /// Domain name to match against. The wildcard "*" is supported if specified before a period: "*.".Defaults to matching all domains: "*".
-    pub domain: Option<String>,
-    /// Resource ID of a service in this application that should serve the matched request. The service must already exist. Example: default.
-    pub service: Option<String>,
+pub struct ContainerInfo {
+    /// URI to the hosted container image in Google Container Registry. The URI must be fully qualified and include a tag or digest. Examples: "gcr.io/my-project/image:tag" or "gcr.io/my-project/image@digest"
+    pub image: Option<String>,
 }
 
-impl Part for UrlDispatchRule {}
+impl Part for ContainerInfo {}
 
 
 /// Readiness checking configuration for VM instances. Unhealthy instances are removed from traffic rotation.
@@ -1779,11 +1770,11 @@ impl Part for EndpointsApiService {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
     /// The standard List next-page token.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
 }
 
 impl ResponseResult for ListOperationsResponse {}
@@ -1846,23 +1837,57 @@ pub struct TrafficSplit {
 impl Part for TrafficSplit {}
 
 
-/// Request message for Firewall.BatchUpdateIngressRules.
+/// Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/) configuration for API handlers.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [firewall ingress rules batch update apps](struct.AppFirewallIngressRuleBatchUpdateCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchUpdateIngressRulesRequest {
-    /// A list of FirewallRules to replace the existing set.
-    #[serde(rename="ingressRules")]
-    pub ingress_rules: Option<Vec<FirewallRule>>,
+pub struct ApiConfigHandler {
+    /// URL to serve the endpoint at.
+    pub url: Option<String>,
+    /// Security (HTTPS) enforcement for this URL.
+    #[serde(rename="securityLevel")]
+    pub security_level: Option<String>,
+    /// Action to take when users access resources that require authentication. Defaults to redirect.
+    #[serde(rename="authFailAction")]
+    pub auth_fail_action: Option<String>,
+    /// Level of login required to access this resource. Defaults to optional.
+    pub login: Option<String>,
+    /// Path to the script from the application root directory.
+    pub script: Option<String>,
 }
 
-impl RequestValue for BatchUpdateIngressRulesRequest {}
+impl Part for ApiConfigHandler {}
+
+
+/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StaticFilesHandler {
+    /// MIME type used to serve all files served by this handler.Defaults to file-specific MIME types, which are derived from each file's filename extension.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// Time a static file served by this handler should be cached by web proxies and browsers.
+    pub expiration: Option<String>,
+    /// Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
+    pub path: Option<String>,
+    /// Regular expression that matches the file paths for all files that should be referenced by this handler.
+    #[serde(rename="uploadPathRegex")]
+    pub upload_path_regex: Option<String>,
+    /// Whether this handler should match the request if the file referenced by the handler does not exist.
+    #[serde(rename="requireMatchingFile")]
+    pub require_matching_file: Option<bool>,
+    /// HTTP headers to use for all responses from these URLs.
+    #[serde(rename="httpHeaders")]
+    pub http_headers: Option<HashMap<String, String>>,
+    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
+    #[serde(rename="applicationReadable")]
+    pub application_readable: Option<bool>,
+}
+
+impl Part for StaticFilesHandler {}
 
 
 /// Target scaling by request utilization. Only applicable in the App Engine flexible environment.
@@ -2835,10 +2860,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2858,7 +2880,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2970,7 +2992,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2978,12 +3000,12 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceListCall<'a, C, A>
@@ -3126,10 +3148,7 @@ impl<'a, C, A> AppAuthorizedDomainListCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3149,7 +3168,7 @@ impl<'a, C, A> AppAuthorizedDomainListCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3241,7 +3260,7 @@ impl<'a, C, A> AppAuthorizedDomainListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3249,12 +3268,12 @@ impl<'a, C, A> AppAuthorizedDomainListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedDomainListCall<'a, C, A>
@@ -3401,10 +3420,7 @@ impl<'a, C, A> AppAuthorizedCertificatePatchCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3436,7 +3452,7 @@ impl<'a, C, A> AppAuthorizedCertificatePatchCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3543,7 +3559,7 @@ impl<'a, C, A> AppAuthorizedCertificatePatchCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3551,12 +3567,12 @@ impl<'a, C, A> AppAuthorizedCertificatePatchCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedCertificatePatchCall<'a, C, A>
@@ -3699,10 +3715,7 @@ impl<'a, C, A> AppDomainMappingListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3722,7 +3735,7 @@ impl<'a, C, A> AppDomainMappingListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3814,7 +3827,7 @@ impl<'a, C, A> AppDomainMappingListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3822,12 +3835,12 @@ impl<'a, C, A> AppDomainMappingListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppDomainMappingListCall<'a, C, A>
@@ -3962,10 +3975,7 @@ impl<'a, C, A> AppFirewallIngressRuleDeleteCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3985,7 +3995,7 @@ impl<'a, C, A> AppFirewallIngressRuleDeleteCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4073,7 +4083,7 @@ impl<'a, C, A> AppFirewallIngressRuleDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4081,12 +4091,12 @@ impl<'a, C, A> AppFirewallIngressRuleDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleDeleteCall<'a, C, A>
@@ -4225,10 +4235,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4248,7 +4255,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4356,7 +4363,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4364,12 +4371,12 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceGetCall<'a, C, A>
@@ -4517,10 +4524,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4540,7 +4544,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4639,7 +4643,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4647,12 +4651,12 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppOperationListCall<'a, C, A>
@@ -4800,10 +4804,7 @@ impl<'a, C, A> AppFirewallIngressRuleListCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4823,7 +4824,7 @@ impl<'a, C, A> AppFirewallIngressRuleListCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4922,7 +4923,7 @@ impl<'a, C, A> AppFirewallIngressRuleListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4930,12 +4931,12 @@ impl<'a, C, A> AppFirewallIngressRuleListCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleListCall<'a, C, A>
@@ -5068,10 +5069,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5091,7 +5089,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5169,7 +5167,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5177,12 +5175,12 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a, C, A>
@@ -5317,10 +5315,7 @@ impl<'a, C, A> AppDomainMappingGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5340,7 +5335,7 @@ impl<'a, C, A> AppDomainMappingGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5428,7 +5423,7 @@ impl<'a, C, A> AppDomainMappingGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5436,12 +5431,12 @@ impl<'a, C, A> AppDomainMappingGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppDomainMappingGetCall<'a, C, A>
@@ -5583,10 +5578,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5606,7 +5598,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5711,7 +5703,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5719,12 +5711,12 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionGetCall<'a, C, A>
@@ -5871,10 +5863,7 @@ impl<'a, C, A> AppFirewallIngressRulePatchCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5906,7 +5895,7 @@ impl<'a, C, A> AppFirewallIngressRulePatchCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6013,7 +6002,7 @@ impl<'a, C, A> AppFirewallIngressRulePatchCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6021,12 +6010,12 @@ impl<'a, C, A> AppFirewallIngressRulePatchCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRulePatchCall<'a, C, A>
@@ -6169,10 +6158,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6192,7 +6178,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6284,7 +6270,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6292,12 +6278,12 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceListCall<'a, C, A>
@@ -6439,10 +6425,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6474,7 +6457,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6574,7 +6557,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6582,12 +6565,12 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionCreateCall<'a, C, A>
@@ -6734,10 +6717,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6769,7 +6749,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6866,7 +6846,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6874,12 +6854,12 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppPatchCall<'a, C, A>
@@ -7027,10 +7007,7 @@ impl<'a, C, A> AppAuthorizedCertificateListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7050,7 +7027,7 @@ impl<'a, C, A> AppAuthorizedCertificateListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7149,7 +7126,7 @@ impl<'a, C, A> AppAuthorizedCertificateListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7157,12 +7134,12 @@ impl<'a, C, A> AppAuthorizedCertificateListCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedCertificateListCall<'a, C, A>
@@ -7301,10 +7278,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7324,7 +7298,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7432,7 +7406,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7440,12 +7414,12 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceDeleteCall<'a, C, A>
@@ -7607,10 +7581,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7642,7 +7613,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7759,7 +7730,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7767,12 +7738,12 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionPatchCall<'a, C, A>
@@ -7922,10 +7893,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7945,7 +7913,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8054,7 +8022,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8062,12 +8030,12 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionListCall<'a, C, A>
@@ -8207,10 +8175,7 @@ impl<'a, C, A> AppFirewallIngressRuleCreateCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8242,7 +8207,7 @@ impl<'a, C, A> AppFirewallIngressRuleCreateCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8332,7 +8297,7 @@ impl<'a, C, A> AppFirewallIngressRuleCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8340,12 +8305,12 @@ impl<'a, C, A> AppFirewallIngressRuleCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleCreateCall<'a, C, A>
@@ -8485,10 +8450,7 @@ impl<'a, C, A> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8520,7 +8482,7 @@ impl<'a, C, A> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8610,7 +8572,7 @@ impl<'a, C, A> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8618,12 +8580,12 @@ impl<'a, C, A> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleBatchUpdateCall<'a, C, A>
@@ -8763,10 +8725,7 @@ impl<'a, C, A> AppRepairCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8798,7 +8757,7 @@ impl<'a, C, A> AppRepairCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8888,7 +8847,7 @@ impl<'a, C, A> AppRepairCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8896,12 +8855,12 @@ impl<'a, C, A> AppRepairCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppRepairCall<'a, C, A>
@@ -9038,10 +8997,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9061,7 +9017,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9159,7 +9115,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9167,12 +9123,12 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionDeleteCall<'a, C, A>
@@ -9312,10 +9268,7 @@ impl<'a, C, A> AppAuthorizedCertificateCreateCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9347,7 +9300,7 @@ impl<'a, C, A> AppAuthorizedCertificateCreateCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9437,7 +9390,7 @@ impl<'a, C, A> AppAuthorizedCertificateCreateCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9445,12 +9398,12 @@ impl<'a, C, A> AppAuthorizedCertificateCreateCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedCertificateCreateCall<'a, C, A>
@@ -9596,10 +9549,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9631,7 +9581,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9751,7 +9701,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9759,12 +9709,12 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceDebugCall<'a, C, A>
@@ -9899,10 +9849,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9922,7 +9869,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10010,7 +9957,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10018,12 +9965,12 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceGetCall<'a, C, A>
@@ -10158,10 +10105,7 @@ impl<'a, C, A> AppAuthorizedCertificateDeleteCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10181,7 +10125,7 @@ impl<'a, C, A> AppAuthorizedCertificateDeleteCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10269,7 +10213,7 @@ impl<'a, C, A> AppAuthorizedCertificateDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10277,12 +10221,12 @@ impl<'a, C, A> AppAuthorizedCertificateDeleteCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedCertificateDeleteCall<'a, C, A>
@@ -10427,10 +10371,7 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10462,7 +10403,7 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10559,7 +10500,7 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10567,12 +10508,12 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppDomainMappingCreateCall<'a, C, A>
@@ -10719,10 +10660,7 @@ impl<'a, C, A> AppDomainMappingPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10754,7 +10692,7 @@ impl<'a, C, A> AppDomainMappingPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10861,7 +10799,7 @@ impl<'a, C, A> AppDomainMappingPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10869,12 +10807,12 @@ impl<'a, C, A> AppDomainMappingPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppDomainMappingPatchCall<'a, C, A>
@@ -11009,10 +10947,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11032,7 +10967,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11120,7 +11055,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11128,12 +11063,12 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppOperationGetCall<'a, C, A>
@@ -11281,10 +11216,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11304,7 +11236,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11403,7 +11335,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11411,12 +11343,12 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppLocationListCall<'a, C, A>
@@ -11551,10 +11483,7 @@ impl<'a, C, A> AppDomainMappingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11574,7 +11503,7 @@ impl<'a, C, A> AppDomainMappingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11662,7 +11591,7 @@ impl<'a, C, A> AppDomainMappingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11670,12 +11599,12 @@ impl<'a, C, A> AppDomainMappingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppDomainMappingDeleteCall<'a, C, A>
@@ -11827,10 +11756,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11862,7 +11788,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11976,7 +11902,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11984,12 +11910,12 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServicePatchCall<'a, C, A>
@@ -12124,10 +12050,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12147,7 +12070,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12235,7 +12158,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12243,12 +12166,12 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceDeleteCall<'a, C, A>
@@ -12367,10 +12290,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12402,7 +12322,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12482,7 +12402,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12490,12 +12410,12 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppCreateCall<'a, C, A>
@@ -12635,10 +12555,7 @@ impl<'a, C, A> AppAuthorizedCertificateGetCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12658,7 +12575,7 @@ impl<'a, C, A> AppAuthorizedCertificateGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12753,7 +12670,7 @@ impl<'a, C, A> AppAuthorizedCertificateGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12761,12 +12678,12 @@ impl<'a, C, A> AppAuthorizedCertificateGetCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedCertificateGetCall<'a, C, A>
@@ -12901,10 +12818,7 @@ impl<'a, C, A> AppFirewallIngressRuleGetCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12924,7 +12838,7 @@ impl<'a, C, A> AppFirewallIngressRuleGetCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13012,7 +12926,7 @@ impl<'a, C, A> AppFirewallIngressRuleGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13020,12 +12934,12 @@ impl<'a, C, A> AppFirewallIngressRuleGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleGetCall<'a, C, A>
@@ -13160,10 +13074,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13183,7 +13094,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13271,7 +13182,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13279,12 +13190,12 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a, C, A>

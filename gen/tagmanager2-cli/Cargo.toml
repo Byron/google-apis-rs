@@ -4,7 +4,7 @@
 [package]
 
 name = "google-tagmanager2-cli"
-version = "1.0.8+20171108"
+version = "1.0.8+20190220"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tag Manager (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager2-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-tagmanager2]
 path = "../tagmanager2"
-version = "1.0.8+20171108"
+version = "1.0.8+20190220"

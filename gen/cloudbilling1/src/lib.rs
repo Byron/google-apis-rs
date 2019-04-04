@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloudbilling* crate version *1.0.8+20180919*, where *20180919* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloudbilling* crate version *1.0.8+20190314*, where *20190314* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloudbilling* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/billing/).
@@ -381,41 +381,6 @@ impl<'a, C, A> Cloudbilling<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Encapsulates a single SKU in Google Cloud Platform
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Sku {
-    /// The category hierarchy of this SKU, purely for organizational purpose.
-    pub category: Option<Category>,
-    /// The identifier for the SKU.
-    /// Example: "AA95-CD31-42FE"
-    #[serde(rename="skuId")]
-    pub sku_id: Option<String>,
-    /// A human readable description of the SKU, has a maximum length of 256
-    /// characters.
-    pub description: Option<String>,
-    /// List of service regions this SKU is offered at.
-    /// Example: "asia-east1"
-    /// Service regions can be found at https://cloud.google.com/about/locations/
-    #[serde(rename="serviceRegions")]
-    pub service_regions: Option<Vec<String>>,
-    /// A timeline of pricing info for this SKU in chronological order.
-    #[serde(rename="pricingInfo")]
-    pub pricing_info: Option<Vec<PricingInfo>>,
-    /// Identifies the service provider.
-    /// This is 'Google' for first party services in Google Cloud Platform.
-    #[serde(rename="serviceProviderName")]
-    pub service_provider_name: Option<String>,
-    /// The resource name for the SKU.
-    /// Example: "services/DA34-426B-A397/skus/AA95-CD31-42FE"
-    pub name: Option<String>,
-}
-
-impl Part for Sku {}
-
-
 /// Represents the category hierarchy of a SKU.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -440,6 +405,41 @@ pub struct Category {
 }
 
 impl Part for Category {}
+
+
+/// Encapsulates a single SKU in Google Cloud Platform
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Sku {
+    /// The category hierarchy of this SKU, purely for organizational purpose.
+    pub category: Option<Category>,
+    /// Identifies the service provider.
+    /// This is 'Google' for first party services in Google Cloud Platform.
+    #[serde(rename="serviceProviderName")]
+    pub service_provider_name: Option<String>,
+    /// A human readable description of the SKU, has a maximum length of 256
+    /// characters.
+    pub description: Option<String>,
+    /// List of service regions this SKU is offered at.
+    /// Example: "asia-east1"
+    /// Service regions can be found at https://cloud.google.com/about/locations/
+    #[serde(rename="serviceRegions")]
+    pub service_regions: Option<Vec<String>>,
+    /// The identifier for the SKU.
+    /// Example: "AA95-CD31-42FE"
+    #[serde(rename="skuId")]
+    pub sku_id: Option<String>,
+    /// A timeline of pricing info for this SKU in chronological order.
+    #[serde(rename="pricingInfo")]
+    pub pricing_info: Option<Vec<PricingInfo>>,
+    /// The resource name for the SKU.
+    /// Example: "services/DA34-426B-A397/skus/AA95-CD31-42FE"
+    pub name: Option<String>,
+}
+
+impl Part for Sku {}
 
 
 /// Request message for `ListProjectBillingInfoResponse`.
@@ -500,6 +500,10 @@ impl RequestValue for TestIamPermissionsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
+    /// The business under which the service is offered.
+    /// Ex. "businessEntities/GCP", "businessEntities/Maps"
+    #[serde(rename="businessEntityName")]
+    pub business_entity_name: Option<String>,
     /// The identifier for the service.
     /// Example: "DA34-426B-A397"
     #[serde(rename="serviceId")]
@@ -543,35 +547,27 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Represents an expression text. Example:
+/// Response message for `ListServices`.
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// # Activities
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list services](struct.ServiceListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
-    pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
-    /// reporting, e.g. a file name and a position in the file.
-    pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
+pub struct ListServicesResponse {
+    /// A token to retrieve the next page of results. To retrieve the next page,
+    /// call `ListServices` again with the `page_token` field set to this
+    /// value. This field is empty if there are no more results to retrieve.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of services.
+    pub services: Option<Vec<Service>>,
 }
 
-impl Part for Expr {}
+impl ResponseResult for ListServicesResponse {}
 
 
 /// Provides the configuration for logging a type of permissions.
@@ -654,6 +650,10 @@ impl ResponseResult for ListBillingAccountsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BillingAccount {
+    /// The display name given to the billing account, such as `My Billing
+    /// Account`. This name is displayed in the GCP Console.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// If this account is a
     /// [subaccount](https://cloud.google.com/billing/docs/concepts), then this
     /// will be the resource name of the master billing account that it is being
@@ -661,10 +661,6 @@ pub struct BillingAccount {
     /// Otherwise this will be empty.
     #[serde(rename="masterBillingAccount")]
     pub master_billing_account: Option<String>,
-    /// The display name given to the billing account, such as `My Billing
-    /// Account`. This name is displayed in the GCP Console.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
     /// The resource name of the billing account. The resource name has the form
     /// `billingAccounts/{billing_account_id}`. For example,
     /// `billingAccounts/012345-567890-ABCDEF` would be the resource name for
@@ -759,9 +755,9 @@ impl Part for AggregationInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -773,9 +769,9 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
     /// Deprecated.
     pub version: Option<i32>,
 }
@@ -789,20 +785,6 @@ impl ResponseResult for Policy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PricingInfo {
-    /// The timestamp from which this pricing was effective within the requested
-    /// time range. This is guaranteed to be greater than or equal to the
-    /// start_time field in the request and less than the end_time field in the
-    /// request. If a time range was not specified in the request this field will
-    /// be equivalent to a time within the last 12 hours, indicating the latest
-    /// pricing info.
-    #[serde(rename="effectiveTime")]
-    pub effective_time: Option<String>,
-    /// An optional human readable summary of the pricing information, has a
-    /// maximum length of 256 characters.
-    pub summary: Option<String>,
-    /// Expresses the pricing formula. See `PricingExpression` for an example.
-    #[serde(rename="pricingExpression")]
-    pub pricing_expression: Option<PricingExpression>,
     /// Conversion rate used for currency conversion, from USD to the currency
     /// specified in the request. This includes any surcharge collected for billing
     /// in non USD currency. If a currency is not specified in the request this
@@ -814,6 +796,20 @@ pub struct PricingInfo {
     /// doesn't require aggregation.
     #[serde(rename="aggregationInfo")]
     pub aggregation_info: Option<AggregationInfo>,
+    /// The timestamp from which this pricing was effective within the requested
+    /// time range. This is guaranteed to be greater than or equal to the
+    /// start_time field in the request and less than the end_time field in the
+    /// request. If a time range was not specified in the request this field will
+    /// be equivalent to a time within the last 12 hours, indicating the latest
+    /// pricing info.
+    #[serde(rename="effectiveTime")]
+    pub effective_time: Option<String>,
+    /// Expresses the pricing formula. See `PricingExpression` for an example.
+    #[serde(rename="pricingExpression")]
+    pub pricing_expression: Option<PricingExpression>,
+    /// An optional human readable summary of the pricing information, has a
+    /// maximum length of 256 characters.
+    pub summary: Option<String>,
 }
 
 impl Part for PricingInfo {}
@@ -919,7 +915,7 @@ pub struct Binding {
     ///    For example, `admins@example.com`.
     /// 
     /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
     /// 
@@ -1006,21 +1002,21 @@ pub struct ProjectBillingInfo {
     /// parse the `name` field to obtain a project ID. This field is read-only.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The resource name for the `ProjectBillingInfo`; has the form
-    /// `projects/{project_id}/billingInfo`. For example, the resource name for the
-    /// billing information for project `tokyo-rain-123` would be
-    /// `projects/tokyo-rain-123/billingInfo`. This field is read-only.
-    pub name: Option<String>,
+    /// The resource name of the billing account associated with the project, if
+    /// any. For example, `billingAccounts/012345-567890-ABCDEF`.
+    #[serde(rename="billingAccountName")]
+    pub billing_account_name: Option<String>,
     /// True if the project is associated with an open billing account, to which
     /// usage on the project is charged. False if the project is associated with a
     /// closed billing account, or no billing account at all, and therefore cannot
     /// use paid services. This field is read-only.
     #[serde(rename="billingEnabled")]
     pub billing_enabled: Option<bool>,
-    /// The resource name of the billing account associated with the project, if
-    /// any. For example, `billingAccounts/012345-567890-ABCDEF`.
-    #[serde(rename="billingAccountName")]
-    pub billing_account_name: Option<String>,
+    /// The resource name for the `ProjectBillingInfo`; has the form
+    /// `projects/{project_id}/billingInfo`. For example, the resource name for the
+    /// billing information for project `tokyo-rain-123` would be
+    /// `projects/tokyo-rain-123/billingInfo`. This field is read-only.
+    pub name: Option<String>,
 }
 
 impl RequestValue for ProjectBillingInfo {}
@@ -1095,27 +1091,35 @@ pub struct AuditConfig {
 impl Part for AuditConfig {}
 
 
-/// Response message for `ListServices`.
+/// Represents an expression text. Example:
 /// 
-/// # Activities
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list services](struct.ServiceListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListServicesResponse {
-    /// A list of services.
-    pub services: Option<Vec<Service>>,
-    /// A token to retrieve the next page of results. To retrieve the next page,
-    /// call `ListServices` again with the `page_token` field set to this
-    /// value. This field is empty if there are no more results to retrieve.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
+pub struct Expr {
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
 }
 
-impl ResponseResult for ListServicesResponse {}
+impl Part for Expr {}
 
 
 /// The price rate indicating starting usage and its corresponding price.
@@ -1671,7 +1675,7 @@ impl<'a, C, A> ServiceSkuListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1687,10 +1691,7 @@ impl<'a, C, A> ServiceSkuListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1710,7 +1711,7 @@ impl<'a, C, A> ServiceSkuListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1838,7 +1839,7 @@ impl<'a, C, A> ServiceSkuListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1846,12 +1847,12 @@ impl<'a, C, A> ServiceSkuListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ServiceSkuListCall<'a, C, A>
@@ -1971,10 +1972,7 @@ impl<'a, C, A> ServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1994,7 +1992,7 @@ impl<'a, C, A> ServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2078,7 +2076,7 @@ impl<'a, C, A> ServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2086,12 +2084,12 @@ impl<'a, C, A> ServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ServiceListCall<'a, C, A>
@@ -2217,10 +2215,7 @@ impl<'a, C, A> BillingAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2252,7 +2247,7 @@ impl<'a, C, A> BillingAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2332,7 +2327,7 @@ impl<'a, C, A> BillingAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2340,12 +2335,12 @@ impl<'a, C, A> BillingAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountCreateCall<'a, C, A>
@@ -2471,10 +2466,7 @@ impl<'a, C, A> BillingAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2494,7 +2486,7 @@ impl<'a, C, A> BillingAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2591,7 +2583,7 @@ impl<'a, C, A> BillingAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2599,12 +2591,12 @@ impl<'a, C, A> BillingAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountListCall<'a, C, A>
@@ -2727,7 +2719,7 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2743,10 +2735,7 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2766,7 +2755,7 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2845,7 +2834,7 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2853,12 +2842,12 @@ impl<'a, C, A> BillingAccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountGetCall<'a, C, A>
@@ -2990,7 +2979,7 @@ impl<'a, C, A> BillingAccountSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3006,10 +2995,7 @@ impl<'a, C, A> BillingAccountSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3041,7 +3027,7 @@ impl<'a, C, A> BillingAccountSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3132,7 +3118,7 @@ impl<'a, C, A> BillingAccountSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3140,12 +3126,12 @@ impl<'a, C, A> BillingAccountSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountSetIamPolicyCall<'a, C, A>
@@ -3283,7 +3269,7 @@ impl<'a, C, A> BillingAccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3299,10 +3285,7 @@ impl<'a, C, A> BillingAccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3334,7 +3317,7 @@ impl<'a, C, A> BillingAccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3432,7 +3415,7 @@ impl<'a, C, A> BillingAccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3440,12 +3423,12 @@ impl<'a, C, A> BillingAccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountPatchCall<'a, C, A>
@@ -3579,7 +3562,7 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3595,10 +3578,7 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3618,7 +3598,7 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3714,7 +3694,7 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3722,12 +3702,12 @@ impl<'a, C, A> BillingAccountProjectListCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountProjectListCall<'a, C, A>
@@ -3857,7 +3837,7 @@ impl<'a, C, A> BillingAccountTestIamPermissionCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3873,10 +3853,7 @@ impl<'a, C, A> BillingAccountTestIamPermissionCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3908,7 +3885,7 @@ impl<'a, C, A> BillingAccountTestIamPermissionCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3999,7 +3976,7 @@ impl<'a, C, A> BillingAccountTestIamPermissionCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4007,12 +3984,12 @@ impl<'a, C, A> BillingAccountTestIamPermissionCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountTestIamPermissionCall<'a, C, A>
@@ -4136,7 +4113,7 @@ impl<'a, C, A> BillingAccountGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4152,10 +4129,7 @@ impl<'a, C, A> BillingAccountGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4175,7 +4149,7 @@ impl<'a, C, A> BillingAccountGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4254,7 +4228,7 @@ impl<'a, C, A> BillingAccountGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4262,12 +4236,12 @@ impl<'a, C, A> BillingAccountGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BillingAccountGetIamPolicyCall<'a, C, A>
@@ -4425,7 +4399,7 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4441,10 +4415,7 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4476,7 +4447,7 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4567,7 +4538,7 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4575,12 +4546,12 @@ impl<'a, C, A> ProjectUpdateBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateBillingInfoCall<'a, C, A>
@@ -4704,7 +4675,7 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4720,10 +4691,7 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4743,7 +4711,7 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4822,7 +4790,7 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4830,12 +4798,12 @@ impl<'a, C, A> ProjectGetBillingInfoCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetBillingInfoCall<'a, C, A>

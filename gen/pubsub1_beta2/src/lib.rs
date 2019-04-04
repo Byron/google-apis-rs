@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.8+20181001*, where *20181001* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Pubsub* crate version *1.0.8+20190314*, where *20190314* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Pubsub* *v1_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -378,6 +378,33 @@ impl<'a, C, A> Pubsub<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Request for the `Pull` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions pull projects](struct.ProjectSubscriptionPullCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PullRequest {
+    /// If this is specified as true the system will respond immediately even if
+    /// it is not able to return a message in the `Pull` response. Otherwise the
+    /// system is allowed to wait until at least one message is available rather
+    /// than returning no messages. The client may cancel the request if it does
+    /// not wish to wait any longer for the response.
+    #[serde(rename="returnImmediately")]
+    pub return_immediately: Option<bool>,
+    /// The maximum number of messages returned for this request. The Pub/Sub
+    /// system may return fewer than the number specified.
+    #[serde(rename="maxMessages")]
+    pub max_messages: Option<i32>,
+}
+
+impl RequestValue for PullRequest {}
+
+
 /// Request message for `TestIamPermissions` method.
 /// 
 /// # Activities
@@ -520,13 +547,13 @@ pub struct ModifyAckDeadlineRequest {
     /// another pull request.
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
-    /// List of acknowledgment IDs.
-    #[serde(rename="ackIds")]
-    pub ack_ids: Option<Vec<String>>,
     /// The acknowledgment ID. Either this or ack_ids must be populated, but not
     /// both.
     #[serde(rename="ackId")]
     pub ack_id: Option<String>,
+    /// List of acknowledgment IDs.
+    #[serde(rename="ackIds")]
+    pub ack_ids: Option<Vec<String>>,
 }
 
 impl RequestValue for ModifyAckDeadlineRequest {}
@@ -745,31 +772,31 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// Request for the `Pull` method.
+/// Contains information needed for generating an
+/// [OpenID Connect
+/// token](https://developers.google.com/identity/protocols/OpenIDConnect).
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions pull projects](struct.ProjectSubscriptionPullCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PullRequest {
-    /// If this is specified as true the system will respond immediately even if
-    /// it is not able to return a message in the `Pull` response. Otherwise the
-    /// system is allowed to wait until at least one message is available rather
-    /// than returning no messages. The client may cancel the request if it does
-    /// not wish to wait any longer for the response.
-    #[serde(rename="returnImmediately")]
-    pub return_immediately: Option<bool>,
-    /// The maximum number of messages returned for this request. The Pub/Sub
-    /// system may return fewer than the number specified.
-    #[serde(rename="maxMessages")]
-    pub max_messages: Option<i32>,
+pub struct OidcToken {
+    /// Audience to be used when generating OIDC token. The audience claim
+    /// identifies the recipients that the JWT is intended for. The audience
+    /// value is a single case-sensitive string. Having multiple values (array)
+    /// for the audience field is not supported. More info about the OIDC JWT
+    /// token audience here: https://tools.ietf.org/html/rfc7519#section-4.1.3
+    /// Note: if not specified, the Push endpoint URL will be used.
+    pub audience: Option<String>,
+    /// [Service account
+    /// email](https://cloud.google.com/iam/docs/service-accounts)
+    /// to be used for generating the OIDC token. The caller (for
+    /// CreateSubscription, UpdateSubscription, and ModifyPushConfig RPCs) must
+    /// have the iam.serviceAccounts.actAs permission for the service account.
+    #[serde(rename="serviceAccountEmail")]
+    pub service_account_email: Option<String>,
 }
 
-impl RequestValue for PullRequest {}
+impl Part for OidcToken {}
 
 
 /// Configuration for a push delivery endpoint.
@@ -801,6 +828,10 @@ pub struct PushConfig {
     /// * `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API.
     /// * `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.
     pub attributes: Option<HashMap<String, String>>,
+    /// If specified, Pub/Sub will generate and attach an OIDC JWT token as an
+    /// `Authorization` header in the HTTP request for every pushed message.
+    #[serde(rename="oidcToken")]
+    pub oidc_token: Option<OidcToken>,
     /// A URL locating the endpoint to which messages should be pushed.
     /// For example, a Webhook endpoint might use "https://example.com/push".
     #[serde(rename="pushEndpoint")]
@@ -869,7 +900,7 @@ pub struct Binding {
     ///    For example, `admins@example.com`.
     /// 
     /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
     /// 
@@ -889,10 +920,9 @@ impl Part for Binding {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
     /// Textual representation of an expression in
     /// Common Expression Language syntax.
     /// 
@@ -902,9 +932,10 @@ pub struct Expr {
     /// An optional string indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
 }
 
 impl Part for Expr {}
@@ -1599,7 +1630,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1615,10 +1646,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1638,7 +1666,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1732,7 +1760,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1876,7 +1904,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1892,10 +1920,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1927,7 +1952,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2017,7 +2042,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2158,7 +2183,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2174,10 +2199,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2209,7 +2231,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2304,7 +2326,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2451,7 +2473,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2467,10 +2489,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2502,7 +2521,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2593,7 +2612,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2739,7 +2758,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2755,10 +2774,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2790,7 +2806,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2880,7 +2896,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3023,7 +3039,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3039,10 +3055,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3074,7 +3087,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3164,7 +3177,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3298,7 +3311,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3314,10 +3327,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3337,7 +3347,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3415,7 +3425,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3551,7 +3561,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3567,10 +3577,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3590,7 +3597,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3669,7 +3676,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3814,7 +3821,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3830,10 +3837,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3865,7 +3869,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3955,7 +3959,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4093,7 +4097,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4109,10 +4113,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4132,7 +4133,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4210,7 +4211,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4352,7 +4353,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4368,10 +4369,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4403,7 +4401,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4494,7 +4492,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4641,7 +4639,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4657,10 +4655,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4692,7 +4687,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4787,7 +4782,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4934,7 +4929,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4950,10 +4945,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4985,7 +4977,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5075,7 +5067,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5211,7 +5203,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5227,10 +5219,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5250,7 +5239,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5329,7 +5318,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5476,7 +5465,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5492,10 +5481,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5527,7 +5513,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5618,7 +5604,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5756,7 +5742,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5772,10 +5758,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5795,7 +5778,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5873,7 +5856,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6007,7 +5990,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6023,10 +6006,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6046,7 +6026,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6124,7 +6104,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6268,7 +6248,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6284,10 +6264,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6307,7 +6284,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6401,7 +6378,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6545,7 +6522,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6561,10 +6538,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6584,7 +6558,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6678,7 +6652,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6820,7 +6794,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6836,10 +6810,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6871,7 +6842,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6962,7 +6933,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

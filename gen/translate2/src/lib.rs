@@ -404,23 +404,22 @@ pub struct DetectionsListResponse {
 impl ResponseResult for DetectionsListResponse {}
 
 
-/// The main language translation response message.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [translate translations](struct.TranslationTranslateCall.html) (response)
-/// * [list translations](struct.TranslationListCall.html) (response)
+/// * [list languages](struct.LanguageListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TranslationsListResponse {
-    /// Translations contains list of translation results of given text
-    pub translations: Option<Vec<TranslationsResource>>,
+pub struct LanguagesListResponse {
+    /// List of source/target languages supported by the translation API. If target parameter is unspecified, the list is sorted by the ASCII code point order of the language code. If target parameter is specified, the list is sorted by the collation order of the language name in the target language.
+    pub languages: Option<Vec<LanguagesResource>>,
 }
 
-impl ResponseResult for TranslationsListResponse {}
+impl ResponseResult for LanguagesListResponse {}
 
 
 /// An array of languages which we detect for the given text The most likely language list first.
@@ -555,22 +554,23 @@ pub struct TranslationsResource {
 impl Part for TranslationsResource {}
 
 
-/// There is no detailed description.
+/// The main language translation response message.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list languages](struct.LanguageListCall.html) (response)
+/// * [translate translations](struct.TranslationTranslateCall.html) (response)
+/// * [list translations](struct.TranslationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LanguagesListResponse {
-    /// List of source/target languages supported by the translation API. If target parameter is unspecified, the list is sorted by the ASCII code point order of the language code. If target parameter is specified, the list is sorted by the collation order of the language name in the target language.
-    pub languages: Option<Vec<LanguagesResource>>,
+pub struct TranslationsListResponse {
+    /// Translations contains list of translation results of given text
+    pub translations: Option<Vec<TranslationsResource>>,
 }
 
-impl ResponseResult for LanguagesListResponse {}
+impl ResponseResult for TranslationsListResponse {}
 
 
 
@@ -886,10 +886,7 @@ impl<'a, C, A> LanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -909,7 +906,7 @@ impl<'a, C, A> LanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -992,15 +989,15 @@ impl<'a, C, A> LanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1124,10 +1121,7 @@ impl<'a, C, A> DetectionDetectCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1159,7 +1153,7 @@ impl<'a, C, A> DetectionDetectCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1239,15 +1233,15 @@ impl<'a, C, A> DetectionDetectCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1370,10 +1364,7 @@ impl<'a, C, A> DetectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1393,7 +1384,7 @@ impl<'a, C, A> DetectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1473,15 +1464,15 @@ impl<'a, C, A> DetectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1605,10 +1596,7 @@ impl<'a, C, A> TranslationTranslateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1640,7 +1628,7 @@ impl<'a, C, A> TranslationTranslateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1720,15 +1708,15 @@ impl<'a, C, A> TranslationTranslateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
@@ -1875,10 +1863,7 @@ impl<'a, C, A> TranslationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1898,7 +1883,7 @@ impl<'a, C, A> TranslationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2023,15 +2008,15 @@ impl<'a, C, A> TranslationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.

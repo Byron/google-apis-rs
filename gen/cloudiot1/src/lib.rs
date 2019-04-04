@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Iot* crate version *1.0.8+20181002*, where *20181002* is the exact revision of the *cloudiot:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Iot* crate version *1.0.8+20190321*, where *20190321* is the exact revision of the *cloudiot:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Iot* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iot).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudIot.html) ... 
 //! 
 //! * projects
-//!  * [*locations registries create*](struct.ProjectLocationRegistryCreateCall.html), [*locations registries delete*](struct.ProjectLocationRegistryDeleteCall.html), [*locations registries devices config versions list*](struct.ProjectLocationRegistryDeviceConfigVersionListCall.html), [*locations registries devices create*](struct.ProjectLocationRegistryDeviceCreateCall.html), [*locations registries devices delete*](struct.ProjectLocationRegistryDeviceDeleteCall.html), [*locations registries devices get*](struct.ProjectLocationRegistryDeviceGetCall.html), [*locations registries devices list*](struct.ProjectLocationRegistryDeviceListCall.html), [*locations registries devices modify cloud to device config*](struct.ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall.html), [*locations registries devices patch*](struct.ProjectLocationRegistryDevicePatchCall.html), [*locations registries devices send command to device*](struct.ProjectLocationRegistryDeviceSendCommandToDeviceCall.html), [*locations registries devices states list*](struct.ProjectLocationRegistryDeviceStateListCall.html), [*locations registries get*](struct.ProjectLocationRegistryGetCall.html), [*locations registries get iam policy*](struct.ProjectLocationRegistryGetIamPolicyCall.html), [*locations registries groups devices config versions list*](struct.ProjectLocationRegistryGroupDeviceConfigVersionListCall.html), [*locations registries groups devices get*](struct.ProjectLocationRegistryGroupDeviceGetCall.html), [*locations registries groups devices list*](struct.ProjectLocationRegistryGroupDeviceListCall.html), [*locations registries groups devices modify cloud to device config*](struct.ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall.html), [*locations registries groups devices patch*](struct.ProjectLocationRegistryGroupDevicePatchCall.html), [*locations registries groups devices send command to device*](struct.ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall.html), [*locations registries groups devices states list*](struct.ProjectLocationRegistryGroupDeviceStateListCall.html), [*locations registries groups get iam policy*](struct.ProjectLocationRegistryGroupGetIamPolicyCall.html), [*locations registries groups set iam policy*](struct.ProjectLocationRegistryGroupSetIamPolicyCall.html), [*locations registries groups test iam permissions*](struct.ProjectLocationRegistryGroupTestIamPermissionCall.html), [*locations registries list*](struct.ProjectLocationRegistryListCall.html), [*locations registries patch*](struct.ProjectLocationRegistryPatchCall.html), [*locations registries set iam policy*](struct.ProjectLocationRegistrySetIamPolicyCall.html) and [*locations registries test iam permissions*](struct.ProjectLocationRegistryTestIamPermissionCall.html)
+//!  * [*locations registries bind device to gateway*](struct.ProjectLocationRegistryBindDeviceToGatewayCall.html), [*locations registries create*](struct.ProjectLocationRegistryCreateCall.html), [*locations registries delete*](struct.ProjectLocationRegistryDeleteCall.html), [*locations registries devices config versions list*](struct.ProjectLocationRegistryDeviceConfigVersionListCall.html), [*locations registries devices create*](struct.ProjectLocationRegistryDeviceCreateCall.html), [*locations registries devices delete*](struct.ProjectLocationRegistryDeviceDeleteCall.html), [*locations registries devices get*](struct.ProjectLocationRegistryDeviceGetCall.html), [*locations registries devices list*](struct.ProjectLocationRegistryDeviceListCall.html), [*locations registries devices modify cloud to device config*](struct.ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall.html), [*locations registries devices patch*](struct.ProjectLocationRegistryDevicePatchCall.html), [*locations registries devices send command to device*](struct.ProjectLocationRegistryDeviceSendCommandToDeviceCall.html), [*locations registries devices states list*](struct.ProjectLocationRegistryDeviceStateListCall.html), [*locations registries get*](struct.ProjectLocationRegistryGetCall.html), [*locations registries get iam policy*](struct.ProjectLocationRegistryGetIamPolicyCall.html), [*locations registries groups bind device to gateway*](struct.ProjectLocationRegistryGroupBindDeviceToGatewayCall.html), [*locations registries groups devices config versions list*](struct.ProjectLocationRegistryGroupDeviceConfigVersionListCall.html), [*locations registries groups devices get*](struct.ProjectLocationRegistryGroupDeviceGetCall.html), [*locations registries groups devices list*](struct.ProjectLocationRegistryGroupDeviceListCall.html), [*locations registries groups devices modify cloud to device config*](struct.ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall.html), [*locations registries groups devices patch*](struct.ProjectLocationRegistryGroupDevicePatchCall.html), [*locations registries groups devices send command to device*](struct.ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall.html), [*locations registries groups devices states list*](struct.ProjectLocationRegistryGroupDeviceStateListCall.html), [*locations registries groups get iam policy*](struct.ProjectLocationRegistryGroupGetIamPolicyCall.html), [*locations registries groups set iam policy*](struct.ProjectLocationRegistryGroupSetIamPolicyCall.html), [*locations registries groups test iam permissions*](struct.ProjectLocationRegistryGroupTestIamPermissionCall.html), [*locations registries groups unbind device from gateway*](struct.ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall.html), [*locations registries list*](struct.ProjectLocationRegistryListCall.html), [*locations registries patch*](struct.ProjectLocationRegistryPatchCall.html), [*locations registries set iam policy*](struct.ProjectLocationRegistrySetIamPolicyCall.html), [*locations registries test iam permissions*](struct.ProjectLocationRegistryTestIamPermissionCall.html) and [*locations registries unbind device from gateway*](struct.ProjectLocationRegistryUnbindDeviceFromGatewayCall.html)
 //! 
 //! 
 //! 
@@ -47,10 +47,10 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_registries_groups_devices_get(...).doit()
 //! let r = hub.projects().locations_registries_devices_create(...).doit()
 //! let r = hub.projects().locations_registries_devices_patch(...).doit()
 //! let r = hub.projects().locations_registries_groups_devices_patch(...).doit()
-//! let r = hub.projects().locations_registries_groups_devices_get(...).doit()
 //! let r = hub.projects().locations_registries_devices_get(...).doit()
 //! ```
 //! 
@@ -422,60 +422,6 @@ pub struct ListDeviceStatesResponse {
 impl ResponseResult for ListDeviceStatesResponse {}
 
 
-/// Response for `SendCommandToDevice`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations registries groups devices send command to device projects](struct.ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall.html) (response)
-/// * [locations registries devices send command to device projects](struct.ProjectLocationRegistryDeviceSendCommandToDeviceCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SendCommandToDeviceResponse { _never_set: Option<bool> }
-
-impl ResponseResult for SendCommandToDeviceResponse {}
-
-
-/// Request message for `GetIamPolicy` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations registries get iam policy projects](struct.ProjectLocationRegistryGetIamPolicyCall.html) (request)
-/// * [locations registries groups get iam policy projects](struct.ProjectLocationRegistryGroupGetIamPolicyCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
-
-impl RequestValue for GetIamPolicyRequest {}
-
-
-/// Request message for `TestIamPermissions` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations registries groups test iam permissions projects](struct.ProjectLocationRegistryGroupTestIamPermissionCall.html) (request)
-/// * [locations registries test iam permissions projects](struct.ProjectLocationRegistryTestIamPermissionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestIamPermissionsRequest {
-    /// The set of permissions to check for the `resource`. Permissions with
-    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
-    /// information see
-    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
-    pub permissions: Option<Vec<String>>,
-}
-
-impl RequestValue for TestIamPermissionsRequest {}
-
-
 /// Request message for `SetIamPolicy` method.
 /// 
 /// # Activities
@@ -496,51 +442,6 @@ pub struct SetIamPolicyRequest {
 }
 
 impl RequestValue for SetIamPolicyRequest {}
-
-
-/// A server-stored registry credential used to validate device credentials.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RegistryCredential {
-    /// A public key certificate used to verify the device credentials.
-    #[serde(rename="publicKeyCertificate")]
-    pub public_key_certificate: Option<PublicKeyCertificate>,
-}
-
-impl Part for RegistryCredential {}
-
-
-/// Represents an expression text. Example:
-/// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
-    pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
-    /// reporting, e.g. a file name and a position in the file.
-    pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
-}
-
-impl Part for Expr {}
 
 
 /// The configuration of MQTT for a device registry.
@@ -596,53 +497,6 @@ pub struct DeviceConfig {
 }
 
 impl ResponseResult for DeviceConfig {}
-
-
-/// Response for `ListDeviceRegistries`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations registries list projects](struct.ProjectLocationRegistryListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListDeviceRegistriesResponse {
-    /// If not empty, indicates that there may be more registries that match the
-    /// request; this value should be passed in a new
-    /// `ListDeviceRegistriesRequest`.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The registries that matched the query.
-    #[serde(rename="deviceRegistries")]
-    pub device_registries: Option<Vec<DeviceRegistry>>,
-}
-
-impl ResponseResult for ListDeviceRegistriesResponse {}
-
-
-/// Response for `ListDevices`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations registries devices list projects](struct.ProjectLocationRegistryDeviceListCall.html) (response)
-/// * [locations registries groups devices list projects](struct.ProjectLocationRegistryGroupDeviceListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListDevicesResponse {
-    /// If not empty, indicates that there may be more devices that match the
-    /// request; this value should be passed in a new `ListDevicesRequest`.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The devices that match the request.
-    pub devices: Option<Vec<Device>>,
-}
-
-impl ResponseResult for ListDevicesResponse {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
@@ -724,6 +578,32 @@ pub struct Policy {
 impl ResponseResult for Policy {}
 
 
+/// Request for `UnbindDeviceFromGateway`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries groups unbind device from gateway projects](struct.ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall.html) (request)
+/// * [locations registries unbind device from gateway projects](struct.ProjectLocationRegistryUnbindDeviceFromGatewayCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UnbindDeviceFromGatewayRequest {
+    /// The value of `gateway_id` can be either the device numeric ID or the
+    /// user-defined device identifier.
+    #[serde(rename="gatewayId")]
+    pub gateway_id: Option<String>,
+    /// The device to disassociate from the specified gateway. The value of
+    /// `device_id` can be either the device numeric ID or the user-defined device
+    /// identifier.
+    #[serde(rename="deviceId")]
+    pub device_id: Option<String>,
+}
+
+impl RequestValue for UnbindDeviceFromGatewayRequest {}
+
+
 /// The device state, as reported by the device.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -742,44 +622,17 @@ pub struct DeviceState {
 impl Part for DeviceState {}
 
 
-/// Details of an X.509 certificate. For informational purposes only.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct X509CertificateDetails {
-    /// The time the certificate becomes valid.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// The algorithm used to sign the certificate.
-    #[serde(rename="signatureAlgorithm")]
-    pub signature_algorithm: Option<String>,
-    /// The entity the certificate and public key belong to.
-    pub subject: Option<String>,
-    /// The time the certificate becomes invalid.
-    #[serde(rename="expiryTime")]
-    pub expiry_time: Option<String>,
-    /// The type of public key in the certificate.
-    #[serde(rename="publicKeyType")]
-    pub public_key_type: Option<String>,
-    /// The entity that signed the certificate.
-    pub issuer: Option<String>,
-}
-
-impl Part for X509CertificateDetails {}
-
-
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -840,22 +693,25 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// A public key certificate format and data.
+/// Response for `ListDeviceConfigVersions`.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries devices config versions list projects](struct.ProjectLocationRegistryDeviceConfigVersionListCall.html) (response)
+/// * [locations registries groups devices config versions list projects](struct.ProjectLocationRegistryGroupDeviceConfigVersionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PublicKeyCertificate {
-    /// [Output only] The certificate details. Used only for X.509 certificates.
-    #[serde(rename="x509Details")]
-    pub x509_details: Option<X509CertificateDetails>,
-    /// The certificate data.
-    pub certificate: Option<String>,
-    /// The certificate format.
-    pub format: Option<String>,
+pub struct ListDeviceConfigVersionsResponse {
+    /// The device configuration for the last few versions. Versions are listed
+    /// in decreasing order, starting from the most recent one.
+    #[serde(rename="deviceConfigs")]
+    pub device_configs: Option<Vec<DeviceConfig>>,
 }
 
-impl Part for PublicKeyCertificate {}
+impl ResponseResult for ListDeviceConfigVersionsResponse {}
 
 
 /// Response message for `TestIamPermissions` method.
@@ -878,122 +734,45 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// A container for a group of devices.
+/// Gateway-related configuration and state.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GatewayConfig {
+    /// Indicates whether the device is a gateway.
+    #[serde(rename="gatewayType")]
+    pub gateway_type: Option<String>,
+    /// [Output only] The ID of the gateway the device accessed most recently.
+    #[serde(rename="lastAccessedGatewayId")]
+    pub last_accessed_gateway_id: Option<String>,
+    /// Indicates how to authorize and/or authenticate devices to access the
+    /// gateway.
+    #[serde(rename="gatewayAuthMethod")]
+    pub gateway_auth_method: Option<String>,
+    /// [Output only] The most recent time at which the device accessed the gateway
+    /// specified in `last_accessed_gateway`.
+    #[serde(rename="lastAccessedGatewayTime")]
+    pub last_accessed_gateway_time: Option<String>,
+}
+
+impl Part for GatewayConfig {}
+
+
+/// Response for `UnbindDeviceFromGateway`.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations registries patch projects](struct.ProjectLocationRegistryPatchCall.html) (request|response)
-/// * [locations registries create projects](struct.ProjectLocationRegistryCreateCall.html) (request|response)
-/// * [locations registries get projects](struct.ProjectLocationRegistryGetCall.html) (response)
+/// * [locations registries groups unbind device from gateway projects](struct.ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall.html) (response)
+/// * [locations registries unbind device from gateway projects](struct.ProjectLocationRegistryUnbindDeviceFromGatewayCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceRegistry {
-    /// The resource path name. For example,
-    /// `projects/example-project/locations/us-central1/registries/my-registry`.
-    pub name: Option<String>,
-    /// The configuration for notification of new states received from the device.
-    /// State updates are guaranteed to be stored in the state history, but
-    /// notifications to Cloud Pub/Sub are not guaranteed. For example, if
-    /// permissions are misconfigured or the specified topic doesn't exist, no
-    /// notification will be published but the state will still be stored in Cloud
-    /// IoT Core.
-    #[serde(rename="stateNotificationConfig")]
-    pub state_notification_config: Option<StateNotificationConfig>,
-    /// **Beta Feature**
-    /// 
-    /// The default logging verbosity for activity from devices in this registry.
-    /// The verbosity level can be overridden by Device.log_level.
-    #[serde(rename="logLevel")]
-    pub log_level: Option<String>,
-    /// The MQTT configuration for this device registry.
-    #[serde(rename="mqttConfig")]
-    pub mqtt_config: Option<MqttConfig>,
-    /// The DeviceService (HTTP) configuration for this device registry.
-    #[serde(rename="httpConfig")]
-    pub http_config: Option<HttpConfig>,
-    /// The configuration for notification of telemetry events received from the
-    /// device. All telemetry events that were successfully published by the
-    /// device and acknowledged by Cloud IoT Core are guaranteed to be
-    /// delivered to Cloud Pub/Sub. If multiple configurations match a message,
-    /// only the first matching configuration is used. If you try to publish a
-    /// device telemetry event using MQTT without specifying a Cloud Pub/Sub topic
-    /// for the device's registry, the connection closes automatically. If you try
-    /// to do so using an HTTP connection, an error is returned. Up to 10
-    /// configurations may be provided.
-    #[serde(rename="eventNotificationConfigs")]
-    pub event_notification_configs: Option<Vec<EventNotificationConfig>>,
-    /// The credentials used to verify the device credentials. No more than 10
-    /// credentials can be bound to a single registry at a time. The verification
-    /// process occurs at the time of device creation or update. If this field is
-    /// empty, no verification is performed. Otherwise, the credentials of a newly
-    /// created device or added credentials of an updated device should be signed
-    /// with one of these registry credentials.
-    /// 
-    /// Note, however, that existing devices will never be affected by
-    /// modifications to this list of credentials: after a device has been
-    /// successfully created in a registry, it should be able to connect even if
-    /// its registry credentials are revoked, deleted, or modified.
-    pub credentials: Option<Vec<RegistryCredential>>,
-    /// The identifier of this device registry. For example, `myRegistry`.
-    pub id: Option<String>,
-}
+pub struct UnbindDeviceFromGatewayResponse { _never_set: Option<bool> }
 
-impl RequestValue for DeviceRegistry {}
-impl ResponseResult for DeviceRegistry {}
-
-
-/// Response for `ListDeviceConfigVersions`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations registries devices config versions list projects](struct.ProjectLocationRegistryDeviceConfigVersionListCall.html) (response)
-/// * [locations registries groups devices config versions list projects](struct.ProjectLocationRegistryGroupDeviceConfigVersionListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListDeviceConfigVersionsResponse {
-    /// The device configuration for the last few versions. Versions are listed
-    /// in decreasing order, starting from the most recent one.
-    #[serde(rename="deviceConfigs")]
-    pub device_configs: Option<Vec<DeviceConfig>>,
-}
-
-impl ResponseResult for ListDeviceConfigVersionsResponse {}
-
-
-/// The configuration for notification of new states received from the device.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StateNotificationConfig {
-    /// A Cloud Pub/Sub topic name. For example,
-    /// `projects/myProject/topics/deviceEvents`.
-    #[serde(rename="pubsubTopicName")]
-    pub pubsub_topic_name: Option<String>,
-}
-
-impl Part for StateNotificationConfig {}
-
-
-/// A public key format and data.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PublicKeyCredential {
-    /// The key data.
-    pub key: Option<String>,
-    /// The format of the key.
-    pub format: Option<String>,
-}
-
-impl Part for PublicKeyCredential {}
+impl ResponseResult for UnbindDeviceFromGatewayResponse {}
 
 
 /// A server-stored device credential used for authentication.
@@ -1023,65 +802,6 @@ pub struct DeviceCredential {
 }
 
 impl Part for DeviceCredential {}
-
-
-/// The configuration of the HTTP bridge for a device registry.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HttpConfig {
-    /// If enabled, allows devices to use DeviceService via the HTTP protocol.
-    /// Otherwise, any requests to DeviceService will fail for this registry.
-    #[serde(rename="httpEnabledState")]
-    pub http_enabled_state: Option<String>,
-}
-
-impl Part for HttpConfig {}
-
-
-/// Associates `members` with a `role`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to `members`.
-    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    pub role: Option<String>,
-    /// Unimplemented. The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
-    pub condition: Option<Expr>,
-    /// Specifies the identities requesting access for a Cloud Platform resource.
-    /// `members` can have the following values:
-    /// 
-    /// * `allUsers`: A special identifier that represents anyone who is
-    ///    on the internet; with or without a Google account.
-    /// 
-    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
-    ///    who is authenticated with a Google account or a service account.
-    /// 
-    /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
-    /// 
-    /// 
-    /// * `serviceAccount:{emailid}`: An email address that represents a service
-    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
-    /// 
-    /// * `group:{emailid}`: An email address that represents a Google group.
-    ///    For example, `admins@example.com`.
-    /// 
-    /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
-    ///    users of that domain. For example, `google.com` or `example.com`.
-    /// 
-    /// 
-    pub members: Option<Vec<String>>,
-}
-
-impl Part for Binding {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -1115,18 +835,17 @@ impl ResponseResult for Empty {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations registries groups devices get projects](struct.ProjectLocationRegistryGroupDeviceGetCall.html) (response)
 /// * [locations registries devices create projects](struct.ProjectLocationRegistryDeviceCreateCall.html) (request|response)
 /// * [locations registries devices patch projects](struct.ProjectLocationRegistryDevicePatchCall.html) (request|response)
 /// * [locations registries groups devices patch projects](struct.ProjectLocationRegistryGroupDevicePatchCall.html) (request|response)
-/// * [locations registries groups devices get projects](struct.ProjectLocationRegistryGroupDeviceGetCall.html) (response)
 /// * [locations registries devices get projects](struct.ProjectLocationRegistryDeviceGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
-    /// [Output only] The last time a cloud-to-device config version was sent to
-    /// the device.
-    #[serde(rename="lastConfigSendTime")]
-    pub last_config_send_time: Option<String>,
+    /// Gateway-related configuration and state.
+    #[serde(rename="gatewayConfig")]
+    pub gateway_config: Option<GatewayConfig>,
     /// [Output only] The time the most recent error occurred, such as a failure to
     /// publish to Cloud Pub/Sub. This field is the timestamp of
     /// 'last_error_status'.
@@ -1136,6 +855,10 @@ pub struct Device {
     /// more compact way to identify devices, and it is globally unique.
     #[serde(rename="numId")]
     pub num_id: Option<String>,
+    /// [Output only] The last time a cloud-to-device config version was sent to
+    /// the device.
+    #[serde(rename="lastConfigSendTime")]
+    pub last_config_send_time: Option<String>,
     /// [Output only] The error message of the most recent error, such as a failure
     /// to publish to Cloud Pub/Sub. 'last_error_time' is the timestamp of this
     /// field. If no errors have occurred, this field has an empty message
@@ -1246,6 +969,369 @@ pub struct ModifyCloudToDeviceConfigRequest {
 impl RequestValue for ModifyCloudToDeviceConfigRequest {}
 
 
+/// A public key format and data.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PublicKeyCredential {
+    /// The key data.
+    pub key: Option<String>,
+    /// The format of the key.
+    pub format: Option<String>,
+}
+
+impl Part for PublicKeyCredential {}
+
+
+/// Response for `SendCommandToDevice`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries groups devices send command to device projects](struct.ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall.html) (response)
+/// * [locations registries devices send command to device projects](struct.ProjectLocationRegistryDeviceSendCommandToDeviceCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SendCommandToDeviceResponse { _never_set: Option<bool> }
+
+impl ResponseResult for SendCommandToDeviceResponse {}
+
+
+/// Request message for `GetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries get iam policy projects](struct.ProjectLocationRegistryGetIamPolicyCall.html) (request)
+/// * [locations registries groups get iam policy projects](struct.ProjectLocationRegistryGroupGetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+
+impl RequestValue for GetIamPolicyRequest {}
+
+
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries groups test iam permissions projects](struct.ProjectLocationRegistryGroupTestIamPermissionCall.html) (request)
+/// * [locations registries test iam permissions projects](struct.ProjectLocationRegistryTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
+
+
+/// The configuration for notification of new states received from the device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StateNotificationConfig {
+    /// A Cloud Pub/Sub topic name. For example,
+    /// `projects/myProject/topics/deviceEvents`.
+    #[serde(rename="pubsubTopicName")]
+    pub pubsub_topic_name: Option<String>,
+}
+
+impl Part for StateNotificationConfig {}
+
+
+/// A server-stored registry credential used to validate device credentials.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RegistryCredential {
+    /// A public key certificate used to verify the device credentials.
+    #[serde(rename="publicKeyCertificate")]
+    pub public_key_certificate: Option<PublicKeyCertificate>,
+}
+
+impl Part for RegistryCredential {}
+
+
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+}
+
+impl Part for Expr {}
+
+
+/// Response for `ListDevices`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries devices list projects](struct.ProjectLocationRegistryDeviceListCall.html) (response)
+/// * [locations registries groups devices list projects](struct.ProjectLocationRegistryGroupDeviceListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListDevicesResponse {
+    /// If not empty, indicates that there may be more devices that match the
+    /// request; this value should be passed in a new `ListDevicesRequest`.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The devices that match the request.
+    pub devices: Option<Vec<Device>>,
+}
+
+impl ResponseResult for ListDevicesResponse {}
+
+
+/// Response for `BindDeviceToGateway`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries bind device to gateway projects](struct.ProjectLocationRegistryBindDeviceToGatewayCall.html) (response)
+/// * [locations registries groups bind device to gateway projects](struct.ProjectLocationRegistryGroupBindDeviceToGatewayCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BindDeviceToGatewayResponse { _never_set: Option<bool> }
+
+impl ResponseResult for BindDeviceToGatewayResponse {}
+
+
+/// Details of an X.509 certificate. For informational purposes only.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct X509CertificateDetails {
+    /// The time the certificate becomes valid.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// The entity that signed the certificate.
+    pub issuer: Option<String>,
+    /// The entity the certificate and public key belong to.
+    pub subject: Option<String>,
+    /// The time the certificate becomes invalid.
+    #[serde(rename="expiryTime")]
+    pub expiry_time: Option<String>,
+    /// The type of public key in the certificate.
+    #[serde(rename="publicKeyType")]
+    pub public_key_type: Option<String>,
+    /// The algorithm used to sign the certificate.
+    #[serde(rename="signatureAlgorithm")]
+    pub signature_algorithm: Option<String>,
+}
+
+impl Part for X509CertificateDetails {}
+
+
+/// A public key certificate format and data.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PublicKeyCertificate {
+    /// [Output only] The certificate details. Used only for X.509 certificates.
+    #[serde(rename="x509Details")]
+    pub x509_details: Option<X509CertificateDetails>,
+    /// The certificate data.
+    pub certificate: Option<String>,
+    /// The certificate format.
+    pub format: Option<String>,
+}
+
+impl Part for PublicKeyCertificate {}
+
+
+/// A container for a group of devices.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries patch projects](struct.ProjectLocationRegistryPatchCall.html) (request|response)
+/// * [locations registries create projects](struct.ProjectLocationRegistryCreateCall.html) (request|response)
+/// * [locations registries get projects](struct.ProjectLocationRegistryGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceRegistry {
+    /// The resource path name. For example,
+    /// `projects/example-project/locations/us-central1/registries/my-registry`.
+    pub name: Option<String>,
+    /// The configuration for notification of new states received from the device.
+    /// State updates are guaranteed to be stored in the state history, but
+    /// notifications to Cloud Pub/Sub are not guaranteed. For example, if
+    /// permissions are misconfigured or the specified topic doesn't exist, no
+    /// notification will be published but the state will still be stored in Cloud
+    /// IoT Core.
+    #[serde(rename="stateNotificationConfig")]
+    pub state_notification_config: Option<StateNotificationConfig>,
+    /// **Beta Feature**
+    /// 
+    /// The default logging verbosity for activity from devices in this registry.
+    /// The verbosity level can be overridden by Device.log_level.
+    #[serde(rename="logLevel")]
+    pub log_level: Option<String>,
+    /// The MQTT configuration for this device registry.
+    #[serde(rename="mqttConfig")]
+    pub mqtt_config: Option<MqttConfig>,
+    /// The DeviceService (HTTP) configuration for this device registry.
+    #[serde(rename="httpConfig")]
+    pub http_config: Option<HttpConfig>,
+    /// The configuration for notification of telemetry events received from the
+    /// device. All telemetry events that were successfully published by the
+    /// device and acknowledged by Cloud IoT Core are guaranteed to be
+    /// delivered to Cloud Pub/Sub. If multiple configurations match a message,
+    /// only the first matching configuration is used. If you try to publish a
+    /// device telemetry event using MQTT without specifying a Cloud Pub/Sub topic
+    /// for the device's registry, the connection closes automatically. If you try
+    /// to do so using an HTTP connection, an error is returned. Up to 10
+    /// configurations may be provided.
+    #[serde(rename="eventNotificationConfigs")]
+    pub event_notification_configs: Option<Vec<EventNotificationConfig>>,
+    /// The credentials used to verify the device credentials. No more than 10
+    /// credentials can be bound to a single registry at a time. The verification
+    /// process occurs at the time of device creation or update. If this field is
+    /// empty, no verification is performed. Otherwise, the credentials of a newly
+    /// created device or added credentials of an updated device should be signed
+    /// with one of these registry credentials.
+    /// 
+    /// Note, however, that existing devices will never be affected by
+    /// modifications to this list of credentials: after a device has been
+    /// successfully created in a registry, it should be able to connect even if
+    /// its registry credentials are revoked, deleted, or modified.
+    pub credentials: Option<Vec<RegistryCredential>>,
+    /// The identifier of this device registry. For example, `myRegistry`.
+    pub id: Option<String>,
+}
+
+impl RequestValue for DeviceRegistry {}
+impl ResponseResult for DeviceRegistry {}
+
+
+/// Response for `ListDeviceRegistries`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries list projects](struct.ProjectLocationRegistryListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListDeviceRegistriesResponse {
+    /// If not empty, indicates that there may be more registries that match the
+    /// request; this value should be passed in a new
+    /// `ListDeviceRegistriesRequest`.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The registries that matched the query.
+    #[serde(rename="deviceRegistries")]
+    pub device_registries: Option<Vec<DeviceRegistry>>,
+}
+
+impl ResponseResult for ListDeviceRegistriesResponse {}
+
+
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    pub role: Option<String>,
+    /// The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@gmail.com` .
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// 
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
+
+
+/// The configuration of the HTTP bridge for a device registry.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HttpConfig {
+    /// If enabled, allows devices to use DeviceService via the HTTP protocol.
+    /// Otherwise, any requests to DeviceService will fail for this registry.
+    #[serde(rename="httpEnabledState")]
+    pub http_enabled_state: Option<String>,
+}
+
+impl Part for HttpConfig {}
+
+
 /// Request for `SendCommandToDevice`.
 /// 
 /// # Activities
@@ -1270,6 +1356,32 @@ pub struct SendCommandToDeviceRequest {
 }
 
 impl RequestValue for SendCommandToDeviceRequest {}
+
+
+/// Request for `BindDeviceToGateway`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations registries bind device to gateway projects](struct.ProjectLocationRegistryBindDeviceToGatewayCall.html) (request)
+/// * [locations registries groups bind device to gateway projects](struct.ProjectLocationRegistryGroupBindDeviceToGatewayCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BindDeviceToGatewayRequest {
+    /// The value of `gateway_id` can be either the device numeric ID or the
+    /// user-defined device identifier.
+    #[serde(rename="gatewayId")]
+    pub gateway_id: Option<String>,
+    /// The device to associate with the specified gateway. The value of
+    /// `device_id` can be either the device numeric ID or the user-defined device
+    /// identifier.
+    #[serde(rename="deviceId")]
+    pub device_id: Option<String>,
+}
+
+impl RequestValue for BindDeviceToGatewayRequest {}
 
 
 
@@ -1301,7 +1413,7 @@ impl RequestValue for SendCommandToDeviceRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudIot::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_registries_create(...)`, `locations_registries_delete(...)`, `locations_registries_devices_config_versions_list(...)`, `locations_registries_devices_create(...)`, `locations_registries_devices_delete(...)`, `locations_registries_devices_get(...)`, `locations_registries_devices_list(...)`, `locations_registries_devices_modify_cloud_to_device_config(...)`, `locations_registries_devices_patch(...)`, `locations_registries_devices_send_command_to_device(...)`, `locations_registries_devices_states_list(...)`, `locations_registries_get(...)`, `locations_registries_get_iam_policy(...)`, `locations_registries_groups_devices_config_versions_list(...)`, `locations_registries_groups_devices_get(...)`, `locations_registries_groups_devices_list(...)`, `locations_registries_groups_devices_modify_cloud_to_device_config(...)`, `locations_registries_groups_devices_patch(...)`, `locations_registries_groups_devices_send_command_to_device(...)`, `locations_registries_groups_devices_states_list(...)`, `locations_registries_groups_get_iam_policy(...)`, `locations_registries_groups_set_iam_policy(...)`, `locations_registries_groups_test_iam_permissions(...)`, `locations_registries_list(...)`, `locations_registries_patch(...)`, `locations_registries_set_iam_policy(...)` and `locations_registries_test_iam_permissions(...)`
+/// // like `locations_registries_bind_device_to_gateway(...)`, `locations_registries_create(...)`, `locations_registries_delete(...)`, `locations_registries_devices_config_versions_list(...)`, `locations_registries_devices_create(...)`, `locations_registries_devices_delete(...)`, `locations_registries_devices_get(...)`, `locations_registries_devices_list(...)`, `locations_registries_devices_modify_cloud_to_device_config(...)`, `locations_registries_devices_patch(...)`, `locations_registries_devices_send_command_to_device(...)`, `locations_registries_devices_states_list(...)`, `locations_registries_get(...)`, `locations_registries_get_iam_policy(...)`, `locations_registries_groups_bind_device_to_gateway(...)`, `locations_registries_groups_devices_config_versions_list(...)`, `locations_registries_groups_devices_get(...)`, `locations_registries_groups_devices_list(...)`, `locations_registries_groups_devices_modify_cloud_to_device_config(...)`, `locations_registries_groups_devices_patch(...)`, `locations_registries_groups_devices_send_command_to_device(...)`, `locations_registries_groups_devices_states_list(...)`, `locations_registries_groups_get_iam_policy(...)`, `locations_registries_groups_set_iam_policy(...)`, `locations_registries_groups_test_iam_permissions(...)`, `locations_registries_groups_unbind_device_from_gateway(...)`, `locations_registries_list(...)`, `locations_registries_patch(...)`, `locations_registries_set_iam_policy(...)`, `locations_registries_test_iam_permissions(...)` and `locations_registries_unbind_device_from_gateway(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1330,9 +1442,52 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _gateway_list_options_gateway_type: Default::default(),
+            _gateway_list_options_associations_gateway_id: Default::default(),
+            _gateway_list_options_associations_device_id: Default::default(),
             _field_mask: Default::default(),
             _device_num_ids: Default::default(),
             _device_ids: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the association between the device and the gateway.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the registry. For example,
+    ///              `projects/example-project/locations/us-central1/registries/my-registry`.
+    pub fn locations_registries_groups_unbind_device_from_gateway(&self, request: UnbindDeviceFromGatewayRequest, parent: &str) -> ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A> {
+        ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the association between the device and the gateway.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the registry. For example,
+    ///              `projects/example-project/locations/us-central1/registries/my-registry`.
+    pub fn locations_registries_unbind_device_from_gateway(&self, request: UnbindDeviceFromGatewayRequest, parent: &str) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> {
+        ProjectLocationRegistryUnbindDeviceFromGatewayCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1416,6 +1571,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _name: name.to_string(),
             _num_versions: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Associates the device with the gateway.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the registry. For example,
+    ///              `projects/example-project/locations/us-central1/registries/my-registry`.
+    pub fn locations_registries_bind_device_to_gateway(&self, request: BindDeviceToGatewayRequest, parent: &str) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> {
+        ProjectLocationRegistryBindDeviceToGatewayCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1602,6 +1777,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _gateway_list_options_gateway_type: Default::default(),
+            _gateway_list_options_associations_gateway_id: Default::default(),
+            _gateway_list_options_associations_device_id: Default::default(),
             _field_mask: Default::default(),
             _device_num_ids: Default::default(),
             _device_ids: Default::default(),
@@ -1912,6 +2090,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Associates the device with the gateway.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the registry. For example,
+    ///              `projects/example-project/locations/us-central1/registries/my-registry`.
+    pub fn locations_registries_groups_bind_device_to_gateway(&self, request: BindDeviceToGatewayRequest, parent: &str) -> ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A> {
+        ProjectLocationRegistryGroupBindDeviceToGatewayCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -1952,9 +2150,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// let result = hub.projects().locations_registries_devices_list("parent")
 ///              .page_token("accusam")
 ///              .page_size(-8)
-///              .field_mask("justo")
-///              .add_device_num_ids("amet.")
-///              .add_device_ids("erat")
+///              .gateway_list_options_gateway_type("justo")
+///              .gateway_list_options_associations_gateway_id("amet.")
+///              .gateway_list_options_associations_device_id("erat")
+///              .field_mask("labore")
+///              .add_device_num_ids("sea")
+///              .add_device_ids("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -1965,6 +2166,9 @@ pub struct ProjectLocationRegistryDeviceListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _gateway_list_options_gateway_type: Option<String>,
+    _gateway_list_options_associations_gateway_id: Option<String>,
+    _gateway_list_options_associations_device_id: Option<String>,
     _field_mask: Option<String>,
     _device_num_ids: Vec<String>,
     _device_ids: Vec<String>,
@@ -1990,13 +2194,22 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "cloudiot.projects.locations.registries.devices.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._gateway_list_options_gateway_type {
+            params.push(("gatewayListOptions.gatewayType", value.to_string()));
+        }
+        if let Some(value) = self._gateway_list_options_associations_gateway_id {
+            params.push(("gatewayListOptions.associationsGatewayId", value.to_string()));
+        }
+        if let Some(value) = self._gateway_list_options_associations_device_id {
+            params.push(("gatewayListOptions.associationsDeviceId", value.to_string()));
         }
         if let Some(value) = self._field_mask {
             params.push(("fieldMask", value.to_string()));
@@ -2011,7 +2224,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
                 params.push(("deviceIds", f.to_string()));
             }
         }
-        for &field in ["alt", "parent", "pageToken", "pageSize", "fieldMask", "deviceNumIds", "deviceIds"].iter() {
+        for &field in ["alt", "parent", "pageToken", "pageSize", "gatewayListOptions.gatewayType", "gatewayListOptions.associationsGatewayId", "gatewayListOptions.associationsDeviceId", "fieldMask", "deviceNumIds", "deviceIds"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2037,7 +2250,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2053,10 +2266,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2076,7 +2286,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2159,6 +2369,35 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
         self._page_size = Some(new_value);
         self
     }
+    /// If `GATEWAY` is specified, only gateways are returned. If `NON_GATEWAY`
+    /// is specified, only non-gateway devices are returned. If
+    /// `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
+    ///
+    /// Sets the *gateway list options.gateway type* query property to the given value.
+    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, C, A> {
+        self._gateway_list_options_gateway_type = Some(new_value.to_string());
+        self
+    }
+    /// If set, only devices associated with the specified gateway are returned.
+    /// The gateway ID can be numeric (`num_id`) or the user-defined string
+    /// (`id`). For example, if `123` is specified, only devices bound to the
+    /// gateway with `num_id` 123 are returned.
+    ///
+    /// Sets the *gateway list options.associations gateway id* query property to the given value.
+    pub fn gateway_list_options_associations_gateway_id(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, C, A> {
+        self._gateway_list_options_associations_gateway_id = Some(new_value.to_string());
+        self
+    }
+    /// If set, returns only the gateways with which the specified device is
+    /// associated. The device ID can be numeric (`num_id`) or the user-defined
+    /// string (`id`). For example, if `456` is specified, returns only the
+    /// gateways to which the device with `num_id` 456 is bound.
+    ///
+    /// Sets the *gateway list options.associations device id* query property to the given value.
+    pub fn gateway_list_options_associations_device_id(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, C, A> {
+        self._gateway_list_options_associations_device_id = Some(new_value.to_string());
+        self
+    }
     /// The fields of the `Device` resource to be returned in the response. The
     /// fields `id` and `num_id` are always returned, along with any
     /// other fields specified.
@@ -2201,7 +2440,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2209,12 +2448,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceListCall<'a, C, A>
@@ -2238,6 +2477,566 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the association between the device and the gateway.
+///
+/// A builder for the *locations.registries.groups.unbindDeviceFromGateway* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudiot1 as cloudiot1;
+/// use cloudiot1::UnbindDeviceFromGatewayRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudiot1::CloudIot;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudIot::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UnbindDeviceFromGatewayRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_registries_groups_unbind_device_from_gateway(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudIot<C, A>,
+    _request: UnbindDeviceFromGatewayRequest,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, UnbindDeviceFromGatewayResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudiot.projects.locations.registries.groups.unbindDeviceFromGateway",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}:unbindDeviceFromGateway";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UnbindDeviceFromGatewayRequest) -> ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the registry. For example,
+    /// `projects/example-project/locations/us-central1/registries/my-registry`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGroupUnbindDeviceFromGatewayCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the association between the device and the gateway.
+///
+/// A builder for the *locations.registries.unbindDeviceFromGateway* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudiot1 as cloudiot1;
+/// use cloudiot1::UnbindDeviceFromGatewayRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudiot1::CloudIot;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudIot::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UnbindDeviceFromGatewayRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_registries_unbind_device_from_gateway(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudIot<C, A>,
+    _request: UnbindDeviceFromGatewayRequest,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, UnbindDeviceFromGatewayResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudiot.projects.locations.registries.unbindDeviceFromGateway",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}:unbindDeviceFromGateway";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UnbindDeviceFromGatewayRequest) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the registry. For example,
+    /// `projects/example-project/locations/us-central1/registries/my-registry`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2283,7 +3082,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_patch(req, "name")
-///              .update_mask("sea")
+///              .update_mask("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -2347,7 +3146,7 @@ impl<'a, C, A> ProjectLocationRegistryPatchCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2363,10 +3162,7 @@ impl<'a, C, A> ProjectLocationRegistryPatchCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2398,7 +3194,7 @@ impl<'a, C, A> ProjectLocationRegistryPatchCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2500,7 +3296,7 @@ impl<'a, C, A> ProjectLocationRegistryPatchCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2508,12 +3304,12 @@ impl<'a, C, A> ProjectLocationRegistryPatchCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryPatchCall<'a, C, A>
@@ -2576,7 +3372,7 @@ impl<'a, C, A> ProjectLocationRegistryPatchCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_groups_devices_get("name")
-///              .field_mask("dolores")
+///              .field_mask("no")
 ///              .doit();
 /// # }
 /// ```
@@ -2639,7 +3435,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceGetCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2655,10 +3451,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceGetCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2678,7 +3471,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceGetCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2766,7 +3559,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceGetCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2774,12 +3567,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceGetCall<'a, C, A> where C: Borr
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceGetCall<'a, C, A>
@@ -2908,7 +3701,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupSetIamPolicyCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2924,10 +3717,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupSetIamPolicyCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2959,7 +3749,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupSetIamPolicyCall<'a, C, A> where C: B
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3050,7 +3840,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupSetIamPolicyCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3058,12 +3848,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupSetIamPolicyCall<'a, C, A> where C: B
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a, C, A>
@@ -3127,7 +3917,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupSetIamPolicyCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_groups_devices_config_versions_list("name")
-///              .num_versions(-31)
+///              .num_versions(-34)
 ///              .doit();
 /// # }
 /// ```
@@ -3190,7 +3980,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3206,10 +3996,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3229,7 +4016,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3318,7 +4105,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3326,12 +4113,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
@@ -3355,6 +4142,286 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGroupDeviceConfigVersionListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Associates the device with the gateway.
+///
+/// A builder for the *locations.registries.bindDeviceToGateway* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudiot1 as cloudiot1;
+/// use cloudiot1::BindDeviceToGatewayRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudiot1::CloudIot;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudIot::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BindDeviceToGatewayRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_registries_bind_device_to_gateway(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudIot<C, A>,
+    _request: BindDeviceToGatewayRequest,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BindDeviceToGatewayResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudiot.projects.locations.registries.bindDeviceToGateway",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}:bindDeviceToGateway";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BindDeviceToGatewayRequest) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the registry. For example,
+    /// `projects/example-project/locations/us-central1/registries/my-registry`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3461,7 +4528,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall<'
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3477,10 +4544,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall<'
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3512,7 +4576,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall<'
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3604,7 +4668,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall<'
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3612,12 +4676,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall<'
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall<'a, C, A>
@@ -3686,7 +4750,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceModifyCloudToDeviceConfigCall<'
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_groups_devices_patch(req, "name")
-///              .update_mask("justo")
+///              .update_mask("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -3750,7 +4814,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDevicePatchCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3766,10 +4830,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDevicePatchCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3801,7 +4862,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDevicePatchCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3905,7 +4966,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDevicePatchCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3913,12 +4974,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupDevicePatchCall<'a, C, A> where C: Bo
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDevicePatchCall<'a, C, A>
@@ -4046,7 +5107,7 @@ impl<'a, C, A> ProjectLocationRegistryCreateCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4062,10 +5123,7 @@ impl<'a, C, A> ProjectLocationRegistryCreateCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4097,7 +5155,7 @@ impl<'a, C, A> ProjectLocationRegistryCreateCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4188,7 +5246,7 @@ impl<'a, C, A> ProjectLocationRegistryCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4196,12 +5254,12 @@ impl<'a, C, A> ProjectLocationRegistryCreateCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryCreateCall<'a, C, A>
@@ -4264,8 +5322,8 @@ impl<'a, C, A> ProjectLocationRegistryCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_list("parent")
-///              .page_token("et")
-///              .page_size(-41)
+///              .page_token("aliquyam")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```
@@ -4332,7 +5390,7 @@ impl<'a, C, A> ProjectLocationRegistryListCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4348,10 +5406,7 @@ impl<'a, C, A> ProjectLocationRegistryListCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4371,7 +5426,7 @@ impl<'a, C, A> ProjectLocationRegistryListCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4469,7 +5524,7 @@ impl<'a, C, A> ProjectLocationRegistryListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4477,12 +5532,12 @@ impl<'a, C, A> ProjectLocationRegistryListCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryListCall<'a, C, A>
@@ -4612,7 +5667,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupGetIamPolicyCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4628,10 +5683,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupGetIamPolicyCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4663,7 +5715,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupGetIamPolicyCall<'a, C, A> where C: B
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4754,7 +5806,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupGetIamPolicyCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4762,12 +5814,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupGetIamPolicyCall<'a, C, A> where C: B
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a, C, A>
@@ -4831,7 +5883,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupGetIamPolicyCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_devices_states_list("name")
-///              .num_states(-21)
+///              .num_states(-81)
 ///              .doit();
 /// # }
 /// ```
@@ -4894,7 +5946,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceStateListCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4910,10 +5962,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceStateListCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4933,7 +5982,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceStateListCall<'a, C, A> where C: Bor
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5022,7 +6071,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceStateListCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5030,12 +6079,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceStateListCall<'a, C, A> where C: Bor
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceStateListCall<'a, C, A>
@@ -5156,7 +6205,7 @@ impl<'a, C, A> ProjectLocationRegistryGetCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5172,10 +6221,7 @@ impl<'a, C, A> ProjectLocationRegistryGetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5195,7 +6241,7 @@ impl<'a, C, A> ProjectLocationRegistryGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5274,7 +6320,7 @@ impl<'a, C, A> ProjectLocationRegistryGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5282,12 +6328,12 @@ impl<'a, C, A> ProjectLocationRegistryGetCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGetCall<'a, C, A>
@@ -5408,7 +6454,7 @@ impl<'a, C, A> ProjectLocationRegistryDeleteCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5424,10 +6470,7 @@ impl<'a, C, A> ProjectLocationRegistryDeleteCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5447,7 +6490,7 @@ impl<'a, C, A> ProjectLocationRegistryDeleteCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5526,7 +6569,7 @@ impl<'a, C, A> ProjectLocationRegistryDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5534,12 +6577,12 @@ impl<'a, C, A> ProjectLocationRegistryDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeleteCall<'a, C, A>
@@ -5602,11 +6645,14 @@ impl<'a, C, A> ProjectLocationRegistryDeleteCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_groups_devices_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-75)
-///              .field_mask("erat")
-///              .add_device_num_ids("sadipscing")
-///              .add_device_ids("dolor")
+///              .page_token("elitr")
+///              .page_size(-97)
+///              .gateway_list_options_gateway_type("no")
+///              .gateway_list_options_associations_gateway_id("labore")
+///              .gateway_list_options_associations_device_id("eirmod")
+///              .field_mask("dolore")
+///              .add_device_num_ids("invidunt")
+///              .add_device_ids("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -5617,6 +6663,9 @@ pub struct ProjectLocationRegistryGroupDeviceListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _gateway_list_options_gateway_type: Option<String>,
+    _gateway_list_options_associations_gateway_id: Option<String>,
+    _gateway_list_options_associations_device_id: Option<String>,
     _field_mask: Option<String>,
     _device_num_ids: Vec<String>,
     _device_ids: Vec<String>,
@@ -5642,13 +6691,22 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
         };
         dlg.begin(MethodInfo { id: "cloudiot.projects.locations.registries.groups.devices.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._gateway_list_options_gateway_type {
+            params.push(("gatewayListOptions.gatewayType", value.to_string()));
+        }
+        if let Some(value) = self._gateway_list_options_associations_gateway_id {
+            params.push(("gatewayListOptions.associationsGatewayId", value.to_string()));
+        }
+        if let Some(value) = self._gateway_list_options_associations_device_id {
+            params.push(("gatewayListOptions.associationsDeviceId", value.to_string()));
         }
         if let Some(value) = self._field_mask {
             params.push(("fieldMask", value.to_string()));
@@ -5663,7 +6721,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
                 params.push(("deviceIds", f.to_string()));
             }
         }
-        for &field in ["alt", "parent", "pageToken", "pageSize", "fieldMask", "deviceNumIds", "deviceIds"].iter() {
+        for &field in ["alt", "parent", "pageToken", "pageSize", "gatewayListOptions.gatewayType", "gatewayListOptions.associationsGatewayId", "gatewayListOptions.associationsDeviceId", "fieldMask", "deviceNumIds", "deviceIds"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5689,7 +6747,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5705,10 +6763,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5728,7 +6783,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5811,6 +6866,35 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
         self._page_size = Some(new_value);
         self
     }
+    /// If `GATEWAY` is specified, only gateways are returned. If `NON_GATEWAY`
+    /// is specified, only non-gateway devices are returned. If
+    /// `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
+    ///
+    /// Sets the *gateway list options.gateway type* query property to the given value.
+    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> {
+        self._gateway_list_options_gateway_type = Some(new_value.to_string());
+        self
+    }
+    /// If set, only devices associated with the specified gateway are returned.
+    /// The gateway ID can be numeric (`num_id`) or the user-defined string
+    /// (`id`). For example, if `123` is specified, only devices bound to the
+    /// gateway with `num_id` 123 are returned.
+    ///
+    /// Sets the *gateway list options.associations gateway id* query property to the given value.
+    pub fn gateway_list_options_associations_gateway_id(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> {
+        self._gateway_list_options_associations_gateway_id = Some(new_value.to_string());
+        self
+    }
+    /// If set, returns only the gateways with which the specified device is
+    /// associated. The device ID can be numeric (`num_id`) or the user-defined
+    /// string (`id`). For example, if `456` is specified, returns only the
+    /// gateways to which the device with `num_id` 456 is bound.
+    ///
+    /// Sets the *gateway list options.associations device id* query property to the given value.
+    pub fn gateway_list_options_associations_device_id(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> {
+        self._gateway_list_options_associations_device_id = Some(new_value.to_string());
+        self
+    }
     /// The fields of the `Device` resource to be returned in the response. The
     /// fields `id` and `num_id` are always returned, along with any
     /// other fields specified.
@@ -5853,7 +6937,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5861,12 +6945,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceListCall<'a, C, A>
@@ -5994,7 +7078,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceCreateCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6010,10 +7094,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceCreateCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6045,7 +7126,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceCreateCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6137,7 +7218,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceCreateCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6145,12 +7226,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceCreateCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceCreateCall<'a, C, A>
@@ -6213,7 +7294,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceCreateCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_devices_get("name")
-///              .field_mask("amet")
+///              .field_mask("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -6276,7 +7357,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceGetCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6292,10 +7373,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceGetCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6315,7 +7393,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceGetCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6403,7 +7481,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceGetCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6411,12 +7489,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceGetCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceGetCall<'a, C, A>
@@ -6556,7 +7634,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A> wh
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6572,10 +7650,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A> wh
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6607,7 +7682,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A> wh
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6699,7 +7774,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A> wh
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6707,12 +7782,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A> wh
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A>
@@ -6842,7 +7917,7 @@ impl<'a, C, A> ProjectLocationRegistryTestIamPermissionCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6858,10 +7933,7 @@ impl<'a, C, A> ProjectLocationRegistryTestIamPermissionCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6893,7 +7965,7 @@ impl<'a, C, A> ProjectLocationRegistryTestIamPermissionCall<'a, C, A> where C: B
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6984,7 +8056,7 @@ impl<'a, C, A> ProjectLocationRegistryTestIamPermissionCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6992,12 +8064,12 @@ impl<'a, C, A> ProjectLocationRegistryTestIamPermissionCall<'a, C, A> where C: B
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryTestIamPermissionCall<'a, C, A>
@@ -7066,7 +8138,7 @@ impl<'a, C, A> ProjectLocationRegistryTestIamPermissionCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_devices_patch(req, "name")
-///              .update_mask("dolore")
+///              .update_mask("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -7130,7 +8202,7 @@ impl<'a, C, A> ProjectLocationRegistryDevicePatchCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7146,10 +8218,7 @@ impl<'a, C, A> ProjectLocationRegistryDevicePatchCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7181,7 +8250,7 @@ impl<'a, C, A> ProjectLocationRegistryDevicePatchCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7285,7 +8354,7 @@ impl<'a, C, A> ProjectLocationRegistryDevicePatchCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7293,12 +8362,12 @@ impl<'a, C, A> ProjectLocationRegistryDevicePatchCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDevicePatchCall<'a, C, A>
@@ -7362,7 +8431,7 @@ impl<'a, C, A> ProjectLocationRegistryDevicePatchCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_devices_config_versions_list("name")
-///              .num_versions(-82)
+///              .num_versions(-22)
 ///              .doit();
 /// # }
 /// ```
@@ -7425,7 +8494,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A> wher
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7441,10 +8510,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A> wher
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7464,7 +8530,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A> wher
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7553,7 +8619,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A> wher
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7561,12 +8627,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A> wher
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A>
@@ -7696,7 +8762,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupTestIamPermissionCall<'a, C, A> where
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7712,10 +8778,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupTestIamPermissionCall<'a, C, A> where
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7747,7 +8810,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupTestIamPermissionCall<'a, C, A> where
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7838,7 +8901,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupTestIamPermissionCall<'a, C, A> where
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7846,12 +8909,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupTestIamPermissionCall<'a, C, A> where
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a, C, A>
@@ -7915,7 +8978,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupTestIamPermissionCall<'a, C, A> where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_registries_groups_devices_states_list("name")
-///              .num_states(-9)
+///              .num_states(-45)
 ///              .doit();
 /// # }
 /// ```
@@ -7978,7 +9041,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceStateListCall<'a, C, A> where C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7994,10 +9057,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceStateListCall<'a, C, A> where C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8017,7 +9077,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceStateListCall<'a, C, A> where C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8106,7 +9166,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceStateListCall<'a, C, A> where C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8114,12 +9174,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceStateListCall<'a, C, A> where C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceStateListCall<'a, C, A>
@@ -8249,7 +9309,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8265,10 +9325,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8300,7 +9357,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8392,7 +9449,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8400,12 +9457,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C,
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C, A>
@@ -8535,7 +9592,7 @@ impl<'a, C, A> ProjectLocationRegistryGetIamPolicyCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8551,10 +9608,7 @@ impl<'a, C, A> ProjectLocationRegistryGetIamPolicyCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8586,7 +9640,7 @@ impl<'a, C, A> ProjectLocationRegistryGetIamPolicyCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8677,7 +9731,7 @@ impl<'a, C, A> ProjectLocationRegistryGetIamPolicyCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8685,12 +9739,12 @@ impl<'a, C, A> ProjectLocationRegistryGetIamPolicyCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGetIamPolicyCall<'a, C, A>
@@ -8830,7 +9884,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall<'a, C, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8846,10 +9900,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall<'a, C, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8881,7 +9932,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall<'a, C, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8973,7 +10024,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall<'a, C, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8981,12 +10032,12 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall<'a, C, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceSendCommandToDeviceCall<'a, C, A>
@@ -9107,7 +10158,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceDeleteCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9123,10 +10174,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceDeleteCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9146,7 +10194,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceDeleteCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9226,7 +10274,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceDeleteCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9234,12 +10282,12 @@ impl<'a, C, A> ProjectLocationRegistryDeviceDeleteCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceDeleteCall<'a, C, A>
@@ -9368,7 +10416,7 @@ impl<'a, C, A> ProjectLocationRegistrySetIamPolicyCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9384,10 +10432,7 @@ impl<'a, C, A> ProjectLocationRegistrySetIamPolicyCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9419,7 +10464,7 @@ impl<'a, C, A> ProjectLocationRegistrySetIamPolicyCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9510,7 +10555,7 @@ impl<'a, C, A> ProjectLocationRegistrySetIamPolicyCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9518,12 +10563,12 @@ impl<'a, C, A> ProjectLocationRegistrySetIamPolicyCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistrySetIamPolicyCall<'a, C, A>
@@ -9547,6 +10592,286 @@ impl<'a, C, A> ProjectLocationRegistrySetIamPolicyCall<'a, C, A> where C: Borrow
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistrySetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Associates the device with the gateway.
+///
+/// A builder for the *locations.registries.groups.bindDeviceToGateway* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudiot1 as cloudiot1;
+/// use cloudiot1::BindDeviceToGatewayRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudiot1::CloudIot;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudIot::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BindDeviceToGatewayRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_registries_groups_bind_device_to_gateway(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudIot<C, A>,
+    _request: BindDeviceToGatewayRequest,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BindDeviceToGatewayResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudiot.projects.locations.registries.groups.bindDeviceToGateway",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}:bindDeviceToGateway";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BindDeviceToGatewayRequest) -> ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the registry. For example,
+    /// `projects/example-project/locations/us-central1/registries/my-registry`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGroupBindDeviceToGatewayCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

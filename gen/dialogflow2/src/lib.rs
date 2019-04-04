@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dialogflow* crate version *1.0.8+20181009*, where *20181009* is the exact revision of the *dialogflow:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Dialogflow* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *dialogflow:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Dialogflow* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/dialogflow-enterprise/).
@@ -50,10 +50,10 @@
 //! let r = hub.projects().agent_restore(...).doit()
 //! let r = hub.projects().agent_intents_batch_delete(...).doit()
 //! let r = hub.projects().agent_entity_types_batch_delete(...).doit()
-//! let r = hub.projects().agent_train(...).doit()
+//! let r = hub.projects().agent_import(...).doit()
 //! let r = hub.projects().agent_export(...).doit()
 //! let r = hub.projects().agent_entity_types_batch_update(...).doit()
-//! let r = hub.projects().agent_import(...).doit()
+//! let r = hub.projects().agent_train(...).doit()
 //! let r = hub.projects().agent_intents_batch_update(...).doit()
 //! let r = hub.projects().agent_entity_types_entities_batch_update(...).doit()
 //! let r = hub.projects().agent_entity_types_entities_batch_delete(...).doit()
@@ -242,6 +242,9 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
+    /// View, manage and query your Dialogflow agents
+    Full,
+
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
 }
@@ -249,6 +252,7 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
+            Scope::Full => "https://www.googleapis.com/auth/dialogflow",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
         }
     }
@@ -256,7 +260,7 @@ impl AsRef<str> for Scope {
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::CloudPlatform
+        Scope::Full
     }
 }
 
@@ -397,6 +401,11 @@ pub struct GoogleCloudDialogflowV2DetectIntentRequest {
     /// A single request can contain up to 1 minute of speech audio data.
     #[serde(rename="inputAudio")]
     pub input_audio: Option<String>,
+    /// Optional. Instructs the speech synthesizer how to generate the output
+    /// audio. If this field is not set and agent-level speech synthesizer is not
+    /// configured, no output audio is generated.
+    #[serde(rename="outputAudioConfig")]
+    pub output_audio_config: Option<GoogleCloudDialogflowV2OutputAudioConfig>,
     /// Required. The input specification. It can be set to:
     /// 
     /// 1.  an audio config
@@ -475,59 +484,70 @@ pub struct GoogleCloudDialogflowV2IntentMessageSimpleResponses {
 impl Part for GoogleCloudDialogflowV2IntentMessageSimpleResponses {}
 
 
-/// The request message for EntityTypes.BatchUpdateEntityTypes.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [agent entity types batch update projects](struct.ProjectAgentEntityTypeBatchUpdateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2BatchUpdateEntityTypesRequest {
-    /// Optional. The language of entity synonyms defined in `entity_types`. If not
-    /// specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// Optional. The mask to control which fields get updated.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
-    /// The URI to a Google Cloud Storage file containing entity types to update
-    /// or create. The file format can either be a serialized proto (of
-    /// EntityBatch type) or a JSON object. Note: The URI must start with
-    /// "gs://".
-    #[serde(rename="entityTypeBatchUri")]
-    pub entity_type_batch_uri: Option<String>,
-    /// The collection of entity types to update or create.
-    #[serde(rename="entityTypeBatchInline")]
-    pub entity_type_batch_inline: Option<GoogleCloudDialogflowV2EntityTypeBatch>,
-}
-
-impl RequestValue for GoogleCloudDialogflowV2BatchUpdateEntityTypesRequest {}
-
-
 /// Represents the natural language text to be processed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2TextInput {
-    /// Required. The UTF-8 encoded natural language text to be processed.
-    /// Text length must not exceed 256 bytes.
-    pub text: Option<String>,
     /// Required. The language of this conversational query. See [Language
-    /// Support](https://dialogflow.com/docs/languages) for a list of the
-    /// currently supported language codes. Note that queries in the same session
-    /// do not necessarily need to specify the same language.
+    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// for a list of the currently supported language codes. Note that queries in
+    /// the same session do not necessarily need to specify the same language.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
+    /// Required. The UTF-8 encoded natural language text to be processed.
+    /// Text length must not exceed 256 characters.
+    pub text: Option<String>,
 }
 
 impl Part for GoogleCloudDialogflowV2TextInput {}
+
+
+/// Represents the query input. It can contain either:
+/// 
+/// 1.  An audio config which
+///     instructs the speech recognizer how to process the speech audio.
+/// 
+/// 2.  A conversational query in the form of text,.
+/// 
+/// 3.  An event that specifies which intent to trigger.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2QueryInput {
+    /// The natural language text to be processed.
+    pub text: Option<GoogleCloudDialogflowV2TextInput>,
+    /// The event to be processed.
+    pub event: Option<GoogleCloudDialogflowV2EventInput>,
+    /// Instructs the speech recognizer how to process the speech audio.
+    #[serde(rename="audioConfig")]
+    pub audio_config: Option<GoogleCloudDialogflowV2InputAudioConfig>,
+}
+
+impl Part for GoogleCloudDialogflowV2QueryInput {}
+
+
+/// Description of which voice to use for speech synthesis.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2VoiceSelectionParams {
+    /// Optional. The preferred gender of the voice. If not set, the service will
+    /// choose a voice based on the other parameters such as language_code and
+    /// name. Note that this is only a preference, not requirement. If a
+    /// voice of the appropriate gender is not available, the synthesizer should
+    /// substitute a voice with a different gender rather than failing the request.
+    #[serde(rename="ssmlGender")]
+    pub ssml_gender: Option<String>,
+    /// Optional. The name of the voice. If not set, the service will choose a
+    /// voice based on the other parameters such as language_code and gender.
+    pub name: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2VoiceSelectionParams {}
 
 
 /// The button object that appears at the bottom of a card.
@@ -554,20 +574,20 @@ impl Part for GoogleCloudDialogflowV2IntentMessageBasicCardButton {}
 pub struct GoogleCloudDialogflowV2IntentTrainingPhrasePart {
     /// Optional. The parameter name for the value extracted from the
     /// annotated part of the example.
+    /// This field is required for annotated parts of the training phrase.
     pub alias: Option<String>,
-    /// Optional. The entity type name prefixed with `@`. This field is
-    /// required for the annotated part of the text and applies only to
-    /// examples.
+    /// Optional. The entity type name prefixed with `@`.
+    /// This field is required for annotated parts of the training phrase.
     #[serde(rename="entityType")]
     pub entity_type: Option<String>,
-    /// Optional. Indicates whether the text was manually annotated by the
-    /// developer.
+    /// Required. The text for this part.
+    pub text: Option<String>,
+    /// Optional. Indicates whether the text was manually annotated.
+    /// This field is set to true when the Dialogflow Console is used to
+    /// manually annotate the part. When creating an annotated part with the
+    /// API, you must set this to true.
     #[serde(rename="userDefined")]
     pub user_defined: Option<bool>,
-    /// Required. The text corresponding to the example or template,
-    /// if there are no annotations. For
-    /// annotated examples, it is the text for one of the example's parts.
-    pub text: Option<String>,
 }
 
 impl Part for GoogleCloudDialogflowV2IntentTrainingPhrasePart {}
@@ -617,9 +637,9 @@ pub struct GoogleCloudDialogflowV2Intent {
     /// Required. The name of this intent.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Required for all methods except `create` (`create` populates the name
-    /// automatically.
     /// The unique identifier of this intent.
+    /// Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
+    /// methods.
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     pub name: Option<String>,
     /// Optional. The collection of parameters associated with the intent.
@@ -637,7 +657,7 @@ pub struct GoogleCloudDialogflowV2Intent {
     /// a direct or indirect parent. We populate this field only in the output.
     #[serde(rename="followupIntentInfo")]
     pub followup_intent_info: Option<Vec<GoogleCloudDialogflowV2IntentFollowupIntentInfo>>,
-    /// Optional. The collection of examples/templates that the agent is
+    /// Optional. The collection of examples that the agent is
     /// trained on.
     #[serde(rename="trainingPhrases")]
     pub training_phrases: Option<Vec<GoogleCloudDialogflowV2IntentTrainingPhrase>>,
@@ -645,7 +665,10 @@ pub struct GoogleCloudDialogflowV2Intent {
     /// `Response` field in the Dialogflow console.
     pub messages: Option<Vec<GoogleCloudDialogflowV2IntentMessage>>,
     /// Optional. The priority of this intent. Higher numbers represent higher
-    /// priorities. Zero or negative numbers mean that the intent is disabled.
+    /// priorities. If this is zero or unspecified, we use the default
+    /// priority 500000.
+    /// 
+    /// Negative numbers mean that the intent is disabled.
     pub priority: Option<i32>,
     /// Read-only. The unique identifier of the root intent in the chain of
     /// followup intents. It identifies the correct followup intents chain for
@@ -688,9 +711,10 @@ pub struct GoogleCloudDialogflowV2BatchCreateEntitiesRequest {
     pub entities: Option<Vec<GoogleCloudDialogflowV2EntityTypeEntity>>,
     /// Optional. The language of entity synonyms defined in `entities`. If not
     /// specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
 }
@@ -724,17 +748,17 @@ pub struct GoogleCloudDialogflowV2IntentMessageCarouselSelect {
 impl Part for GoogleCloudDialogflowV2IntentMessageCarouselSelect {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -795,21 +819,32 @@ pub struct GoogleRpcStatus {
 impl Part for GoogleRpcStatus {}
 
 
-/// Optional. Represents an entity.
+/// An **entity entry** for an associated entity type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EntityTypeEntity {
-    /// Required. A collection of synonyms. For `KIND_LIST` entity types this
-    /// must contain exactly one synonym equal to `value`.
-    pub synonyms: Option<Vec<String>>,
-    /// Required.
-    /// For `KIND_MAP` entity types:
-    ///   A canonical name to be used in place of synonyms.
+    /// Required. A collection of value synonyms. For example, if the entity type
+    /// is *vegetable*, and `value` is *scallions*, a synonym could be *green
+    /// onions*.
+    /// 
     /// For `KIND_LIST` entity types:
-    ///   A string that can contain references to other entity types (with or
-    ///   without aliases).
+    /// 
+    /// *   This collection must contain exactly one synonym equal to `value`.
+    pub synonyms: Option<Vec<String>>,
+    /// Required. The primary value associated with this entity entry.
+    /// For example, if the entity type is *vegetable*, the value could be
+    /// *scallions*.
+    /// 
+    /// For `KIND_MAP` entity types:
+    /// 
+    /// *   A canonical value to be used in place of synonyms.
+    /// 
+    /// For `KIND_LIST` entity types:
+    /// 
+    /// *   A string that can contain references to other entity types (with or
+    ///     without aliases).
     pub value: Option<String>,
 }
 
@@ -932,18 +967,28 @@ impl Part for GoogleCloudDialogflowV2IntentMessageCarouselSelectItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2DetectIntentResponse {
-    /// The selected results of the conversational query or event processing.
-    /// See `alternative_query_results` for additional potential results.
-    #[serde(rename="queryResult")]
-    pub query_result: Option<GoogleCloudDialogflowV2QueryResult>,
-    /// Specifies the status of the webhook request. `webhook_status`
-    /// is never populated in webhook requests.
+    /// The audio data bytes encoded as specified in the request.
+    /// Note: The output audio is generated based on the values of default platform
+    /// text responses found in the `query_result.fulfillment_messages` field. If
+    /// multiple default text responses exist, they will be concatenated when
+    /// generating audio. If no default platform text responses exist, the
+    /// generated audio content will be empty.
+    #[serde(rename="outputAudio")]
+    pub output_audio: Option<String>,
+    /// The config used by the speech synthesizer to generate the output audio.
+    #[serde(rename="outputAudioConfig")]
+    pub output_audio_config: Option<GoogleCloudDialogflowV2OutputAudioConfig>,
+    /// Specifies the status of the webhook request.
     #[serde(rename="webhookStatus")]
     pub webhook_status: Option<GoogleRpcStatus>,
     /// The unique identifier of the response. It can be used to
     /// locate a response in the training example set or for reporting issues.
     #[serde(rename="responseId")]
     pub response_id: Option<String>,
+    /// The selected results of the conversational query or event processing.
+    /// See `alternative_query_results` for additional potential results.
+    #[serde(rename="queryResult")]
+    pub query_result: Option<GoogleCloudDialogflowV2QueryResult>,
 }
 
 impl ResponseResult for GoogleCloudDialogflowV2DetectIntentResponse {}
@@ -962,9 +1007,10 @@ impl ResponseResult for GoogleCloudDialogflowV2DetectIntentResponse {}
 pub struct GoogleCloudDialogflowV2BatchDeleteEntitiesRequest {
     /// Optional. The language of entity synonyms defined in `entities`. If not
     /// specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
     /// Required. The canonical `values` of the entities to delete. Note that
@@ -991,6 +1037,80 @@ pub struct GoogleCloudDialogflowV2IntentMessageCardButton {
 }
 
 impl Part for GoogleCloudDialogflowV2IntentMessageCardButton {}
+
+
+/// Configuration of how speech should be synthesized.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SynthesizeSpeechConfig {
+    /// Optional. An identifier which selects 'audio effects' profiles that are
+    /// applied on (post synthesized) text to speech. Effects are applied on top of
+    /// each other in the order they are given.
+    #[serde(rename="effectsProfileId")]
+    pub effects_profile_id: Option<Vec<String>>,
+    /// Optional. The desired voice of the synthesized audio.
+    pub voice: Option<GoogleCloudDialogflowV2VoiceSelectionParams>,
+    /// Optional. Speaking rate/speed, in the range [0.25, 4.0]. 1.0 is the normal
+    /// native speed supported by the specific voice. 2.0 is twice as fast, and
+    /// 0.5 is half as fast. If unset(0.0), defaults to the native 1.0 speed. Any
+    /// other values < 0.25 or > 4.0 will return an error.
+    #[serde(rename="speakingRate")]
+    pub speaking_rate: Option<f64>,
+    /// Optional. Volume gain (in dB) of the normal native volume supported by the
+    /// specific voice, in the range [-96.0, 16.0]. If unset, or set to a value of
+    /// 0.0 (dB), will play at normal native signal amplitude. A value of -6.0 (dB)
+    /// will play at approximately half the amplitude of the normal native signal
+    /// amplitude. A value of +6.0 (dB) will play at approximately twice the
+    /// amplitude of the normal native signal amplitude. We strongly recommend not
+    /// to exceed +10 (dB) as there's usually no effective increase in loudness for
+    /// any value greater than that.
+    #[serde(rename="volumeGainDb")]
+    pub volume_gain_db: Option<f64>,
+    /// Optional. Speaking pitch, in the range [-20.0, 20.0]. 20 means increase 20
+    /// semitones from the original pitch. -20 means decrease 20 semitones from the
+    /// original pitch.
+    pub pitch: Option<f64>,
+}
+
+impl Part for GoogleCloudDialogflowV2SynthesizeSpeechConfig {}
+
+
+/// The request message for EntityTypes.BatchUpdateEntityTypes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [agent entity types batch update projects](struct.ProjectAgentEntityTypeBatchUpdateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2BatchUpdateEntityTypesRequest {
+    /// Optional. The language of entity synonyms defined in `entity_types`. If not
+    /// specified, the agent's default language is used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// The URI to a Google Cloud Storage file containing entity types to update
+    /// or create. The file format can either be a serialized proto (of
+    /// EntityBatch type) or a JSON object. Note: The URI must start with
+    /// "gs://".
+    #[serde(rename="entityTypeBatchUri")]
+    pub entity_type_batch_uri: Option<String>,
+    /// The collection of entity types to update or create.
+    #[serde(rename="entityTypeBatchInline")]
+    pub entity_type_batch_inline: Option<GoogleCloudDialogflowV2EntityTypeBatch>,
+    /// Optional. The mask to control which fields get updated.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
+
+impl RequestValue for GoogleCloudDialogflowV2BatchUpdateEntityTypesRequest {}
 
 
 /// The request message for Agents.ImportAgent.
@@ -1044,14 +1164,18 @@ impl RequestValue for GoogleCloudDialogflowV2ImportAgentRequest {}
 pub struct GoogleCloudDialogflowV2Context {
     /// Required. The unique identifier of the context. Format:
     /// `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`.
+    /// 
+    /// The `Context ID` is always converted to lowercase, may only contain
+    /// characters in [a-zA-Z0-9_-%] and may be at most 250 bytes long.
     pub name: Option<String>,
     /// Optional. The collection of parameters associated with this context.
-    /// Refer to [this doc](https://dialogflow.com/docs/actions-and-parameters) for
-    /// syntax.
+    /// Refer to [this
+    /// doc](https://cloud.google.com/dialogflow-enterprise/docs/intents-actions-parameters)
+    /// for syntax.
     pub parameters: Option<HashMap<String, String>>,
     /// Optional. The number of conversational query requests after which the
     /// context expires. If set to `0` (the default) the context expires
-    /// immediately. Contexts expire automatically after 20 minutes even if there
+    /// immediately. Contexts expire automatically after 20 minutes if there
     /// are no matching queries.
     #[serde(rename="lifespanCount")]
     pub lifespan_count: Option<i32>,
@@ -1079,9 +1203,10 @@ pub struct GoogleCloudDialogflowV2BatchUpdateEntitiesRequest {
     pub update_mask: Option<String>,
     /// Optional. The language of entity synonyms defined in `entities`. If not
     /// specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
 }
@@ -1196,9 +1321,10 @@ impl ResponseResult for GoogleCloudDialogflowV2SessionEntityType {}
 pub struct GoogleCloudDialogflowV2BatchUpdateIntentsRequest {
     /// Optional. The language of training phrases, parameters and rich messages
     /// defined in `intents`. If not specified, the agent's default language is
-    /// used. [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// used. [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
     /// The URI to a Google Cloud Storage file containing intents to update or
@@ -1234,6 +1360,22 @@ pub struct GoogleCloudDialogflowV2IntentMessageSuggestion {
 impl Part for GoogleCloudDialogflowV2IntentMessageSuggestion {}
 
 
+/// Configures the types of sentiment analysis to perform.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SentimentAnalysisRequestConfig {
+    /// Optional. Instructs the service to perform sentiment analysis on
+    /// `query_text`. If not provided, sentiment analysis is not performed on
+    /// `query_text`.
+    #[serde(rename="analyzeQueryTextSentiment")]
+    pub analyze_query_text_sentiment: Option<bool>,
+}
+
+impl Part for GoogleCloudDialogflowV2SentimentAnalysisRequestConfig {}
+
+
 /// The response message for EntityTypes.ListEntityTypes.
 /// 
 /// # Activities
@@ -1258,59 +1400,44 @@ pub struct GoogleCloudDialogflowV2ListEntityTypesResponse {
 impl ResponseResult for GoogleCloudDialogflowV2ListEntityTypesResponse {}
 
 
-/// This message is a wrapper around a collection of entity types.
+/// The response message for SessionEntityTypes.ListSessionEntityTypes.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2EntityTypeBatch {
-    /// A collection of entity types.
-    #[serde(rename="entityTypes")]
-    pub entity_types: Option<Vec<GoogleCloudDialogflowV2EntityType>>,
-}
-
-impl Part for GoogleCloudDialogflowV2EntityTypeBatch {}
-
-
-/// Represents the query input. It can contain either:
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// 1.  An audio config which
-///     instructs the speech recognizer how to process the speech audio.
-/// 
-/// 2.  A conversational query in the form of text,.
-/// 
-/// 3.  An event that specifies which intent to trigger.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [agent sessions entity types list projects](struct.ProjectAgentSessionEntityTypeListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2QueryInput {
-    /// The natural language text to be processed.
-    pub text: Option<GoogleCloudDialogflowV2TextInput>,
-    /// The event to be processed.
-    pub event: Option<GoogleCloudDialogflowV2EventInput>,
-    /// Instructs the speech recognizer how to process the speech audio.
-    #[serde(rename="audioConfig")]
-    pub audio_config: Option<GoogleCloudDialogflowV2InputAudioConfig>,
+pub struct GoogleCloudDialogflowV2ListSessionEntityTypesResponse {
+    /// Token to retrieve the next page of results, or empty if there are no
+    /// more results in the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of session entity types. There will be a maximum number of items
+    /// returned based on the page_size field in the request.
+    #[serde(rename="sessionEntityTypes")]
+    pub session_entity_types: Option<Vec<GoogleCloudDialogflowV2SessionEntityType>>,
 }
 
-impl Part for GoogleCloudDialogflowV2QueryInput {}
+impl ResponseResult for GoogleCloudDialogflowV2ListSessionEntityTypesResponse {}
 
 
 /// Events allow for matching intents by event name instead of the natural
-/// language input. For instance, input `<event: { name: “welcome_event”,
-/// parameters: { name: “Sam” } }>` can trigger a personalized welcome response.
+/// language input. For instance, input `<event: { name: "welcome_event",
+/// parameters: { name: "Sam" } }>` can trigger a personalized welcome response.
 /// The parameter `name` may be used by the agent in the response:
-/// `“Hello #welcome_event.name! What can I do for you today?”`.
+/// `"Hello #welcome_event.name! What can I do for you today?"`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EventInput {
     /// Required. The language of this query. See [Language
-    /// Support](https://dialogflow.com/docs/languages) for a list of the
-    /// currently supported language codes. Note that queries in the same session
-    /// do not necessarily need to specify the same language.
+    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// for a list of the currently supported language codes. Note that queries in
+    /// the same session do not necessarily need to specify the same language.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
     /// Required. The unique identifier of the event.
@@ -1333,13 +1460,13 @@ impl Part for GoogleCloudDialogflowV2EventInput {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListContextsResponse {
+    /// The list of contexts. There will be a maximum number of items
+    /// returned based on the page_size field in the request.
+    pub contexts: Option<Vec<GoogleCloudDialogflowV2Context>>,
     /// Token to retrieve the next page of results, or empty if there are no
     /// more results in the list.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The list of contexts. There will be a maximum number of items
-    /// returned based on the page_size field in the request.
-    pub contexts: Option<Vec<GoogleCloudDialogflowV2Context>>,
 }
 
 impl ResponseResult for GoogleCloudDialogflowV2ListContextsResponse {}
@@ -1353,13 +1480,13 @@ impl ResponseResult for GoogleCloudDialogflowV2ListContextsResponse {}
 pub struct GoogleCloudDialogflowV2IntentMessageCard {
     /// Optional. The collection of card buttons.
     pub buttons: Option<Vec<GoogleCloudDialogflowV2IntentMessageCardButton>>,
-    /// Optional. The title of the card.
-    pub title: Option<String>,
-    /// Optional. The subtitle of the card.
-    pub subtitle: Option<String>,
     /// Optional. The public URI to an image file for the card.
     #[serde(rename="imageUri")]
     pub image_uri: Option<String>,
+    /// Optional. The subtitle of the card.
+    pub subtitle: Option<String>,
+    /// Optional. The title of the card.
+    pub title: Option<String>,
 }
 
 impl Part for GoogleCloudDialogflowV2IntentMessageCard {}
@@ -1403,6 +1530,30 @@ pub struct GoogleCloudDialogflowV2TrainAgentRequest { _never_set: Option<bool> }
 impl RequestValue for GoogleCloudDialogflowV2TrainAgentRequest {}
 
 
+/// Instructs the speech synthesizer how to generate the output audio content.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2OutputAudioConfig {
+    /// Required. Audio encoding of the synthesized audio content.
+    #[serde(rename="audioEncoding")]
+    pub audio_encoding: Option<String>,
+    /// Optional. The synthesis sample rate (in hertz) for this audio. If not
+    /// provided, then the synthesizer will use the default sample rate based on
+    /// the audio encoding. If this is different from the voice's natural sample
+    /// rate, then the synthesizer will honor this request by converting to the
+    /// desired sample rate (which might result in worse audio quality).
+    #[serde(rename="sampleRateHertz")]
+    pub sample_rate_hertz: Option<i32>,
+    /// Optional. Configuration of how speech should be synthesized.
+    #[serde(rename="synthesizeSpeechConfig")]
+    pub synthesize_speech_config: Option<GoogleCloudDialogflowV2SynthesizeSpeechConfig>,
+}
+
+impl Part for GoogleCloudDialogflowV2OutputAudioConfig {}
+
+
 /// The suggestion chip message that allows the user to jump out to the app
 /// or website associated with this agent.
 /// 
@@ -1440,17 +1591,17 @@ pub struct GoogleCloudDialogflowV2EntityType {
     /// expanded.
     #[serde(rename="autoExpansionMode")]
     pub auto_expansion_mode: Option<String>,
-    /// Optional. The collection of entities associated with the entity type.
+    /// Optional. The collection of entity entries associated with the entity type.
     pub entities: Option<Vec<GoogleCloudDialogflowV2EntityTypeEntity>>,
     /// Required. Indicates the kind of entity type.
     pub kind: Option<String>,
     /// Required. The name of the entity type.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Required for all methods except `create` (`create` populates the name
-    /// automatically.
-    /// The unique identifier of the entity type. Format:
-    /// `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
+    /// The unique identifier of the entity type.
+    /// Required for EntityTypes.UpdateEntityType and
+    /// EntityTypes.BatchUpdateEntityTypes methods.
+    /// Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
     pub name: Option<String>,
 }
 
@@ -1497,11 +1648,14 @@ pub struct GoogleCloudDialogflowV2InputAudioConfig {
     pub phrase_hints: Option<Vec<String>>,
     /// Required. The language of the supplied audio. Dialogflow does not do
     /// translations. See [Language
-    /// Support](https://dialogflow.com/docs/languages) for a list of the
-    /// currently supported language codes. Note that queries in the same session
-    /// do not necessarily need to specify the same language.
+    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// for a list of the currently supported language codes. Note that queries in
+    /// the same session do not necessarily need to specify the same language.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
+    /// Required. Audio encoding of the audio content to process.
+    #[serde(rename="audioEncoding")]
+    pub audio_encoding: Option<String>,
     /// Required. Sample rate (in Hertz) of the audio content sent in the query.
     /// Refer to
     /// [Cloud Speech API
@@ -1509,93 +1663,39 @@ pub struct GoogleCloudDialogflowV2InputAudioConfig {
     /// more details.
     #[serde(rename="sampleRateHertz")]
     pub sample_rate_hertz: Option<i32>,
-    /// Required. Audio encoding of the audio content to process.
-    #[serde(rename="audioEncoding")]
-    pub audio_encoding: Option<String>,
 }
 
 impl Part for GoogleCloudDialogflowV2InputAudioConfig {}
 
 
-/// Represents the result of conversational query or event processing.
+/// The result of sentiment analysis as configured by
+/// `sentiment_analysis_request_config`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2QueryResult {
-    /// The language that was triggered during intent detection.
-    /// See [Language Support](https://dialogflow.com/docs/reference/language)
-    /// for a list of the currently supported language codes.
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// The text to be pronounced to the user or shown on the screen.
-    #[serde(rename="fulfillmentText")]
-    pub fulfillment_text: Option<String>,
-    /// This field is set to:
-    /// - `false` if the matched intent has required parameters and not all of
-    ///    the required parameter values have been collected.
-    /// - `true` if all required parameter values have been collected, or if the
-    ///    matched intent doesn't contain any required parameters.
-    #[serde(rename="allRequiredParamsPresent")]
-    pub all_required_params_present: Option<bool>,
-    /// The collection of extracted parameters.
-    pub parameters: Option<HashMap<String, String>>,
-    /// The collection of rich messages to present to the user.
-    #[serde(rename="fulfillmentMessages")]
-    pub fulfillment_messages: Option<Vec<GoogleCloudDialogflowV2IntentMessage>>,
-    /// The Speech recognition confidence between 0.0 and 1.0. A higher number
-    /// indicates an estimated greater likelihood that the recognized words are
-    /// correct. The default of 0.0 is a sentinel value indicating that confidence
-    /// was not set.
-    /// 
-    /// This field is not guaranteed to be accurate or set. In particular this
-    /// field isn't set for StreamingDetectIntent since the streaming endpoint has
-    /// separate confidence estimates per portion of the audio in
-    /// StreamingRecognitionResult.
-    #[serde(rename="speechRecognitionConfidence")]
-    pub speech_recognition_confidence: Option<f32>,
-    /// The intent detection confidence. Values range from 0.0
-    /// (completely uncertain) to 1.0 (completely certain).
-    /// If there are `multiple knowledge_answers` messages, this value is set to
-    /// the greatest `knowledgeAnswers.match_confidence` value in the list.
-    #[serde(rename="intentDetectionConfidence")]
-    pub intent_detection_confidence: Option<f32>,
-    /// The original conversational query text:
-    /// - If natural language text was provided as input, `query_text` contains
-    ///   a copy of the input.
-    /// - If natural language speech audio was provided as input, `query_text`
-    ///   contains the speech recognition result. If speech recognizer produced
-    ///   multiple alternatives, a particular one is picked.
-    /// - If an event was provided as input, `query_text` is not set.
-    #[serde(rename="queryText")]
-    pub query_text: Option<String>,
-    /// The intent that matched the conversational query. Some, not
-    /// all fields are filled in this message, including but not limited to:
-    /// `name`, `display_name` and `webhook_state`.
-    pub intent: Option<GoogleCloudDialogflowV2Intent>,
-    /// The free-form diagnostic info. For example, this field
-    /// could contain webhook call latency.
-    #[serde(rename="diagnosticInfo")]
-    pub diagnostic_info: Option<HashMap<String, String>>,
-    /// The action name from the matched intent.
-    pub action: Option<String>,
-    /// If the query was fulfilled by a webhook call, this field is set to the
-    /// value of the `source` field returned in the webhook response.
-    #[serde(rename="webhookSource")]
-    pub webhook_source: Option<String>,
-    /// The collection of output contexts. If applicable,
-    /// `output_contexts.parameters` contains entries with name
-    /// `<parameter name>.original` containing the original parameter values
-    /// before the query.
-    #[serde(rename="outputContexts")]
-    pub output_contexts: Option<Vec<GoogleCloudDialogflowV2Context>>,
-    /// If the query was fulfilled by a webhook call, this field is set to the
-    /// value of the `payload` field returned in the webhook response.
-    #[serde(rename="webhookPayload")]
-    pub webhook_payload: Option<HashMap<String, String>>,
+pub struct GoogleCloudDialogflowV2SentimentAnalysisResult {
+    /// The sentiment analysis result for `query_text`.
+    #[serde(rename="queryTextSentiment")]
+    pub query_text_sentiment: Option<GoogleCloudDialogflowV2Sentiment>,
 }
 
-impl Part for GoogleCloudDialogflowV2QueryResult {}
+impl Part for GoogleCloudDialogflowV2SentimentAnalysisResult {}
+
+
+/// The card for presenting a list of options to select from.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2IntentMessageListSelect {
+    /// Required. List items.
+    pub items: Option<Vec<GoogleCloudDialogflowV2IntentMessageListSelectItem>>,
+    /// Optional. The overall title of the list.
+    pub title: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2IntentMessageListSelect {}
 
 
 /// Additional info about the select item for when it is triggered in a
@@ -1616,28 +1716,22 @@ pub struct GoogleCloudDialogflowV2IntentMessageSelectItemInfo {
 impl Part for GoogleCloudDialogflowV2IntentMessageSelectItemInfo {}
 
 
-/// The response message for SessionEntityTypes.ListSessionEntityTypes.
+/// The sentiment, such as positive/negative feeling or association, for a unit
+/// of analysis, such as the query text.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [agent sessions entity types list projects](struct.ProjectAgentSessionEntityTypeListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2ListSessionEntityTypesResponse {
-    /// Token to retrieve the next page of results, or empty if there are no
-    /// more results in the list.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of session entity types. There will be a maximum number of items
-    /// returned based on the page_size field in the request.
-    #[serde(rename="sessionEntityTypes")]
-    pub session_entity_types: Option<Vec<GoogleCloudDialogflowV2SessionEntityType>>,
+pub struct GoogleCloudDialogflowV2Sentiment {
+    /// A non-negative number in the [0, +inf) range, which represents the absolute
+    /// magnitude of sentiment, regardless of score (positive or negative).
+    pub magnitude: Option<f32>,
+    /// Sentiment score between -1.0 (negative sentiment) and 1.0 (positive
+    /// sentiment).
+    pub score: Option<f32>,
 }
 
-impl ResponseResult for GoogleCloudDialogflowV2ListSessionEntityTypesResponse {}
+impl Part for GoogleCloudDialogflowV2Sentiment {}
 
 
 /// The quick replies response message.
@@ -1656,19 +1750,92 @@ pub struct GoogleCloudDialogflowV2IntentMessageQuickReplies {
 impl Part for GoogleCloudDialogflowV2IntentMessageQuickReplies {}
 
 
-/// The card for presenting a list of options to select from.
+/// Represents the result of conversational query or event processing.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2IntentMessageListSelect {
-    /// Required. List items.
-    pub items: Option<Vec<GoogleCloudDialogflowV2IntentMessageListSelectItem>>,
-    /// Optional. The overall title of the list.
-    pub title: Option<String>,
+pub struct GoogleCloudDialogflowV2QueryResult {
+    /// The collection of rich messages to present to the user.
+    #[serde(rename="fulfillmentMessages")]
+    pub fulfillment_messages: Option<Vec<GoogleCloudDialogflowV2IntentMessage>>,
+    /// The text to be pronounced to the user or shown on the screen.
+    /// Note: This is a legacy field, `fulfillment_messages` should be preferred.
+    #[serde(rename="fulfillmentText")]
+    pub fulfillment_text: Option<String>,
+    /// This field is set to:
+    /// - `false` if the matched intent has required parameters and not all of
+    ///    the required parameter values have been collected.
+    /// - `true` if all required parameter values have been collected, or if the
+    ///    matched intent doesn't contain any required parameters.
+    #[serde(rename="allRequiredParamsPresent")]
+    pub all_required_params_present: Option<bool>,
+    /// The collection of extracted parameters.
+    pub parameters: Option<HashMap<String, String>>,
+    /// The language that was triggered during intent detection.
+    /// See [Language
+    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// for a list of the currently supported language codes.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// The Speech recognition confidence between 0.0 and 1.0. A higher number
+    /// indicates an estimated greater likelihood that the recognized words are
+    /// correct. The default of 0.0 is a sentinel value indicating that confidence
+    /// was not set.
+    /// 
+    /// This field is not guaranteed to be accurate or set. In particular this
+    /// field isn't set for StreamingDetectIntent since the streaming endpoint has
+    /// separate confidence estimates per portion of the audio in
+    /// StreamingRecognitionResult.
+    #[serde(rename="speechRecognitionConfidence")]
+    pub speech_recognition_confidence: Option<f32>,
+    /// The intent detection confidence. Values range from 0.0
+    /// (completely uncertain) to 1.0 (completely certain).
+    /// If there are `multiple knowledge_answers` messages, this value is set to
+    /// the greatest `knowledgeAnswers.match_confidence` value in the list.
+    #[serde(rename="intentDetectionConfidence")]
+    pub intent_detection_confidence: Option<f32>,
+    /// The action name from the matched intent.
+    pub action: Option<String>,
+    /// The intent that matched the conversational query. Some, not
+    /// all fields are filled in this message, including but not limited to:
+    /// `name`, `display_name` and `webhook_state`.
+    pub intent: Option<GoogleCloudDialogflowV2Intent>,
+    /// The sentiment analysis result, which depends on the
+    /// `sentiment_analysis_request_config` specified in the request.
+    #[serde(rename="sentimentAnalysisResult")]
+    pub sentiment_analysis_result: Option<GoogleCloudDialogflowV2SentimentAnalysisResult>,
+    /// The free-form diagnostic info. For example, this field could contain
+    /// webhook call latency. The string keys of the Struct's fields map can change
+    /// without notice.
+    #[serde(rename="diagnosticInfo")]
+    pub diagnostic_info: Option<HashMap<String, String>>,
+    /// The original conversational query text:
+    /// - If natural language text was provided as input, `query_text` contains
+    ///   a copy of the input.
+    /// - If natural language speech audio was provided as input, `query_text`
+    ///   contains the speech recognition result. If speech recognizer produced
+    ///   multiple alternatives, a particular one is picked.
+    /// - If an event was provided as input, `query_text` is not set.
+    #[serde(rename="queryText")]
+    pub query_text: Option<String>,
+    /// The collection of output contexts. If applicable,
+    /// `output_contexts.parameters` contains entries with name
+    /// `<parameter name>.original` containing the original parameter values
+    /// before the query.
+    #[serde(rename="outputContexts")]
+    pub output_contexts: Option<Vec<GoogleCloudDialogflowV2Context>>,
+    /// If the query was fulfilled by a webhook call, this field is set to the
+    /// value of the `source` field returned in the webhook response.
+    #[serde(rename="webhookSource")]
+    pub webhook_source: Option<String>,
+    /// If the query was fulfilled by a webhook call, this field is set to the
+    /// value of the `payload` field returned in the webhook response.
+    #[serde(rename="webhookPayload")]
+    pub webhook_payload: Option<HashMap<String, String>>,
 }
 
-impl Part for GoogleCloudDialogflowV2IntentMessageListSelect {}
+impl Part for GoogleCloudDialogflowV2QueryResult {}
 
 
 /// The basic card message. Useful for displaying information.
@@ -1693,22 +1860,38 @@ pub struct GoogleCloudDialogflowV2IntentMessageBasicCard {
 impl Part for GoogleCloudDialogflowV2IntentMessageBasicCard {}
 
 
-/// Represents an example or template that the agent is trained on.
+/// Represents an example that the agent is trained on.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentTrainingPhrase {
-    /// Required. The collection of training phrase parts (can be annotated).
-    /// Fields: `entity_type`, `alias` and `user_defined` should be populated
-    /// only for the annotated parts of the training phrase.
+    /// Required. The ordered list of training phrase parts.
+    /// The parts are concatenated in order to form the training phrase.
+    /// 
+    /// Note: The API does not automatically annotate training phrases like the
+    /// Dialogflow Console does.
+    /// 
+    /// Note: Do not forget to include whitespace at part boundaries,
+    /// so the training phrase is well formatted when the parts are concatenated.
+    /// 
+    /// If the training phrase does not need to be annotated with parameters,
+    /// you just need a single part with only the Part.text field set.
+    /// 
+    /// If you want to annotate the training phrase, you must create multiple
+    /// parts, where the fields of each part are populated in one of two ways:
+    /// 
+    /// -   `Part.text` is set to a part of the phrase that has no parameters.
+    /// -   `Part.text` is set to a part of the phrase that you want to annotate,
+    ///     and the `entity_type`, `alias`, and `user_defined` fields are all
+    ///     set.
     pub parts: Option<Vec<GoogleCloudDialogflowV2IntentTrainingPhrasePart>>,
     /// Required. The type of the training phrase.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Output only. The unique identifier of this training phrase.
     pub name: Option<String>,
-    /// Optional. Indicates how many times this example or template was added to
+    /// Optional. Indicates how many times this example was added to
     /// the intent. Each time a developer adds an existing sample by editing an
     /// intent or training, this counter is increased.
     #[serde(rename="timesAddedCount")]
@@ -1795,6 +1978,10 @@ pub struct GoogleCloudDialogflowV2QueryParameters {
     /// Optional. The collection of contexts to be activated before this query is
     /// executed.
     pub contexts: Option<Vec<GoogleCloudDialogflowV2Context>>,
+    /// Optional. Configures the type of sentiment analysis to perform. If not
+    /// provided, sentiment analysis is not performed.
+    #[serde(rename="sentimentAnalysisRequestConfig")]
+    pub sentiment_analysis_request_config: Option<GoogleCloudDialogflowV2SentimentAnalysisRequestConfig>,
     /// Optional. The time zone of this conversational query from the
     /// [time zone database](https://www.iana.org/time-zones), e.g.,
     /// America/New_York, Europe/Paris. If not provided, the time zone specified in
@@ -1840,6 +2027,19 @@ pub struct GoogleCloudDialogflowV2IntentMessageSimpleResponse {
 impl Part for GoogleCloudDialogflowV2IntentMessageSimpleResponse {}
 
 
+/// The collection of suggestions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2IntentMessageSuggestions {
+    /// Required. The list of suggested replies.
+    pub suggestions: Option<Vec<GoogleCloudDialogflowV2IntentMessageSuggestion>>,
+}
+
+impl Part for GoogleCloudDialogflowV2IntentMessageSuggestions {}
+
+
 /// Opens the given URI.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1864,10 +2064,10 @@ impl Part for GoogleCloudDialogflowV2IntentMessageBasicCardButtonOpenUriAction {
 /// * [agent restore projects](struct.ProjectAgentRestoreCall.html) (response)
 /// * [agent intents batch delete projects](struct.ProjectAgentIntentBatchDeleteCall.html) (response)
 /// * [agent entity types batch delete projects](struct.ProjectAgentEntityTypeBatchDeleteCall.html) (response)
-/// * [agent train projects](struct.ProjectAgentTrainCall.html) (response)
+/// * [agent import projects](struct.ProjectAgentImportCall.html) (response)
 /// * [agent export projects](struct.ProjectAgentExportCall.html) (response)
 /// * [agent entity types batch update projects](struct.ProjectAgentEntityTypeBatchUpdateCall.html) (response)
-/// * [agent import projects](struct.ProjectAgentImportCall.html) (response)
+/// * [agent train projects](struct.ProjectAgentTrainCall.html) (response)
 /// * [agent intents batch update projects](struct.ProjectAgentIntentBatchUpdateCall.html) (response)
 /// * [agent entity types entities batch update projects](struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html) (response)
 /// * [agent entity types entities batch delete projects](struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html) (response)
@@ -1918,7 +2118,9 @@ impl ResponseResult for GoogleLongrunningOperation {}
 pub struct GoogleCloudDialogflowV2Agent {
     /// Optional. The URI of the agent's avatar.
     /// Avatars are used throughout the Dialogflow console and in the self-hosted
-    /// [Web Demo](https://dialogflow.com/docs/integrations/web-demo) integration.
+    /// [Web
+    /// Demo](https://cloud.google.com/dialogflow-enterprise/docs/integrations/web-demo)
+    /// integration.
     #[serde(rename="avatarUri")]
     pub avatar_uri: Option<String>,
     /// Required. The name of this agent.
@@ -1930,15 +2132,16 @@ pub struct GoogleCloudDialogflowV2Agent {
     /// Required. The project of this agent.
     /// Format: `projects/<Project ID>`.
     pub parent: Option<String>,
+    /// Required. The default language of the agent as a language tag. See
+    /// [Language
+    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// for a list of the currently supported language codes. This field cannot be
+    /// set by the `Update` method.
+    #[serde(rename="defaultLanguageCode")]
+    pub default_language_code: Option<String>,
     /// Optional. Determines whether this agent should log conversation queries.
     #[serde(rename="enableLogging")]
     pub enable_logging: Option<bool>,
-    /// Required. The default language of the agent as a language tag. See
-    /// [Language Support](https://dialogflow.com/docs/reference/language) for a
-    /// list of the currently supported language codes.
-    /// This field cannot be set by the `Update` method.
-    #[serde(rename="defaultLanguageCode")]
-    pub default_language_code: Option<String>,
     /// Optional. Determines how intents are detected from user queries.
     #[serde(rename="matchMode")]
     pub match_mode: Option<String>,
@@ -1954,7 +2157,7 @@ pub struct GoogleCloudDialogflowV2Agent {
     /// Optional. To filter out false positive results and still get variety in
     /// matched natural language inputs for your agent, you can tune the machine
     /// learning classification threshold. If the returned score value is less than
-    /// the threshold value, then a fallback intent is be triggered or, if there
+    /// the threshold value, then a fallback intent will be triggered or, if there
     /// are no fallback intents defined, no intent will be triggered. The score
     /// values range from 0.0 (completely uncertain) to 1.0 (completely certain).
     /// If set to 0.0, the default of 0.3 is used.
@@ -1965,17 +2168,18 @@ pub struct GoogleCloudDialogflowV2Agent {
 impl ResponseResult for GoogleCloudDialogflowV2Agent {}
 
 
-/// The collection of suggestions.
+/// This message is a wrapper around a collection of entity types.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2IntentMessageSuggestions {
-    /// Required. The list of suggested replies.
-    pub suggestions: Option<Vec<GoogleCloudDialogflowV2IntentMessageSuggestion>>,
+pub struct GoogleCloudDialogflowV2EntityTypeBatch {
+    /// A collection of entity types.
+    #[serde(rename="entityTypes")]
+    pub entity_types: Option<Vec<GoogleCloudDialogflowV2EntityType>>,
 }
 
-impl Part for GoogleCloudDialogflowV2IntentMessageSuggestions {}
+impl Part for GoogleCloudDialogflowV2EntityTypeBatch {}
 
 
 /// An item in the list.
@@ -2119,8 +2323,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Updates/Creates multiple entity types in the specified agent.
     /// 
-    /// Operation <response: BatchUpdateEntityTypesResponse,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: BatchUpdateEntityTypesResponse>
     /// 
     /// # Arguments
     ///
@@ -2142,8 +2345,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Trains the specified agent.
     /// 
-    /// Operation <response: google.protobuf.Empty,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
     ///
@@ -2212,8 +2414,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Replaces the current agent version with a new one. All the intents and
     /// entity types in the older version are deleted.
     /// 
-    /// Operation <response: google.protobuf.Empty,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
     ///
@@ -2261,8 +2462,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Deletes entity types in the specified agent.
     /// 
-    /// Operation <response: google.protobuf.Empty,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
     ///
@@ -2288,8 +2488,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Intents and entity types with the same name are replaced with the new
     /// versions from ImportAgentRequest.
     /// 
-    /// Operation <response: google.protobuf.Empty,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
     ///
@@ -2335,8 +2534,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// method does not affect entities in the entity type that aren't explicitly
     /// specified in the request.
     /// 
-    /// Operation <response: google.protobuf.Empty,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
     ///
@@ -2489,10 +2687,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required for all methods except `create` (`create` populates the name
-    ///            automatically.
-    ///            The unique identifier of the entity type. Format:
-    ///            `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
+    /// * `name` - The unique identifier of the entity type.
+    ///            Required for EntityTypes.UpdateEntityType and
+    ///            EntityTypes.BatchUpdateEntityTypes methods.
+    ///            Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
     pub fn agent_entity_types_patch(&self, request: GoogleCloudDialogflowV2EntityType, name: &str) -> ProjectAgentEntityTypePatchCall<'a, C, A> {
         ProjectAgentEntityTypePatchCall {
             hub: self.hub,
@@ -2587,8 +2785,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Deletes entities in the specified entity type.
     /// 
-    /// Operation <response: google.protobuf.Empty,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
     ///
@@ -2615,6 +2812,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - Required. The unique identifier of the context. Format:
     ///            `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`.
+    ///            The `Context ID` is always converted to lowercase, may only contain
+    ///            characters in [a-zA-Z0-9_-%] and may be at most 250 bytes long.
     pub fn agent_sessions_contexts_patch(&self, request: GoogleCloudDialogflowV2Context, name: &str) -> ProjectAgentSessionContextPatchCall<'a, C, A> {
         ProjectAgentSessionContextPatchCall {
             hub: self.hub,
@@ -2724,8 +2923,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Exports the specified agent to a ZIP file.
     /// 
-    /// Operation <response: ExportAgentResponse,
-    ///            metadata: google.protobuf.Struct>
+    /// Operation <response: ExportAgentResponse>
     /// 
     /// # Arguments
     ///
@@ -2750,9 +2948,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required for all methods except `create` (`create` populates the name
-    ///            automatically.
-    ///            The unique identifier of this intent.
+    /// * `name` - The unique identifier of this intent.
+    ///            Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
+    ///            methods.
     ///            Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     pub fn agent_intents_patch(&self, request: GoogleCloudDialogflowV2Intent, name: &str) -> ProjectAgentIntentPatchCall<'a, C, A> {
         ProjectAgentIntentPatchCall {
@@ -2949,7 +3147,7 @@ impl<'a, C, A> ProjectAgentSessionDeleteContextCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2965,10 +3163,7 @@ impl<'a, C, A> ProjectAgentSessionDeleteContextCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2988,7 +3183,7 @@ impl<'a, C, A> ProjectAgentSessionDeleteContextCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3067,7 +3262,7 @@ impl<'a, C, A> ProjectAgentSessionDeleteContextCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3075,12 +3270,12 @@ impl<'a, C, A> ProjectAgentSessionDeleteContextCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionDeleteContextCall<'a, C, A>
@@ -3213,7 +3408,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypePatchCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3229,10 +3424,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypePatchCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3264,7 +3456,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypePatchCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3366,7 +3558,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypePatchCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3374,12 +3566,12 @@ impl<'a, C, A> ProjectAgentSessionEntityTypePatchCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionEntityTypePatchCall<'a, C, A>
@@ -3416,8 +3608,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypePatchCall<'a, C, A> where C: BorrowM
 
 /// Updates/Creates multiple entity types in the specified agent.
 /// 
-/// Operation <response: BatchUpdateEntityTypesResponse,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: BatchUpdateEntityTypesResponse>
 ///
 /// A builder for the *agent.entityTypes.batchUpdate* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3510,7 +3701,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchUpdateCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3526,10 +3717,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchUpdateCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3561,7 +3749,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchUpdateCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3652,7 +3840,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchUpdateCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3660,12 +3848,12 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchUpdateCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeBatchUpdateCall<'a, C, A>
@@ -3702,8 +3890,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchUpdateCall<'a, C, A> where C: BorrowMu
 
 /// Trains the specified agent.
 /// 
-/// Operation <response: google.protobuf.Empty,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *agent.train* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3796,7 +3983,7 @@ impl<'a, C, A> ProjectAgentTrainCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3812,10 +3999,7 @@ impl<'a, C, A> ProjectAgentTrainCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3847,7 +4031,7 @@ impl<'a, C, A> ProjectAgentTrainCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3938,7 +4122,7 @@ impl<'a, C, A> ProjectAgentTrainCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3946,12 +4130,12 @@ impl<'a, C, A> ProjectAgentTrainCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentTrainCall<'a, C, A>
@@ -4081,7 +4265,7 @@ impl<'a, C, A> ProjectAgentIntentBatchUpdateCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4097,10 +4281,7 @@ impl<'a, C, A> ProjectAgentIntentBatchUpdateCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4132,7 +4313,7 @@ impl<'a, C, A> ProjectAgentIntentBatchUpdateCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4223,7 +4404,7 @@ impl<'a, C, A> ProjectAgentIntentBatchUpdateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4231,12 +4412,12 @@ impl<'a, C, A> ProjectAgentIntentBatchUpdateCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentIntentBatchUpdateCall<'a, C, A>
@@ -4366,7 +4547,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4382,10 +4563,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4417,7 +4595,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4508,7 +4686,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4516,12 +4694,12 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A> where C: Bo
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A>
@@ -4561,8 +4739,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A> where C: Bo
 /// Replaces the current agent version with a new one. All the intents and
 /// entity types in the older version are deleted.
 /// 
-/// Operation <response: google.protobuf.Empty,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *agent.restore* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4655,7 +4832,7 @@ impl<'a, C, A> ProjectAgentRestoreCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4671,10 +4848,7 @@ impl<'a, C, A> ProjectAgentRestoreCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4706,7 +4880,7 @@ impl<'a, C, A> ProjectAgentRestoreCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4797,7 +4971,7 @@ impl<'a, C, A> ProjectAgentRestoreCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4805,12 +4979,12 @@ impl<'a, C, A> ProjectAgentRestoreCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentRestoreCall<'a, C, A>
@@ -4941,7 +5115,7 @@ impl<'a, C, A> ProjectAgentSessionDetectIntentCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4957,10 +5131,7 @@ impl<'a, C, A> ProjectAgentSessionDetectIntentCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4992,7 +5163,7 @@ impl<'a, C, A> ProjectAgentSessionDetectIntentCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5086,7 +5257,7 @@ impl<'a, C, A> ProjectAgentSessionDetectIntentCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5094,12 +5265,12 @@ impl<'a, C, A> ProjectAgentSessionDetectIntentCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionDetectIntentCall<'a, C, A>
@@ -5136,8 +5307,7 @@ impl<'a, C, A> ProjectAgentSessionDetectIntentCall<'a, C, A> where C: BorrowMut<
 
 /// Deletes entity types in the specified agent.
 /// 
-/// Operation <response: google.protobuf.Empty,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *agent.entityTypes.batchDelete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5230,7 +5400,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5246,10 +5416,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5281,7 +5448,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5372,7 +5539,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5380,12 +5547,12 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A>
@@ -5426,8 +5593,7 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A> where C: BorrowMu
 /// Intents and entity types with the same name are replaced with the new
 /// versions from ImportAgentRequest.
 /// 
-/// Operation <response: google.protobuf.Empty,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *agent.import* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5520,7 +5686,7 @@ impl<'a, C, A> ProjectAgentImportCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5536,10 +5702,7 @@ impl<'a, C, A> ProjectAgentImportCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5571,7 +5734,7 @@ impl<'a, C, A> ProjectAgentImportCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5662,7 +5825,7 @@ impl<'a, C, A> ProjectAgentImportCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5670,12 +5833,12 @@ impl<'a, C, A> ProjectAgentImportCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentImportCall<'a, C, A>
@@ -5816,7 +5979,7 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5832,10 +5995,7 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5855,7 +6015,7 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5936,9 +6096,10 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
     /// Optional. The language to list training phrases, parameters and rich
     /// messages for. If not specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentIntentListCall<'a, C, A> {
@@ -5967,7 +6128,7 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5975,12 +6136,12 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentIntentListCall<'a, C, A>
@@ -6019,8 +6180,7 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// method does not affect entities in the entity type that aren't explicitly
 /// specified in the request.
 /// 
-/// Operation <response: google.protobuf.Empty,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *agent.entityTypes.entities.batchUpdate* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6113,7 +6273,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6129,10 +6289,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6164,7 +6321,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6255,7 +6412,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6263,12 +6420,12 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A>
@@ -6399,7 +6556,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeCreateCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6415,10 +6572,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeCreateCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6450,7 +6604,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeCreateCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6541,7 +6695,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeCreateCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6549,12 +6703,12 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeCreateCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionEntityTypeCreateCall<'a, C, A>
@@ -6684,7 +6838,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6700,10 +6854,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6735,7 +6886,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6826,7 +6977,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6834,12 +6985,12 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionContextCreateCall<'a, C, A>
@@ -6970,7 +7121,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeListCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6986,10 +7137,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeListCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7009,7 +7157,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeListCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7103,7 +7251,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeListCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7111,12 +7259,12 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeListCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionEntityTypeListCall<'a, C, A>
@@ -7247,7 +7395,7 @@ impl<'a, C, A> ProjectAgentSessionContextListCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7263,10 +7411,7 @@ impl<'a, C, A> ProjectAgentSessionContextListCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7286,7 +7431,7 @@ impl<'a, C, A> ProjectAgentSessionContextListCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7380,7 +7525,7 @@ impl<'a, C, A> ProjectAgentSessionContextListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7388,12 +7533,12 @@ impl<'a, C, A> ProjectAgentSessionContextListCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionContextListCall<'a, C, A>
@@ -7529,7 +7674,7 @@ impl<'a, C, A> ProjectAgentEntityTypeListCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7545,10 +7690,7 @@ impl<'a, C, A> ProjectAgentEntityTypeListCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7568,7 +7710,7 @@ impl<'a, C, A> ProjectAgentEntityTypeListCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7649,9 +7791,10 @@ impl<'a, C, A> ProjectAgentEntityTypeListCall<'a, C, A> where C: BorrowMut<hyper
     }
     /// Optional. The language to list entity synonyms for. If not specified,
     /// the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentEntityTypeListCall<'a, C, A> {
@@ -7673,7 +7816,7 @@ impl<'a, C, A> ProjectAgentEntityTypeListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7681,12 +7824,12 @@ impl<'a, C, A> ProjectAgentEntityTypeListCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeListCall<'a, C, A>
@@ -7816,7 +7959,7 @@ impl<'a, C, A> ProjectAgentIntentBatchDeleteCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7832,10 +7975,7 @@ impl<'a, C, A> ProjectAgentIntentBatchDeleteCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7867,7 +8007,7 @@ impl<'a, C, A> ProjectAgentIntentBatchDeleteCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7958,7 +8098,7 @@ impl<'a, C, A> ProjectAgentIntentBatchDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7966,12 +8106,12 @@ impl<'a, C, A> ProjectAgentIntentBatchDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentIntentBatchDeleteCall<'a, C, A>
@@ -8109,7 +8249,7 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8125,10 +8265,7 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8160,7 +8297,7 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8225,10 +8362,10 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// Required for all methods except `create` (`create` populates the name
-    /// automatically.
-    /// The unique identifier of the entity type. Format:
-    /// `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
+    /// The unique identifier of the entity type.
+    /// Required for EntityTypes.UpdateEntityType and
+    /// EntityTypes.BatchUpdateEntityTypes methods.
+    /// Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8247,9 +8384,10 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
     }
     /// Optional. The language of entity synonyms defined in `entity_type`. If not
     /// specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentEntityTypePatchCall<'a, C, A> {
@@ -8271,7 +8409,7 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8279,12 +8417,12 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypePatchCall<'a, C, A>
@@ -8405,7 +8543,7 @@ impl<'a, C, A> ProjectAgentEntityTypeDeleteCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8421,10 +8559,7 @@ impl<'a, C, A> ProjectAgentEntityTypeDeleteCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8444,7 +8579,7 @@ impl<'a, C, A> ProjectAgentEntityTypeDeleteCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8523,7 +8658,7 @@ impl<'a, C, A> ProjectAgentEntityTypeDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8531,12 +8666,12 @@ impl<'a, C, A> ProjectAgentEntityTypeDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeDeleteCall<'a, C, A>
@@ -8657,7 +8792,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeGetCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8673,10 +8808,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeGetCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8696,7 +8828,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeGetCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8776,7 +8908,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeGetCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8784,12 +8916,12 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeGetCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionEntityTypeGetCall<'a, C, A>
@@ -8922,7 +9054,7 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8938,10 +9070,7 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8973,7 +9102,7 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9051,9 +9180,10 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
     }
     /// Optional. The language of entity synonyms defined in `entity_type`. If not
     /// specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentEntityTypeCreateCall<'a, C, A> {
@@ -9075,7 +9205,7 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9083,12 +9213,12 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeCreateCall<'a, C, A>
@@ -9214,7 +9344,7 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9230,10 +9360,7 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9253,7 +9380,7 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9319,9 +9446,10 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
     }
     /// Optional. The language to retrieve entity synonyms for. If not specified,
     /// the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentEntityTypeGetCall<'a, C, A> {
@@ -9343,7 +9471,7 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9351,12 +9479,12 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeGetCall<'a, C, A>
@@ -9393,8 +9521,7 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
 
 /// Deletes entities in the specified entity type.
 /// 
-/// Operation <response: google.protobuf.Empty,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *agent.entityTypes.entities.batchDelete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9487,7 +9614,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9503,10 +9630,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9538,7 +9662,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9629,7 +9753,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9637,12 +9761,12 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A>
@@ -9775,7 +9899,7 @@ impl<'a, C, A> ProjectAgentSessionContextPatchCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9791,10 +9915,7 @@ impl<'a, C, A> ProjectAgentSessionContextPatchCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9826,7 +9947,7 @@ impl<'a, C, A> ProjectAgentSessionContextPatchCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9893,6 +10014,9 @@ impl<'a, C, A> ProjectAgentSessionContextPatchCall<'a, C, A> where C: BorrowMut<
     }
     /// Required. The unique identifier of the context. Format:
     /// `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`.
+    /// 
+    /// The `Context ID` is always converted to lowercase, may only contain
+    /// characters in [a-zA-Z0-9_-%] and may be at most 250 bytes long.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9924,7 +10048,7 @@ impl<'a, C, A> ProjectAgentSessionContextPatchCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9932,12 +10056,12 @@ impl<'a, C, A> ProjectAgentSessionContextPatchCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionContextPatchCall<'a, C, A>
@@ -10058,7 +10182,7 @@ impl<'a, C, A> ProjectAgentSessionContextGetCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10074,10 +10198,7 @@ impl<'a, C, A> ProjectAgentSessionContextGetCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10097,7 +10218,7 @@ impl<'a, C, A> ProjectAgentSessionContextGetCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10176,7 +10297,7 @@ impl<'a, C, A> ProjectAgentSessionContextGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10184,12 +10305,12 @@ impl<'a, C, A> ProjectAgentSessionContextGetCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionContextGetCall<'a, C, A>
@@ -10312,7 +10433,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10328,10 +10449,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10351,7 +10469,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10429,7 +10547,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10437,12 +10555,12 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, C, A>
@@ -10573,7 +10691,7 @@ impl<'a, C, A> ProjectAgentIntentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10589,10 +10707,7 @@ impl<'a, C, A> ProjectAgentIntentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10612,7 +10727,7 @@ impl<'a, C, A> ProjectAgentIntentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10678,9 +10793,10 @@ impl<'a, C, A> ProjectAgentIntentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
     /// Optional. The language to retrieve training phrases, parameters and rich
     /// messages for. If not specified, the agent's default language is used.
-    /// [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentIntentGetCall<'a, C, A> {
@@ -10709,7 +10825,7 @@ impl<'a, C, A> ProjectAgentIntentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10717,12 +10833,12 @@ impl<'a, C, A> ProjectAgentIntentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentIntentGetCall<'a, C, A>
@@ -10843,7 +10959,7 @@ impl<'a, C, A> ProjectGetAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10859,10 +10975,7 @@ impl<'a, C, A> ProjectGetAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10882,7 +10995,7 @@ impl<'a, C, A> ProjectGetAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10961,7 +11074,7 @@ impl<'a, C, A> ProjectGetAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10969,12 +11082,12 @@ impl<'a, C, A> ProjectGetAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAgentCall<'a, C, A>
@@ -11095,7 +11208,7 @@ impl<'a, C, A> ProjectAgentSessionContextDeleteCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11111,10 +11224,7 @@ impl<'a, C, A> ProjectAgentSessionContextDeleteCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11134,7 +11244,7 @@ impl<'a, C, A> ProjectAgentSessionContextDeleteCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11213,7 +11323,7 @@ impl<'a, C, A> ProjectAgentSessionContextDeleteCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11221,12 +11331,12 @@ impl<'a, C, A> ProjectAgentSessionContextDeleteCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionContextDeleteCall<'a, C, A>
@@ -11263,8 +11373,7 @@ impl<'a, C, A> ProjectAgentSessionContextDeleteCall<'a, C, A> where C: BorrowMut
 
 /// Exports the specified agent to a ZIP file.
 /// 
-/// Operation <response: ExportAgentResponse,
-///            metadata: google.protobuf.Struct>
+/// Operation <response: ExportAgentResponse>
 ///
 /// A builder for the *agent.export* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11357,7 +11466,7 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11373,10 +11482,7 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11408,7 +11514,7 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11499,7 +11605,7 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11507,12 +11613,12 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentExportCall<'a, C, A>
@@ -11655,7 +11761,7 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11671,10 +11777,7 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11706,7 +11809,7 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11771,9 +11874,9 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Required for all methods except `create` (`create` populates the name
-    /// automatically.
     /// The unique identifier of this intent.
+    /// Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
+    /// methods.
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     ///
     /// Sets the *name* path property to the given value.
@@ -11793,9 +11896,10 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     }
     /// Optional. The language of training phrases, parameters and rich messages
     /// defined in `intent`. If not specified, the agent's default language is
-    /// used. [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// used. [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentIntentPatchCall<'a, C, A> {
@@ -11824,7 +11928,7 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11832,12 +11936,12 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentIntentPatchCall<'a, C, A>
@@ -11958,7 +12062,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11974,10 +12078,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11997,7 +12098,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12077,7 +12178,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12085,12 +12186,12 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A>
@@ -12227,7 +12328,7 @@ impl<'a, C, A> ProjectAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12243,10 +12344,7 @@ impl<'a, C, A> ProjectAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12266,7 +12364,7 @@ impl<'a, C, A> ProjectAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12360,7 +12458,7 @@ impl<'a, C, A> ProjectAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12368,12 +12466,12 @@ impl<'a, C, A> ProjectAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSearchCall<'a, C, A>
@@ -12494,7 +12592,7 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12510,10 +12608,7 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12533,7 +12628,7 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12588,7 +12683,6 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 
     /// Required. The name of the intent to delete. If this intent has direct or
     /// indirect followup intents, we also delete them.
-    /// 
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     ///
     /// Sets the *name* path property to the given value.
@@ -12614,7 +12708,7 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12622,12 +12716,12 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentIntentDeleteCall<'a, C, A>
@@ -12765,7 +12859,7 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12781,10 +12875,7 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12816,7 +12907,7 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12894,9 +12985,10 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
     }
     /// Optional. The language of training phrases, parameters and rich messages
     /// defined in `intent`. If not specified, the agent's default language is
-    /// used. [More than a dozen
-    /// languages](https://dialogflow.com/docs/reference/language) are supported.
-    /// Note: languages must be enabled in the agent, before they can be used.
+    /// used. [Many
+    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// are supported. Note: languages must be enabled in the agent before they can
+    /// be used.
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProjectAgentIntentCreateCall<'a, C, A> {
@@ -12925,7 +13017,7 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12933,12 +13025,12 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentIntentCreateCall<'a, C, A>

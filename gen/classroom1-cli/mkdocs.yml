@@ -1,4 +1,4 @@
-site_name: classroom v1.0.8+20181009
+site_name: classroom v1.0.8+20190401
 site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
 site_description: A complete library to interact with classroom (protocol v1)
 
@@ -44,6 +44,11 @@ pages:
 - ['courses_teachers-delete.md', 'Courses', 'Teachers Delete']
 - ['courses_teachers-get.md', 'Courses', 'Teachers Get']
 - ['courses_teachers-list.md', 'Courses', 'Teachers List']
+- ['courses_topics-create.md', 'Courses', 'Topics Create']
+- ['courses_topics-delete.md', 'Courses', 'Topics Delete']
+- ['courses_topics-get.md', 'Courses', 'Topics Get']
+- ['courses_topics-list.md', 'Courses', 'Topics List']
+- ['courses_topics-patch.md', 'Courses', 'Topics Patch']
 - ['courses_update.md', 'Courses', 'Update']
 - ['invitations_accept.md', 'Invitations', 'Accept']
 - ['invitations_create.md', 'Invitations', 'Create']

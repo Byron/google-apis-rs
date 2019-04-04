@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudkms1-cli"
-version = "1.0.8+20181005"
+version = "1.0.8+20190328"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud KMS (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudkms1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-cloudkms1]
 path = "../cloudkms1"
-version = "1.0.8+20181005"
+version = "1.0.8+20190328"

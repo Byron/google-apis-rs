@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20181009*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Shopping Content* API at revision *20190327*. The CLI is at version *1.0.8*.
 
 ```bash
 content2 [options]
@@ -73,10 +73,10 @@ content2 [options]
                 list <merchant-id> [-p <v>]... [-o <out>]
                 listposdataproviders [-p <v>]... [-o <out>]
                 patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                requestgmbaccess <merchant-id> <account-id> [-p <v>]... [-o <out>]
+                requestgmbaccess <merchant-id> <account-id> <gmb-email> [-p <v>]... [-o <out>]
                 requestinventoryverification <merchant-id> <account-id> <country> [-p <v>]... [-o <out>]
-                setinventoryverificationcontact <merchant-id> <account-id> [-p <v>]... [-o <out>]
-                setposdataprovider <merchant-id> <account-id> [-p <v>]... [-o <out>]
+                setinventoryverificationcontact <merchant-id> <account-id> <contact-email> <contact-name> <country> <language> [-p <v>]... [-o <out>]
+                setposdataprovider <merchant-id> <account-id> <country> [-p <v>]... [-o <out>]
                 update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
         orderinvoices
                 createchargeinvoice <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]

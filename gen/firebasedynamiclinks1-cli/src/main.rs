@@ -83,11 +83,12 @@ impl<'n> Engine<'n> {
                     "dynamic-link-info.ios-info.ios-custom-scheme" => Some(("dynamicLinkInfo.iosInfo.iosCustomScheme", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-fallback-link" => Some(("dynamicLinkInfo.iosInfo.iosFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-bundle-id" => Some(("dynamicLinkInfo.iosInfo.iosBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-minimum-version" => Some(("dynamicLinkInfo.iosInfo.iosMinimumVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-ipad-bundle-id" => Some(("dynamicLinkInfo.iosInfo.iosIpadBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-app-store-id" => Some(("dynamicLinkInfo.iosInfo.iosAppStoreId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-ipad-fallback-link" => Some(("dynamicLinkInfo.iosInfo.iosIpadFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dynamic-link-info.android-info.android-package-name" => Some(("dynamicLinkInfo.androidInfo.androidPackageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.android-info.android-fallback-link" => Some(("dynamicLinkInfo.androidInfo.androidFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.android-info.android-package-name" => Some(("dynamicLinkInfo.androidInfo.androidPackageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.android-info.android-link" => Some(("dynamicLinkInfo.androidInfo.androidLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.android-info.android-min-package-version-code" => Some(("dynamicLinkInfo.androidInfo.androidMinPackageVersionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.social-meta-tag-info.social-title" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -97,13 +98,13 @@ impl<'n> Engine<'n> {
                     "dynamic-link-info.link" => Some(("dynamicLinkInfo.link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.desktop-info.desktop-fallback-link" => Some(("dynamicLinkInfo.desktopInfo.desktopFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.dynamic-link-domain" => Some(("dynamicLinkInfo.dynamicLinkDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-dynamic-link" => Some(("longDynamicLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suffix.option" => Some(("suffix.option", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suffix.custom-suffix" => Some(("suffix.customSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "custom-suffix", "desktop-fallback-link", "desktop-info", "domain-uri-prefix", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "name", "navigation-info", "option", "pt", "sdk-version", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "custom-suffix", "desktop-fallback-link", "desktop-info", "domain-uri-prefix", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "ios-minimum-version", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "name", "navigation-info", "option", "pt", "sdk-version", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -249,6 +250,7 @@ impl<'n> Engine<'n> {
                     "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-installation-time" => Some(("appInstallationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unique-match-link-to-check" => Some(("uniqueMatchLinkToCheck", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "retrieval-method" => Some(("retrievalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.language-code" => Some(("device.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.language-code-raw" => Some(("device.languageCodeRaw", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-model-name" => Some(("device.deviceModelName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -256,9 +258,8 @@ impl<'n> Engine<'n> {
                     "device.screen-resolution-height" => Some(("device.screenResolutionHeight", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.timezone" => Some(("device.timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.screen-resolution-width" => Some(("device.screenResolutionWidth", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "retrieval-method" => Some(("retrievalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ios-version" => Some(("iosVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bundle-id" => Some(("bundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ios-version" => Some(("iosVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["app-installation-time", "bundle-id", "device", "device-model-name", "ios-version", "language-code", "language-code-from-webview", "language-code-raw", "retrieval-method", "screen-resolution-height", "screen-resolution-width", "sdk-version", "timezone", "unique-match-link-to-check", "visual-style"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -444,11 +445,12 @@ impl<'n> Engine<'n> {
                     "dynamic-link-info.ios-info.ios-custom-scheme" => Some(("dynamicLinkInfo.iosInfo.iosCustomScheme", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-fallback-link" => Some(("dynamicLinkInfo.iosInfo.iosFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-bundle-id" => Some(("dynamicLinkInfo.iosInfo.iosBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-minimum-version" => Some(("dynamicLinkInfo.iosInfo.iosMinimumVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-ipad-bundle-id" => Some(("dynamicLinkInfo.iosInfo.iosIpadBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-app-store-id" => Some(("dynamicLinkInfo.iosInfo.iosAppStoreId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.ios-info.ios-ipad-fallback-link" => Some(("dynamicLinkInfo.iosInfo.iosIpadFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dynamic-link-info.android-info.android-package-name" => Some(("dynamicLinkInfo.androidInfo.androidPackageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.android-info.android-fallback-link" => Some(("dynamicLinkInfo.androidInfo.androidFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.android-info.android-package-name" => Some(("dynamicLinkInfo.androidInfo.androidPackageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.android-info.android-link" => Some(("dynamicLinkInfo.androidInfo.androidLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.android-info.android-min-package-version-code" => Some(("dynamicLinkInfo.androidInfo.androidMinPackageVersionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.social-meta-tag-info.social-title" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -458,12 +460,12 @@ impl<'n> Engine<'n> {
                     "dynamic-link-info.link" => Some(("dynamicLinkInfo.link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.desktop-info.desktop-fallback-link" => Some(("dynamicLinkInfo.desktopInfo.desktopFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.dynamic-link-domain" => Some(("dynamicLinkInfo.dynamicLinkDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-dynamic-link" => Some(("longDynamicLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suffix.option" => Some(("suffix.option", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suffix.custom-suffix" => Some(("suffix.customSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "custom-suffix", "desktop-fallback-link", "desktop-info", "domain-uri-prefix", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "navigation-info", "option", "pt", "sdk-version", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "custom-suffix", "desktop-fallback-link", "desktop-info", "domain-uri-prefix", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "ios-minimum-version", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "navigation-info", "option", "pt", "sdk-version", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -797,7 +799,7 @@ fn main() {
     
     let mut app = App::new("firebasedynamiclinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181008")
+           .version("1.0.8+20190403")
            .about("Programmatically creates and manages Firebase Dynamic Links.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli")
            .arg(Arg::with_name("url")

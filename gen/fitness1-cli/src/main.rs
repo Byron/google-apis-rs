@@ -566,105 +566,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_data_sources_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-stream-name" => Some(("dataStreamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-type.name" => Some(("dataType.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-quality-standard" => Some(("dataQualityStandard", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "application.package-name" => Some(("application.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "application.version" => Some(("application.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "application.name" => Some(("application.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "application.details-url" => Some(("application.detailsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.model" => Some(("device.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.version" => Some(("device.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.type" => Some(("device.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.uid" => Some(("device.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.manufacturer" => Some(("device.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-stream-id" => Some(("dataStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["application", "data-quality-standard", "data-stream-id", "data-stream-name", "data-type", "details-url", "device", "manufacturer", "model", "name", "package-name", "type", "uid", "version"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::DataSource = json::value::from_value(object).unwrap();
-        let mut call = self.hub.users().data_sources_patch(request, opt.value_of("user-id").unwrap_or(""), opt.value_of("data-source-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _users_data_sources_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1104,9 +1005,6 @@ impl<'n> Engine<'n> {
                     ("data-sources-list", Some(opt)) => {
                         call_result = self._users_data_sources_list(opt, dry_run, &mut err);
                     },
-                    ("data-sources-patch", Some(opt)) => {
-                        call_result = self._users_data_sources_patch(opt, dry_run, &mut err);
-                    },
                     ("data-sources-update", Some(opt)) => {
                         call_result = self._users_data_sources_update(opt, dry_run, &mut err);
                     },
@@ -1210,7 +1108,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("users", "methods: 'data-sources-create', 'data-sources-data-point-changes-list', 'data-sources-datasets-delete', 'data-sources-datasets-get', 'data-sources-datasets-patch', 'data-sources-delete', 'data-sources-get', 'data-sources-list', 'data-sources-patch', 'data-sources-update', 'dataset-aggregate', 'sessions-delete', 'sessions-list' and 'sessions-update'", vec![
+        ("users", "methods: 'data-sources-create', 'data-sources-data-point-changes-list', 'data-sources-datasets-delete', 'data-sources-datasets-get', 'data-sources-datasets-patch', 'data-sources-delete', 'data-sources-get', 'data-sources-list', 'data-sources-update', 'dataset-aggregate', 'sessions-delete', 'sessions-list' and 'sessions-update'", vec![
             ("data-sources-create",
                     Some(r##"Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-create",
@@ -1447,42 +1345,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("data-sources-patch",
-                    Some(r##"Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
-        
-        Data sources are identified by their dataStreamId. This method supports patch semantics."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-patch",
-                  vec![
-                    (Some(r##"user-id"##),
-                     None,
-                     Some(r##"Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"data-source-id"##),
-                     None,
-                     Some(r##"The data stream ID of the data source to update."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("data-sources-update",
                     Some(r##"Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
         
@@ -1631,7 +1493,7 @@ fn main() {
     
     let mut app = App::new("fitness1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20170922")
+           .version("1.0.8+20190403")
            .about("Stores and accesses user data in the fitness store from apps on any platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fitness1_cli")
            .arg(Arg::with_name("url")

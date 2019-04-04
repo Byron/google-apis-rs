@@ -25,28 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *plusDomains* API at revision *20181007*. The CLI is at version *1.0.8*.
+This documentation was generated from the *plusDomains* API at revision *20190328*. The CLI is at version *1.0.8*.
 
 ```bash
 plusdomains1 [options]
         activities
                 get <activity-id> [-p <v>]... [-o <out>]
-                insert <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <user-id> <collection> [-p <v>]... [-o <out>]
         audiences
                 list <user-id> [-p <v>]... [-o <out>]
         circles
-                add-people <circle-id> [-p <v>]... [-o <out>]
-                get <circle-id> [-p <v>]... [-o <out>]
-                insert <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <user-id> [-p <v>]... [-o <out>]
-                patch <circle-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                remove <circle-id> [-p <v>]...
-                remove-people <circle-id> [-p <v>]...
-                update <circle-id> (-r <kv>)... [-p <v>]... [-o <out>]
         comments
                 get <comment-id> [-p <v>]... [-o <out>]
-                insert <activity-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <activity-id> [-p <v>]... [-o <out>]
         media
                 insert <user-id> <collection> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]

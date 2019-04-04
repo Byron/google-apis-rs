@@ -4,12 +4,12 @@
 [package]
 
 name = "google-dfareporting3d2"
-version = "1.0.8+20180830"
+version = "1.0.8+20190206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v3.2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting3d2"
 homepage = "https://developers.google.com/doubleclick-advertisers/"
-documentation = "https://docs.rs/google-dfareporting3d2/1.0.8+20180830"
+documentation = "https://docs.rs/google-dfareporting3d2/1.0.8+20190206"
 license = "MIT"
 keywords = ["dfareporting", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

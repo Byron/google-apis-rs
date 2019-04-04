@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.8+20181001*, where *20181001* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Pubsub* crate version *1.0.8+20190314*, where *20190314* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -379,42 +379,30 @@ impl<'a, C, A> Pubsub<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Response for the `Seek` method (this response is empty).
+/// Request for the `Pull` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [subscriptions seek projects](struct.ProjectSubscriptionSeekCall.html) (response)
+/// * [subscriptions pull projects](struct.ProjectSubscriptionPullCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SeekResponse { _never_set: Option<bool> }
-
-impl ResponseResult for SeekResponse {}
-
-
-/// Request message for `TestIamPermissions` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions test iam permissions projects](struct.ProjectSubscriptionTestIamPermissionCall.html) (request)
-/// * [topics test iam permissions projects](struct.ProjectTopicTestIamPermissionCall.html) (request)
-/// * [snapshots test iam permissions projects](struct.ProjectSnapshotTestIamPermissionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestIamPermissionsRequest {
-    /// The set of permissions to check for the `resource`. Permissions with
-    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
-    /// information see
-    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
-    pub permissions: Option<Vec<String>>,
+pub struct PullRequest {
+    /// If this field set to true, the system will respond immediately even if
+    /// it there are no messages available to return in the `Pull` response.
+    /// Otherwise, the system may wait (for a bounded amount of time) until at
+    /// least one message is available, rather than returning no messages.
+    #[serde(rename="returnImmediately")]
+    pub return_immediately: Option<bool>,
+    /// The maximum number of messages returned for this request. The Pub/Sub
+    /// system may return fewer than the number specified.
+    #[serde(rename="maxMessages")]
+    pub max_messages: Option<i32>,
 }
 
-impl RequestValue for TestIamPermissionsRequest {}
+impl RequestValue for PullRequest {}
 
 
 /// Response for the `ListTopicSubscriptions` method.
@@ -479,27 +467,6 @@ pub struct ReceivedMessage {
 impl Part for ReceivedMessage {}
 
 
-/// Response for the `Publish` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PublishResponse {
-    /// The server-assigned ID of each published message, in the same order as
-    /// the messages in the request. IDs are guaranteed to be unique within
-    /// the topic.
-    #[serde(rename="messageIds")]
-    pub message_ids: Option<Vec<String>>,
-}
-
-impl ResponseResult for PublishResponse {}
-
-
 /// Request for the Acknowledge method.
 /// 
 /// # Activities
@@ -534,8 +501,9 @@ pub struct ModifyAckDeadlineRequest {
     /// The new ack deadline with respect to the time this request was sent to
     /// the Pub/Sub system. For example, if the value is 10, the new
     /// ack deadline will expire 10 seconds after the `ModifyAckDeadline` call
-    /// was made. Specifying zero may immediately make the message available for
-    /// another pull request.
+    /// was made. Specifying zero might immediately make the message available for
+    /// delivery to another subscriber client. This typically results in an
+    /// increase in the rate of message redeliveries (that is, duplicates).
     /// The minimum deadline you can specify is 0 seconds.
     /// The maximum deadline you can specify is 600 seconds (10 minutes).
     #[serde(rename="ackDeadlineSeconds")]
@@ -546,6 +514,78 @@ pub struct ModifyAckDeadlineRequest {
 }
 
 impl RequestValue for ModifyAckDeadlineRequest {}
+
+
+/// Request for the `Seek` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions seek projects](struct.ProjectSubscriptionSeekCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SeekRequest {
+    /// The snapshot to seek to. The snapshot's topic must be the same as that of
+    /// the provided subscription.
+    /// Format is `projects/{project}/snapshots/{snap}`.
+    pub snapshot: Option<String>,
+    /// The time to seek to.
+    /// Messages retained in the subscription that were published before this
+    /// time are marked as acknowledged, and messages retained in the
+    /// subscription that were published after this time are marked as
+    /// unacknowledged. Note that this operation affects only those messages
+    /// retained in the subscription (configured by the combination of
+    /// `message_retention_duration` and `retain_acked_messages`). For example,
+    /// if `time` corresponds to a point before the message retention
+    /// window (or to a point before the system's notion of the subscription
+    /// creation time), only retained messages will be marked as unacknowledged,
+    /// and already-expunged messages will not be restored.
+    pub time: Option<String>,
+}
+
+impl RequestValue for SeekRequest {}
+
+
+/// Request for the Publish method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PublishRequest {
+    /// The messages to publish.
+    pub messages: Option<Vec<PubsubMessage>>,
+}
+
+impl RequestValue for PublishRequest {}
+
+
+/// Response for the `ListSnapshots` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots list projects](struct.ProjectSnapshotListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListSnapshotsResponse {
+    /// If not empty, indicates that there may be more snapshot that match the
+    /// request; this value should be passed in a new `ListSnapshotsRequest`.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The resulting snapshots.
+    pub snapshots: Option<Vec<Snapshot>>,
+}
+
+impl ResponseResult for ListSnapshotsResponse {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
@@ -627,152 +667,6 @@ pub struct Policy {
 }
 
 impl ResponseResult for Policy {}
-
-
-/// Request for the Publish method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PublishRequest {
-    /// The messages to publish.
-    pub messages: Option<Vec<PubsubMessage>>,
-}
-
-impl RequestValue for PublishRequest {}
-
-
-/// A snapshot resource. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [snapshots get projects](struct.ProjectSnapshotGetCall.html) (response)
-/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (response)
-/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Snapshot {
-    /// The snapshot is guaranteed to exist up until this time.
-    /// A newly-created snapshot expires no later than 7 days from the time of its
-    /// creation. Its exact lifetime is determined at creation by the existing
-    /// backlog in the source subscription. Specifically, the lifetime of the
-    /// snapshot is `7 days - (age of oldest unacked message in the subscription)`.
-    /// For example, consider a subscription whose oldest unacked message is 3 days
-    /// old. If a snapshot is created from this subscription, the snapshot -- which
-    /// will always capture this 3-day-old backlog as long as the snapshot
-    /// exists -- will expire in 4 days. The service will refuse to create a
-    /// snapshot that would expire in less than 1 hour after creation.
-    #[serde(rename="expireTime")]
-    pub expire_time: Option<String>,
-    /// The name of the topic from which this snapshot is retaining messages.
-    pub topic: Option<String>,
-    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
-    pub labels: Option<HashMap<String, String>>,
-    /// The name of the snapshot.
-    pub name: Option<String>,
-}
-
-impl ResponseResult for Snapshot {}
-
-
-/// Response for the `ListSnapshots` method.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [snapshots list projects](struct.ProjectSnapshotListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListSnapshotsResponse {
-    /// If not empty, indicates that there may be more snapshot that match the
-    /// request; this value should be passed in a new `ListSnapshotsRequest`.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The resulting snapshots.
-    pub snapshots: Option<Vec<Snapshot>>,
-}
-
-impl ResponseResult for ListSnapshotsResponse {}
-
-
-/// Request for the `Seek` method. <br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions seek projects](struct.ProjectSubscriptionSeekCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SeekRequest {
-    /// The snapshot to seek to. The snapshot's topic must be the same as that of
-    /// the provided subscription.
-    /// Format is `projects/{project}/snapshots/{snap}`.
-    pub snapshot: Option<String>,
-    /// The time to seek to.
-    /// Messages retained in the subscription that were published before this
-    /// time are marked as acknowledged, and messages retained in the
-    /// subscription that were published after this time are marked as
-    /// unacknowledged. Note that this operation affects only those messages
-    /// retained in the subscription (configured by the combination of
-    /// `message_retention_duration` and `retain_acked_messages`). For example,
-    /// if `time` corresponds to a point before the message retention
-    /// window (or to a point before the system's notion of the subscription
-    /// creation time), only retained messages will be marked as unacknowledged,
-    /// and already-expunged messages will not be restored.
-    pub time: Option<String>,
-}
-
-impl RequestValue for SeekRequest {}
-
-
-/// Request for the UpdateSnapshot method.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateSnapshotRequest {
-    /// The updated snapshot object.
-    pub snapshot: Option<Snapshot>,
-    /// Indicates which fields in the provided snapshot to update.
-    /// Must be specified and non-empty.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
-}
-
-impl RequestValue for UpdateSnapshotRequest {}
 
 
 /// Response for the `ListSubscriptions` method.
@@ -918,214 +812,31 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// A message that is published by publishers and consumed by subscribers. The
-/// message must contain either a non-empty data field or at least one attribute.
+/// Contains information needed for generating an
+/// [OpenID Connect
+/// token](https://developers.google.com/identity/protocols/OpenIDConnect).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PubsubMessage {
-    /// Optional attributes for this message.
-    pub attributes: Option<HashMap<String, String>>,
-    /// The message data field. If this field is empty, the message must contain
-    /// at least one attribute.
-    pub data: Option<String>,
-    /// The time at which the message was published, populated by the server when
-    /// it receives the `Publish` call. It must not be populated by the
-    /// publisher in a `Publish` call.
-    #[serde(rename="publishTime")]
-    pub publish_time: Option<String>,
-    /// ID of this message, assigned by the server when the message is published.
-    /// Guaranteed to be unique within the topic. This value may be read by a
-    /// subscriber that receives a `PubsubMessage` via a `Pull` call or a push
-    /// delivery. It must not be populated by the publisher in a `Publish` call.
-    #[serde(rename="messageId")]
-    pub message_id: Option<String>,
+pub struct OidcToken {
+    /// Audience to be used when generating OIDC token. The audience claim
+    /// identifies the recipients that the JWT is intended for. The audience
+    /// value is a single case-sensitive string. Having multiple values (array)
+    /// for the audience field is not supported. More info about the OIDC JWT
+    /// token audience here: https://tools.ietf.org/html/rfc7519#section-4.1.3
+    /// Note: if not specified, the Push endpoint URL will be used.
+    pub audience: Option<String>,
+    /// [Service account
+    /// email](https://cloud.google.com/iam/docs/service-accounts)
+    /// to be used for generating the OIDC token. The caller (for
+    /// CreateSubscription, UpdateSubscription, and ModifyPushConfig RPCs) must
+    /// have the iam.serviceAccounts.actAs permission for the service account.
+    #[serde(rename="serviceAccountEmail")]
+    pub service_account_email: Option<String>,
 }
 
-impl Part for PubsubMessage {}
-
-
-/// Request for the `Pull` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions pull projects](struct.ProjectSubscriptionPullCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PullRequest {
-    /// If this field set to true, the system will respond immediately even if
-    /// it there are no messages available to return in the `Pull` response.
-    /// Otherwise, the system may wait (for a bounded amount of time) until at
-    /// least one message is available, rather than returning no messages.
-    #[serde(rename="returnImmediately")]
-    pub return_immediately: Option<bool>,
-    /// The maximum number of messages returned for this request. The Pub/Sub
-    /// system may return fewer than the number specified.
-    #[serde(rename="maxMessages")]
-    pub max_messages: Option<i32>,
-}
-
-impl RequestValue for PullRequest {}
-
-
-/// Associates `members` with a `role`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to `members`.
-    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    pub role: Option<String>,
-    /// Unimplemented. The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
-    pub condition: Option<Expr>,
-    /// Specifies the identities requesting access for a Cloud Platform resource.
-    /// `members` can have the following values:
-    /// 
-    /// * `allUsers`: A special identifier that represents anyone who is
-    ///    on the internet; with or without a Google account.
-    /// 
-    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
-    ///    who is authenticated with a Google account or a service account.
-    /// 
-    /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
-    /// 
-    /// 
-    /// * `serviceAccount:{emailid}`: An email address that represents a service
-    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
-    /// 
-    /// * `group:{emailid}`: An email address that represents a Google group.
-    ///    For example, `admins@example.com`.
-    /// 
-    /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
-    ///    users of that domain. For example, `google.com` or `example.com`.
-    /// 
-    /// 
-    pub members: Option<Vec<String>>,
-}
-
-impl Part for Binding {}
-
-
-/// Request for the `CreateSnapshot` method.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be changed in
-/// backward-incompatible ways and is not recommended for production use.
-/// It is not subject to any SLA or deprecation policy.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateSnapshotRequest {
-    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
-    pub labels: Option<HashMap<String, String>>,
-    /// The subscription whose backlog the snapshot retains.
-    /// Specifically, the created snapshot is guaranteed to retain:
-    ///  (a) The existing backlog on the subscription. More precisely, this is
-    ///      defined as the messages in the subscription's backlog that are
-    ///      unacknowledged upon the successful completion of the
-    ///      `CreateSnapshot` request; as well as:
-    ///  (b) Any messages published to the subscription's topic following the
-    ///      successful completion of the CreateSnapshot request.
-    /// Format is `projects/{project}/subscriptions/{sub}`.
-    pub subscription: Option<String>,
-}
-
-impl RequestValue for CreateSnapshotRequest {}
-
-
-/// A topic resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [topics create projects](struct.ProjectTopicCreateCall.html) (request|response)
-/// * [topics patch projects](struct.ProjectTopicPatchCall.html) (response)
-/// * [topics get projects](struct.ProjectTopicGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Topic {
-    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
-    pub labels: Option<HashMap<String, String>>,
-    /// The name of the topic. It must have the format
-    /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
-    /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
-    /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
-    /// signs (`%`). It must be between 3 and 255 characters in length, and it
-    /// must not start with `"goog"`.
-    pub name: Option<String>,
-}
-
-impl RequestValue for Topic {}
-impl ResponseResult for Topic {}
-
-
-/// Request for the UpdateSubscription method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions patch projects](struct.ProjectSubscriptionPatchCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateSubscriptionRequest {
-    /// Indicates which fields in the provided subscription to update.
-    /// Must be specified and non-empty.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
-    /// The updated subscription object.
-    pub subscription: Option<Subscription>,
-}
-
-impl RequestValue for UpdateSubscriptionRequest {}
-
-
-/// Represents an expression text. Example:
-/// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
-    pub expression: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
-    /// An optional string indicating the location of the expression for error
-    /// reporting, e.g. a file name and a position in the file.
-    pub location: Option<String>,
-}
-
-impl Part for Expr {}
+impl Part for OidcToken {}
 
 
 /// Response for the `Pull` method.
@@ -1150,10 +861,7 @@ pub struct PullResponse {
 impl ResponseResult for PullResponse {}
 
 
-/// Response for the `ListTopicSnapshots` method.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
+/// Response for the `ListTopicSnapshots` method.
 /// 
 /// # Activities
 /// 
@@ -1204,6 +912,10 @@ pub struct PushConfig {
     /// * `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API.
     /// * `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.
     pub attributes: Option<HashMap<String, String>>,
+    /// If specified, Pub/Sub will generate and attach an OIDC JWT token as an
+    /// `Authorization` header in the HTTP request for every pushed message.
+    #[serde(rename="oidcToken")]
+    pub oidc_token: Option<OidcToken>,
     /// A URL locating the endpoint to which messages should be pushed.
     /// For example, a Webhook endpoint might use "https://example.com/push".
     #[serde(rename="pushEndpoint")]
@@ -1226,33 +938,6 @@ impl Part for PushConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// The name of the topic from which this subscription is receiving messages.
-    /// Format is `projects/{project}/topics/{topic}`.
-    /// The value of this field will be `_deleted-topic_` if the topic has been
-    /// deleted.
-    pub topic: Option<String>,
-    /// How long to retain unacknowledged messages in the subscription's backlog,
-    /// from the moment a message is published.
-    /// If `retain_acked_messages` is true, then this also configures the retention
-    /// of acknowledged messages, and thus configures how far back in time a `Seek`
-    /// can be done. Defaults to 7 days. Cannot be more than 7 days or less than 10
-    /// minutes.<br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
-    #[serde(rename="messageRetentionDuration")]
-    pub message_retention_duration: Option<String>,
-    /// Indicates whether to retain acknowledged messages. If true, then
-    /// messages are not expunged from the subscription's backlog, even if they are
-    /// acknowledged, until they fall out of the `message_retention_duration`
-    /// window. This must be true if you would like to
-    /// <a href="/pubsub/docs/replay-overview#seek_to_a_time">Seek to a timestamp</a>.
-    /// <br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
-    #[serde(rename="retainAckedMessages")]
-    pub retain_acked_messages: Option<bool>,
     /// The name of the subscription. It must have the format
     /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
     /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
@@ -1260,11 +945,11 @@ pub struct Subscription {
     /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
     /// in length, and it must not start with `"goog"`.
     pub name: Option<String>,
-    /// This value is the maximum time after a subscriber receives a message
-    /// before the subscriber should acknowledge the message. After message
-    /// delivery but before the ack deadline expires and before the message is
-    /// acknowledged, it is an outstanding message and will not be delivered
-    /// again during that time (on a best-effort basis).
+    /// The approximate amount of time (on a best-effort basis) Pub/Sub waits for
+    /// the subscriber to acknowledge receipt before resending the message. In the
+    /// interval after the message is delivered and before it is acknowledged, it
+    /// is considered to be <i>outstanding</i>. During that time period, the
+    /// message will not be redelivered (on a best-effort basis).
     /// 
     /// For pull subscriptions, this value is used as the initial value for the ack
     /// deadline. To override this value for a given message, call
@@ -1282,17 +967,381 @@ pub struct Subscription {
     /// system will eventually redeliver the message.
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
-    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
+    /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
+    /// managing labels</a>.
     pub labels: Option<HashMap<String, String>>,
     /// If push delivery is used with this subscription, this field is
     /// used to configure it. An empty `pushConfig` signifies that the subscriber
     /// will pull and ack messages using API methods.
     #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
+    /// The name of the topic from which this subscription is receiving messages.
+    /// Format is `projects/{project}/topics/{topic}`.
+    /// The value of this field will be `_deleted-topic_` if the topic has been
+    /// deleted.
+    pub topic: Option<String>,
+    /// How long to retain unacknowledged messages in the subscription's backlog,
+    /// from the moment a message is published.
+    /// If `retain_acked_messages` is true, then this also configures the retention
+    /// of acknowledged messages, and thus configures how far back in time a `Seek`
+    /// can be done. Defaults to 7 days. Cannot be more than 7 days or less than 10
+    /// minutes.
+    #[serde(rename="messageRetentionDuration")]
+    pub message_retention_duration: Option<String>,
+    /// Indicates whether to retain acknowledged messages. If true, then
+    /// messages are not expunged from the subscription's backlog, even if they are
+    /// acknowledged, until they fall out of the `message_retention_duration`
+    /// window. This must be true if you would like to
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time">
+    /// Seek to a timestamp</a>.
+    #[serde(rename="retainAckedMessages")]
+    pub retain_acked_messages: Option<bool>,
+    /// A policy that specifies the conditions for this subscription's expiration.
+    /// A subscription is considered active as long as any connected subscriber is
+    /// successfully consuming messages from the subscription or is issuing
+    /// operations on the subscription. If `expiration_policy` is not set, a
+    /// *default policy* with `ttl` of 31 days will be used. The minimum allowed
+    /// value for `expiration_policy.ttl` is 1 day.
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
+    #[serde(rename="expirationPolicy")]
+    pub expiration_policy: Option<ExpirationPolicy>,
 }
 
 impl RequestValue for Subscription {}
 impl ResponseResult for Subscription {}
+
+
+/// Response for the `Seek` method (this response is empty).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions seek projects](struct.ProjectSubscriptionSeekCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SeekResponse { _never_set: Option<bool> }
+
+impl ResponseResult for SeekResponse {}
+
+
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions test iam permissions projects](struct.ProjectSubscriptionTestIamPermissionCall.html) (request)
+/// * [topics test iam permissions projects](struct.ProjectTopicTestIamPermissionCall.html) (request)
+/// * [snapshots test iam permissions projects](struct.ProjectSnapshotTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
+
+
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+}
+
+impl Part for Expr {}
+
+
+/// Response for the `Publish` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PublishResponse {
+    /// The server-assigned ID of each published message, in the same order as
+    /// the messages in the request. IDs are guaranteed to be unique within
+    /// the topic.
+    #[serde(rename="messageIds")]
+    pub message_ids: Option<Vec<String>>,
+}
+
+impl ResponseResult for PublishResponse {}
+
+
+/// A snapshot resource. Snapshots are used in
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots get projects](struct.ProjectSnapshotGetCall.html) (response)
+/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (response)
+/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Snapshot {
+    /// The snapshot is guaranteed to exist up until this time.
+    /// A newly-created snapshot expires no later than 7 days from the time of its
+    /// creation. Its exact lifetime is determined at creation by the existing
+    /// backlog in the source subscription. Specifically, the lifetime of the
+    /// snapshot is `7 days - (age of oldest unacked message in the subscription)`.
+    /// For example, consider a subscription whose oldest unacked message is 3 days
+    /// old. If a snapshot is created from this subscription, the snapshot -- which
+    /// will always capture this 3-day-old backlog as long as the snapshot
+    /// exists -- will expire in 4 days. The service will refuse to create a
+    /// snapshot that would expire in less than 1 hour after creation.
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
+    /// The name of the topic from which this snapshot is retaining messages.
+    pub topic: Option<String>,
+    /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
+    /// managing labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// The name of the snapshot.
+    pub name: Option<String>,
+}
+
+impl ResponseResult for Snapshot {}
+
+
+/// A policy that specifies the conditions for resource expiration (i.e.,
+/// automatic resource deletion).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExpirationPolicy {
+    /// Specifies the "time-to-live" duration for an associated resource. The
+    /// resource expires if it is not active for a period of `ttl`. The definition
+    /// of "activity" depends on the type of the associated resource. The minimum
+    /// and maximum allowed values for `ttl` depend on the type of the associated
+    /// resource, as well. If `ttl` is not set, the associated resource never
+    /// expires.
+    pub ttl: Option<String>,
+}
+
+impl Part for ExpirationPolicy {}
+
+
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    pub role: Option<String>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@gmail.com` .
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// 
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
+
+
+/// Request for the `CreateSnapshot` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateSnapshotRequest {
+    /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
+    /// managing labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// The subscription whose backlog the snapshot retains.
+    /// Specifically, the created snapshot is guaranteed to retain:
+    ///  (a) The existing backlog on the subscription. More precisely, this is
+    ///      defined as the messages in the subscription's backlog that are
+    ///      unacknowledged upon the successful completion of the
+    ///      `CreateSnapshot` request; as well as:
+    ///  (b) Any messages published to the subscription's topic following the
+    ///      successful completion of the CreateSnapshot request.
+    /// Format is `projects/{project}/subscriptions/{sub}`.
+    pub subscription: Option<String>,
+}
+
+impl RequestValue for CreateSnapshotRequest {}
+
+
+/// A topic resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics create projects](struct.ProjectTopicCreateCall.html) (request|response)
+/// * [topics patch projects](struct.ProjectTopicPatchCall.html) (response)
+/// * [topics get projects](struct.ProjectTopicGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Topic {
+    /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
+    /// managing labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// The name of the topic. It must have the format
+    /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+    /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+    /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+    /// signs (`%`). It must be between 3 and 255 characters in length, and it
+    /// must not start with `"goog"`.
+    pub name: Option<String>,
+}
+
+impl RequestValue for Topic {}
+impl ResponseResult for Topic {}
+
+
+/// Request for the UpdateSubscription method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions patch projects](struct.ProjectSubscriptionPatchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSubscriptionRequest {
+    /// Indicates which fields in the provided subscription to update.
+    /// Must be specified and non-empty.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+    /// The updated subscription object.
+    pub subscription: Option<Subscription>,
+}
+
+impl RequestValue for UpdateSubscriptionRequest {}
+
+
+/// Request for the UpdateSnapshot method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSnapshotRequest {
+    /// The updated snapshot object.
+    pub snapshot: Option<Snapshot>,
+    /// Indicates which fields in the provided snapshot to update.
+    /// Must be specified and non-empty.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
+
+impl RequestValue for UpdateSnapshotRequest {}
+
+
+/// A message that is published by publishers and consumed by subscribers. The
+/// message must contain either a non-empty data field or at least one attribute.
+/// Note that client libraries represent this object differently
+/// depending on the language. See the corresponding
+/// <a href="https://cloud.google.com/pubsub/docs/reference/libraries">client
+/// library documentation</a> for more information. See
+/// <a href="https://cloud.google.com/pubsub/quotas">Quotas and limits</a>
+/// for more information about message limits.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PubsubMessage {
+    /// Optional attributes for this message.
+    pub attributes: Option<HashMap<String, String>>,
+    /// The message data field. If this field is empty, the message must contain
+    /// at least one attribute.
+    pub data: Option<String>,
+    /// The time at which the message was published, populated by the server when
+    /// it receives the `Publish` call. It must not be populated by the
+    /// publisher in a `Publish` call.
+    #[serde(rename="publishTime")]
+    pub publish_time: Option<String>,
+    /// ID of this message, assigned by the server when the message is published.
+    /// Guaranteed to be unique within the topic. This value may be read by a
+    /// subscriber that receives a `PubsubMessage` via a `Pull` call or a push
+    /// delivery. It must not be populated by the publisher in a `Publish` call.
+    #[serde(rename="messageId")]
+    pub message_id: Option<String>,
+}
+
+impl Part for PubsubMessage {}
 
 
 
@@ -1362,7 +1411,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates the given topic with the given name. See the
-    /// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
+    /// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+    /// resource name rules</a>.
     /// 
     /// # Arguments
     ///
@@ -1624,13 +1674,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the configuration details of a snapshot. Snapshots are used in
-    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
-    /// you to manage message acknowledgments in bulk. That is, you can set the
-    /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.<br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+    /// operations, which allow you to manage message acknowledgments in bulk. That
+    /// is, you can set the acknowledgment state of messages in an existing
+    /// subscription to the state captured by a snapshot.
     /// 
     /// # Arguments
     ///
@@ -1689,14 +1736,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates an existing snapshot. Snapshots are used in
-    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+    /// operations, which allow
     /// you to manage message acknowledgments in bulk. That is, you can set the
     /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.<br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
-    /// Note that certain properties of a snapshot are not modifiable.
+    /// captured by a snapshot.
     /// 
     /// # Arguments
     ///
@@ -1755,13 +1799,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Removes an existing snapshot. Snapshots are used in
-    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+    /// operations, which allow
     /// you to manage message acknowledgments in bulk. That is, you can set the
     /// acknowledgment state of messages in an existing subscription to the state
     /// captured by a snapshot.<br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
     /// When the snapshot is deleted, all messages retained in the snapshot
     /// are immediately dropped. After a snapshot is deleted, a new one may be
     /// created with the same name, but the new one has no association with the old
@@ -1830,14 +1872,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a subscription to a given topic. See the
-    /// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
+    /// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+    /// resource name rules</a>.
     /// If the subscription already exists, returns `ALREADY_EXISTS`.
     /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
     /// 
     /// If the name is not provided in the request, the server will assign a random
     /// name for this subscription on the same project as the topic, conforming
     /// to the
-    /// [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
+    /// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
     /// The generated name is populated in the returned Subscription object.
     /// Note that for REST API requests, you must specify a name in the request.
     /// 
@@ -1889,25 +1932,22 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a snapshot from the requested subscription. Snapshots are used in
-    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+    /// operations, which allow
     /// you to manage message acknowledgments in bulk. That is, you can set the
     /// acknowledgment state of messages in an existing subscription to the state
     /// captured by a snapshot.
-    /// <br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.<br><br>
-    /// If the snapshot already exists, returns `ALREADY_EXISTS`.
+    /// <br><br>If the snapshot already exists, returns `ALREADY_EXISTS`.
     /// If the requested subscription doesn't exist, returns `NOT_FOUND`.
     /// If the backlog in the subscription is too old -- and the resulting snapshot
     /// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
     /// See also the `Snapshot.expire_time` field. If the name is not provided in
     /// the request, the server will assign a random
     /// name for this snapshot on the same project as the subscription, conforming
-    /// to the [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
-    /// The generated
-    /// name is populated in the returned Snapshot object. Note that for REST API
-    /// requests, you must specify a name in the request.
+    /// to the
+    /// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
+    /// The generated name is populated in the returned Snapshot object. Note that
+    /// for REST API requests, you must specify a name in the request.
     /// 
     /// # Arguments
     ///
@@ -1916,7 +1956,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///            If the name is not provided in the request, the server will assign a random
     ///            name for this snapshot on the same project as the subscription.
     ///            Note that for REST API requests, you must specify a name.  See the
-    ///            <a href="/pubsub/docs/admin#resource_names">resource name rules</a>.
+    ///            <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+    ///            resource name rules</a>.
     ///            Format is `projects/{project}/snapshots/{snap}`.
     pub fn snapshots_create(&self, request: CreateSnapshotRequest, name: &str) -> ProjectSnapshotCreateCall<'a, C, A> {
         ProjectSnapshotCreateCall {
@@ -1954,13 +1995,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the existing snapshots. Snapshots are used in
-    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+    /// operations, which allow
     /// you to manage message acknowledgments in bulk. That is, you can set the
     /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.<br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
+    /// captured by a snapshot.
     /// 
     /// # Arguments
     ///
@@ -2003,14 +2042,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Seeks an existing subscription to a point in time or to a given snapshot,
     /// whichever is provided in the request. Snapshots are used in
-    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+    /// operations, which allow
     /// you to manage message acknowledgments in bulk. That is, you can set the
     /// acknowledgment state of messages in an existing subscription to the state
     /// captured by a snapshot. Note that both the subscription and the snapshot
-    /// must be on the same topic.<br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
+    /// must be on the same topic.
     /// 
     /// # Arguments
     ///
@@ -2068,13 +2105,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the names of the snapshots on this topic. Snapshots are used in
-    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+    /// operations, which allow
     /// you to manage message acknowledgments in bulk. That is, you can set the
     /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.<br><br>
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
+    /// captured by a snapshot.
     /// 
     /// # Arguments
     ///
@@ -2218,7 +2253,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2234,10 +2269,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2257,7 +2289,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2352,7 +2384,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2401,7 +2433,8 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
 /// Creates the given topic with the given name. See the
-/// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
+/// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+/// resource name rules</a>.
 ///
 /// A builder for the *topics.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2494,7 +2527,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2510,10 +2543,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2545,7 +2575,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2640,7 +2670,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2787,7 +2817,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2803,10 +2833,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2838,7 +2865,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2929,7 +2956,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3076,7 +3103,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3092,10 +3119,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3127,7 +3151,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3218,7 +3242,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3365,7 +3389,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3381,10 +3405,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3416,7 +3437,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3507,7 +3528,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3650,7 +3671,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3666,10 +3687,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3701,7 +3719,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3792,7 +3810,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3938,7 +3956,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3954,10 +3972,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3989,7 +4004,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4080,7 +4095,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4216,7 +4231,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4232,10 +4247,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4255,7 +4267,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4334,7 +4346,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4479,7 +4491,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4495,10 +4507,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4530,7 +4539,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4621,7 +4630,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4757,7 +4766,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4773,10 +4782,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4796,7 +4802,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4875,7 +4881,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5022,7 +5028,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5038,10 +5044,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5073,7 +5076,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5164,7 +5167,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5302,7 +5305,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5318,10 +5321,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5341,7 +5341,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5420,7 +5420,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5469,13 +5469,10 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
 
 /// Gets the configuration details of a snapshot. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow you to manage message acknowledgments in bulk. That
+/// is, you can set the acknowledgment state of messages in an existing
+/// subscription to the state captured by a snapshot.
 ///
 /// A builder for the *snapshots.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5561,7 +5558,7 @@ impl<'a, C, A> ProjectSnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5577,10 +5574,7 @@ impl<'a, C, A> ProjectSnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5600,7 +5594,7 @@ impl<'a, C, A> ProjectSnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5679,7 +5673,7 @@ impl<'a, C, A> ProjectSnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5815,7 +5809,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5831,10 +5825,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5854,7 +5845,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5933,7 +5924,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6077,7 +6068,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6093,10 +6084,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6116,7 +6104,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6211,7 +6199,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6260,14 +6248,11 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
 /// Updates an existing snapshot. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow
 /// you to manage message acknowledgments in bulk. That is, you can set the
 /// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
-/// Note that certain properties of a snapshot are not modifiable.
+/// captured by a snapshot.
 ///
 /// A builder for the *snapshots.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6360,7 +6345,7 @@ impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6376,10 +6361,7 @@ impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6411,7 +6393,7 @@ impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6501,7 +6483,7 @@ impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6643,7 +6625,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6659,10 +6641,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6694,7 +6673,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6785,7 +6764,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6919,7 +6898,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6935,10 +6914,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6958,7 +6934,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7037,7 +7013,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7086,13 +7062,11 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
 /// Removes an existing snapshot. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow
 /// you to manage message acknowledgments in bulk. That is, you can set the
 /// acknowledgment state of messages in an existing subscription to the state
 /// captured by a snapshot.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
 /// When the snapshot is deleted, all messages retained in the snapshot
 /// are immediately dropped. After a snapshot is deleted, a new one may be
 /// created with the same name, but the new one has no association with the old
@@ -7182,7 +7156,7 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7198,10 +7172,7 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7221,7 +7192,7 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7300,7 +7271,7 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7442,7 +7413,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7458,10 +7429,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7493,7 +7461,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7584,7 +7552,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7726,7 +7694,7 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7742,10 +7710,7 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7777,7 +7742,7 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7872,7 +7837,7 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7921,14 +7886,15 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
 /// Creates a subscription to a given topic. See the
-/// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
+/// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+/// resource name rules</a>.
 /// If the subscription already exists, returns `ALREADY_EXISTS`.
 /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
 /// 
 /// If the name is not provided in the request, the server will assign a random
 /// name for this subscription on the same project as the topic, conforming
 /// to the
-/// [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
+/// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
 /// The generated name is populated in the returned Subscription object.
 /// Note that for REST API requests, you must specify a name in the request.
 ///
@@ -8023,7 +7989,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8039,10 +8005,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8074,7 +8037,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8169,7 +8132,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8311,7 +8274,7 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8327,10 +8290,7 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8362,7 +8322,7 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8457,7 +8417,7 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8506,25 +8466,22 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
 
 /// Creates a snapshot from the requested subscription. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow
 /// you to manage message acknowledgments in bulk. That is, you can set the
 /// acknowledgment state of messages in an existing subscription to the state
 /// captured by a snapshot.
-/// <br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.<br><br>
-/// If the snapshot already exists, returns `ALREADY_EXISTS`.
+/// <br><br>If the snapshot already exists, returns `ALREADY_EXISTS`.
 /// If the requested subscription doesn't exist, returns `NOT_FOUND`.
 /// If the backlog in the subscription is too old -- and the resulting snapshot
 /// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
 /// See also the `Snapshot.expire_time` field. If the name is not provided in
 /// the request, the server will assign a random
 /// name for this snapshot on the same project as the subscription, conforming
-/// to the [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
-/// The generated
-/// name is populated in the returned Snapshot object. Note that for REST API
-/// requests, you must specify a name in the request.
+/// to the
+/// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
+/// The generated name is populated in the returned Snapshot object. Note that
+/// for REST API requests, you must specify a name in the request.
 ///
 /// A builder for the *snapshots.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8617,7 +8574,7 @@ impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8633,10 +8590,7 @@ impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8668,7 +8622,7 @@ impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8737,7 +8691,8 @@ impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// If the name is not provided in the request, the server will assign a random
     /// name for this snapshot on the same project as the subscription.
     /// Note that for REST API requests, you must specify a name.  See the
-    /// <a href="/pubsub/docs/admin#resource_names">resource name rules</a>.
+    /// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+    /// resource name rules</a>.
     /// Format is `projects/{project}/snapshots/{snap}`.
     ///
     /// Sets the *name* path property to the given value.
@@ -8763,7 +8718,7 @@ impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8901,7 +8856,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8917,10 +8872,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8940,7 +8892,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9019,7 +8971,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9068,13 +9020,11 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Lists the existing snapshots. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow
 /// you to manage message acknowledgments in bulk. That is, you can set the
 /// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
+/// captured by a snapshot.
 ///
 /// A builder for the *snapshots.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9170,7 +9120,7 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9186,10 +9136,7 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9209,7 +9156,7 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9304,7 +9251,7 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9446,7 +9393,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9462,10 +9409,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9497,7 +9441,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9588,7 +9532,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9638,14 +9582,12 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
 /// Seeks an existing subscription to a point in time or to a given snapshot,
 /// whichever is provided in the request. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow
 /// you to manage message acknowledgments in bulk. That is, you can set the
 /// acknowledgment state of messages in an existing subscription to the state
 /// captured by a snapshot. Note that both the subscription and the snapshot
-/// must be on the same topic.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
+/// must be on the same topic.
 ///
 /// A builder for the *subscriptions.seek* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9738,7 +9680,7 @@ impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9754,10 +9696,7 @@ impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9789,7 +9728,7 @@ impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9879,7 +9818,7 @@ impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10013,7 +9952,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10029,10 +9968,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10052,7 +9988,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10131,7 +10067,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10275,7 +10211,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10291,10 +10227,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10314,7 +10247,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10409,7 +10342,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10458,13 +10391,11 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 
 
 /// Lists the names of the snapshots on this topic. Snapshots are used in
-/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+/// operations, which allow
 /// you to manage message acknowledgments in bulk. That is, you can set the
 /// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.<br><br>
-/// <b>BETA:</b> This feature is part of a beta release. This API might be
-/// changed in backward-incompatible ways and is not recommended for production
-/// use. It is not subject to any SLA or deprecation policy.
+/// captured by a snapshot.
 ///
 /// A builder for the *topics.snapshots.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10560,7 +10491,7 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10576,10 +10507,7 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10599,7 +10527,7 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10694,7 +10622,7 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10836,7 +10764,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10852,10 +10780,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10887,7 +10812,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10978,7 +10903,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

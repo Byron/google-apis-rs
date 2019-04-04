@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Clouderrorreporting* crate version *1.0.8+20181005*, where *20181005* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Clouderrorreporting* crate version *1.0.8+20190321*, where *20190321* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Clouderrorreporting* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/error-reporting/).
@@ -471,48 +471,96 @@ pub struct ErrorContext {
 impl Part for ErrorContext {}
 
 
-/// An error event which is reported to the Error Reporting system.
+/// Description of a group of similar error events.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [events report projects](struct.ProjectEventReportCall.html) (request)
+/// * [groups get projects](struct.ProjectGroupGetCall.html) (response)
+/// * [groups update projects](struct.ProjectGroupUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReportedErrorEvent {
-    /// [Required] The service context in which this error has occurred.
-    #[serde(rename="serviceContext")]
-    pub service_context: Option<ServiceContext>,
-    /// [Optional] Time when the event occurred.
-    /// If not provided, the time when the event was received by the
-    /// Error Reporting system will be used.
-    #[serde(rename="eventTime")]
-    pub event_time: Option<String>,
-    /// [Required] The error message.
-    /// If no `context.reportLocation` is provided, the message must contain a
-    /// header (typically consisting of the exception type name and an error
-    /// message) and an exception stack trace in one of the supported programming
-    /// languages and formats.
-    /// Supported languages are Java, Python, JavaScript, Ruby, C#, PHP, and Go.
-    /// Supported stack trace formats are:
-    /// 
-    /// * **Java**: Must be the return value of [`Throwable.printStackTrace()`](https://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#printStackTrace%28%29).
-    /// * **Python**: Must be the return value of [`traceback.format_exc()`](https://docs.python.org/2/library/traceback.html#traceback.format_exc).
-    /// * **JavaScript**: Must be the value of [`error.stack`](https://github.com/v8/v8/wiki/Stack-Trace-API)
-    /// as returned by V8.
-    /// * **Ruby**: Must contain frames returned by [`Exception.backtrace`](https://ruby-doc.org/core-2.2.0/Exception.html#method-i-backtrace).
-    /// * **C#**: Must be the return value of [`Exception.ToString()`](https://msdn.microsoft.com/en-us/library/system.exception.tostring.aspx).
-    /// * **PHP**: Must start with `PHP (Notice|Parse error|Fatal error|Warning)`
-    /// and contain the result of [`(string)$exception`](http://php.net/manual/en/exception.tostring.php).
-    /// * **Go**: Must be the return value of [`runtime.Stack()`](https://golang.org/pkg/runtime/debug/#Stack).
-    pub message: Option<String>,
-    /// [Optional] A description of the context in which the error occurred.
-    pub context: Option<ErrorContext>,
+pub struct ErrorGroup {
+    /// Associated tracking issues.
+    #[serde(rename="trackingIssues")]
+    pub tracking_issues: Option<Vec<TrackingIssue>>,
+    /// Group IDs are unique for a given project. If the same kind of error
+    /// occurs in different service contexts, it will receive the same group ID.
+    #[serde(rename="groupId")]
+    pub group_id: Option<String>,
+    /// The group resource name.
+    /// Example: <code>projects/my-project-123/groups/my-groupid</code>
+    pub name: Option<String>,
 }
 
-impl RequestValue for ReportedErrorEvent {}
+impl RequestValue for ErrorGroup {}
+impl ResponseResult for ErrorGroup {}
+
+
+/// Data extracted for a specific group based on certain filter criteria,
+/// such as a given time period and/or service filter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ErrorGroupStats {
+    /// Approximate total number of events in the given group that match
+    /// the filter criteria.
+    pub count: Option<String>,
+    /// Approximate first occurrence that was ever seen for this group
+    /// and which matches the given filter criteria, ignoring the
+    /// time_range that was specified in the request.
+    #[serde(rename="firstSeenTime")]
+    pub first_seen_time: Option<String>,
+    /// Approximate number of affected users in the given group that
+    /// match the filter criteria.
+    /// Users are distinguished by data in the `ErrorContext` of the
+    /// individual error events, such as their login name or their remote
+    /// IP address in case of HTTP requests.
+    /// The number of affected users can be zero even if the number of
+    /// errors is non-zero if no data was provided from which the
+    /// affected user could be deduced.
+    /// Users are counted based on data in the request
+    /// context that was provided in the error report. If more users are
+    /// implicitly affected, such as due to a crash of the whole service,
+    /// this is not reflected here.
+    #[serde(rename="affectedUsersCount")]
+    pub affected_users_count: Option<i64>,
+    /// Service contexts with a non-zero error count for the given filter
+    /// criteria. This list can be truncated if multiple services are affected.
+    /// Refer to `num_affected_services` for the total count.
+    #[serde(rename="affectedServices")]
+    pub affected_services: Option<Vec<ServiceContext>>,
+    /// Approximate number of occurrences over time.
+    /// Timed counts returned by ListGroups are guaranteed to be:
+    /// 
+    /// - Inside the requested time interval
+    /// - Non-overlapping, and
+    /// - Ordered by ascending time.
+    #[serde(rename="timedCounts")]
+    pub timed_counts: Option<Vec<TimedCount>>,
+    /// Approximate last occurrence that was ever seen for this group and
+    /// which matches the given filter criteria, ignoring the time_range
+    /// that was specified in the request.
+    #[serde(rename="lastSeenTime")]
+    pub last_seen_time: Option<String>,
+    /// An arbitrary event that is chosen as representative for the whole group.
+    /// The representative event is intended to be used as a quick preview for
+    /// the whole group. Events in the group are usually sufficiently similar
+    /// to each other such that showing an arbitrary representative provides
+    /// insight into the characteristics of the group as a whole.
+    pub representative: Option<ErrorEvent>,
+    /// The total number of services with a non-zero error count for the given
+    /// filter criteria.
+    #[serde(rename="numAffectedServices")]
+    pub num_affected_services: Option<i32>,
+    /// Group data that is independent of the filter criteria.
+    pub group: Option<ErrorGroup>,
+}
+
+impl Part for ErrorGroupStats {}
 
 
 /// Response message for deleting error events.
@@ -620,110 +668,62 @@ pub struct ListGroupStatsResponse {
     /// request, to view the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The error group stats which match the given request.
+    #[serde(rename="errorGroupStats")]
+    pub error_group_stats: Option<Vec<ErrorGroupStats>>,
     /// The timestamp specifies the start time to which the request was restricted.
     /// The start time is set based on the requested time range. It may be adjusted
     /// to a later time if a project has exceeded the storage quota and older data
     /// has been deleted.
     #[serde(rename="timeRangeBegin")]
     pub time_range_begin: Option<String>,
-    /// The error group stats which match the given request.
-    #[serde(rename="errorGroupStats")]
-    pub error_group_stats: Option<Vec<ErrorGroupStats>>,
 }
 
 impl ResponseResult for ListGroupStatsResponse {}
 
 
-/// Data extracted for a specific group based on certain filter criteria,
-/// such as a given time period and/or service filter.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorGroupStats {
-    /// Approximate total number of events in the given group that match
-    /// the filter criteria.
-    pub count: Option<String>,
-    /// Approximate first occurrence that was ever seen for this group
-    /// and which matches the given filter criteria, ignoring the
-    /// time_range that was specified in the request.
-    #[serde(rename="firstSeenTime")]
-    pub first_seen_time: Option<String>,
-    /// Approximate number of affected users in the given group that
-    /// match the filter criteria.
-    /// Users are distinguished by data in the `ErrorContext` of the
-    /// individual error events, such as their login name or their remote
-    /// IP address in case of HTTP requests.
-    /// The number of affected users can be zero even if the number of
-    /// errors is non-zero if no data was provided from which the
-    /// affected user could be deduced.
-    /// Users are counted based on data in the request
-    /// context that was provided in the error report. If more users are
-    /// implicitly affected, such as due to a crash of the whole service,
-    /// this is not reflected here.
-    #[serde(rename="affectedUsersCount")]
-    pub affected_users_count: Option<i64>,
-    /// Group data that is independent of the filter criteria.
-    pub group: Option<ErrorGroup>,
-    /// Approximate number of occurrences over time.
-    /// Timed counts returned by ListGroups are guaranteed to be:
-    /// 
-    /// - Inside the requested time interval
-    /// - Non-overlapping, and
-    /// - Ordered by ascending time.
-    #[serde(rename="timedCounts")]
-    pub timed_counts: Option<Vec<TimedCount>>,
-    /// Approximate last occurrence that was ever seen for this group and
-    /// which matches the given filter criteria, ignoring the time_range
-    /// that was specified in the request.
-    #[serde(rename="lastSeenTime")]
-    pub last_seen_time: Option<String>,
-    /// An arbitrary event that is chosen as representative for the whole group.
-    /// The representative event is intended to be used as a quick preview for
-    /// the whole group. Events in the group are usually sufficiently similar
-    /// to each other such that showing an arbitrary representative provides
-    /// insight into the characteristics of the group as a whole.
-    pub representative: Option<ErrorEvent>,
-    /// The total number of services with a non-zero error count for the given
-    /// filter criteria.
-    #[serde(rename="numAffectedServices")]
-    pub num_affected_services: Option<i32>,
-    /// Service contexts with a non-zero error count for the given filter
-    /// criteria. This list can be truncated if multiple services are affected.
-    /// Refer to `num_affected_services` for the total count.
-    #[serde(rename="affectedServices")]
-    pub affected_services: Option<Vec<ServiceContext>>,
-}
-
-impl Part for ErrorGroupStats {}
-
-
-/// Description of a group of similar error events.
+/// An error event which is reported to the Error Reporting system.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [groups get projects](struct.ProjectGroupGetCall.html) (response)
-/// * [groups update projects](struct.ProjectGroupUpdateCall.html) (request|response)
+/// * [events report projects](struct.ProjectEventReportCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorGroup {
-    /// Associated tracking issues.
-    #[serde(rename="trackingIssues")]
-    pub tracking_issues: Option<Vec<TrackingIssue>>,
-    /// The group resource name.
-    /// Example: <code>projects/my-project-123/groups/my-groupid</code>
-    pub name: Option<String>,
-    /// Group IDs are unique for a given project. If the same kind of error
-    /// occurs in different service contexts, it will receive the same group ID.
-    #[serde(rename="groupId")]
-    pub group_id: Option<String>,
+pub struct ReportedErrorEvent {
+    /// [Required] The service context in which this error has occurred.
+    #[serde(rename="serviceContext")]
+    pub service_context: Option<ServiceContext>,
+    /// [Optional] Time when the event occurred.
+    /// If not provided, the time when the event was received by the
+    /// Error Reporting system will be used.
+    #[serde(rename="eventTime")]
+    pub event_time: Option<String>,
+    /// [Required] The error message.
+    /// If no `context.reportLocation` is provided, the message must contain a
+    /// header (typically consisting of the exception type name and an error
+    /// message) and an exception stack trace in one of the supported programming
+    /// languages and formats.
+    /// Supported languages are Java, Python, JavaScript, Ruby, C#, PHP, and Go.
+    /// Supported stack trace formats are:
+    /// 
+    /// * **Java**: Must be the return value of [`Throwable.printStackTrace()`](https://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#printStackTrace%28%29).
+    /// * **Python**: Must be the return value of [`traceback.format_exc()`](https://docs.python.org/2/library/traceback.html#traceback.format_exc).
+    /// * **JavaScript**: Must be the value of [`error.stack`](https://github.com/v8/v8/wiki/Stack-Trace-API)
+    /// as returned by V8.
+    /// * **Ruby**: Must contain frames returned by [`Exception.backtrace`](https://ruby-doc.org/core-2.2.0/Exception.html#method-i-backtrace).
+    /// * **C#**: Must be the return value of [`Exception.ToString()`](https://msdn.microsoft.com/en-us/library/system.exception.tostring.aspx).
+    /// * **PHP**: Must start with `PHP (Notice|Parse error|Fatal error|Warning)`
+    /// and contain the result of [`(string)$exception`](http://php.net/manual/en/exception.tostring.php).
+    /// * **Go**: Must be the return value of [`runtime.Stack()`](https://golang.org/pkg/runtime/debug/#Stack).
+    pub message: Option<String>,
+    /// [Optional] A description of the context in which the error occurred.
+    pub context: Option<ErrorContext>,
 }
 
-impl RequestValue for ErrorGroup {}
-impl ResponseResult for ErrorGroup {}
+impl RequestValue for ReportedErrorEvent {}
 
 
 /// Response for reporting an individual error event.
@@ -1093,7 +1093,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1109,10 +1109,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1132,7 +1129,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1217,7 +1214,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1225,12 +1222,12 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGroupGetCall<'a, C, A>
@@ -1408,7 +1405,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1424,10 +1421,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1447,7 +1441,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1618,7 +1612,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1626,12 +1620,12 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGroupStatListCall<'a, C, A>
@@ -1752,7 +1746,7 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1768,10 +1762,7 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1791,7 +1782,7 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1873,7 +1864,7 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1881,12 +1872,12 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteEventCall<'a, C, A>
@@ -2042,7 +2033,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2058,10 +2049,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2081,7 +2069,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2215,7 +2203,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2223,12 +2211,12 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectEventListCall<'a, C, A>
@@ -2357,7 +2345,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2373,10 +2361,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2408,7 +2393,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2499,7 +2484,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2507,12 +2492,12 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGroupUpdateCall<'a, C, A>
@@ -2647,7 +2632,7 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2663,10 +2648,7 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2698,7 +2680,7 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2791,7 +2773,7 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2799,12 +2781,12 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectEventReportCall<'a, C, A>

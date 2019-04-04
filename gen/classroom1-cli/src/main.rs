@@ -715,35 +715,36 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "topic-id" => Some(("topicId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "submission-modification-mode" => Some(("submissionModificationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "assignment.student-work-folder.alternate-link" => Some(("assignment.studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "assignment.student-work-folder.id" => Some(("assignment.studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "assignment.student-work-folder.title" => Some(("assignment.studentWorkFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assignment.student-work-folder.id" => Some(("assignment.studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assignment.student-work-folder.alternate-link" => Some(("assignment.studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scheduled-time" => Some(("scheduledTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "associated-with-developer" => Some(("associatedWithDeveloper", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "individual-students-options.student-ids" => Some(("individualStudentsOptions.studentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "work-type" => Some(("workType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "assignee-mode", "assignment", "associated-with-developer", "choices", "course-id", "creation-time", "creator-user-id", "day", "description", "due-date", "due-time", "hours", "id", "individual-students-options", "max-points", "minutes", "month", "multiple-choice-question", "nanos", "scheduled-time", "seconds", "state", "student-ids", "student-work-folder", "submission-modification-mode", "title", "update-time", "work-type", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "assignee-mode", "assignment", "associated-with-developer", "choices", "course-id", "creation-time", "creator-user-id", "day", "description", "due-date", "due-time", "hours", "id", "individual-students-options", "max-points", "minutes", "month", "multiple-choice-question", "nanos", "scheduled-time", "seconds", "state", "student-ids", "student-work-folder", "submission-modification-mode", "title", "topic-id", "update-time", "work-type", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1082,35 +1083,36 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "topic-id" => Some(("topicId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "submission-modification-mode" => Some(("submissionModificationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "assignment.student-work-folder.alternate-link" => Some(("assignment.studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "assignment.student-work-folder.id" => Some(("assignment.studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "assignment.student-work-folder.title" => Some(("assignment.studentWorkFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assignment.student-work-folder.id" => Some(("assignment.studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assignment.student-work-folder.alternate-link" => Some(("assignment.studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scheduled-time" => Some(("scheduledTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "associated-with-developer" => Some(("associatedWithDeveloper", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "individual-students-options.student-ids" => Some(("individualStudentsOptions.studentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "work-type" => Some(("workType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "assignee-mode", "assignment", "associated-with-developer", "choices", "course-id", "creation-time", "creator-user-id", "day", "description", "due-date", "due-time", "hours", "id", "individual-students-options", "max-points", "minutes", "month", "multiple-choice-question", "nanos", "scheduled-time", "seconds", "state", "student-ids", "student-work-folder", "submission-modification-mode", "title", "update-time", "work-type", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "assignee-mode", "assignment", "associated-with-developer", "choices", "course-id", "creation-time", "creator-user-id", "day", "description", "due-date", "due-time", "hours", "id", "individual-students-options", "max-points", "minutes", "month", "multiple-choice-question", "nanos", "scheduled-time", "seconds", "state", "student-ids", "student-work-folder", "submission-modification-mode", "title", "topic-id", "update-time", "work-type", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1767,9 +1769,9 @@ impl<'n> Engine<'n> {
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-id" => Some(("ownerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "calendar-id" => Some(("calendarId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.title" => Some(("teacherFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-state" => Some(("courseState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2042,9 +2044,9 @@ impl<'n> Engine<'n> {
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-id" => Some(("ownerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "calendar-id" => Some(("calendarId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.title" => Some(("teacherFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-state" => Some(("courseState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2146,9 +2148,9 @@ impl<'n> Engine<'n> {
                     "profile.name.given-name" => Some(("profile.name.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.name.family-name" => Some(("profile.name.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.photo-url" => Some(("profile.photoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "student-work-folder.alternate-link" => Some(("studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "student-work-folder.id" => Some(("studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-work-folder.title" => Some(("studentWorkFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-folder.id" => Some(("studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-folder.alternate-link" => Some(("studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-link", "course-id", "email-address", "family-name", "full-name", "given-name", "id", "name", "photo-url", "profile", "student-work-folder", "title", "user-id", "verified-teacher"]);
@@ -2401,6 +2403,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.id" => Some(("profile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.verified-teacher" => Some(("profile.verifiedTeacher", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "profile.email-address" => Some(("profile.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2408,7 +2411,6 @@ impl<'n> Engine<'n> {
                     "profile.name.given-name" => Some(("profile.name.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.name.family-name" => Some(("profile.name.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.photo-url" => Some(("profile.photoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "email-address", "family-name", "full-name", "given-name", "id", "name", "photo-url", "profile", "user-id", "verified-teacher"]);
@@ -2634,6 +2636,349 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _courses_topics_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic-id" => Some(("topicId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "name", "topic-id", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Topic = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().topics_create(request, opt.value_of("course-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _courses_topics_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().topics_delete(opt.value_of("course-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _courses_topics_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().topics_get(opt.value_of("course-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _courses_topics_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().topics_list(opt.value_of("course-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _courses_topics_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic-id" => Some(("topicId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "name", "topic-id", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Topic = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().topics_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _courses_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2668,9 +3013,9 @@ impl<'n> Engine<'n> {
                     "teacher-group-email" => Some(("teacherGroupEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-id" => Some(("ownerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "calendar-id" => Some(("calendarId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "teacher-folder.title" => Some(("teacherFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-folder.id" => Some(("teacherFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-folder.alternate-link" => Some(("teacherFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-state" => Some(("courseState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3266,8 +3611,8 @@ impl<'n> Engine<'n> {
                     "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-id" => Some(("studentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "invitation-id", "invited-email-address", "state", "student-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3472,8 +3817,8 @@ impl<'n> Engine<'n> {
                     "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-id" => Some(("studentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "invitation-id", "invited-email-address", "state", "student-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3817,6 +4162,21 @@ impl<'n> Engine<'n> {
                     ("teachers-list", Some(opt)) => {
                         call_result = self._courses_teachers_list(opt, dry_run, &mut err);
                     },
+                    ("topics-create", Some(opt)) => {
+                        call_result = self._courses_topics_create(opt, dry_run, &mut err);
+                    },
+                    ("topics-delete", Some(opt)) => {
+                        call_result = self._courses_topics_delete(opt, dry_run, &mut err);
+                    },
+                    ("topics-get", Some(opt)) => {
+                        call_result = self._courses_topics_get(opt, dry_run, &mut err);
+                    },
+                    ("topics-list", Some(opt)) => {
+                        call_result = self._courses_topics_list(opt, dry_run, &mut err);
+                    },
+                    ("topics-patch", Some(opt)) => {
+                        call_result = self._courses_topics_patch(opt, dry_run, &mut err);
+                    },
                     ("update", Some(opt)) => {
                         call_result = self._courses_update(opt, dry_run, &mut err);
                     },
@@ -3980,7 +4340,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("courses", "methods: 'aliases-create', 'aliases-delete', 'aliases-list', 'announcements-create', 'announcements-delete', 'announcements-get', 'announcements-list', 'announcements-modify-assignees', 'announcements-patch', 'course-work-create', 'course-work-delete', 'course-work-get', 'course-work-list', 'course-work-modify-assignees', 'course-work-patch', 'course-work-student-submissions-get', 'course-work-student-submissions-list', 'course-work-student-submissions-modify-attachments', 'course-work-student-submissions-patch', 'course-work-student-submissions-reclaim', 'course-work-student-submissions-return', 'course-work-student-submissions-turn-in', 'create', 'delete', 'get', 'list', 'patch', 'students-create', 'students-delete', 'students-get', 'students-list', 'teachers-create', 'teachers-delete', 'teachers-get', 'teachers-list' and 'update'", vec![
+        ("courses", "methods: 'aliases-create', 'aliases-delete', 'aliases-list', 'announcements-create', 'announcements-delete', 'announcements-get', 'announcements-list', 'announcements-modify-assignees', 'announcements-patch', 'course-work-create', 'course-work-delete', 'course-work-get', 'course-work-list', 'course-work-modify-assignees', 'course-work-patch', 'course-work-student-submissions-get', 'course-work-student-submissions-list', 'course-work-student-submissions-modify-attachments', 'course-work-student-submissions-patch', 'course-work-student-submissions-reclaim', 'course-work-student-submissions-return', 'course-work-student-submissions-turn-in', 'create', 'delete', 'get', 'list', 'patch', 'students-create', 'students-delete', 'students-get', 'students-list', 'teachers-create', 'teachers-delete', 'teachers-get', 'teachers-list', 'topics-create', 'topics-delete', 'topics-get', 'topics-list', 'topics-patch' and 'update'", vec![
             ("aliases-create",
                     Some(r##"Creates an alias for a course.
         
@@ -4810,7 +5170,7 @@ fn main() {
                     Some(r##"Reclaims a student submission on behalf of the student that owns it.
         
         Reclaiming a student submission transfers ownership of attached Drive
-        files to the student and update the submission state.
+        files to the student and updates the submission state.
         
         Only the student that owns the requested student submission may call this
         method, and only for a student submission that has been turned in.
@@ -5456,6 +5816,191 @@ fn main() {
         alias."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("topics-create",
+                    Some(r##"Creates a topic.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course, create a topic in the requested course,
+        or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_topics-create",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("topics-delete",
+                    Some(r##"Deletes a topic.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not allowed to delete the
+        requested topic or for access errors.
+        * `FAILED_PRECONDITION` if the requested topic has already been
+        deleted.
+        * `NOT_FOUND` if no course or topic exists with the requested ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_topics-delete",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"Identifier of the topic to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("topics-get",
+                    Some(r##"Returns a topic.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+        requested course or topic, or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course or topic does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_topics-get",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"Identifier of the topic."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("topics-list",
+                    Some(r##"Returns the list of topics that the requester is permitted to view.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting user is not permitted to access
+        the requested course or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_topics-list",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("topics-patch",
+                    Some(r##"Updates one or more fields of a topic.
+        
+        This method returns the following error codes:
+        
+        * `PERMISSION_DENIED` if the requesting developer project did not create
+        the corresponding topic or for access errors.
+        * `INVALID_ARGUMENT` if the request is malformed.
+        * `NOT_FOUND` if the requested course or topic does not exist"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_topics-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Identifier of the course.
+        This identifier can be either the Classroom-assigned identifier or an
+        alias."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"Identifier of the topic."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6115,7 +6660,7 @@ fn main() {
     
     let mut app = App::new("classroom1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181009")
+           .version("1.0.8+20190401")
            .about("Manages classes, rosters, and invitations in Google Classroom.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_classroom1_cli")
            .arg(Arg::with_name("url")

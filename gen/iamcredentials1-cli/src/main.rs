@@ -326,8 +326,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "payload" => Some(("payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delegates" => Some(("delegates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "payload" => Some(("payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["delegates", "payload"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -412,8 +412,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "payload" => Some(("payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delegates" => Some(("delegates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "payload" => Some(("payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["delegates", "payload"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -597,7 +597,8 @@ fn main() {
                      None,
                      Some(r##"The resource name of the service account for which the credentials
         are requested, in the following format:
-        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`."##),
+        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+        character is required; replacing it with a project ID is invalid."##),
                      Some(true),
                      Some(false)),
         
@@ -627,7 +628,8 @@ fn main() {
                      None,
                      Some(r##"The resource name of the service account for which the credentials
         are requested, in the following format:
-        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`."##),
+        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+        character is required; replacing it with a project ID is invalid."##),
                      Some(true),
                      Some(false)),
         
@@ -657,7 +659,8 @@ fn main() {
                      None,
                      Some(r##"The resource name of the service account for which the credentials
         are requested, in the following format:
-        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`."##),
+        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+        character is required; replacing it with a project ID is invalid."##),
                      Some(true),
                      Some(false)),
         
@@ -687,7 +690,8 @@ fn main() {
                      None,
                      Some(r##"The resource name of the service account for which the credentials
         are requested, in the following format:
-        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`."##),
+        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+        character is required; replacing it with a project ID is invalid."##),
                      Some(true),
                      Some(false)),
         
@@ -717,7 +721,8 @@ fn main() {
                      None,
                      Some(r##"The resource name of the service account for which the credentials
         are requested, in the following format:
-        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`."##),
+        `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+        character is required; replacing it with a project ID is invalid."##),
                      Some(true),
                      Some(false)),
         
@@ -745,8 +750,8 @@ fn main() {
     
     let mut app = App::new("iamcredentials1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181004")
-           .about("IAM Service Account Credentials API")
+           .version("1.0.8+20190329")
+           .about("Creates short-lived, limited-privilege credentials for IAM service accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iamcredentials1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *1.0.8+20180913*, where *20180913* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Tasks* crate version *1.0.8+20190326*, where *20190326* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/tasks/).
@@ -402,7 +402,8 @@ pub struct PullMessage {
     /// The tag must be less than 500 characters.
     /// 
     /// SDK compatibility: Although the SDK allows tags to be either
-    /// string or [bytes](https://cloud.google.com/appengine/docs/standard/java/javadoc/com/google/appengine/api/taskqueue/TaskOptions.html#tag-byte:A-),
+    /// string or
+    /// [bytes](https://cloud.google.com/appengine/docs/standard/java/javadoc/com/google/appengine/api/taskqueue/TaskOptions.html#tag-byte:A-),
     /// only UTF-8 encoded tags can be used in Cloud Tasks. If a tag isn't UTF-8
     /// encoded, the tag will be empty when the task is returned by Cloud Tasks.
     pub tag: Option<String>,
@@ -430,9 +431,16 @@ impl Part for PullMessage {}
 /// 
 /// The task will be delivered to the App Engine app which belongs to the same
 /// project as the queue. For more information, see
-/// [How Requests are Routed](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)
+/// [How Requests are
+/// Routed](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)
 /// and how routing is affected by
-/// [dispatch files](https://cloud.google.com/appengine/docs/python/config/dispatchref).
+/// [dispatch
+/// files](https://cloud.google.com/appengine/docs/python/config/dispatchref).
+/// Traffic is encrypted during transport and never leaves Google datacenters.
+/// Because this traffic is carried over a communication mechanism internal to
+/// Google, you cannot explicitly set the protocol (for example, HTTP or HTTPS).
+/// The request to the handler, however, will appear to have used the HTTP
+/// protocol.
 /// 
 /// The AppEngineRouting used to construct the URL that the task is
 /// delivered to can be set at the queue-level or task-level:
@@ -448,6 +456,16 @@ impl Part for PullMessage {}
 /// 
 /// * `url =` host `+`
 ///   relative_url
+/// 
+/// Tasks can be dispatched to secure app handlers, unsecure app handlers, and
+/// URIs restricted with
+/// [`login:
+/// admin`](https://cloud.google.com/appengine/docs/standard/python/config/appref).
+/// Because tasks are not run as any user, they cannot be dispatched to URIs
+/// restricted with
+/// [`login:
+/// required`](https://cloud.google.com/appengine/docs/standard/python/config/appref)
+/// Task dispatches also do not follow redirects.
 /// 
 /// The task attempt has succeeded if the app's request handler returns
 /// an HTTP response code in the range [`200` - `299`]. `503` is
@@ -469,32 +487,6 @@ pub struct AppEngineHttpRequest {
     /// No spaces are allowed, and the maximum length allowed is 2083 characters.
     #[serde(rename="relativeUrl")]
     pub relative_url: Option<String>,
-    /// The HTTP method to use for the request. The default is POST.
-    /// 
-    /// The app's request handler for the task's target URL must be able to handle
-    /// HTTP requests with this http_method, otherwise the task attempt will fail
-    /// with error code 405 (Method Not Allowed). See
-    /// [Writing a push task request handler](https://cloud.google.com/appengine/docs/java/taskqueue/push/creating-handlers#writing_a_push_task_request_handler)
-    /// and the documentation for the request handlers in the language your app is
-    /// written in e.g.
-    /// [Python Request Handler](https://cloud.google.com/appengine/docs/python/tools/webapp/requesthandlerclass).
-    #[serde(rename="httpMethod")]
-    pub http_method: Option<String>,
-    /// Task-level setting for App Engine routing.
-    /// 
-    /// If set,
-    /// app_engine_routing_override
-    /// is used for all tasks in the queue, no matter what the setting is for the
-    /// task-level app_engine_routing.
-    #[serde(rename="appEngineRouting")]
-    pub app_engine_routing: Option<AppEngineRouting>,
-    /// Payload.
-    /// 
-    /// The payload will be sent as the HTTP message body. A message
-    /// body, and thus a payload, is allowed only if the HTTP method is
-    /// POST or PUT. It is an error to set a data payload on a task with
-    /// an incompatible HttpMethod.
-    pub payload: Option<String>,
     /// HTTP request headers.
     /// 
     /// This map contains the header field names and values.
@@ -529,7 +521,8 @@ pub struct AppEngineHttpRequest {
     /// 
     /// In addition, Cloud Tasks sets some headers when the task is dispatched,
     /// such as headers containing information about the task; see
-    /// [request headers](https://cloud.google.com/appengine/docs/python/taskqueue/push/creating-handlers#reading_request_headers).
+    /// [request
+    /// headers](https://cloud.google.com/appengine/docs/python/taskqueue/push/creating-handlers#reading_request_headers).
     /// These headers are set only when the task is dispatched, so they are not
     /// visible when the task is returned in a Cloud Tasks response.
     /// 
@@ -537,6 +530,34 @@ pub struct AppEngineHttpRequest {
     /// the size, there is a limit on the maximum size of the Task. For more
     /// information, see the CreateTask documentation.
     pub headers: Option<HashMap<String, String>>,
+    /// Task-level setting for App Engine routing.
+    /// 
+    /// If set,
+    /// app_engine_routing_override
+    /// is used for all tasks in the queue, no matter what the setting is for the
+    /// task-level app_engine_routing.
+    #[serde(rename="appEngineRouting")]
+    pub app_engine_routing: Option<AppEngineRouting>,
+    /// Payload.
+    /// 
+    /// The payload will be sent as the HTTP message body. A message
+    /// body, and thus a payload, is allowed only if the HTTP method is
+    /// POST or PUT. It is an error to set a data payload on a task with
+    /// an incompatible HttpMethod.
+    pub payload: Option<String>,
+    /// The HTTP method to use for the request. The default is POST.
+    /// 
+    /// The app's request handler for the task's target URL must be able to handle
+    /// HTTP requests with this http_method, otherwise the task attempt will fail
+    /// with error code 405 (Method Not Allowed). See
+    /// [Writing a push task request
+    /// handler](https://cloud.google.com/appengine/docs/java/taskqueue/push/creating-handlers#writing_a_push_task_request_handler)
+    /// and the documentation for the request handlers in the language your app is
+    /// written in e.g.
+    /// [Python Request
+    /// Handler](https://cloud.google.com/appengine/docs/python/tools/webapp/requesthandlerclass).
+    #[serde(rename="httpMethod")]
+    pub http_method: Option<String>,
 }
 
 impl Part for AppEngineHttpRequest {}
@@ -553,22 +574,22 @@ pub struct AttemptStatus {
     /// `schedule_time` will be truncated to the nearest microsecond.
     #[serde(rename="scheduleTime")]
     pub schedule_time: Option<String>,
+    /// Output only. The time that this attempt was dispatched.
+    /// 
+    /// `dispatch_time` will be truncated to the nearest microsecond.
+    #[serde(rename="dispatchTime")]
+    pub dispatch_time: Option<String>,
+    /// Output only. The time that this attempt response was received.
+    /// 
+    /// `response_time` will be truncated to the nearest microsecond.
+    #[serde(rename="responseTime")]
+    pub response_time: Option<String>,
     /// Output only. The response from the target for this attempt.
     /// 
     /// If the task has not been attempted or the task is currently running
     /// then the response status is unset.
     #[serde(rename="responseStatus")]
     pub response_status: Option<Status>,
-    /// Output only. The time that this attempt response was received.
-    /// 
-    /// `response_time` will be truncated to the nearest microsecond.
-    #[serde(rename="responseTime")]
-    pub response_time: Option<String>,
-    /// Output only. The time that this attempt was dispatched.
-    /// 
-    /// `dispatch_time` will be truncated to the nearest microsecond.
-    #[serde(rename="dispatchTime")]
-    pub dispatch_time: Option<String>,
 }
 
 impl Part for AttemptStatus {}
@@ -666,80 +687,138 @@ pub struct Policy {
 impl ResponseResult for Policy {}
 
 
-/// A unit of scheduled work.
+/// App Engine Routing.
 /// 
-/// # Activities
+/// Defines routing characteristics specific to App Engine - service, version,
+/// and instance.
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// For more information about services, versions, and instances see
+/// [An Overview of App
+/// Engine](https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine),
+/// [Microservices Architecture on Google App
+/// Engine](https://cloud.google.com/appengine/docs/python/microservices-on-app-engine),
+/// [App Engine Standard request
+/// routing](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed),
+/// and [App Engine Flex request
+/// routing](https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed).
 /// 
-/// * [locations queues tasks run projects](struct.ProjectLocationQueueTaskRunCall.html) (response)
-/// * [locations queues tasks renew lease projects](struct.ProjectLocationQueueTaskRenewLeaseCall.html) (response)
-/// * [locations queues tasks cancel lease projects](struct.ProjectLocationQueueTaskCancelLeaseCall.html) (response)
-/// * [locations queues tasks get projects](struct.ProjectLocationQueueTaskGetCall.html) (response)
-/// * [locations queues tasks create projects](struct.ProjectLocationQueueTaskCreateCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Task {
-    /// Output only. The task status.
-    pub status: Option<TaskStatus>,
-    /// LeaseTasks to process the task. Can be
-    /// set only if pull_target is set on the queue.
+pub struct AppEngineRouting {
+    /// App instance.
     /// 
-    /// A pull task is a task that has PullMessage set.
-    #[serde(rename="pullMessage")]
-    pub pull_message: Option<PullMessage>,
-    /// App Engine HTTP request that is sent to the task's target. Can
-    /// be set only if
-    /// app_engine_http_target is set
-    /// on the queue.
+    /// By default, the task is sent to an instance which is available when
+    /// the task is attempted.
     /// 
-    /// An App Engine task is a task that has AppEngineHttpRequest set.
-    #[serde(rename="appEngineHttpRequest")]
-    pub app_engine_http_request: Option<AppEngineHttpRequest>,
-    /// Optionally caller-specified in CreateTask.
+    /// Requests can only be sent to a specific instance if
+    /// [manual scaling is used in App Engine
+    /// Standard](https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine?hl=en_US#scaling_types_and_instance_classes).
+    /// App Engine Flex does not support instances. For more information, see
+    /// [App Engine Standard request
+    /// routing](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)
+    /// and [App Engine Flex request
+    /// routing](https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed).
+    pub instance: Option<String>,
+    /// Output only. The host that the task is sent to.
     /// 
-    /// The task name.
+    /// For more information, see
+    /// [How Requests are
+    /// Routed](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed).
     /// 
-    /// The task name must have the following format:
-    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
+    /// The host is constructed as:
     /// 
-    /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
-    ///    hyphens (-), colons (:), or periods (.).
-    ///    For more information, see
-    ///    [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
-    /// * `LOCATION_ID` is the canonical ID for the task's location.
-    ///    The list of available locations can be obtained by calling
-    ///    ListLocations.
-    ///    For more information, see https://cloud.google.com/about/locations/.
-    /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
-    ///   hyphens (-). The maximum length is 100 characters.
-    /// * `TASK_ID` can contain only letters ([A-Za-z]), numbers ([0-9]),
-    ///   hyphens (-), or underscores (_). The maximum length is 500 characters.
-    pub name: Option<String>,
-    /// The time when the task is scheduled to be attempted.
     /// 
-    /// For App Engine queues, this is when the task will be attempted or retried.
+    /// * `host = [application_domain_name]`</br>
+    ///   `| [service] + '.' + [application_domain_name]`</br>
+    ///   `| [version] + '.' + [application_domain_name]`</br>
+    ///   `| [version_dot_service]+ '.' + [application_domain_name]`</br>
+    ///   `| [instance] + '.' + [application_domain_name]`</br>
+    ///   `| [instance_dot_service] + '.' + [application_domain_name]`</br>
+    ///   `| [instance_dot_version] + '.' + [application_domain_name]`</br>
+    ///   `| [instance_dot_version_dot_service] + '.' + [application_domain_name]`
     /// 
-    /// For pull queues, this is the time when the task is available to
-    /// be leased; if a task is currently leased, this is the time when
-    /// the current lease expires, that is, the time that the task was
-    /// leased plus the lease_duration.
+    /// * `application_domain_name` = The domain name of the app, for
+    ///   example <app-id>.appspot.com, which is associated with the
+    ///   queue's project ID. Some tasks which were created using the App Engine
+    ///   SDK use a custom domain name.
     /// 
-    /// `schedule_time` will be truncated to the nearest microsecond.
-    #[serde(rename="scheduleTime")]
-    pub schedule_time: Option<String>,
-    /// Output only. The time that the task was created.
+    /// * `service =` service
     /// 
-    /// `create_time` will be truncated to the nearest second.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Output only. The view specifies which subset of the Task has
-    /// been returned.
-    pub view: Option<String>,
+    /// * `version =` version
+    /// 
+    /// * `version_dot_service =`
+    ///   version `+ '.' +`
+    ///   service
+    /// 
+    /// * `instance =` instance
+    /// 
+    /// * `instance_dot_service =`
+    ///   instance `+ '.' +`
+    ///   service
+    /// 
+    /// * `instance_dot_version =`
+    ///   instance `+ '.' +`
+    ///   version
+    /// 
+    /// * `instance_dot_version_dot_service =`
+    ///   instance `+ '.' +`
+    ///   version `+ '.' +`
+    ///   service
+    /// 
+    /// If service is empty, then the task will be sent
+    /// to the service which is the default service when the task is attempted.
+    /// 
+    /// If version is empty, then the task will be sent
+    /// to the version which is the default version when the task is attempted.
+    /// 
+    /// If instance is empty, then the task
+    /// will be sent to an instance which is available when the task is
+    /// attempted.
+    /// 
+    /// If service,
+    /// version, or
+    /// instance is invalid, then the task
+    /// will be sent to the default version of the default service when
+    /// the task is attempted.
+    pub host: Option<String>,
+    /// App version.
+    /// 
+    /// By default, the task is sent to the version which is the default
+    /// version when the task is attempted.
+    /// 
+    /// For some queues or tasks which were created using the App Engine
+    /// Task Queue API, host is not parsable
+    /// into service,
+    /// version, and
+    /// instance. For example, some tasks
+    /// which were created using the App Engine SDK use a custom domain
+    /// name; custom domains are not parsed by Cloud Tasks. If
+    /// host is not parsable, then
+    /// service,
+    /// version, and
+    /// instance are the empty string.
+    pub version: Option<String>,
+    /// App service.
+    /// 
+    /// By default, the task is sent to the service which is the default
+    /// service when the task is attempted.
+    /// 
+    /// For some queues or tasks which were created using the App Engine
+    /// Task Queue API, host is not parsable
+    /// into service,
+    /// version, and
+    /// instance. For example, some tasks
+    /// which were created using the App Engine SDK use a custom domain
+    /// name; custom domains are not parsed by Cloud Tasks. If
+    /// host is not parsable, then
+    /// service,
+    /// version, and
+    /// instance are the empty string.
+    pub service: Option<String>,
 }
 
-impl ResponseResult for Task {}
+impl Part for AppEngineRouting {}
 
 
 /// The response message for Locations.ListLocations.
@@ -774,17 +853,17 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
-    /// The canonical id for this location. For example: `"us-east1"`.
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
-    /// Cross-service attributes for the location. For example
-    /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
-    pub labels: Option<HashMap<String, String>>,
     /// The friendly name for this location, typically a nearby city name.
     /// For example, "Tokyo".
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// Cross-service attributes for the location. For example
+    /// 
+    ///     {"cloud.googleapis.com/region": "us-east1"}
+    pub labels: Option<HashMap<String, String>>,
+    /// The canonical id for this location. For example: `"us-east1"`.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Resource name for the location, which may vary between implementations.
     /// For example: `"projects/example-project/locations/us-east1"`
     pub name: Option<String>,
@@ -951,17 +1030,17 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -1062,19 +1141,81 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Request message for `GetIamPolicy` method.
+/// A unit of scheduled work.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations queues get iam policy projects](struct.ProjectLocationQueueGetIamPolicyCall.html) (request)
+/// * [locations queues tasks run projects](struct.ProjectLocationQueueTaskRunCall.html) (response)
+/// * [locations queues tasks renew lease projects](struct.ProjectLocationQueueTaskRenewLeaseCall.html) (response)
+/// * [locations queues tasks cancel lease projects](struct.ProjectLocationQueueTaskCancelLeaseCall.html) (response)
+/// * [locations queues tasks get projects](struct.ProjectLocationQueueTaskGetCall.html) (response)
+/// * [locations queues tasks create projects](struct.ProjectLocationQueueTaskCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct Task {
+    /// Output only. The task status.
+    pub status: Option<TaskStatus>,
+    /// LeaseTasks to process the task. Can be
+    /// set only if pull_target is set on the queue.
+    /// 
+    /// A pull task is a task that has PullMessage set.
+    #[serde(rename="pullMessage")]
+    pub pull_message: Option<PullMessage>,
+    /// App Engine HTTP request that is sent to the task's target. Can
+    /// be set only if
+    /// app_engine_http_target is set
+    /// on the queue.
+    /// 
+    /// An App Engine task is a task that has AppEngineHttpRequest set.
+    #[serde(rename="appEngineHttpRequest")]
+    pub app_engine_http_request: Option<AppEngineHttpRequest>,
+    /// Optionally caller-specified in CreateTask.
+    /// 
+    /// The task name.
+    /// 
+    /// The task name must have the following format:
+    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
+    /// 
+    /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+    ///    hyphens (-), colons (:), or periods (.).
+    ///    For more information, see
+    ///    [Identifying
+    ///    projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+    /// * `LOCATION_ID` is the canonical ID for the task's location.
+    ///    The list of available locations can be obtained by calling
+    ///    ListLocations.
+    ///    For more information, see https://cloud.google.com/about/locations/.
+    /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+    ///   hyphens (-). The maximum length is 100 characters.
+    /// * `TASK_ID` can contain only letters ([A-Za-z]), numbers ([0-9]),
+    ///   hyphens (-), or underscores (_). The maximum length is 500 characters.
+    pub name: Option<String>,
+    /// The time when the task is scheduled to be attempted.
+    /// 
+    /// For App Engine queues, this is when the task will be attempted or retried.
+    /// 
+    /// For pull queues, this is the time when the task is available to
+    /// be leased; if a task is currently leased, this is the time when
+    /// the current lease expires, that is, the time that the task was
+    /// leased plus the lease_duration.
+    /// 
+    /// `schedule_time` will be truncated to the nearest microsecond.
+    #[serde(rename="scheduleTime")]
+    pub schedule_time: Option<String>,
+    /// Output only. The time that the task was created.
+    /// 
+    /// `create_time` will be truncated to the nearest second.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Output only. The view specifies which subset of the Task has
+    /// been returned.
+    pub view: Option<String>,
+}
 
-impl RequestValue for GetIamPolicyRequest {}
+impl ResponseResult for Task {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -1108,10 +1249,9 @@ impl RequestValue for TestIamPermissionsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
     /// Textual representation of an expression in
     /// Common Expression Language syntax.
     /// 
@@ -1121,9 +1261,10 @@ pub struct Expr {
     /// An optional string indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
 }
 
 impl Part for Expr {}
@@ -1187,7 +1328,7 @@ pub struct TaskStatus {
     pub first_attempt_status: Option<AttemptStatus>,
     /// Output only. The number of attempts dispatched.
     /// 
-    /// This count includes tasks which have been dispatched but haven't
+    /// This count includes attempts which have been dispatched but haven't
     /// received a response.
     #[serde(rename="attemptDispatchCount")]
     pub attempt_dispatch_count: Option<i32>,
@@ -1233,7 +1374,8 @@ pub struct Queue {
     /// were purged.
     /// 
     /// A queue can be purged using PurgeQueue, the
-    /// [App Engine Task Queue SDK, or the Cloud Console](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue).
+    /// [App Engine Task Queue SDK, or the Cloud
+    /// Console](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue).
     /// 
     /// Purge time will be truncated to the nearest microsecond. Purge
     /// time will be unset if the queue has never been purged.
@@ -1250,7 +1392,8 @@ pub struct Queue {
     /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
     ///    hyphens (-), colons (:), or periods (.).
     ///    For more information, see
-    ///    [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+    ///    [Identifying
+    ///    projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
     /// * `LOCATION_ID` is the canonical ID for the queue's location.
     ///    The list of available locations can be obtained by calling
     ///    ListLocations.
@@ -1293,7 +1436,8 @@ pub struct Queue {
     /// * For tasks created using the App Engine SDK: the queue-level retry
     ///   settings apply to all tasks in the queue which do not have retry settings
     ///   explicitly set on the task and were created by the App Engine SDK. See
-    ///   [App Engine documentation](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/retrying-tasks).
+    ///   [App Engine
+    ///   documentation](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/retrying-tasks).
     #[serde(rename="retryConfig")]
     pub retry_config: Option<RetryConfig>,
 }
@@ -1340,6 +1484,21 @@ pub struct CancelLeaseRequest {
 }
 
 impl RequestValue for CancelLeaseRequest {}
+
+
+/// Request message for `GetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations queues get iam policy projects](struct.ProjectLocationQueueGetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+
+impl RequestValue for GetIamPolicyRequest {}
 
 
 /// Request message for CreateTask.
@@ -1526,7 +1685,8 @@ pub struct RateLimits {
     /// 
     /// 
     /// This field has the same meaning as
-    /// [rate in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#rate).
+    /// [rate in
+    /// queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#rate).
     #[serde(rename="maxTasksDispatchedPerSecond")]
     pub max_tasks_dispatched_per_second: Option<f64>,
     /// Output only. The max burst size.
@@ -1581,7 +1741,8 @@ pub struct RateLimits {
     /// 
     /// 
     /// This field has the same meaning as
-    /// [max_concurrent_requests in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#max_concurrent_requests).
+    /// [max_concurrent_requests in
+    /// queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#max_concurrent_requests).
     #[serde(rename="maxConcurrentTasks")]
     pub max_concurrent_tasks: Option<i32>,
 }
@@ -1629,7 +1790,7 @@ pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
-    /// Unimplemented. The condition that is associated with this binding.
+    /// The condition that is associated with this binding.
     /// NOTE: an unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
@@ -1654,7 +1815,7 @@ pub struct Binding {
     ///    For example, `admins@example.com`.
     /// 
     /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
     /// 
@@ -1662,129 +1823,6 @@ pub struct Binding {
 }
 
 impl Part for Binding {}
-
-
-/// App Engine Routing.
-/// 
-/// For more information about services, versions, and instances see
-/// [An Overview of App Engine](https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine),
-/// [Microservices Architecture on Google App Engine](https://cloud.google.com/appengine/docs/python/microservices-on-app-engine),
-/// [App Engine Standard request routing](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed),
-/// and [App Engine Flex request routing](https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppEngineRouting {
-    /// App instance.
-    /// 
-    /// By default, the task is sent to an instance which is available when
-    /// the task is attempted.
-    /// 
-    /// Requests can only be sent to a specific instance if
-    /// [manual scaling is used in App Engine Standard](https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine?hl=en_US#scaling_types_and_instance_classes).
-    /// App Engine Flex does not support instances. For more information, see
-    /// [App Engine Standard request routing](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)
-    /// and [App Engine Flex request routing](https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed).
-    pub instance: Option<String>,
-    /// Output only. The host that the task is sent to.
-    /// 
-    /// For more information, see
-    /// [How Requests are Routed](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed).
-    /// 
-    /// The host is constructed as:
-    /// 
-    /// 
-    /// * `host = [application_domain_name]`</br>
-    ///   `| [service] + '.' + [application_domain_name]`</br>
-    ///   `| [version] + '.' + [application_domain_name]`</br>
-    ///   `| [version_dot_service]+ '.' + [application_domain_name]`</br>
-    ///   `| [instance] + '.' + [application_domain_name]`</br>
-    ///   `| [instance_dot_service] + '.' + [application_domain_name]`</br>
-    ///   `| [instance_dot_version] + '.' + [application_domain_name]`</br>
-    ///   `| [instance_dot_version_dot_service] + '.' + [application_domain_name]`
-    /// 
-    /// * `application_domain_name` = The domain name of the app, for
-    ///   example <app-id>.appspot.com, which is associated with the
-    ///   queue's project ID. Some tasks which were created using the App Engine
-    ///   SDK use a custom domain name.
-    /// 
-    /// * `service =` service
-    /// 
-    /// * `version =` version
-    /// 
-    /// * `version_dot_service =`
-    ///   version `+ '.' +`
-    ///   service
-    /// 
-    /// * `instance =` instance
-    /// 
-    /// * `instance_dot_service =`
-    ///   instance `+ '.' +`
-    ///   service
-    /// 
-    /// * `instance_dot_version =`
-    ///   instance `+ '.' +`
-    ///   version
-    /// 
-    /// * `instance_dot_version_dot_service =`
-    ///   instance `+ '.' +`
-    ///   version `+ '.' +`
-    ///   service
-    /// 
-    /// If service is empty, then the task will be sent
-    /// to the service which is the default service when the task is attempted.
-    /// 
-    /// If version is empty, then the task will be sent
-    /// to the version which is the default version when the task is attempted.
-    /// 
-    /// If instance is empty, then the task
-    /// will be sent to an instance which is available when the task is
-    /// attempted.
-    /// 
-    /// If service,
-    /// version, or
-    /// instance is invalid, then the task
-    /// will be sent to the default version of the default service when
-    /// the task is attempted.
-    pub host: Option<String>,
-    /// App version.
-    /// 
-    /// By default, the task is sent to the version which is the default
-    /// version when the task is attempted.
-    /// 
-    /// For some queues or tasks which were created using the App Engine
-    /// Task Queue API, host is not parsable
-    /// into service,
-    /// version, and
-    /// instance. For example, some tasks
-    /// which were created using the App Engine SDK use a custom domain
-    /// name; custom domains are not parsed by Cloud Tasks. If
-    /// host is not parsable, then
-    /// service,
-    /// version, and
-    /// instance are the empty string.
-    pub version: Option<String>,
-    /// App service.
-    /// 
-    /// By default, the task is sent to the service which is the default
-    /// service when the task is attempted.
-    /// 
-    /// For some queues or tasks which were created using the App Engine
-    /// Task Queue API, host is not parsable
-    /// into service,
-    /// version, and
-    /// instance. For example, some tasks
-    /// which were created using the App Engine SDK use a custom domain
-    /// name; custom domains are not parsed by Cloud Tasks. If
-    /// host is not parsable, then
-    /// service,
-    /// version, and
-    /// instance are the empty string.
-    pub service: Option<String>,
-}
-
-impl Part for AppEngineRouting {}
 
 
 /// Request message for ResumeQueue.
@@ -1864,7 +1902,8 @@ pub struct RetryConfig {
     /// `max_retry_duration` will be truncated to the nearest second.
     /// 
     /// This field has the same meaning as
-    /// [task_age_limit in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [task_age_limit in
+    /// queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxRetryDuration")]
     pub max_retry_duration: Option<String>,
     /// A task will be scheduled for retry between
@@ -1882,7 +1921,8 @@ pub struct RetryConfig {
     /// `min_backoff` will be truncated to the nearest second.
     /// 
     /// This field has the same meaning as
-    /// [min_backoff_seconds in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [min_backoff_seconds in
+    /// queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="minBackoff")]
     pub min_backoff: Option<String>,
     /// The time between retries will double `max_doublings` times.
@@ -1911,7 +1951,8 @@ pub struct RetryConfig {
     /// 
     /// 
     /// This field has the same meaning as
-    /// [max_doublings in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [max_doublings in
+    /// queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxDoublings")]
     pub max_doublings: Option<i32>,
     /// A task will be scheduled for retry between
@@ -1929,7 +1970,8 @@ pub struct RetryConfig {
     /// `max_backoff` will be truncated to the nearest second.
     /// 
     /// This field has the same meaning as
-    /// [max_backoff_seconds in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [max_backoff_seconds in
+    /// queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxBackoff")]
     pub max_backoff: Option<String>,
     /// If true, then the number of attempts is unlimited.
@@ -2122,7 +2164,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///            * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
     ///               hyphens (-), colons (:), or periods (.).
     ///               For more information, see
-    ///               [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+    ///               [Identifying
+    ///               projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
     ///            * `LOCATION_ID` is the canonical ID for the queue's location.
     ///               The list of available locations can be obtained by calling
     ///               ListLocations.
@@ -2718,7 +2761,7 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2734,10 +2777,7 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2757,7 +2797,7 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2856,7 +2896,7 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2864,12 +2904,12 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskGetCall<'a, C, A>
@@ -3013,7 +3053,7 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3029,10 +3069,7 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3052,7 +3089,7 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3179,7 +3216,7 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3187,12 +3224,12 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskListCall<'a, C, A>
@@ -3324,7 +3361,7 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3340,10 +3377,7 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3363,7 +3397,7 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3444,7 +3478,7 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3452,12 +3486,12 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueDeleteCall<'a, C, A>
@@ -3595,7 +3629,7 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3611,10 +3645,7 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3646,7 +3677,7 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3737,7 +3768,7 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3745,12 +3776,12 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueSetIamPolicyCall<'a, C, A>
@@ -3896,7 +3927,7 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3912,10 +3943,7 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3947,7 +3975,7 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4023,7 +4051,8 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
     ///    hyphens (-), colons (:), or periods (.).
     ///    For more information, see
-    ///    [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+    ///    [Identifying
+    ///    projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
     /// * `LOCATION_ID` is the canonical ID for the queue's location.
     ///    The list of available locations can be obtained by calling
     ///    ListLocations.
@@ -4063,7 +4092,7 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4071,12 +4100,12 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueuePatchCall<'a, C, A>
@@ -4214,7 +4243,7 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4230,10 +4259,7 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4265,7 +4291,7 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4362,7 +4388,7 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4370,12 +4396,12 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueCreateCall<'a, C, A>
@@ -4496,7 +4522,7 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4512,10 +4538,7 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4535,7 +4558,7 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4616,7 +4639,7 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4624,12 +4647,12 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueGetCall<'a, C, A>
@@ -4763,7 +4786,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4779,10 +4802,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4814,7 +4834,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4909,7 +4929,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4917,12 +4937,12 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskCreateCall<'a, C, A>
@@ -5047,7 +5067,7 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5063,10 +5083,7 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5086,7 +5103,7 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5167,7 +5184,7 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5175,12 +5192,12 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskDeleteCall<'a, C, A>
@@ -5320,7 +5337,7 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5336,10 +5353,7 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5371,7 +5385,7 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5464,7 +5478,7 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5472,12 +5486,12 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A>
@@ -5616,7 +5630,7 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5632,10 +5646,7 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5667,7 +5678,7 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5760,7 +5771,7 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5768,12 +5779,12 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueResumeCall<'a, C, A>
@@ -5906,7 +5917,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5922,10 +5933,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5957,7 +5965,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6050,7 +6058,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6058,12 +6066,12 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A>
@@ -6201,7 +6209,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6217,10 +6225,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6240,7 +6245,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6364,7 +6369,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6372,12 +6377,12 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueListCall<'a, C, A>
@@ -6531,7 +6536,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6547,10 +6552,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6582,7 +6584,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6675,7 +6677,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6683,12 +6685,12 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskRunCall<'a, C, A>
@@ -6822,7 +6824,7 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6838,10 +6840,7 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6873,7 +6872,7 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6966,7 +6965,7 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6974,12 +6973,12 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueuePauseCall<'a, C, A>
@@ -7115,7 +7114,7 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7131,10 +7130,7 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7166,7 +7162,7 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7257,7 +7253,7 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7265,12 +7261,12 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueGetIamPolicyCall<'a, C, A>
@@ -7391,7 +7387,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7407,10 +7403,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7430,7 +7423,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7508,7 +7501,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7516,12 +7509,12 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C, A>
@@ -7653,7 +7646,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7669,10 +7662,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7704,7 +7694,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7797,7 +7787,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7805,12 +7795,12 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A>
@@ -7959,7 +7949,7 @@ impl<'a, C, A> ProjectLocationQueueTaskLeaseCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7975,10 +7965,7 @@ impl<'a, C, A> ProjectLocationQueueTaskLeaseCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8010,7 +7997,7 @@ impl<'a, C, A> ProjectLocationQueueTaskLeaseCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8103,7 +8090,7 @@ impl<'a, C, A> ProjectLocationQueueTaskLeaseCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8111,12 +8098,12 @@ impl<'a, C, A> ProjectLocationQueueTaskLeaseCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskLeaseCall<'a, C, A>
@@ -8252,7 +8239,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8268,10 +8255,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8291,7 +8275,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8390,7 +8374,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8398,12 +8382,12 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
@@ -8537,7 +8521,7 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8553,10 +8537,7 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8588,7 +8569,7 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8679,7 +8660,7 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8687,12 +8668,12 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTestIamPermissionCall<'a, C, A>
@@ -8825,7 +8806,7 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8841,10 +8822,7 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8876,7 +8854,7 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8969,7 +8947,7 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8977,12 +8955,12 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueuePurgeCall<'a, C, A>

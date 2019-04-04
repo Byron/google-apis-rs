@@ -1,0 +1,40 @@
+site_name: Container Analysis v1.0.8+20190401
+site_url: http://byron.github.io/google-apis-rs/google-containeranalysis1_beta1-cli
+site_description: A complete library to interact with Container Analysis (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/containeranalysis1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_notes-batch-create.md', 'Projects', 'Notes Batch Create']
+- ['projects_notes-create.md', 'Projects', 'Notes Create']
+- ['projects_notes-delete.md', 'Projects', 'Notes Delete']
+- ['projects_notes-get.md', 'Projects', 'Notes Get']
+- ['projects_notes-get-iam-policy.md', 'Projects', 'Notes Get Iam Policy']
+- ['projects_notes-list.md', 'Projects', 'Notes List']
+- ['projects_notes-occurrences-list.md', 'Projects', 'Notes Occurrences List']
+- ['projects_notes-patch.md', 'Projects', 'Notes Patch']
+- ['projects_notes-set-iam-policy.md', 'Projects', 'Notes Set Iam Policy']
+- ['projects_notes-test-iam-permissions.md', 'Projects', 'Notes Test Iam Permissions']
+- ['projects_occurrences-batch-create.md', 'Projects', 'Occurrences Batch Create']
+- ['projects_occurrences-create.md', 'Projects', 'Occurrences Create']
+- ['projects_occurrences-delete.md', 'Projects', 'Occurrences Delete']
+- ['projects_occurrences-get.md', 'Projects', 'Occurrences Get']
+- ['projects_occurrences-get-iam-policy.md', 'Projects', 'Occurrences Get Iam Policy']
+- ['projects_occurrences-get-notes.md', 'Projects', 'Occurrences Get Notes']
+- ['projects_occurrences-get-vulnerability-summary.md', 'Projects', 'Occurrences Get Vulnerability Summary']
+- ['projects_occurrences-list.md', 'Projects', 'Occurrences List']
+- ['projects_occurrences-patch.md', 'Projects', 'Occurrences Patch']
+- ['projects_occurrences-set-iam-policy.md', 'Projects', 'Occurrences Set Iam Policy']
+- ['projects_occurrences-test-iam-permissions.md', 'Projects', 'Occurrences Test Iam Permissions']
+- ['projects_scan-configs-get.md', 'Projects', 'Scan Configs Get']
+- ['projects_scan-configs-list.md', 'Projects', 'Scan Configs List']
+- ['projects_scan-configs-update.md', 'Projects', 'Scan Configs Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

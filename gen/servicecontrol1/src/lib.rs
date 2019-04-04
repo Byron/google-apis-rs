@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Control* crate version *1.0.8+20181008*, where *20181008* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Service Control* crate version *1.0.8+20190323*, where *20190323* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Service Control* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/service-control/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.ServiceControl.html) ... 
 //! 
 //! * services
-//!  * [*allocate quota*](struct.ServiceAllocateQuotaCall.html), [*check*](struct.ServiceCheckCall.html), [*end reconciliation*](struct.ServiceEndReconciliationCall.html), [*release quota*](struct.ServiceReleaseQuotaCall.html), [*report*](struct.ServiceReportCall.html) and [*start reconciliation*](struct.ServiceStartReconciliationCall.html)
+//!  * [*allocate quota*](struct.ServiceAllocateQuotaCall.html), [*check*](struct.ServiceCheckCall.html) and [*report*](struct.ServiceReportCall.html)
 //! 
 //! 
 //! 
@@ -381,6 +381,10 @@ impl<'a, C, A> ServiceControl<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CheckError {
+    /// Contains public information about the check error. If available,
+    /// `status.code` will be non zero and client can propagate it out as public
+    /// error.
+    pub status: Option<Status>,
     /// The error code.
     pub code: Option<String>,
     /// Free-form text providing details on the error cause of the error.
@@ -539,17 +543,6 @@ impl RequestValue for ReportRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QuotaInfo {
-    /// Map of quota group name to the actual number of tokens consumed. If the
-    /// quota check was not successful, then this will not be populated due to no
-    /// quota consumption.
-    /// 
-    /// We are not merging this field with 'quota_metrics' field because of the
-    /// complexity of scaling in Chemist client code base. For simplicity, we will
-    /// keep this field for Castor (that scales quota usage) and 'quota_metrics'
-    /// for SuperQuota (that doesn't scale quota usage).
-    /// 
-    #[serde(rename="quotaConsumed")]
-    pub quota_consumed: Option<HashMap<String, i32>>,
     /// Quota metrics to indicate the usage. Depending on the check request, one or
     /// more of the following metrics will be included:
     /// 
@@ -573,33 +566,20 @@ pub struct QuotaInfo {
     /// Deprecated: Use quota_metrics to get per quota group limit exceeded status.
     #[serde(rename="limitExceeded")]
     pub limit_exceeded: Option<Vec<String>>,
+    /// Map of quota group name to the actual number of tokens consumed. If the
+    /// quota check was not successful, then this will not be populated due to no
+    /// quota consumption.
+    /// 
+    /// We are not merging this field with 'quota_metrics' field because of the
+    /// complexity of scaling in Chemist client code base. For simplicity, we will
+    /// keep this field for Castor (that scales quota usage) and 'quota_metrics'
+    /// for SuperQuota (that doesn't scale quota usage).
+    /// 
+    #[serde(rename="quotaConsumed")]
+    pub quota_consumed: Option<HashMap<String, i32>>,
 }
 
 impl Part for QuotaInfo {}
-
-
-/// Request message for the ReleaseQuota method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [release quota services](struct.ServiceReleaseQuotaCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReleaseQuotaRequest {
-    /// Operation that describes the quota release.
-    #[serde(rename="releaseOperation")]
-    pub release_operation: Option<QuotaOperation>,
-    /// Specifies which version of service configuration should be used to process
-    /// the request. If unspecified or no matching version can be found, the latest
-    /// one will be used.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-}
-
-impl RequestValue for ReleaseQuotaRequest {}
 
 
 /// Distribution represents a frequency distribution of double-valued sample
@@ -697,6 +677,7 @@ impl Part for ExplicitBuckets {}
 pub struct CheckRequest {
     /// Indicates if service activation check should be skipped for this request.
     /// Default behavior is to perform the check and apply relevant quota.
+    /// WARNING: Setting this flag to "true" will disable quota enforcement.
     #[serde(rename="skipActivationCheck")]
     pub skip_activation_check: Option<bool>,
     /// The operation to be checked.
@@ -716,17 +697,311 @@ pub struct CheckRequest {
 impl RequestValue for CheckRequest {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// A common proto for logging HTTP requests. Only contains semantics
+/// defined by the HTTP specification. Product-specific logging
+/// information MUST be defined in a separate message.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HttpRequest {
+    /// The response code indicating the status of the response.
+    /// Examples: 200, 404.
+    pub status: Option<i32>,
+    /// Whether or not the response was validated with the origin server before
+    /// being served from cache. This field is only meaningful if `cache_hit` is
+    /// True.
+    #[serde(rename="cacheValidatedWithOriginServer")]
+    pub cache_validated_with_origin_server: Option<bool>,
+    /// Protocol used for the request. Examples: "HTTP/1.1", "HTTP/2", "websocket"
+    pub protocol: Option<String>,
+    /// The request processing latency on the server, from the time the request was
+    /// received until the response was sent.
+    pub latency: Option<String>,
+    /// The number of HTTP response bytes inserted into cache. Set only when a
+    /// cache fill was attempted.
+    #[serde(rename="cacheFillBytes")]
+    pub cache_fill_bytes: Option<String>,
+    /// The scheme (http, https), the host name, the path, and the query
+    /// portion of the URL that was requested.
+    /// Example: `"http://example.com/some/info?color=red"`.
+    #[serde(rename="requestUrl")]
+    pub request_url: Option<String>,
+    /// Whether or not an entity was served from cache
+    /// (with or without validation).
+    #[serde(rename="cacheHit")]
+    pub cache_hit: Option<bool>,
+    /// The IP address (IPv4 or IPv6) of the origin server that the request was
+    /// sent to.
+    #[serde(rename="serverIp")]
+    pub server_ip: Option<String>,
+    /// Whether or not a cache lookup was attempted.
+    #[serde(rename="cacheLookup")]
+    pub cache_lookup: Option<bool>,
+    /// The request method. Examples: `"GET"`, `"HEAD"`, `"PUT"`, `"POST"`.
+    #[serde(rename="requestMethod")]
+    pub request_method: Option<String>,
+    /// The referer URL of the request, as defined in
+    /// [HTTP/1.1 Header Field
+    /// Definitions](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html).
+    pub referer: Option<String>,
+    /// The IP address (IPv4 or IPv6) of the client that issued the HTTP
+    /// request. Examples: `"192.168.1.1"`, `"FE80::0202:B3FF:FE1E:8329"`.
+    #[serde(rename="remoteIp")]
+    pub remote_ip: Option<String>,
+    /// The user agent sent by the client. Example:
+    /// `"Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; Q312461; .NET
+    /// CLR 1.0.3705)"`.
+    #[serde(rename="userAgent")]
+    pub user_agent: Option<String>,
+    /// The size of the HTTP request message in bytes, including the request
+    /// headers and the request body.
+    #[serde(rename="requestSize")]
+    pub request_size: Option<String>,
+    /// The size of the HTTP response message sent back to the client, in bytes,
+    /// including the response headers and the response body.
+    #[serde(rename="responseSize")]
+    pub response_size: Option<String>,
+}
+
+impl Part for HttpRequest {}
+
+
+/// Response message for the Report method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [report services](struct.ServiceReportCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReportResponse {
+    /// Partial failures, one for each `Operation` in the request that failed
+    /// processing. There are three possible combinations of the RPC status:
+    /// 
+    /// 1. The combination of a successful RPC status and an empty `report_errors`
+    ///    list indicates a complete success where all `Operations` in the
+    ///    request are processed successfully.
+    /// 2. The combination of a successful RPC status and a non-empty
+    ///    `report_errors` list indicates a partial success where some
+    ///    `Operations` in the request succeeded. Each
+    ///    `Operation` that failed processing has a corresponding item
+    ///    in this list.
+    /// 3. A failed RPC status indicates a general non-deterministic failure.
+    ///    When this happens, it's impossible to know which of the
+    ///    'Operations' in the request succeeded or failed.
+    #[serde(rename="reportErrors")]
+    pub report_errors: Option<Vec<ReportError>>,
+    /// Quota usage for each quota release `Operation` request.
+    /// 
+    /// Fully or partially failed quota release request may or may not be present
+    /// in `report_quota_info`. For example, a failed quota release request will
+    /// have the current quota usage info when precise quota library returns the
+    /// info. A deadline exceeded quota request will not have quota usage info.
+    /// 
+    /// If there is no quota release request, report_quota_info will be empty.
+    /// 
+    #[serde(rename="reportInfos")]
+    pub report_infos: Option<Vec<ReportInfo>>,
+    /// The actual config id used to process the request.
+    #[serde(rename="serviceConfigId")]
+    pub service_config_id: Option<String>,
+}
+
+impl ResponseResult for ReportResponse {}
+
+
+/// Represents a set of metric values in the same metric.
+/// Each metric value in the set should have a unique combination of start time,
+/// end time, and label values.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MetricValueSet {
+    /// The values in this metric.
+    #[serde(rename="metricValues")]
+    pub metric_values: Option<Vec<MetricValue>>,
+    /// The metric name defined in the service configuration.
+    #[serde(rename="metricName")]
+    pub metric_name: Option<String>,
+}
+
+impl Part for MetricValueSet {}
+
+
+/// Represents error information for QuotaOperation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QuotaError {
+    /// Error code.
+    pub code: Option<String>,
+    /// Free-form text that provides details on the cause of the error.
+    pub description: Option<String>,
+    /// Subject to whom this error applies. See the specific enum for more details
+    /// on this field. For example, "clientip:<ip address of client>" or
+    /// "project:<Google developer project id>".
+    pub subject: Option<String>,
+}
+
+impl Part for QuotaError {}
+
+
+/// Describes a resource associated with this operation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceInfo {
+    /// The identifier of the parent of this resource instance.
+    /// Must be in one of the following formats:
+    ///     - “projects/<project-id or project-number>”
+    ///     - “folders/<folder-id>”
+    ///     - “organizations/<organization-id>”
+    #[serde(rename="resourceContainer")]
+    pub resource_container: Option<String>,
+    /// The location of the resource. If not empty, the resource will be checked
+    /// against location policy. The value must be a valid zone, region or
+    /// multiregion. For example: "europe-west4" or "northamerica-northeast1-a"
+    #[serde(rename="resourceLocation")]
+    pub resource_location: Option<String>,
+    /// Name of the resource. This is used for auditing purposes.
+    #[serde(rename="resourceName")]
+    pub resource_name: Option<String>,
+}
+
+impl Part for ResourceInfo {}
+
+
+/// An individual log entry.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LogEntry {
+    /// Optional. Information about the HTTP request associated with this
+    /// log entry, if applicable.
+    #[serde(rename="httpRequest")]
+    pub http_request: Option<HttpRequest>,
+    /// Required. The log to which this log entry belongs. Examples: `"syslog"`,
+    /// `"book_log"`.
+    pub name: Option<String>,
+    /// The log entry payload, represented as a Unicode string (UTF-8).
+    #[serde(rename="textPayload")]
+    pub text_payload: Option<String>,
+    /// The time the event described by the log entry occurred. If
+    /// omitted, defaults to operation start time.
+    pub timestamp: Option<String>,
+    /// A set of user-defined (key, value) data that provides additional
+    /// information about the log entry.
+    pub labels: Option<HashMap<String, String>>,
+    /// The log entry payload, represented as a structure that
+    /// is expressed as a JSON object.
+    #[serde(rename="structPayload")]
+    pub struct_payload: Option<HashMap<String, String>>,
+    /// A unique ID for the log entry used for deduplication. If omitted,
+    /// the implementation will generate one based on operation_id.
+    #[serde(rename="insertId")]
+    pub insert_id: Option<String>,
+    /// The log entry payload, represented as a protocol buffer that is
+    /// expressed as a JSON object. The only accepted type currently is
+    /// AuditLog.
+    #[serde(rename="protoPayload")]
+    pub proto_payload: Option<HashMap<String, String>>,
+    /// Optional. Resource name of the trace associated with the log entry, if any.
+    /// If this field contains a relative resource name, you can assume the name is
+    /// relative to `//tracing.googleapis.com`. Example:
+    /// `projects/my-projectid/traces/06796866738c859f2f19b7cfb3214824`
+    pub trace: Option<String>,
+    /// Optional. Information about an operation associated with the log entry, if
+    /// applicable.
+    pub operation: Option<LogEntryOperation>,
+    /// The severity of the log entry. The default value is
+    /// `LogSeverity.DEFAULT`.
+    pub severity: Option<String>,
+}
+
+impl Part for LogEntry {}
+
+
+/// `ConsumerInfo` provides information about the consumer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConsumerInfo {
+    /// The consumer identity number, can be Google cloud project number, folder
+    /// number or organization number e.g. 1234567890. A value of 0 indicates no
+    /// consumer number is found.
+    #[serde(rename="consumerNumber")]
+    pub consumer_number: Option<String>,
+    /// no description provided
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The Google cloud project number, e.g. 1234567890. A value of 0 indicates
+    /// no project number is found.
+    /// 
+    /// NOTE: This field is deprecated after Chemist support flexible consumer
+    /// id. New code should not depend on this field anymore.
+    #[serde(rename="projectNumber")]
+    pub project_number: Option<String>,
+}
+
+impl Part for ConsumerInfo {}
+
+
+/// Response message for the Check method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [check services](struct.ServiceCheckCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CheckResponse {
+    /// The same operation_id value used in the CheckRequest.
+    /// Used for logging and diagnostics purposes.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+    /// The actual config id used to process the request.
+    #[serde(rename="serviceConfigId")]
+    pub service_config_id: Option<String>,
+    /// Feedback data returned from the server during processing a Check request.
+    #[serde(rename="checkInfo")]
+    pub check_info: Option<CheckInfo>,
+    /// Indicate the decision of the check.
+    /// 
+    /// If no check errors are present, the service should process the operation.
+    /// Otherwise the service should use the list of errors to determine the
+    /// appropriate action.
+    #[serde(rename="checkErrors")]
+    pub check_errors: Option<Vec<CheckError>>,
+    /// Quota information for the check request associated with this response.
+    /// 
+    #[serde(rename="quotaInfo")]
+    pub quota_info: Option<QuotaInfo>,
+}
+
+impl ResponseResult for CheckResponse {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -785,403 +1060,6 @@ pub struct Status {
 }
 
 impl Part for Status {}
-
-
-/// Response message for the Report method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [report services](struct.ServiceReportCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReportResponse {
-    /// The actual config id used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Quota usage for each quota release `Operation` request.
-    /// 
-    /// Fully or partially failed quota release request may or may not be present
-    /// in `report_quota_info`. For example, a failed quota release request will
-    /// have the current quota usage info when precise quota library returns the
-    /// info. A deadline exceeded quota request will not have quota usage info.
-    /// 
-    /// If there is no quota release request, report_quota_info will be empty.
-    /// 
-    #[serde(rename="reportInfos")]
-    pub report_infos: Option<Vec<ReportInfo>>,
-    /// Partial failures, one for each `Operation` in the request that failed
-    /// processing. There are three possible combinations of the RPC status:
-    /// 
-    /// 1. The combination of a successful RPC status and an empty `report_errors`
-    ///    list indicates a complete success where all `Operations` in the
-    ///    request are processed successfully.
-    /// 2. The combination of a successful RPC status and a non-empty
-    ///    `report_errors` list indicates a partial success where some
-    ///    `Operations` in the request succeeded. Each
-    ///    `Operation` that failed processing has a corresponding item
-    ///    in this list.
-    /// 3. A failed RPC status indicates a general non-deterministic failure.
-    ///    When this happens, it's impossible to know which of the
-    ///    'Operations' in the request succeeded or failed.
-    #[serde(rename="reportErrors")]
-    pub report_errors: Option<Vec<ReportError>>,
-}
-
-impl ResponseResult for ReportResponse {}
-
-
-/// Response message for the ReleaseQuota method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [release quota services](struct.ServiceReleaseQuotaCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReleaseQuotaResponse {
-    /// The same operation_id value used in the ReleaseQuotaRequest. Used for
-    /// logging and diagnostics purposes.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
-    /// ID of the actual config used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Quota metrics to indicate the result of release. Depending on the
-    /// request, one or more of the following metrics will be included:
-    /// 
-    /// 1. For rate quota, per quota group or per quota metric released amount
-    /// will be specified using the following delta metric:
-    ///   "serviceruntime.googleapis.com/api/consumer/quota_refund_count"
-    /// 
-    /// 2. For allocation quota, per quota metric total usage will be specified
-    /// using the following gauge metric:
-    ///   "serviceruntime.googleapis.com/allocation/consumer/quota_used_count"
-    /// 
-    /// 3. For allocation quota, value for each quota limit associated with
-    /// the metrics will be specified using the following gauge metric:
-    ///   "serviceruntime.googleapis.com/quota/limit"
-    #[serde(rename="quotaMetrics")]
-    pub quota_metrics: Option<Vec<MetricValueSet>>,
-    /// Indicates the decision of the release.
-    #[serde(rename="releaseErrors")]
-    pub release_errors: Option<Vec<QuotaError>>,
-}
-
-impl ResponseResult for ReleaseQuotaResponse {}
-
-
-/// Represents a set of metric values in the same metric.
-/// Each metric value in the set should have a unique combination of start time,
-/// end time, and label values.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MetricValueSet {
-    /// The values in this metric.
-    #[serde(rename="metricValues")]
-    pub metric_values: Option<Vec<MetricValue>>,
-    /// The metric name defined in the service configuration.
-    #[serde(rename="metricName")]
-    pub metric_name: Option<String>,
-}
-
-impl Part for MetricValueSet {}
-
-
-/// Represents error information for QuotaOperation.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QuotaError {
-    /// Error code.
-    pub code: Option<String>,
-    /// Free-form text that provides details on the cause of the error.
-    pub description: Option<String>,
-    /// Subject to whom this error applies. See the specific enum for more details
-    /// on this field. For example, "clientip:<ip address of client>" or
-    /// "project:<Google developer project id>".
-    pub subject: Option<String>,
-}
-
-impl Part for QuotaError {}
-
-
-/// Describes a resource associated with this operation.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceInfo {
-    /// The identifier of the parent of this resource instance.
-    /// Must be in one of the following formats:
-    ///     - “projects/<project-id or project-number>”
-    ///     - “folders/<folder-id>”
-    ///     - “organizations/<organization-id>”
-    #[serde(rename="resourceContainer")]
-    pub resource_container: Option<String>,
-    /// Name of the resource. This is used for auditing purposes.
-    #[serde(rename="resourceName")]
-    pub resource_name: Option<String>,
-    /// The location of the resource. If not empty, the resource will be checked
-    /// against location policy. The value must be a valid zone, region or
-    /// multiregion. For example: "europe-west4" or "northamerica-northeast1-a"
-    #[serde(rename="resourceLocation")]
-    pub resource_location: Option<String>,
-}
-
-impl Part for ResourceInfo {}
-
-
-/// An individual log entry.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LogEntry {
-    /// Optional. Information about the HTTP request associated with this
-    /// log entry, if applicable.
-    #[serde(rename="httpRequest")]
-    pub http_request: Option<HttpRequest>,
-    /// The severity of the log entry. The default value is
-    /// `LogSeverity.DEFAULT`.
-    pub severity: Option<String>,
-    /// Optional. Resource name of the trace associated with the log entry, if any.
-    /// If this field contains a relative resource name, you can assume the name is
-    /// relative to `//tracing.googleapis.com`. Example:
-    /// `projects/my-projectid/traces/06796866738c859f2f19b7cfb3214824`
-    pub trace: Option<String>,
-    /// The log entry payload, represented as a Unicode string (UTF-8).
-    #[serde(rename="textPayload")]
-    pub text_payload: Option<String>,
-    /// The time the event described by the log entry occurred. If
-    /// omitted, defaults to operation start time.
-    pub timestamp: Option<String>,
-    /// A set of user-defined (key, value) data that provides additional
-    /// information about the log entry.
-    pub labels: Option<HashMap<String, String>>,
-    /// The log entry payload, represented as a structure that
-    /// is expressed as a JSON object.
-    #[serde(rename="structPayload")]
-    pub struct_payload: Option<HashMap<String, String>>,
-    /// The log entry payload, represented as a protocol buffer that is
-    /// expressed as a JSON object. The only accepted type currently is
-    /// AuditLog.
-    #[serde(rename="protoPayload")]
-    pub proto_payload: Option<HashMap<String, String>>,
-    /// A unique ID for the log entry used for deduplication. If omitted,
-    /// the implementation will generate one based on operation_id.
-    #[serde(rename="insertId")]
-    pub insert_id: Option<String>,
-    /// Optional. Information about an operation associated with the log entry, if
-    /// applicable.
-    pub operation: Option<LogEntryOperation>,
-    /// Required. The log to which this log entry belongs. Examples: `"syslog"`,
-    /// `"book_log"`.
-    pub name: Option<String>,
-}
-
-impl Part for LogEntry {}
-
-
-/// Response message for QuotaController.EndReconciliation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [end reconciliation services](struct.ServiceEndReconciliationCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EndReconciliationResponse {
-    /// ID of the actual config used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Metric values as tracked by One Platform before the adjustment was made.
-    /// The following metrics will be included:
-    /// 
-    /// 1. Per quota metric total usage will be specified using the following gauge
-    /// metric:
-    ///   "serviceruntime.googleapis.com/allocation/consumer/quota_used_count"
-    /// 
-    /// 2. Value for each quota limit associated with the metrics will be specified
-    /// using the following gauge metric:
-    ///   "serviceruntime.googleapis.com/quota/limit"
-    /// 
-    /// 3. Delta value of the usage after the reconciliation for limits associated
-    /// with the metrics will be specified using the following metric:
-    ///   "serviceruntime.googleapis.com/allocation/reconciliation_delta"
-    /// The delta value is defined as:
-    ///   new_usage_from_client - existing_value_in_spanner.
-    /// This metric is not defined in serviceruntime.yaml or in Cloud Monarch.
-    /// This metric is meant for callers' use only. Since this metric is not
-    /// defined in the monitoring backend, reporting on this metric will result in
-    /// an error.
-    #[serde(rename="quotaMetrics")]
-    pub quota_metrics: Option<Vec<MetricValueSet>>,
-    /// Indicates the decision of the reconciliation end.
-    #[serde(rename="reconciliationErrors")]
-    pub reconciliation_errors: Option<Vec<QuotaError>>,
-    /// The same operation_id value used in the EndReconciliationRequest. Used for
-    /// logging and diagnostics purposes.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
-}
-
-impl ResponseResult for EndReconciliationResponse {}
-
-
-/// `ConsumerInfo` provides information about the consumer project.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ConsumerInfo {
-    /// The Google cloud project number, e.g. 1234567890. A value of 0 indicates
-    /// no project number is found.
-    #[serde(rename="projectNumber")]
-    pub project_number: Option<String>,
-}
-
-impl Part for ConsumerInfo {}
-
-
-/// Response message for the Check method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [check services](struct.ServiceCheckCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CheckResponse {
-    /// The same operation_id value used in the CheckRequest.
-    /// Used for logging and diagnostics purposes.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
-    /// The actual config id used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Feedback data returned from the server during processing a Check request.
-    #[serde(rename="checkInfo")]
-    pub check_info: Option<CheckInfo>,
-    /// Indicate the decision of the check.
-    /// 
-    /// If no check errors are present, the service should process the operation.
-    /// Otherwise the service should use the list of errors to determine the
-    /// appropriate action.
-    #[serde(rename="checkErrors")]
-    pub check_errors: Option<Vec<CheckError>>,
-    /// Quota information for the check request associated with this response.
-    /// 
-    #[serde(rename="quotaInfo")]
-    pub quota_info: Option<QuotaInfo>,
-}
-
-impl ResponseResult for CheckResponse {}
-
-
-/// A common proto for logging HTTP requests. Only contains semantics
-/// defined by the HTTP specification. Product-specific logging
-/// information MUST be defined in a separate message.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HttpRequest {
-    /// The response code indicating the status of the response.
-    /// Examples: 200, 404.
-    pub status: Option<i32>,
-    /// Whether or not the response was validated with the origin server before
-    /// being served from cache. This field is only meaningful if `cache_hit` is
-    /// True.
-    #[serde(rename="cacheValidatedWithOriginServer")]
-    pub cache_validated_with_origin_server: Option<bool>,
-    /// Protocol used for the request. Examples: "HTTP/1.1", "HTTP/2", "websocket"
-    pub protocol: Option<String>,
-    /// The request method. Examples: `"GET"`, `"HEAD"`, `"PUT"`, `"POST"`.
-    #[serde(rename="requestMethod")]
-    pub request_method: Option<String>,
-    /// The request processing latency on the server, from the time the request was
-    /// received until the response was sent.
-    pub latency: Option<String>,
-    /// The number of HTTP response bytes inserted into cache. Set only when a
-    /// cache fill was attempted.
-    #[serde(rename="cacheFillBytes")]
-    pub cache_fill_bytes: Option<String>,
-    /// The scheme (http, https), the host name, the path, and the query
-    /// portion of the URL that was requested.
-    /// Example: `"http://example.com/some/info?color=red"`.
-    #[serde(rename="requestUrl")]
-    pub request_url: Option<String>,
-    /// The IP address (IPv4 or IPv6) of the origin server that the request was
-    /// sent to.
-    #[serde(rename="serverIp")]
-    pub server_ip: Option<String>,
-    /// Whether or not a cache lookup was attempted.
-    #[serde(rename="cacheLookup")]
-    pub cache_lookup: Option<bool>,
-    /// Whether or not an entity was served from cache
-    /// (with or without validation).
-    #[serde(rename="cacheHit")]
-    pub cache_hit: Option<bool>,
-    /// The referer URL of the request, as defined in
-    /// [HTTP/1.1 Header Field
-    /// Definitions](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html).
-    pub referer: Option<String>,
-    /// The IP address (IPv4 or IPv6) of the client that issued the HTTP
-    /// request. Examples: `"192.168.1.1"`, `"FE80::0202:B3FF:FE1E:8329"`.
-    #[serde(rename="remoteIp")]
-    pub remote_ip: Option<String>,
-    /// The user agent sent by the client. Example:
-    /// `"Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; Q312461; .NET
-    /// CLR 1.0.3705)"`.
-    #[serde(rename="userAgent")]
-    pub user_agent: Option<String>,
-    /// The size of the HTTP request message in bytes, including the request
-    /// headers and the request body.
-    #[serde(rename="requestSize")]
-    pub request_size: Option<String>,
-    /// The size of the HTTP response message sent back to the client, in bytes,
-    /// including the response headers and the response body.
-    #[serde(rename="responseSize")]
-    pub response_size: Option<String>,
-}
-
-impl Part for HttpRequest {}
-
-
-/// Request message for QuotaController.StartReconciliation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [start reconciliation services](struct.ServiceStartReconciliationCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StartReconciliationRequest {
-    /// Specifies which version of service configuration should be used to process
-    /// the request. If unspecified or no matching version can be found, the latest
-    /// one will be used.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Operation that describes the quota reconciliation.
-    #[serde(rename="reconciliationOperation")]
-    pub reconciliation_operation: Option<QuotaOperation>,
-}
-
-impl RequestValue for StartReconciliationRequest {}
 
 
 /// Request message for the AllocateQuota method.
@@ -1359,30 +1237,6 @@ pub struct Money {
 impl Part for Money {}
 
 
-/// Request message for QuotaController.EndReconciliation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [end reconciliation services](struct.ServiceEndReconciliationCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EndReconciliationRequest {
-    /// Specifies which version of service configuration should be used to process
-    /// the request. If unspecified or no matching version can be found, the latest
-    /// one will be used.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Operation that describes the quota reconciliation.
-    #[serde(rename="reconciliationOperation")]
-    pub reconciliation_operation: Option<QuotaOperation>,
-}
-
-impl RequestValue for EndReconciliationRequest {}
-
-
 /// Contains additional info about the report operation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1398,44 +1252,6 @@ pub struct ReportInfo {
 }
 
 impl Part for ReportInfo {}
-
-
-/// Response message for QuotaController.StartReconciliation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [start reconciliation services](struct.ServiceStartReconciliationCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StartReconciliationResponse {
-    /// ID of the actual config used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Metric values as tracked by One Platform before the start of
-    /// reconciliation. The following metrics will be included:
-    /// 
-    /// 1. Per quota metric total usage will be specified using the following gauge
-    /// metric:
-    ///   "serviceruntime.googleapis.com/allocation/consumer/quota_used_count"
-    /// 
-    /// 2. Value for each quota limit associated with the metrics will be specified
-    /// using the following gauge metric:
-    ///   "serviceruntime.googleapis.com/quota/limit"
-    #[serde(rename="quotaMetrics")]
-    pub quota_metrics: Option<Vec<MetricValueSet>>,
-    /// Indicates the decision of the reconciliation start.
-    #[serde(rename="reconciliationErrors")]
-    pub reconciliation_errors: Option<Vec<QuotaError>>,
-    /// The same operation_id value used in the StartReconciliationRequest. Used
-    /// for logging and diagnostics purposes.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
-}
-
-impl ResponseResult for StartReconciliationResponse {}
 
 
 /// Represents the processing error of one Operation in the request.
@@ -1474,6 +1290,23 @@ impl Part for QuotaProperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
+    /// Fully qualified name of the operation. Reserved for future use.
+    #[serde(rename="operationName")]
+    pub operation_name: Option<String>,
+    /// Represents information about this operation. Each MetricValueSet
+    /// corresponds to a metric defined in the service configuration.
+    /// The data type used in the MetricValueSet must agree with
+    /// the data type specified in the metric definition.
+    /// 
+    /// Within a single operation, it is not allowed to have more than one
+    /// MetricValue instances that have the same metric names and identical
+    /// label value combinations. If a request has such duplicated MetricValue
+    /// instances, the entire request is rejected with
+    /// an invalid argument error.
+    #[serde(rename="metricValueSets")]
+    pub metric_value_sets: Option<Vec<MetricValueSet>>,
+    /// DO NOT USE. This is an experimental field.
+    pub importance: Option<String>,
     /// Labels describing the operation. Only the following labels are allowed:
     /// 
     /// - Labels describing monitored resources as defined in
@@ -1491,23 +1324,6 @@ pub struct Operation {
     ///        where the API is served, such as App Engine, Compute Engine, or
     ///        Kubernetes Engine.
     pub labels: Option<HashMap<String, String>>,
-    /// Represents information about this operation. Each MetricValueSet
-    /// corresponds to a metric defined in the service configuration.
-    /// The data type used in the MetricValueSet must agree with
-    /// the data type specified in the metric definition.
-    /// 
-    /// Within a single operation, it is not allowed to have more than one
-    /// MetricValue instances that have the same metric names and identical
-    /// label value combinations. If a request has such duplicated MetricValue
-    /// instances, the entire request is rejected with
-    /// an invalid argument error.
-    #[serde(rename="metricValueSets")]
-    pub metric_value_sets: Option<Vec<MetricValueSet>>,
-    /// DO NOT USE. This is an experimental field.
-    pub importance: Option<String>,
-    /// Fully qualified name of the operation. Reserved for future use.
-    #[serde(rename="operationName")]
-    pub operation_name: Option<String>,
     /// Represents the properties needed for quota check. Applicable only if this
     /// operation is for a quota check request. If this is not specified, no quota
     /// check will be performed.
@@ -1543,10 +1359,13 @@ pub struct Operation {
     /// consumer, but not for service-initiated operations that are
     /// not related to a specific consumer.
     /// 
-    /// This can be in one of the following formats:
-    ///   project:<project_id>,
-    ///   project_number:<project_number>,
-    ///   api_key:<api_key>.
+    /// - This can be in one of the following formats:
+    ///     - project:PROJECT_ID,
+    ///     - project`_`number:PROJECT_NUMBER,
+    ///     - projects/PROJECT_ID or PROJECT_NUMBER,
+    ///     - folders/FOLDER_NUMBER,
+    ///     - organizations/ORGANIZATION_NUMBER,
+    ///     - api`_`key:API_KEY.
     #[serde(rename="consumerId")]
     pub consumer_id: Option<String>,
     /// The resources that are involved in the operation.
@@ -1622,7 +1441,7 @@ impl Part for LinearBuckets {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ServiceControl::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `allocate_quota(...)`, `check(...)`, `end_reconciliation(...)`, `release_quota(...)`, `report(...)` and `start_reconciliation(...)`
+/// // like `allocate_quota(...)`, `check(...)` and `report(...)`
 /// // to build up your call.
 /// let rb = hub.services();
 /// # }
@@ -1636,37 +1455,6 @@ pub struct ServiceMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for ServiceMethods<'a, C, A> {}
 
 impl<'a, C, A> ServiceMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Releases previously allocated quota done through AllocateQuota method.
-    /// 
-    /// This method requires the `servicemanagement.services.quota`
-    /// permission on the specified service. For more information, see
-    /// [Cloud IAM](https://cloud.google.com/iam).
-    /// 
-    /// 
-    /// **NOTE:** The client **must** fail-open on server errors `INTERNAL`,
-    /// `UNKNOWN`, `DEADLINE_EXCEEDED`, and `UNAVAILABLE`. To ensure system
-    /// reliability, the server may inject these errors to prohibit any hard
-    /// dependency on the quota functionality.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `serviceName` - Name of the service as specified in the service configuration. For example,
-    ///                   `"pubsub.googleapis.com"`.
-    ///                   See google.api.Service for the definition of a service name.
-    pub fn release_quota(&self, request: ReleaseQuotaRequest, service_name: &str) -> ServiceReleaseQuotaCall<'a, C, A> {
-        ServiceReleaseQuotaCall {
-            hub: self.hub,
-            _request: request,
-            _service_name: service_name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1697,108 +1485,6 @@ impl<'a, C, A> ServiceMethods<'a, C, A> {
     ///                   for the definition of a service name.
     pub fn check(&self, request: CheckRequest, service_name: &str) -> ServiceCheckCall<'a, C, A> {
         ServiceCheckCall {
-            hub: self.hub,
-            _request: request,
-            _service_name: service_name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Unlike rate quota, allocation quota does not get refilled periodically.
-    /// So, it is possible that the quota usage as seen by the service differs from
-    /// what the One Platform considers the usage is. This is expected to happen
-    /// only rarely, but over time this can accumulate. Services can invoke
-    /// StartReconciliation and EndReconciliation to correct this usage drift, as
-    /// described below:
-    /// 1. Service sends StartReconciliation with a timestamp in future for each
-    ///    metric that needs to be reconciled. The timestamp being in future allows
-    ///    to account for in-flight AllocateQuota and ReleaseQuota requests for the
-    ///    same metric.
-    /// 2. One Platform records this timestamp and starts tracking subsequent
-    ///    AllocateQuota and ReleaseQuota requests until EndReconciliation is
-    ///    called.
-    /// 3. At or after the time specified in the StartReconciliation, service
-    ///    sends EndReconciliation with the usage that needs to be reconciled to.
-    /// 4. One Platform adjusts its own record of usage for that metric to the
-    ///    value specified in EndReconciliation by taking in to account any
-    ///    allocation or release between StartReconciliation and EndReconciliation.
-    /// 
-    /// Signals the quota controller that the service wants to perform a usage
-    /// reconciliation as specified in the request.
-    /// 
-    /// This method requires the `servicemanagement.services.quota`
-    /// permission on the specified service. For more information, see
-    /// [Google Cloud IAM](https://cloud.google.com/iam).
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `serviceName` - Name of the service as specified in the service configuration. For example,
-    ///                   `"pubsub.googleapis.com"`.
-    ///                   See google.api.Service for the definition of a service name.
-    pub fn start_reconciliation(&self, request: StartReconciliationRequest, service_name: &str) -> ServiceStartReconciliationCall<'a, C, A> {
-        ServiceStartReconciliationCall {
-            hub: self.hub,
-            _request: request,
-            _service_name: service_name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Signals the quota controller that service ends the ongoing usage
-    /// reconciliation.
-    /// 
-    /// This method requires the `servicemanagement.services.quota`
-    /// permission on the specified service. For more information, see
-    /// [Google Cloud IAM](https://cloud.google.com/iam).
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `serviceName` - Name of the service as specified in the service configuration. For example,
-    ///                   `"pubsub.googleapis.com"`.
-    ///                   See google.api.Service for the definition of a service name.
-    pub fn end_reconciliation(&self, request: EndReconciliationRequest, service_name: &str) -> ServiceEndReconciliationCall<'a, C, A> {
-        ServiceEndReconciliationCall {
-            hub: self.hub,
-            _request: request,
-            _service_name: service_name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Attempts to allocate quota for the specified consumer. It should be called
-    /// before the operation is executed.
-    /// 
-    /// This method requires the `servicemanagement.services.quota`
-    /// permission on the specified service. For more information, see
-    /// [Cloud IAM](https://cloud.google.com/iam).
-    /// 
-    /// **NOTE:** The client **must** fail-open on server errors `INTERNAL`,
-    /// `UNKNOWN`, `DEADLINE_EXCEEDED`, and `UNAVAILABLE`. To ensure system
-    /// reliability, the server may inject these errors to prohibit any hard
-    /// dependency on the quota functionality.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `serviceName` - Name of the service as specified in the service configuration. For example,
-    ///                   `"pubsub.googleapis.com"`.
-    ///                   See google.api.Service for the definition of a service name.
-    pub fn allocate_quota(&self, request: AllocateQuotaRequest, service_name: &str) -> ServiceAllocateQuotaCall<'a, C, A> {
-        ServiceAllocateQuotaCall {
             hub: self.hub,
             _request: request,
             _service_name: service_name.to_string(),
@@ -1843,6 +1529,37 @@ impl<'a, C, A> ServiceMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Attempts to allocate quota for the specified consumer. It should be called
+    /// before the operation is executed.
+    /// 
+    /// This method requires the `servicemanagement.services.quota`
+    /// permission on the specified service. For more information, see
+    /// [Cloud IAM](https://cloud.google.com/iam).
+    /// 
+    /// **NOTE:** The client **must** fail-open on server errors `INTERNAL`,
+    /// `UNKNOWN`, `DEADLINE_EXCEEDED`, and `UNAVAILABLE`. To ensure system
+    /// reliability, the server may inject these errors to prohibit any hard
+    /// dependency on the quota functionality.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `serviceName` - Name of the service as specified in the service configuration. For example,
+    ///                   `"pubsub.googleapis.com"`.
+    ///                   See google.api.Service for the definition of a service name.
+    pub fn allocate_quota(&self, request: AllocateQuotaRequest, service_name: &str) -> ServiceAllocateQuotaCall<'a, C, A> {
+        ServiceAllocateQuotaCall {
+            hub: self.hub,
+            _request: request,
+            _service_name: service_name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -1852,297 +1569,6 @@ impl<'a, C, A> ServiceMethods<'a, C, A> {
 // ###################
 // CallBuilders   ###
 // #################
-
-/// Releases previously allocated quota done through AllocateQuota method.
-/// 
-/// This method requires the `servicemanagement.services.quota`
-/// permission on the specified service. For more information, see
-/// [Cloud IAM](https://cloud.google.com/iam).
-/// 
-/// 
-/// **NOTE:** The client **must** fail-open on server errors `INTERNAL`,
-/// `UNKNOWN`, `DEADLINE_EXCEEDED`, and `UNAVAILABLE`. To ensure system
-/// reliability, the server may inject these errors to prohibit any hard
-/// dependency on the quota functionality.
-///
-/// A builder for the *releaseQuota* method supported by a *service* resource.
-/// It is not used directly, but through a `ServiceMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_servicecontrol1 as servicecontrol1;
-/// use servicecontrol1::ReleaseQuotaRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use servicecontrol1::ServiceControl;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ServiceControl::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ReleaseQuotaRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.services().release_quota(req, "serviceName")
-///              .doit();
-/// # }
-/// ```
-pub struct ServiceReleaseQuotaCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ServiceControl<C, A>,
-    _request: ReleaseQuotaRequest,
-    _service_name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ServiceReleaseQuotaCall<'a, C, A> {}
-
-impl<'a, C, A> ServiceReleaseQuotaCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ReleaseQuotaResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "servicecontrol.services.releaseQuota",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("serviceName", self._service_name.to_string()));
-        for &field in ["alt", "serviceName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/services/{serviceName}:releaseQuota";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{serviceName}", "serviceName")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["serviceName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReleaseQuotaRequest) -> ServiceReleaseQuotaCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the service as specified in the service configuration. For example,
-    /// `"pubsub.googleapis.com"`.
-    /// 
-    /// See google.api.Service for the definition of a service name.
-    ///
-    /// Sets the *service name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn service_name(mut self, new_value: &str) -> ServiceReleaseQuotaCall<'a, C, A> {
-        self._service_name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ServiceReleaseQuotaCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceReleaseQuotaCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceReleaseQuotaCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
 
 /// Checks whether an operation on a service should be allowed to proceed
 /// based on the configuration of the service and related policies. It must be
@@ -2264,10 +1690,7 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2299,7 +1722,7 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2394,7 +1817,7 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2402,12 +1825,12 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ServiceCheckCall<'a, C, A>
@@ -2431,888 +1854,6 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ServiceCheckCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Unlike rate quota, allocation quota does not get refilled periodically.
-/// So, it is possible that the quota usage as seen by the service differs from
-/// what the One Platform considers the usage is. This is expected to happen
-/// only rarely, but over time this can accumulate. Services can invoke
-/// StartReconciliation and EndReconciliation to correct this usage drift, as
-/// described below:
-/// 1. Service sends StartReconciliation with a timestamp in future for each
-///    metric that needs to be reconciled. The timestamp being in future allows
-///    to account for in-flight AllocateQuota and ReleaseQuota requests for the
-///    same metric.
-/// 2. One Platform records this timestamp and starts tracking subsequent
-///    AllocateQuota and ReleaseQuota requests until EndReconciliation is
-///    called.
-/// 3. At or after the time specified in the StartReconciliation, service
-///    sends EndReconciliation with the usage that needs to be reconciled to.
-/// 4. One Platform adjusts its own record of usage for that metric to the
-///    value specified in EndReconciliation by taking in to account any
-///    allocation or release between StartReconciliation and EndReconciliation.
-/// 
-/// Signals the quota controller that the service wants to perform a usage
-/// reconciliation as specified in the request.
-/// 
-/// This method requires the `servicemanagement.services.quota`
-/// permission on the specified service. For more information, see
-/// [Google Cloud IAM](https://cloud.google.com/iam).
-///
-/// A builder for the *startReconciliation* method supported by a *service* resource.
-/// It is not used directly, but through a `ServiceMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_servicecontrol1 as servicecontrol1;
-/// use servicecontrol1::StartReconciliationRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use servicecontrol1::ServiceControl;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ServiceControl::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = StartReconciliationRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.services().start_reconciliation(req, "serviceName")
-///              .doit();
-/// # }
-/// ```
-pub struct ServiceStartReconciliationCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ServiceControl<C, A>,
-    _request: StartReconciliationRequest,
-    _service_name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ServiceStartReconciliationCall<'a, C, A> {}
-
-impl<'a, C, A> ServiceStartReconciliationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, StartReconciliationResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "servicecontrol.services.startReconciliation",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("serviceName", self._service_name.to_string()));
-        for &field in ["alt", "serviceName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/services/{serviceName}:startReconciliation";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{serviceName}", "serviceName")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["serviceName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StartReconciliationRequest) -> ServiceStartReconciliationCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the service as specified in the service configuration. For example,
-    /// `"pubsub.googleapis.com"`.
-    /// 
-    /// See google.api.Service for the definition of a service name.
-    ///
-    /// Sets the *service name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn service_name(mut self, new_value: &str) -> ServiceStartReconciliationCall<'a, C, A> {
-        self._service_name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ServiceStartReconciliationCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceStartReconciliationCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceStartReconciliationCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Signals the quota controller that service ends the ongoing usage
-/// reconciliation.
-/// 
-/// This method requires the `servicemanagement.services.quota`
-/// permission on the specified service. For more information, see
-/// [Google Cloud IAM](https://cloud.google.com/iam).
-///
-/// A builder for the *endReconciliation* method supported by a *service* resource.
-/// It is not used directly, but through a `ServiceMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_servicecontrol1 as servicecontrol1;
-/// use servicecontrol1::EndReconciliationRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use servicecontrol1::ServiceControl;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ServiceControl::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = EndReconciliationRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.services().end_reconciliation(req, "serviceName")
-///              .doit();
-/// # }
-/// ```
-pub struct ServiceEndReconciliationCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ServiceControl<C, A>,
-    _request: EndReconciliationRequest,
-    _service_name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ServiceEndReconciliationCall<'a, C, A> {}
-
-impl<'a, C, A> ServiceEndReconciliationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, EndReconciliationResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "servicecontrol.services.endReconciliation",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("serviceName", self._service_name.to_string()));
-        for &field in ["alt", "serviceName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/services/{serviceName}:endReconciliation";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{serviceName}", "serviceName")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["serviceName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EndReconciliationRequest) -> ServiceEndReconciliationCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the service as specified in the service configuration. For example,
-    /// `"pubsub.googleapis.com"`.
-    /// 
-    /// See google.api.Service for the definition of a service name.
-    ///
-    /// Sets the *service name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn service_name(mut self, new_value: &str) -> ServiceEndReconciliationCall<'a, C, A> {
-        self._service_name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ServiceEndReconciliationCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceEndReconciliationCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceEndReconciliationCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Attempts to allocate quota for the specified consumer. It should be called
-/// before the operation is executed.
-/// 
-/// This method requires the `servicemanagement.services.quota`
-/// permission on the specified service. For more information, see
-/// [Cloud IAM](https://cloud.google.com/iam).
-/// 
-/// **NOTE:** The client **must** fail-open on server errors `INTERNAL`,
-/// `UNKNOWN`, `DEADLINE_EXCEEDED`, and `UNAVAILABLE`. To ensure system
-/// reliability, the server may inject these errors to prohibit any hard
-/// dependency on the quota functionality.
-///
-/// A builder for the *allocateQuota* method supported by a *service* resource.
-/// It is not used directly, but through a `ServiceMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_servicecontrol1 as servicecontrol1;
-/// use servicecontrol1::AllocateQuotaRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use servicecontrol1::ServiceControl;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ServiceControl::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AllocateQuotaRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.services().allocate_quota(req, "serviceName")
-///              .doit();
-/// # }
-/// ```
-pub struct ServiceAllocateQuotaCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ServiceControl<C, A>,
-    _request: AllocateQuotaRequest,
-    _service_name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ServiceAllocateQuotaCall<'a, C, A> {}
-
-impl<'a, C, A> ServiceAllocateQuotaCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AllocateQuotaResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "servicecontrol.services.allocateQuota",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("serviceName", self._service_name.to_string()));
-        for &field in ["alt", "serviceName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/services/{serviceName}:allocateQuota";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{serviceName}", "serviceName")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["serviceName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AllocateQuotaRequest) -> ServiceAllocateQuotaCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the service as specified in the service configuration. For example,
-    /// `"pubsub.googleapis.com"`.
-    /// 
-    /// See google.api.Service for the definition of a service name.
-    ///
-    /// Sets the *service name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn service_name(mut self, new_value: &str) -> ServiceAllocateQuotaCall<'a, C, A> {
-        self._service_name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ServiceAllocateQuotaCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceAllocateQuotaCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceAllocateQuotaCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3442,10 +1983,7 @@ impl<'a, C, A> ServiceReportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3477,7 +2015,7 @@ impl<'a, C, A> ServiceReportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3572,7 +2110,7 @@ impl<'a, C, A> ServiceReportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3580,12 +2118,12 @@ impl<'a, C, A> ServiceReportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ServiceReportCall<'a, C, A>
@@ -3609,6 +2147,294 @@ impl<'a, C, A> ServiceReportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ServiceReportCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Attempts to allocate quota for the specified consumer. It should be called
+/// before the operation is executed.
+/// 
+/// This method requires the `servicemanagement.services.quota`
+/// permission on the specified service. For more information, see
+/// [Cloud IAM](https://cloud.google.com/iam).
+/// 
+/// **NOTE:** The client **must** fail-open on server errors `INTERNAL`,
+/// `UNKNOWN`, `DEADLINE_EXCEEDED`, and `UNAVAILABLE`. To ensure system
+/// reliability, the server may inject these errors to prohibit any hard
+/// dependency on the quota functionality.
+///
+/// A builder for the *allocateQuota* method supported by a *service* resource.
+/// It is not used directly, but through a `ServiceMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_servicecontrol1 as servicecontrol1;
+/// use servicecontrol1::AllocateQuotaRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use servicecontrol1::ServiceControl;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ServiceControl::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AllocateQuotaRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.services().allocate_quota(req, "serviceName")
+///              .doit();
+/// # }
+/// ```
+pub struct ServiceAllocateQuotaCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ServiceControl<C, A>,
+    _request: AllocateQuotaRequest,
+    _service_name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ServiceAllocateQuotaCall<'a, C, A> {}
+
+impl<'a, C, A> ServiceAllocateQuotaCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AllocateQuotaResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "servicecontrol.services.allocateQuota",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("serviceName", self._service_name.to_string()));
+        for &field in ["alt", "serviceName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/services/{serviceName}:allocateQuota";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{serviceName}", "serviceName")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["serviceName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AllocateQuotaRequest) -> ServiceAllocateQuotaCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the service as specified in the service configuration. For example,
+    /// `"pubsub.googleapis.com"`.
+    /// 
+    /// See google.api.Service for the definition of a service name.
+    ///
+    /// Sets the *service name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn service_name(mut self, new_value: &str) -> ServiceAllocateQuotaCall<'a, C, A> {
+        self._service_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ServiceAllocateQuotaCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ServiceAllocateQuotaCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceAllocateQuotaCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

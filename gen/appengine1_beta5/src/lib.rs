@@ -447,59 +447,72 @@ impl Part for Network {}
 pub struct Service {
     /// Relative name of the service within the application. Example: default.@OutputOnly
     pub id: Option<String>,
-    /// Mapping that defines fractional HTTP traffic diversion to different versions within the service.
-    pub split: Option<TrafficSplit>,
     /// Full path to the Service resource in the API. Example: apps/myapp/services/default.@OutputOnly
     pub name: Option<String>,
+    /// Mapping that defines fractional HTTP traffic diversion to different versions within the service.
+    pub split: Option<TrafficSplit>,
 }
 
 impl RequestValue for Service {}
 impl ResponseResult for Service {}
 
 
-/// An Application resource contains the top-level configuration of an App Engine application.
+/// An Instance resource is the computing unit that App Engine uses to automatically scale an application.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [create apps](struct.AppCreateCall.html) (request)
-/// * [patch apps](struct.AppPatchCall.html) (request)
-/// * [get apps](struct.AppGetCall.html) (response)
+/// * [services versions instances get apps](struct.AppServiceVersionInstanceGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Application {
-    /// Hostname used to reach the application, as resolved by App Engine.@OutputOnly
-    #[serde(rename="defaultHostname")]
-    pub default_hostname: Option<String>,
-    /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
+pub struct Instance {
+    /// App Engine release this instance is running on.@OutputOnly
+    #[serde(rename="appEngineRelease")]
+    pub app_engine_release: Option<String>,
+    /// Virtual machine ID of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmId")]
+    pub vm_id: Option<String>,
+    /// Total memory in use (bytes).@OutputOnly
+    #[serde(rename="memoryUsage")]
+    pub memory_usage: Option<String>,
+    /// The IP address of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmIp")]
+    pub vm_ip: Option<String>,
+    /// Average queries per second (QPS) over the last minute.@OutputOnly
+    pub qps: Option<f32>,
+    /// Availability of the instance.@OutputOnly
+    pub availability: Option<String>,
+    /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
     pub name: Option<String>,
-    /// A Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
-    #[serde(rename="codeBucket")]
-    pub code_bucket: Option<String>,
-    /// A Google Cloud Storage bucket that can be used by the application to store content.@OutputOnly
-    #[serde(rename="defaultBucket")]
-    pub default_bucket: Option<String>,
-    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent.@OutputOnly
-    #[serde(rename="dispatchRules")]
-    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
-    /// Cookie expiration policy for this application.
-    #[serde(rename="defaultCookieExpiration")]
-    pub default_cookie_expiration: Option<String>,
-    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
+    /// Number of errors since this instance was started.@OutputOnly
+    pub errors: Option<u32>,
+    /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmStatus")]
+    pub vm_status: Option<String>,
+    /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmUnlocked")]
+    pub vm_unlocked: Option<bool>,
+    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
     pub id: Option<String>,
-    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored.Defaults to us-central.Options are:us-central - Central USeurope-west - Western Europeus-east1 - Eastern US
-    pub location: Option<String>,
-    /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
-    #[serde(rename="authDomain")]
-    pub auth_domain: Option<String>,
-    /// no description provided
-    pub iap: Option<IdentityAwareProxy>,
+    /// Average latency (ms) over the last minute.@OutputOnly
+    #[serde(rename="averageLatency")]
+    pub average_latency: Option<i32>,
+    /// Number of requests since this instance was started.@OutputOnly
+    pub requests: Option<i32>,
+    /// Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmName")]
+    pub vm_name: Option<String>,
+    /// Time that this instance was started.@OutputOnly
+    #[serde(rename="startTimestamp")]
+    pub start_timestamp: Option<String>,
+    /// Zone where the virtual machine is located. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmZoneName")]
+    pub vm_zone_name: Option<String>,
 }
 
-impl RequestValue for Application {}
-impl ResponseResult for Application {}
+impl ResponseResult for Instance {}
 
 
 /// A Version resource is a specific set of source code and configuration files that are deployed into a service.
@@ -509,8 +522,8 @@ impl ResponseResult for Application {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services versions get apps](struct.AppServiceVersionGetCall.html) (response)
 /// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (request)
+/// * [services versions get apps](struct.AppServiceVersionGetCall.html) (response)
 /// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -550,8 +563,8 @@ pub struct Version {
     pub serving_status: Option<String>,
     /// Relative name of the version within the module. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
     pub id: Option<String>,
-    /// Whether multiple requests can be dispatched to this version at once.
-    pub threadsafe: Option<bool>,
+    /// Extra network settings. Only applicable for VM runtimes.
+    pub network: Option<Network>,
     /// The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/<language>/config/appref
     #[serde(rename="runtimeApiVersion")]
     pub runtime_api_version: Option<String>,
@@ -561,8 +574,8 @@ pub struct Version {
     /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
     #[serde(rename="nobuildFilesRegex")]
     pub nobuild_files_regex: Option<String>,
-    /// Extra network settings. Only applicable for VM runtimes.
-    pub network: Option<Network>,
+    /// Whether multiple requests can be dispatched to this version at once.
+    pub threadsafe: Option<bool>,
     /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
     pub handlers: Option<Vec<UrlMap>>,
     /// Configures health checking for VM instances. Unhealthy instances are be stopped and replaced with new instances. Only applicable for VM runtimes.Only returned in GET requests if view=FULL is set.
@@ -630,16 +643,16 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
-    /// The canonical id for this location. For example: "us-east1".
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
+    /// The friendly name for this location, typically a nearby city name. For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Cross-service attributes for the location. For example
     /// {"cloud.googleapis.com/region": "us-east1"}
     /// 
     pub labels: Option<HashMap<String, String>>,
-    /// The friendly name for this location, typically a nearby city name. For example, "Tokyo".
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
+    /// The canonical id for this location. For example: "us-east1".
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Resource name for the location, which may vary between implementations. For example: "projects/example-project/locations/us-east1"
     pub name: Option<String>,
     /// Service-specific metadata. For example the available capacity at the given location.
@@ -693,16 +706,16 @@ impl Part for CpuUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Resources {
-    /// Volumes mounted within the app container.
-    pub volumes: Option<Vec<Volume>>,
+    /// Memory (GB) needed.
+    #[serde(rename="memoryGb")]
+    pub memory_gb: Option<f64>,
     /// Disk size (GB) needed.
     #[serde(rename="diskGb")]
     pub disk_gb: Option<f64>,
     /// Number of CPU cores needed.
     pub cpu: Option<f64>,
-    /// Memory (GB) needed.
-    #[serde(rename="memoryGb")]
-    pub memory_gb: Option<f64>,
+    /// Volumes mounted within the app container.
+    pub volumes: Option<Vec<Volume>>,
 }
 
 impl Part for Resources {}
@@ -749,36 +762,6 @@ pub struct BasicScaling {
 impl Part for BasicScaling {}
 
 
-/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StaticFilesHandler {
-    /// MIME type used to serve all files served by this handler. Defaults to file-specific MIME types, which are derived from each file's filename extension.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// Time a static file served by this handler should be cached.
-    pub expiration: Option<String>,
-    /// Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
-    pub path: Option<String>,
-    /// Regular expression that matches the file paths for all files that should be referenced by this handler.
-    #[serde(rename="uploadPathRegex")]
-    pub upload_path_regex: Option<String>,
-    /// Whether this handler should match the request if the file referenced by the handler does not exist.
-    #[serde(rename="requireMatchingFile")]
-    pub require_matching_file: Option<bool>,
-    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
-    #[serde(rename="applicationReadable")]
-    pub application_readable: Option<bool>,
-    /// HTTP headers to use for all responses from these URLs.
-    #[serde(rename="httpHeaders")]
-    pub http_headers: Option<HashMap<String, String>>,
-}
-
-impl Part for StaticFilesHandler {}
-
-
 /// Target scaling by network usage. Only applicable for VM runtimes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -788,15 +771,15 @@ pub struct NetworkUtilization {
     /// Target bytes received per second.
     #[serde(rename="targetReceivedBytesPerSec")]
     pub target_received_bytes_per_sec: Option<i32>,
-    /// Target packets sent per second.
-    #[serde(rename="targetSentPacketsPerSec")]
-    pub target_sent_packets_per_sec: Option<i32>,
     /// Target bytes sent per second.
     #[serde(rename="targetSentBytesPerSec")]
     pub target_sent_bytes_per_sec: Option<i32>,
     /// Target packets received per second.
     #[serde(rename="targetReceivedPacketsPerSec")]
     pub target_received_packets_per_sec: Option<i32>,
+    /// Target packets sent per second.
+    #[serde(rename="targetSentPacketsPerSec")]
+    pub target_sent_packets_per_sec: Option<i32>,
 }
 
 impl Part for NetworkUtilization {}
@@ -935,6 +918,26 @@ pub struct HealthCheck {
 impl Part for HealthCheck {}
 
 
+/// Custom static error page to be served when an error occurs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ErrorHandler {
+    /// Error condition this handler applies to.
+    #[serde(rename="errorCode")]
+    pub error_code: Option<String>,
+    /// MIME type of file. Defaults to text/html.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// Static file content to be served for this error.
+    #[serde(rename="staticFile")]
+    pub static_file: Option<String>,
+}
+
+impl Part for ErrorHandler {}
+
+
 /// Identity-Aware Proxy
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -955,26 +958,6 @@ pub struct IdentityAwareProxy {
 }
 
 impl Part for IdentityAwareProxy {}
-
-
-/// Custom static error page to be served when an error occurs.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorHandler {
-    /// Error condition this handler applies to.
-    #[serde(rename="errorCode")]
-    pub error_code: Option<String>,
-    /// MIME type of file. Defaults to text/html.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// Static file content to be served for this error.
-    #[serde(rename="staticFile")]
-    pub static_file: Option<String>,
-}
-
-impl Part for ErrorHandler {}
 
 
 /// Automatic scaling is based on request rate, response latencies, and other application metrics.
@@ -1047,11 +1030,11 @@ pub struct UrlMap {
     /// Uses API Endpoints to handle requests.
     #[serde(rename="apiEndpoint")]
     pub api_endpoint: Option<ApiEndpointHandler>,
-    /// Level of login required to access this resource.
-    pub login: Option<String>,
     /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     pub redirect_http_response_code: Option<String>,
+    /// Level of login required to access this resource.
+    pub login: Option<String>,
 }
 
 impl Part for UrlMap {}
@@ -1120,62 +1103,49 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// An Instance resource is the computing unit that App Engine uses to automatically scale an application.
+/// An Application resource contains the top-level configuration of an App Engine application.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services versions instances get apps](struct.AppServiceVersionInstanceGetCall.html) (response)
+/// * [create apps](struct.AppCreateCall.html) (request)
+/// * [patch apps](struct.AppPatchCall.html) (request)
+/// * [get apps](struct.AppGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Instance {
-    /// Time that this instance was started.@OutputOnly
-    #[serde(rename="startTimestamp")]
-    pub start_timestamp: Option<String>,
-    /// Virtual machine ID of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmId")]
-    pub vm_id: Option<String>,
-    /// Total memory in use (bytes).@OutputOnly
-    #[serde(rename="memoryUsage")]
-    pub memory_usage: Option<String>,
-    /// The IP address of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmIp")]
-    pub vm_ip: Option<String>,
-    /// Average queries per second (QPS) over the last minute.@OutputOnly
-    pub qps: Option<f32>,
-    /// Availability of the instance.@OutputOnly
-    pub availability: Option<String>,
-    /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
+pub struct Application {
+    /// Hostname used to reach the application, as resolved by App Engine.@OutputOnly
+    #[serde(rename="defaultHostname")]
+    pub default_hostname: Option<String>,
+    /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
     pub name: Option<String>,
-    /// Number of errors since this instance was started.@OutputOnly
-    pub errors: Option<u32>,
-    /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmStatus")]
-    pub vm_status: Option<String>,
-    /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmUnlocked")]
-    pub vm_unlocked: Option<bool>,
-    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
+    /// A Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
+    #[serde(rename="codeBucket")]
+    pub code_bucket: Option<String>,
+    /// A Google Cloud Storage bucket that can be used by the application to store content.@OutputOnly
+    #[serde(rename="defaultBucket")]
+    pub default_bucket: Option<String>,
+    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent.@OutputOnly
+    #[serde(rename="dispatchRules")]
+    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
+    /// Cookie expiration policy for this application.
+    #[serde(rename="defaultCookieExpiration")]
+    pub default_cookie_expiration: Option<String>,
+    /// no description provided
+    pub iap: Option<IdentityAwareProxy>,
+    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored.Defaults to us-central.Options are:us-central - Central USeurope-west - Western Europeus-east1 - Eastern US
+    pub location: Option<String>,
+    /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
+    #[serde(rename="authDomain")]
+    pub auth_domain: Option<String>,
+    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
     pub id: Option<String>,
-    /// Average latency (ms) over the last minute.@OutputOnly
-    #[serde(rename="averageLatency")]
-    pub average_latency: Option<i32>,
-    /// Number of requests since this instance was started.@OutputOnly
-    pub requests: Option<i32>,
-    /// Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmName")]
-    pub vm_name: Option<String>,
-    /// App Engine release this instance is running on.@OutputOnly
-    #[serde(rename="appEngineRelease")]
-    pub app_engine_release: Option<String>,
-    /// Zone where the virtual machine is located. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmZoneName")]
-    pub vm_zone_name: Option<String>,
 }
 
-impl ResponseResult for Instance {}
+impl RequestValue for Application {}
+impl ResponseResult for Application {}
 
 
 /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
@@ -1225,6 +1195,36 @@ pub struct ApiConfigHandler {
 }
 
 impl Part for ApiConfigHandler {}
+
+
+/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StaticFilesHandler {
+    /// MIME type used to serve all files served by this handler. Defaults to file-specific MIME types, which are derived from each file's filename extension.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// Time a static file served by this handler should be cached.
+    pub expiration: Option<String>,
+    /// Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
+    pub path: Option<String>,
+    /// Regular expression that matches the file paths for all files that should be referenced by this handler.
+    #[serde(rename="uploadPathRegex")]
+    pub upload_path_regex: Option<String>,
+    /// Whether this handler should match the request if the file referenced by the handler does not exist.
+    #[serde(rename="requireMatchingFile")]
+    pub require_matching_file: Option<bool>,
+    /// HTTP headers to use for all responses from these URLs.
+    #[serde(rename="httpHeaders")]
+    pub http_headers: Option<HashMap<String, String>>,
+    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
+    #[serde(rename="applicationReadable")]
+    pub application_readable: Option<bool>,
+}
+
+impl Part for StaticFilesHandler {}
 
 
 /// Third-party Python runtime library that is required by the application.
@@ -1309,11 +1309,11 @@ impl Part for RequestUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServicesResponse {
-    /// The services belonging to the requested application.
-    pub services: Option<Vec<Service>>,
     /// Continuation token for fetching the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The services belonging to the requested application.
+    pub services: Option<Vec<Service>>,
 }
 
 impl ResponseResult for ListServicesResponse {}
@@ -1960,10 +1960,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1983,7 +1980,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2095,7 +2092,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2250,10 +2247,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2285,7 +2279,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2385,7 +2379,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2545,10 +2539,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2580,7 +2571,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2677,7 +2668,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2836,10 +2827,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2871,7 +2859,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2991,7 +2979,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3139,10 +3127,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3162,7 +3147,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3250,7 +3235,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3402,10 +3387,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3425,7 +3407,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3533,7 +3515,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3699,10 +3681,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3734,7 +3713,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3851,7 +3830,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4014,10 +3993,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4037,7 +4013,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4146,7 +4122,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4294,10 +4270,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4317,7 +4290,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4405,7 +4378,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4561,10 +4534,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4584,7 +4554,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4676,7 +4646,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4837,10 +4807,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4860,7 +4827,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4959,7 +4926,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5111,10 +5078,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5134,7 +5098,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5242,7 +5206,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5403,10 +5367,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5426,7 +5387,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5525,7 +5486,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5675,10 +5636,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5698,7 +5656,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5796,7 +5754,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5944,10 +5902,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5967,7 +5922,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6055,7 +6010,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6220,10 +6175,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6255,7 +6207,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6369,7 +6321,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6520,10 +6472,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6543,7 +6492,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6628,7 +6577,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6776,10 +6725,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6799,7 +6745,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6887,7 +6833,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7019,10 +6965,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7054,7 +6997,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7134,7 +7077,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7289,10 +7232,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7312,7 +7252,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7417,7 +7357,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

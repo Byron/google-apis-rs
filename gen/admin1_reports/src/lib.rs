@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *1.0.8+20180806*, where *20180806* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *reports* crate version *1.0.8+20190210*, where *20190210* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -117,9 +117,10 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.entity_usage_reports().get("entityType", "entityKey", "date")
-//!              .parameters("erat")
-//!              .page_token("labore")
+//! let result = hub.user_usage_report().get("userKey", "date")
+//!              .parameters("amet.")
+//!              .page_token("erat")
+//!              .org_unit_id("labore")
 //!              .max_results(92)
 //!              .filters("nonumy")
 //!              .customer_id("dolores")
@@ -305,9 +306,10 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.entity_usage_reports().get("entityType", "entityKey", "date")
-///              .parameters("ea")
-///              .page_token("no")
+/// let result = hub.user_usage_report().get("userKey", "date")
+///              .parameters("aliquyam")
+///              .page_token("ea")
+///              .org_unit_id("no")
 ///              .max_results(80)
 ///              .filters("justo")
 ///              .customer_id("et")
@@ -912,6 +914,7 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
             _application_name: application_name.to_string(),
             _start_time: Default::default(),
             _page_token: Default::default(),
+            _org_unit_id: Default::default(),
             _max_results: Default::default(),
             _filters: Default::default(),
             _event_name: Default::default(),
@@ -941,6 +944,7 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
             _application_name: application_name.to_string(),
             _start_time: Default::default(),
             _page_token: Default::default(),
+            _org_unit_id: Default::default(),
             _max_results: Default::default(),
             _filters: Default::default(),
             _event_name: Default::default(),
@@ -1072,6 +1076,7 @@ impl<'a, C, A> UserUsageReportMethods<'a, C, A> {
             _date: date.to_string(),
             _parameters: Default::default(),
             _page_token: Default::default(),
+            _org_unit_id: Default::default(),
             _max_results: Default::default(),
             _filters: Default::default(),
             _customer_id: Default::default(),
@@ -1171,10 +1176,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1206,7 +1208,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1276,7 +1278,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1447,10 +1449,7 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1470,7 +1469,7 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1603,7 +1602,7 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1677,12 +1676,13 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// let result = hub.activities().list("userKey", "applicationName")
 ///              .start_time("erat")
 ///              .page_token("sadipscing")
-///              .max_results(-48)
-///              .filters("eirmod")
-///              .event_name("elitr")
-///              .end_time("amet")
-///              .customer_id("no")
-///              .actor_ip_address("labore")
+///              .org_unit_id("dolor")
+///              .max_results(-39)
+///              .filters("elitr")
+///              .event_name("amet")
+///              .end_time("no")
+///              .customer_id("labore")
+///              .actor_ip_address("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -1694,6 +1694,7 @@ pub struct ActivityListCall<'a, C, A>
     _application_name: String,
     _start_time: Option<String>,
     _page_token: Option<String>,
+    _org_unit_id: Option<String>,
     _max_results: Option<i32>,
     _filters: Option<String>,
     _event_name: Option<String>,
@@ -1721,7 +1722,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "reports.activities.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
         params.push(("userKey", self._user_key.to_string()));
         params.push(("applicationName", self._application_name.to_string()));
         if let Some(value) = self._start_time {
@@ -1729,6 +1730,9 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._org_unit_id {
+            params.push(("orgUnitID", value.to_string()));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -1748,7 +1752,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._actor_ip_address {
             params.push(("actorIpAddress", value.to_string()));
         }
-        for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
+        for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "orgUnitID", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1787,10 +1791,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1810,7 +1811,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1897,6 +1898,13 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._page_token = Some(new_value.to_string());
         self
     }
+    /// the organizational unit's(OU) ID to filter activities from users belonging to a specific OU or one of its sub-OU(s)
+    ///
+    /// Sets the *org unit id* query property to the given value.
+    pub fn org_unit_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._org_unit_id = Some(new_value.to_string());
+        self
+    }
     /// Number of activity records to be shown in each page.
     ///
     /// Sets the *max results* query property to the given value.
@@ -1954,7 +1962,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2032,14 +2040,15 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().watch(req, "userKey", "applicationName")
-///              .start_time("invidunt")
-///              .page_token("aliquyam")
-///              .max_results(-73)
-///              .filters("Lorem")
-///              .event_name("sea")
+///              .start_time("aliquyam")
+///              .page_token("accusam")
+///              .org_unit_id("Lorem")
+///              .max_results(-9)
+///              .filters("et")
+///              .event_name("duo")
 ///              .end_time("et")
-///              .customer_id("duo")
-///              .actor_ip_address("et")
+///              .customer_id("eirmod")
+///              .actor_ip_address("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -2052,6 +2061,7 @@ pub struct ActivityWatchCall<'a, C, A>
     _application_name: String,
     _start_time: Option<String>,
     _page_token: Option<String>,
+    _org_unit_id: Option<String>,
     _max_results: Option<i32>,
     _filters: Option<String>,
     _event_name: Option<String>,
@@ -2079,7 +2089,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "reports.activities.watch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(14 + self._additional_params.len());
         params.push(("userKey", self._user_key.to_string()));
         params.push(("applicationName", self._application_name.to_string()));
         if let Some(value) = self._start_time {
@@ -2087,6 +2097,9 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._org_unit_id {
+            params.push(("orgUnitID", value.to_string()));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -2106,7 +2119,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._actor_ip_address {
             params.push(("actorIpAddress", value.to_string()));
         }
-        for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
+        for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "orgUnitID", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2145,10 +2158,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2180,7 +2190,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2279,6 +2289,13 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._page_token = Some(new_value.to_string());
         self
     }
+    /// the organizational unit's(OU) ID to filter activities from users belonging to a specific OU or one of its sub-OU(s)
+    ///
+    /// Sets the *org unit id* query property to the given value.
+    pub fn org_unit_id(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
+        self._org_unit_id = Some(new_value.to_string());
+        self
+    }
     /// Number of activity records to be shown in each page.
     ///
     /// Sets the *max results* query property to the given value.
@@ -2336,7 +2353,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2408,9 +2425,9 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customer_usage_reports().get("date")
-///              .parameters("sanctus")
+///              .parameters("amet")
 ///              .page_token("et")
-///              .customer_id("amet")
+///              .customer_id("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -2493,10 +2510,7 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2516,7 +2530,7 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2615,7 +2629,7 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2687,11 +2701,12 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_usage_report().get("userKey", "date")
-///              .parameters("ut")
-///              .page_token("ea")
-///              .max_results(21)
-///              .filters("dolor")
-///              .customer_id("dolor")
+///              .parameters("sed")
+///              .page_token("dolor")
+///              .org_unit_id("dolor")
+///              .max_results(53)
+///              .filters("et")
+///              .customer_id("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -2703,6 +2718,7 @@ pub struct UserUsageReportGetCall<'a, C, A>
     _date: String,
     _parameters: Option<String>,
     _page_token: Option<String>,
+    _org_unit_id: Option<String>,
     _max_results: Option<u32>,
     _filters: Option<String>,
     _customer_id: Option<String>,
@@ -2727,7 +2743,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "reports.userUsageReport.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("userKey", self._user_key.to_string()));
         params.push(("date", self._date.to_string()));
         if let Some(value) = self._parameters {
@@ -2735,6 +2751,9 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._org_unit_id {
+            params.push(("orgUnitID", value.to_string()));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
@@ -2745,7 +2764,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         if let Some(value) = self._customer_id {
             params.push(("customerId", value.to_string()));
         }
-        for &field in ["alt", "userKey", "date", "parameters", "pageToken", "maxResults", "filters", "customerId"].iter() {
+        for &field in ["alt", "userKey", "date", "parameters", "pageToken", "orgUnitID", "maxResults", "filters", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2784,10 +2803,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2807,7 +2823,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2894,6 +2910,13 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._page_token = Some(new_value.to_string());
         self
     }
+    /// the organizational unit's ID to filter usage parameters from users belonging to a specific OU or one of its sub-OU(s).
+    ///
+    /// Sets the *org unit id* query property to the given value.
+    pub fn org_unit_id(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
+        self._org_unit_id = Some(new_value.to_string());
+        self
+    }
     /// Maximum number of results to return. Maximum allowed is 1000
     ///
     /// Sets the *max results* query property to the given value.
@@ -2930,7 +2953,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

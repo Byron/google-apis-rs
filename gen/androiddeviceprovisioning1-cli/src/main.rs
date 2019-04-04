@@ -1066,15 +1066,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "device-metadata.entries" => Some(("deviceMetadata.entries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.model" => Some(("deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.serial-number" => Some(("deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section-type" => Some(("sectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["customer-id", "device-identifier", "imei", "manufacturer", "meid", "model", "section-type", "serial-number"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["customer-id", "device-identifier", "device-metadata", "entries", "imei", "manufacturer", "meid", "model", "section-type", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2414,8 +2415,9 @@ fn main() {
             ("customers-create",
                     Some(r##"Creates a customer for zero-touch enrollment. After the method returns
         successfully, admin and owner roles can manage devices and EMM configs
-        by calling API methods or using their zero-touch enrollment portal. The API
-        doesn't notify the customer that they have access."##),
+        by calling API methods or using their zero-touch enrollment portal.
+        The customer receives an email that welcomes them to zero-touch enrollment
+        and explains how to sign into the portal."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_customers-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2620,7 +2622,7 @@ fn main() {
         
                     (Some(r##"device-id"##),
                      None,
-                     Some(r##"Required. The ID of the reseller partner."##),
+                     Some(r##"Required. The ID of the device."##),
                      Some(true),
                      Some(false)),
         
@@ -2783,7 +2785,7 @@ fn main() {
     
     let mut app = App::new("androiddeviceprovisioning1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181007")
+           .version("1.0.8+20190330")
            .about("Automates Android zero-touch enrollment for device resellers, customers, and EMMs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli")
            .arg(Arg::with_name("folder")

@@ -1099,8 +1099,8 @@ impl<'n> Engine<'n> {
                     "query.filter.property-filter.value.exclude-from-indexes" => Some(("query.filter.propertyFilter.value.excludeFromIndexes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.key-value.partition-id.project-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.key-value.partition-id.namespace-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.blob-value" => Some(("query.filter.propertyFilter.value.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.string-value" => Some(("query.filter.propertyFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.blob-value" => Some(("query.filter.propertyFilter.value.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.boolean-value" => Some(("query.filter.propertyFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.integer-value" => Some(("query.filter.propertyFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.geo-point-value.latitude" => Some(("query.filter.propertyFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -1756,7 +1756,7 @@ fn main() {
     
     let mut app = App::new("datastore1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181002")
+           .version("1.0.8+20190105")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_cli")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container* crate version *1.0.8+20180917*, where *20180917* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Container* crate version *1.0.8+20190316*, where *20190316* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Container* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Container.html) ... 
 //! 
 //! * projects
-//!  * [*locations clusters complete ip rotation*](struct.ProjectLocationClusterCompleteIpRotationCall.html), [*locations clusters create*](struct.ProjectLocationClusterCreateCall.html), [*locations clusters delete*](struct.ProjectLocationClusterDeleteCall.html), [*locations clusters get*](struct.ProjectLocationClusterGetCall.html), [*locations clusters list*](struct.ProjectLocationClusterListCall.html), [*locations clusters node pools create*](struct.ProjectLocationClusterNodePoolCreateCall.html), [*locations clusters node pools delete*](struct.ProjectLocationClusterNodePoolDeleteCall.html), [*locations clusters node pools get*](struct.ProjectLocationClusterNodePoolGetCall.html), [*locations clusters node pools list*](struct.ProjectLocationClusterNodePoolListCall.html), [*locations clusters node pools rollback*](struct.ProjectLocationClusterNodePoolRollbackCall.html), [*locations clusters node pools set autoscaling*](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html), [*locations clusters node pools set management*](struct.ProjectLocationClusterNodePoolSetManagementCall.html), [*locations clusters node pools set size*](struct.ProjectLocationClusterNodePoolSetSizeCall.html), [*locations clusters node pools update*](struct.ProjectLocationClusterNodePoolUpdateCall.html), [*locations clusters set addons*](struct.ProjectLocationClusterSetAddonCall.html), [*locations clusters set legacy abac*](struct.ProjectLocationClusterSetLegacyAbacCall.html), [*locations clusters set locations*](struct.ProjectLocationClusterSetLocationCall.html), [*locations clusters set logging*](struct.ProjectLocationClusterSetLoggingCall.html), [*locations clusters set maintenance policy*](struct.ProjectLocationClusterSetMaintenancePolicyCall.html), [*locations clusters set master auth*](struct.ProjectLocationClusterSetMasterAuthCall.html), [*locations clusters set monitoring*](struct.ProjectLocationClusterSetMonitoringCall.html), [*locations clusters set network policy*](struct.ProjectLocationClusterSetNetworkPolicyCall.html), [*locations clusters set resource labels*](struct.ProjectLocationClusterSetResourceLabelCall.html), [*locations clusters start ip rotation*](struct.ProjectLocationClusterStartIpRotationCall.html), [*locations clusters update*](struct.ProjectLocationClusterUpdateCall.html), [*locations clusters update master*](struct.ProjectLocationClusterUpdateMasterCall.html), [*locations get server config*](struct.ProjectLocationGetServerConfigCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*zones clusters addons*](struct.ProjectZoneClusterAddonCall.html), [*zones clusters complete ip rotation*](struct.ProjectZoneClusterCompleteIpRotationCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters legacy abac*](struct.ProjectZoneClusterLegacyAbacCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones clusters locations*](struct.ProjectZoneClusterLocationCall.html), [*zones clusters logging*](struct.ProjectZoneClusterLoggingCall.html), [*zones clusters master*](struct.ProjectZoneClusterMasterCall.html), [*zones clusters monitoring*](struct.ProjectZoneClusterMonitoringCall.html), [*zones clusters node pools autoscaling*](struct.ProjectZoneClusterNodePoolAutoscalingCall.html), [*zones clusters node pools create*](struct.ProjectZoneClusterNodePoolCreateCall.html), [*zones clusters node pools delete*](struct.ProjectZoneClusterNodePoolDeleteCall.html), [*zones clusters node pools get*](struct.ProjectZoneClusterNodePoolGetCall.html), [*zones clusters node pools list*](struct.ProjectZoneClusterNodePoolListCall.html), [*zones clusters node pools rollback*](struct.ProjectZoneClusterNodePoolRollbackCall.html), [*zones clusters node pools set management*](struct.ProjectZoneClusterNodePoolSetManagementCall.html), [*zones clusters node pools set size*](struct.ProjectZoneClusterNodePoolSetSizeCall.html), [*zones clusters node pools update*](struct.ProjectZoneClusterNodePoolUpdateCall.html), [*zones clusters resource labels*](struct.ProjectZoneClusterResourceLabelCall.html), [*zones clusters set maintenance policy*](struct.ProjectZoneClusterSetMaintenancePolicyCall.html), [*zones clusters set master auth*](struct.ProjectZoneClusterSetMasterAuthCall.html), [*zones clusters set network policy*](struct.ProjectZoneClusterSetNetworkPolicyCall.html), [*zones clusters start ip rotation*](struct.ProjectZoneClusterStartIpRotationCall.html), [*zones clusters update*](struct.ProjectZoneClusterUpdateCall.html), [*zones get serverconfig*](struct.ProjectZoneGetServerconfigCall.html), [*zones operations cancel*](struct.ProjectZoneOperationCancelCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
+//!  * [*locations clusters complete ip rotation*](struct.ProjectLocationClusterCompleteIpRotationCall.html), [*locations clusters create*](struct.ProjectLocationClusterCreateCall.html), [*locations clusters delete*](struct.ProjectLocationClusterDeleteCall.html), [*locations clusters get*](struct.ProjectLocationClusterGetCall.html), [*locations clusters get jwks*](struct.ProjectLocationClusterGetJwkCall.html), [*locations clusters list*](struct.ProjectLocationClusterListCall.html), [*locations clusters node pools create*](struct.ProjectLocationClusterNodePoolCreateCall.html), [*locations clusters node pools delete*](struct.ProjectLocationClusterNodePoolDeleteCall.html), [*locations clusters node pools get*](struct.ProjectLocationClusterNodePoolGetCall.html), [*locations clusters node pools list*](struct.ProjectLocationClusterNodePoolListCall.html), [*locations clusters node pools rollback*](struct.ProjectLocationClusterNodePoolRollbackCall.html), [*locations clusters node pools set autoscaling*](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html), [*locations clusters node pools set management*](struct.ProjectLocationClusterNodePoolSetManagementCall.html), [*locations clusters node pools set size*](struct.ProjectLocationClusterNodePoolSetSizeCall.html), [*locations clusters node pools update*](struct.ProjectLocationClusterNodePoolUpdateCall.html), [*locations clusters set addons*](struct.ProjectLocationClusterSetAddonCall.html), [*locations clusters set legacy abac*](struct.ProjectLocationClusterSetLegacyAbacCall.html), [*locations clusters set locations*](struct.ProjectLocationClusterSetLocationCall.html), [*locations clusters set logging*](struct.ProjectLocationClusterSetLoggingCall.html), [*locations clusters set maintenance policy*](struct.ProjectLocationClusterSetMaintenancePolicyCall.html), [*locations clusters set master auth*](struct.ProjectLocationClusterSetMasterAuthCall.html), [*locations clusters set monitoring*](struct.ProjectLocationClusterSetMonitoringCall.html), [*locations clusters set network policy*](struct.ProjectLocationClusterSetNetworkPolicyCall.html), [*locations clusters set resource labels*](struct.ProjectLocationClusterSetResourceLabelCall.html), [*locations clusters start ip rotation*](struct.ProjectLocationClusterStartIpRotationCall.html), [*locations clusters update*](struct.ProjectLocationClusterUpdateCall.html), [*locations clusters update master*](struct.ProjectLocationClusterUpdateMasterCall.html), [*locations clusters well-known get openid-configuration*](struct.ProjectLocationClusterWell-knownGetOpenid-configurationCall.html), [*locations get server config*](struct.ProjectLocationGetServerConfigCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*zones clusters addons*](struct.ProjectZoneClusterAddonCall.html), [*zones clusters complete ip rotation*](struct.ProjectZoneClusterCompleteIpRotationCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters legacy abac*](struct.ProjectZoneClusterLegacyAbacCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones clusters locations*](struct.ProjectZoneClusterLocationCall.html), [*zones clusters logging*](struct.ProjectZoneClusterLoggingCall.html), [*zones clusters master*](struct.ProjectZoneClusterMasterCall.html), [*zones clusters monitoring*](struct.ProjectZoneClusterMonitoringCall.html), [*zones clusters node pools autoscaling*](struct.ProjectZoneClusterNodePoolAutoscalingCall.html), [*zones clusters node pools create*](struct.ProjectZoneClusterNodePoolCreateCall.html), [*zones clusters node pools delete*](struct.ProjectZoneClusterNodePoolDeleteCall.html), [*zones clusters node pools get*](struct.ProjectZoneClusterNodePoolGetCall.html), [*zones clusters node pools list*](struct.ProjectZoneClusterNodePoolListCall.html), [*zones clusters node pools rollback*](struct.ProjectZoneClusterNodePoolRollbackCall.html), [*zones clusters node pools set management*](struct.ProjectZoneClusterNodePoolSetManagementCall.html), [*zones clusters node pools set size*](struct.ProjectZoneClusterNodePoolSetSizeCall.html), [*zones clusters node pools update*](struct.ProjectZoneClusterNodePoolUpdateCall.html), [*zones clusters resource labels*](struct.ProjectZoneClusterResourceLabelCall.html), [*zones clusters set maintenance policy*](struct.ProjectZoneClusterSetMaintenancePolicyCall.html), [*zones clusters set master auth*](struct.ProjectZoneClusterSetMasterAuthCall.html), [*zones clusters set network policy*](struct.ProjectZoneClusterSetNetworkPolicyCall.html), [*zones clusters start ip rotation*](struct.ProjectZoneClusterStartIpRotationCall.html), [*zones clusters update*](struct.ProjectZoneClusterUpdateCall.html), [*zones get serverconfig*](struct.ProjectZoneGetServerconfigCall.html), [*zones operations cancel*](struct.ProjectZoneOperationCancelCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
 //! 
 //! 
 //! 
@@ -54,7 +54,7 @@
 //! let r = hub.projects().locations_clusters_update(...).doit()
 //! let r = hub.projects().zones_clusters_delete(...).doit()
 //! let r = hub.projects().zones_clusters_legacy_abac(...).doit()
-//! let r = hub.projects().zones_clusters_set_master_auth(...).doit()
+//! let r = hub.projects().zones_clusters_addons(...).doit()
 //! let r = hub.projects().locations_clusters_delete(...).doit()
 //! let r = hub.projects().locations_clusters_node_pools_delete(...).doit()
 //! let r = hub.projects().zones_clusters_start_ip_rotation(...).doit()
@@ -87,7 +87,7 @@
 //! let r = hub.projects().zones_clusters_node_pools_update(...).doit()
 //! let r = hub.projects().zones_clusters_set_network_policy(...).doit()
 //! let r = hub.projects().locations_clusters_set_maintenance_policy(...).doit()
-//! let r = hub.projects().zones_clusters_addons(...).doit()
+//! let r = hub.projects().zones_clusters_set_master_auth(...).doit()
 //! let r = hub.projects().locations_clusters_set_master_auth(...).doit()
 //! let r = hub.projects().zones_clusters_complete_ip_rotation(...).doit()
 //! let r = hub.projects().zones_clusters_resource_labels(...).doit()
@@ -463,7 +463,7 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredMasterAuthorizedNetworksConfig")]
     pub desired_master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
     /// The desired list of Google Compute Engine
-    /// [locations](/compute/docs/zones#available) in which the cluster's nodes
+    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
     /// should be located. Changing the locations a cluster is in will result
     /// in nodes being either created or removed from the cluster, depending on
     /// whether locations are being added or removed.
@@ -505,6 +505,16 @@ pub struct ClusterUpdate {
     /// - "-": picks the Kubernetes master version
     #[serde(rename="desiredNodeVersion")]
     pub desired_node_version: Option<String>,
+    /// The desired image type for the node pool.
+    /// NOTE: Set the "desired_node_pool" field as well.
+    #[serde(rename="desiredImageType")]
+    pub desired_image_type: Option<String>,
+    /// Autoscaler configuration for the node pool specified in
+    /// desired_node_pool_id. If there is only one pool in the
+    /// cluster and desired_node_pool_id is not provided then
+    /// the change applies to that single node pool.
+    #[serde(rename="desiredNodePoolAutoscaling")]
+    pub desired_node_pool_autoscaling: Option<NodePoolAutoscaling>,
     /// The monitoring service the cluster should use to write metrics.
     /// Currently available options:
     /// 
@@ -512,19 +522,113 @@ pub struct ClusterUpdate {
     /// * "none" - no metrics will be exported from the cluster
     #[serde(rename="desiredMonitoringService")]
     pub desired_monitoring_service: Option<String>,
-    /// Autoscaler configuration for the node pool specified in
-    /// desired_node_pool_id. If there is only one pool in the
-    /// cluster and desired_node_pool_id is not provided then
-    /// the change applies to that single node pool.
-    #[serde(rename="desiredNodePoolAutoscaling")]
-    pub desired_node_pool_autoscaling: Option<NodePoolAutoscaling>,
-    /// The desired image type for the node pool.
-    /// NOTE: Set the "desired_node_pool" field as well.
-    #[serde(rename="desiredImageType")]
-    pub desired_image_type: Option<String>,
 }
 
 impl Part for ClusterUpdate {}
+
+
+/// This operation resource represents operations that may have happened or are
+/// happening on the cluster. All fields are output only.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools rollback projects](struct.ProjectZoneClusterNodePoolRollbackCall.html) (response)
+/// * [locations clusters node pools set autoscaling projects](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html) (response)
+/// * [zones clusters node pools create projects](struct.ProjectZoneClusterNodePoolCreateCall.html) (response)
+/// * [zones clusters monitoring projects](struct.ProjectZoneClusterMonitoringCall.html) (response)
+/// * [locations clusters update projects](struct.ProjectLocationClusterUpdateCall.html) (response)
+/// * [zones clusters delete projects](struct.ProjectZoneClusterDeleteCall.html) (response)
+/// * [zones clusters legacy abac projects](struct.ProjectZoneClusterLegacyAbacCall.html) (response)
+/// * [zones clusters addons projects](struct.ProjectZoneClusterAddonCall.html) (response)
+/// * [locations clusters delete projects](struct.ProjectLocationClusterDeleteCall.html) (response)
+/// * [locations clusters node pools delete projects](struct.ProjectLocationClusterNodePoolDeleteCall.html) (response)
+/// * [zones clusters start ip rotation projects](struct.ProjectZoneClusterStartIpRotationCall.html) (response)
+/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (response)
+/// * [locations clusters set addons projects](struct.ProjectLocationClusterSetAddonCall.html) (response)
+/// * [locations clusters complete ip rotation projects](struct.ProjectLocationClusterCompleteIpRotationCall.html) (response)
+/// * [locations clusters node pools update projects](struct.ProjectLocationClusterNodePoolUpdateCall.html) (response)
+/// * [locations clusters node pools set size projects](struct.ProjectLocationClusterNodePoolSetSizeCall.html) (response)
+/// * [locations clusters set network policy projects](struct.ProjectLocationClusterSetNetworkPolicyCall.html) (response)
+/// * [zones clusters node pools set management projects](struct.ProjectZoneClusterNodePoolSetManagementCall.html) (response)
+/// * [zones operations get projects](struct.ProjectZoneOperationGetCall.html) (response)
+/// * [locations clusters set monitoring projects](struct.ProjectLocationClusterSetMonitoringCall.html) (response)
+/// * [locations clusters set locations projects](struct.ProjectLocationClusterSetLocationCall.html) (response)
+/// * [zones clusters logging projects](struct.ProjectZoneClusterLoggingCall.html) (response)
+/// * [zones clusters update projects](struct.ProjectZoneClusterUpdateCall.html) (response)
+/// * [zones clusters node pools autoscaling projects](struct.ProjectZoneClusterNodePoolAutoscalingCall.html) (response)
+/// * [zones clusters node pools set size projects](struct.ProjectZoneClusterNodePoolSetSizeCall.html) (response)
+/// * [locations clusters set legacy abac projects](struct.ProjectLocationClusterSetLegacyAbacCall.html) (response)
+/// * [locations clusters create projects](struct.ProjectLocationClusterCreateCall.html) (response)
+/// * [locations clusters node pools set management projects](struct.ProjectLocationClusterNodePoolSetManagementCall.html) (response)
+/// * [locations clusters update master projects](struct.ProjectLocationClusterUpdateMasterCall.html) (response)
+/// * [zones clusters set maintenance policy projects](struct.ProjectZoneClusterSetMaintenancePolicyCall.html) (response)
+/// * [locations clusters node pools rollback projects](struct.ProjectLocationClusterNodePoolRollbackCall.html) (response)
+/// * [zones clusters node pools delete projects](struct.ProjectZoneClusterNodePoolDeleteCall.html) (response)
+/// * [zones clusters locations projects](struct.ProjectZoneClusterLocationCall.html) (response)
+/// * [locations clusters start ip rotation projects](struct.ProjectLocationClusterStartIpRotationCall.html) (response)
+/// * [locations clusters set resource labels projects](struct.ProjectLocationClusterSetResourceLabelCall.html) (response)
+/// * [locations clusters node pools create projects](struct.ProjectLocationClusterNodePoolCreateCall.html) (response)
+/// * [zones clusters master projects](struct.ProjectZoneClusterMasterCall.html) (response)
+/// * [zones clusters node pools update projects](struct.ProjectZoneClusterNodePoolUpdateCall.html) (response)
+/// * [zones clusters set network policy projects](struct.ProjectZoneClusterSetNetworkPolicyCall.html) (response)
+/// * [locations clusters set maintenance policy projects](struct.ProjectLocationClusterSetMaintenancePolicyCall.html) (response)
+/// * [zones clusters set master auth projects](struct.ProjectZoneClusterSetMasterAuthCall.html) (response)
+/// * [locations clusters set master auth projects](struct.ProjectLocationClusterSetMasterAuthCall.html) (response)
+/// * [zones clusters complete ip rotation projects](struct.ProjectZoneClusterCompleteIpRotationCall.html) (response)
+/// * [zones clusters resource labels projects](struct.ProjectZoneClusterResourceLabelCall.html) (response)
+/// * [locations clusters set logging projects](struct.ProjectLocationClusterSetLoggingCall.html) (response)
+/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// The current status of the operation.
+    pub status: Option<String>,
+    /// Server-defined URL for the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// [Output only] The time the operation completed, in
+    /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The server-assigned ID for the operation.
+    pub name: Option<String>,
+    /// The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the operation
+    /// is taking place.
+    /// This field is deprecated, use location instead.
+    pub zone: Option<String>,
+    /// Detailed operation progress, if available.
+    pub detail: Option<String>,
+    /// The operation type.
+    #[serde(rename="operationType")]
+    pub operation_type: Option<String>,
+    /// Server-defined URL for the target of the operation.
+    #[serde(rename="targetLink")]
+    pub target_link: Option<String>,
+    /// [Output only] The name of the Google Compute Engine
+    /// [zone](/compute/docs/regions-zones/regions-zones#available) or
+    /// [region](/compute/docs/regions-zones/regions-zones#available) in which
+    /// the cluster resides.
+    pub location: Option<String>,
+    /// [Output only] The time the operation started, in
+    /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// Which conditions caused the current node pool state.
+    #[serde(rename="nodepoolConditions")]
+    pub nodepool_conditions: Option<Vec<StatusCondition>>,
+    /// If an error has occurred, a textual description of the error.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
+    /// Which conditions caused the current cluster state.
+    #[serde(rename="clusterConditions")]
+    pub cluster_conditions: Option<Vec<StatusCondition>>,
+}
+
+impl ResponseResult for Operation {}
 
 
 /// Kubernetes Engine service configuration.
@@ -565,6 +669,14 @@ impl ResponseResult for ServerConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NodeConfig {
+    /// The number of local SSD disks to be attached to the node.
+    /// 
+    /// The limit for this value is dependant upon the maximum number of
+    /// disks available on a machine per zone. See:
+    /// https://cloud.google.com/compute/docs/disks/local-ssd#local_ssd_limits
+    /// for more information.
+    #[serde(rename="localSsdCount")]
+    pub local_ssd_count: Option<i32>,
     /// The name of a Google Compute Engine [machine
     /// type](/compute/docs/machine-types) (e.g.
     /// `n1-standard-1`).
@@ -595,6 +707,11 @@ pub struct NodeConfig {
     /// no Service Account is specified, the "default" service account is used.
     #[serde(rename="serviceAccount")]
     pub service_account: Option<String>,
+    /// List of kubernetes taints to be applied to each node.
+    /// 
+    /// For more information, including usage and the valid values, see:
+    /// https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    pub taints: Option<Vec<NodeTaint>>,
     /// The set of Google API scopes to be made available on all of the
     /// node VMs under the "default" service account.
     /// 
@@ -611,11 +728,6 @@ pub struct NodeConfig {
     /// Monitoring are enabled, in which case their required scopes will be added.
     #[serde(rename="oauthScopes")]
     pub oauth_scopes: Option<Vec<String>>,
-    /// Type of the disk attached to each node (e.g. 'pd-standard' or 'pd-ssd')
-    /// 
-    /// If unspecified, the default disk type is 'pd-standard'
-    #[serde(rename="diskType")]
-    pub disk_type: Option<String>,
     /// Size of the disk attached to each node, specified in GB.
     /// The smallest allowed disk size is 10GB.
     /// 
@@ -635,6 +747,15 @@ pub struct NodeConfig {
     /// platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
     #[serde(rename="minCpuPlatform")]
     pub min_cpu_platform: Option<String>,
+    /// Type of the disk attached to each node (e.g. 'pd-standard' or 'pd-ssd')
+    /// 
+    /// If unspecified, the default disk type is 'pd-standard'
+    #[serde(rename="diskType")]
+    pub disk_type: Option<String>,
+    /// The image type to use for this node. Note that for a given image type,
+    /// the latest version of it will be used.
+    #[serde(rename="imageType")]
+    pub image_type: Option<String>,
     /// The metadata key/value pairs assigned to instances in the cluster.
     /// 
     /// Keys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes
@@ -645,6 +766,7 @@ pub struct NodeConfig {
     ///  "cluster-name"
     ///  "cluster-uid"
     ///  "configure-sh"
+    ///  "containerd-configure-sh"
     ///  "enable-os-login"
     ///  "gci-update-strategy"
     ///  "gci-ensure-gke-docker"
@@ -659,18 +781,6 @@ pub struct NodeConfig {
     /// 
     /// The total size of all keys and values must be less than 512 KB.
     pub metadata: Option<HashMap<String, String>>,
-    /// The image type to use for this node. Note that for a given image type,
-    /// the latest version of it will be used.
-    #[serde(rename="imageType")]
-    pub image_type: Option<String>,
-    /// The number of local SSD disks to be attached to the node.
-    /// 
-    /// The limit for this value is dependant upon the maximum number of
-    /// disks available on a machine per zone. See:
-    /// https://cloud.google.com/compute/docs/disks/local-ssd#local_ssd_limits
-    /// for more information.
-    #[serde(rename="localSsdCount")]
-    pub local_ssd_count: Option<i32>,
 }
 
 impl Part for NodeConfig {}
@@ -871,20 +981,37 @@ pub struct MaintenancePolicy {
 impl Part for MaintenancePolicy {}
 
 
-/// Configuration options for the NetworkPolicy feature.
-/// https://kubernetes.io/docs/concepts/services-networking/networkpolicies/
+/// CreateClusterRequest creates a cluster.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters create projects](struct.ProjectLocationClusterCreateCall.html) (request)
+/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NetworkPolicy {
-    /// Whether network policy is enabled on the cluster.
-    pub enabled: Option<bool>,
-    /// The selected network policy provider.
-    pub provider: Option<String>,
+pub struct CreateClusterRequest {
+    /// A [cluster
+    /// resource](/container-engine/reference/rest/v1/projects.zones.clusters)
+    pub cluster: Option<Cluster>,
+    /// The parent (project and location) where the cluster will be created.
+    /// Specified in the format 'projects/*/locations/*'.
+    pub parent: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the parent field.
+    pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the parent field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
 }
 
-impl Part for NetworkPolicy {}
+impl RequestValue for CreateClusterRequest {}
 
 
 /// SetNodePoolManagementRequest sets the node management properties of a node
@@ -927,6 +1054,37 @@ pub struct SetNodePoolManagementRequest {
 }
 
 impl RequestValue for SetNodePoolManagementRequest {}
+
+
+/// GetOpenIDConfigResponse is an OIDC discovery document for the cluster.
+/// See the OpenID Connect Discovery 1.0 specification for details.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters well-known get openid-configuration projects](struct.ProjectLocationClusterWell-knownGetOpenid-configurationCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetOpenIDConfigResponse {
+    /// NOLINT
+    pub id_token_signing_alg_values_supported: Option<Vec<String>>,
+    /// NOLINT
+    pub claims_supported: Option<Vec<String>>,
+    /// NOLINT
+    pub response_types_supported: Option<Vec<String>>,
+    /// NOLINT
+    pub jwks_uri: Option<String>,
+    /// NOLINT
+    pub grant_types: Option<Vec<String>>,
+    /// NOLINT
+    pub subject_types_supported: Option<Vec<String>>,
+    /// NOLINT
+    pub issuer: Option<String>,
+}
+
+impl ResponseResult for GetOpenIDConfigResponse {}
 
 
 /// Configuration options for the master authorized networks feature. Enabled
@@ -1016,51 +1174,20 @@ pub struct SetAddonsConfigRequest {
 impl RequestValue for SetAddonsConfigRequest {}
 
 
-/// SetLabelsRequest sets the Google Cloud Platform labels on a Google Container
-/// Engine cluster, which will in turn set them for Google Compute Engine
-/// resources used by that cluster
+/// Configuration options for the HTTP (L7) load balancing controller addon,
+/// which makes it easy to set up HTTP load balancers for services in a cluster.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters set resource labels projects](struct.ProjectLocationClusterSetResourceLabelCall.html) (request)
-/// * [zones clusters resource labels projects](struct.ProjectZoneClusterResourceLabelCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetLabelsRequest {
-    /// The name (project, location, cluster id) of the cluster to set labels.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://developers.google.com/console/help/new/#projectnumber).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The fingerprint of the previous set of labels for this resource,
-    /// used to detect conflicts. The fingerprint is initially generated by
-    /// Kubernetes Engine and changes after every request to modify or update
-    /// labels. You must always provide an up-to-date fingerprint hash when
-    /// updating or changing labels. Make a <code>get()</code> request to the
-    /// resource to get the latest fingerprint.
-    #[serde(rename="labelFingerprint")]
-    pub label_fingerprint: Option<String>,
-    /// Deprecated. The name of the cluster.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The labels to set for that cluster.
-    #[serde(rename="resourceLabels")]
-    pub resource_labels: Option<HashMap<String, String>>,
+pub struct HttpLoadBalancing {
+    /// Whether the HTTP Load Balancing controller is enabled in the cluster.
+    /// When enabled, it runs a small pod in the cluster that manages the load
+    /// balancers.
+    pub disabled: Option<bool>,
 }
 
-impl RequestValue for SetLabelsRequest {}
+impl Part for HttpLoadBalancing {}
 
 
 /// Configuration for the legacy Attribute Based Access Control authorization
@@ -1128,7 +1255,7 @@ pub struct SetLocationsRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The desired list of Google Compute Engine
-    /// [locations](/compute/docs/zones#available) in which the cluster's nodes
+    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
     /// should be located. Changing the locations a cluster is in will result
     /// in nodes being either created or removed from the cluster, depending on
     /// whether locations are being added or removed.
@@ -1234,102 +1361,37 @@ pub struct ClientCertificateConfig {
 impl Part for ClientCertificateConfig {}
 
 
-/// This operation resource represents operations that may have happened or are
-/// happening on the cluster. All fields are output only.
+/// CancelOperationRequest cancels a single operation.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [zones clusters node pools rollback projects](struct.ProjectZoneClusterNodePoolRollbackCall.html) (response)
-/// * [locations clusters node pools set autoscaling projects](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html) (response)
-/// * [zones clusters node pools create projects](struct.ProjectZoneClusterNodePoolCreateCall.html) (response)
-/// * [zones clusters monitoring projects](struct.ProjectZoneClusterMonitoringCall.html) (response)
-/// * [locations clusters update projects](struct.ProjectLocationClusterUpdateCall.html) (response)
-/// * [zones clusters delete projects](struct.ProjectZoneClusterDeleteCall.html) (response)
-/// * [zones clusters legacy abac projects](struct.ProjectZoneClusterLegacyAbacCall.html) (response)
-/// * [zones clusters set master auth projects](struct.ProjectZoneClusterSetMasterAuthCall.html) (response)
-/// * [locations clusters delete projects](struct.ProjectLocationClusterDeleteCall.html) (response)
-/// * [locations clusters node pools delete projects](struct.ProjectLocationClusterNodePoolDeleteCall.html) (response)
-/// * [zones clusters start ip rotation projects](struct.ProjectZoneClusterStartIpRotationCall.html) (response)
-/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (response)
-/// * [locations clusters set addons projects](struct.ProjectLocationClusterSetAddonCall.html) (response)
-/// * [locations clusters complete ip rotation projects](struct.ProjectLocationClusterCompleteIpRotationCall.html) (response)
-/// * [locations clusters node pools update projects](struct.ProjectLocationClusterNodePoolUpdateCall.html) (response)
-/// * [locations clusters node pools set size projects](struct.ProjectLocationClusterNodePoolSetSizeCall.html) (response)
-/// * [locations clusters set network policy projects](struct.ProjectLocationClusterSetNetworkPolicyCall.html) (response)
-/// * [zones clusters node pools set management projects](struct.ProjectZoneClusterNodePoolSetManagementCall.html) (response)
-/// * [zones operations get projects](struct.ProjectZoneOperationGetCall.html) (response)
-/// * [locations clusters set monitoring projects](struct.ProjectLocationClusterSetMonitoringCall.html) (response)
-/// * [locations clusters set locations projects](struct.ProjectLocationClusterSetLocationCall.html) (response)
-/// * [zones clusters logging projects](struct.ProjectZoneClusterLoggingCall.html) (response)
-/// * [zones clusters update projects](struct.ProjectZoneClusterUpdateCall.html) (response)
-/// * [zones clusters node pools autoscaling projects](struct.ProjectZoneClusterNodePoolAutoscalingCall.html) (response)
-/// * [zones clusters node pools set size projects](struct.ProjectZoneClusterNodePoolSetSizeCall.html) (response)
-/// * [locations clusters set legacy abac projects](struct.ProjectLocationClusterSetLegacyAbacCall.html) (response)
-/// * [locations clusters create projects](struct.ProjectLocationClusterCreateCall.html) (response)
-/// * [locations clusters node pools set management projects](struct.ProjectLocationClusterNodePoolSetManagementCall.html) (response)
-/// * [locations clusters update master projects](struct.ProjectLocationClusterUpdateMasterCall.html) (response)
-/// * [zones clusters set maintenance policy projects](struct.ProjectZoneClusterSetMaintenancePolicyCall.html) (response)
-/// * [locations clusters node pools rollback projects](struct.ProjectLocationClusterNodePoolRollbackCall.html) (response)
-/// * [zones clusters node pools delete projects](struct.ProjectZoneClusterNodePoolDeleteCall.html) (response)
-/// * [zones clusters locations projects](struct.ProjectZoneClusterLocationCall.html) (response)
-/// * [locations clusters start ip rotation projects](struct.ProjectLocationClusterStartIpRotationCall.html) (response)
-/// * [locations clusters set resource labels projects](struct.ProjectLocationClusterSetResourceLabelCall.html) (response)
-/// * [locations clusters node pools create projects](struct.ProjectLocationClusterNodePoolCreateCall.html) (response)
-/// * [zones clusters master projects](struct.ProjectZoneClusterMasterCall.html) (response)
-/// * [zones clusters node pools update projects](struct.ProjectZoneClusterNodePoolUpdateCall.html) (response)
-/// * [zones clusters set network policy projects](struct.ProjectZoneClusterSetNetworkPolicyCall.html) (response)
-/// * [locations clusters set maintenance policy projects](struct.ProjectLocationClusterSetMaintenancePolicyCall.html) (response)
-/// * [zones clusters addons projects](struct.ProjectZoneClusterAddonCall.html) (response)
-/// * [locations clusters set master auth projects](struct.ProjectLocationClusterSetMasterAuthCall.html) (response)
-/// * [zones clusters complete ip rotation projects](struct.ProjectZoneClusterCompleteIpRotationCall.html) (response)
-/// * [zones clusters resource labels projects](struct.ProjectZoneClusterResourceLabelCall.html) (response)
-/// * [locations clusters set logging projects](struct.ProjectLocationClusterSetLoggingCall.html) (response)
-/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
+/// * [zones operations cancel projects](struct.ProjectZoneOperationCancelCall.html) (request)
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The current status of the operation.
-    pub status: Option<String>,
-    /// If an error has occurred, a textual description of the error.
-    #[serde(rename="statusMessage")]
-    pub status_message: Option<String>,
-    /// The server-assigned ID for the operation.
+pub struct CancelOperationRequest {
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The name (project, location, operation id) of the operation to cancel.
+    /// Specified in the format 'projects/*/locations/*/operations/*'.
     pub name: Option<String>,
-    /// The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the operation
-    /// is taking place.
-    /// This field is deprecated, use location instead.
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the operation resides.
+    /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
-    /// [Output only] The time the operation started, in
-    /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// Detailed operation progress, if available.
-    pub detail: Option<String>,
-    /// [Output only] The name of the Google Compute Engine
-    /// [zone](/compute/docs/regions-zones/regions-zones#available) or
-    /// [region](/compute/docs/regions-zones/regions-zones#available) in which
-    /// the cluster resides.
-    pub location: Option<String>,
-    /// The operation type.
-    #[serde(rename="operationType")]
-    pub operation_type: Option<String>,
-    /// [Output only] The time the operation completed, in
-    /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// Server-defined URL for the resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-    /// Server-defined URL for the target of the operation.
-    #[serde(rename="targetLink")]
-    pub target_link: Option<String>,
+    /// Deprecated. The server-assigned `name` of the operation.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
 }
 
-impl ResponseResult for Operation {}
+impl RequestValue for CancelOperationRequest {}
 
 
 /// CompleteIPRotationRequest moves the cluster master back into single-IP mode.
@@ -1366,20 +1428,51 @@ pub struct CompleteIPRotationRequest {
 impl RequestValue for CompleteIPRotationRequest {}
 
 
-/// Configuration options for the HTTP (L7) load balancing controller addon,
-/// which makes it easy to set up HTTP load balancers for services in a cluster.
+/// SetLabelsRequest sets the Google Cloud Platform labels on a Google Container
+/// Engine cluster, which will in turn set them for Google Compute Engine
+/// resources used by that cluster
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters set resource labels projects](struct.ProjectLocationClusterSetResourceLabelCall.html) (request)
+/// * [zones clusters resource labels projects](struct.ProjectZoneClusterResourceLabelCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HttpLoadBalancing {
-    /// Whether the HTTP Load Balancing controller is enabled in the cluster.
-    /// When enabled, it runs a small pod in the cluster that manages the load
-    /// balancers.
-    pub disabled: Option<bool>,
+pub struct SetLabelsRequest {
+    /// The name (project, location, cluster id) of the cluster to set labels.
+    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the name field.
+    pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://developers.google.com/console/help/new/#projectnumber).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The fingerprint of the previous set of labels for this resource,
+    /// used to detect conflicts. The fingerprint is initially generated by
+    /// Kubernetes Engine and changes after every request to modify or update
+    /// labels. You must always provide an up-to-date fingerprint hash when
+    /// updating or changing labels. Make a <code>get()</code> request to the
+    /// resource to get the latest fingerprint.
+    #[serde(rename="labelFingerprint")]
+    pub label_fingerprint: Option<String>,
+    /// Deprecated. The name of the cluster.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The labels to set for that cluster.
+    #[serde(rename="resourceLabels")]
+    pub resource_labels: Option<HashMap<String, String>>,
 }
 
-impl Part for HttpLoadBalancing {}
+impl RequestValue for SetLabelsRequest {}
 
 
 /// ListClustersResponse is the result of ListClustersRequest.
@@ -1394,13 +1487,13 @@ impl Part for HttpLoadBalancing {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListClustersResponse {
+    /// A list of clusters in the project in the specified zone, or
+    /// across all ones.
+    pub clusters: Option<Vec<Cluster>>,
     /// If any zones are listed here, the list of clusters returned
     /// may be missing those zones.
     #[serde(rename="missingZones")]
     pub missing_zones: Option<Vec<String>>,
-    /// A list of clusters in the project in the specified zone, or
-    /// across all ones.
-    pub clusters: Option<Vec<Cluster>>,
 }
 
 impl ResponseResult for ListClustersResponse {}
@@ -1443,6 +1536,38 @@ pub struct HorizontalPodAutoscaling {
 impl Part for HorizontalPodAutoscaling {}
 
 
+/// Jwk is a JSON Web Key as specified in RFC 7517
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Jwk {
+    /// NOLINT
+    #[serde(rename="use")]
+    pub use_: Option<String>,
+    /// NOLINT
+    pub crv: Option<String>,
+    /// NOLINT
+    pub kty: Option<String>,
+    /// NOLINT
+    pub alg: Option<String>,
+    /// Fields for RSA keys.
+    /// NOLINT
+    pub n: Option<String>,
+    /// NOLINT
+    pub y: Option<String>,
+    /// Fields for ECDSA keys.
+    /// NOLINT
+    pub x: Option<String>,
+    /// NOLINT
+    pub e: Option<String>,
+    /// NOLINT
+    pub kid: Option<String>,
+}
+
+impl Part for Jwk {}
+
+
 /// CreateNodePoolRequest creates a node pool for a cluster.
 /// 
 /// # Activities
@@ -1460,80 +1585,46 @@ pub struct CreateNodePoolRequest {
     /// This field has been deprecated and replaced by the parent field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
+    /// Deprecated. The name of the cluster.
+    /// This field has been deprecated and replaced by the parent field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The parent (project, location, cluster id) where the node pool will be
+    /// created. Specified in the format
+    /// 'projects/*/locations/*/clusters/*'.
+    pub parent: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
     /// [zone](/compute/docs/zones#available) in which the cluster
     /// resides.
     /// This field has been deprecated and replaced by the parent field.
     pub zone: Option<String>,
-    /// Deprecated. The name of the cluster.
-    /// This field has been deprecated and replaced by the parent field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
     /// The node pool to create.
     #[serde(rename="nodePool")]
     pub node_pool: Option<NodePool>,
-    /// The parent (project, location, cluster id) where the node pool will be
-    /// created. Specified in the format
-    /// 'projects/*/locations/*/clusters/*'.
-    pub parent: Option<String>,
 }
 
 impl RequestValue for CreateNodePoolRequest {}
 
 
-/// UpdateNodePoolRequests update a node pool's image and/or version.
+/// Kubernetes taint is comprised of three fields: key, value, and effect. Effect
+/// can only be one of three types:  NoSchedule, PreferNoSchedule or NoExecute.
 /// 
-/// # Activities
+/// For more information, including usage and the valid values, see:
+/// https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones clusters node pools update projects](struct.ProjectZoneClusterNodePoolUpdateCall.html) (request)
-/// * [locations clusters node pools update projects](struct.ProjectLocationClusterNodePoolUpdateCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateNodePoolRequest {
-    /// The name (project, location, cluster, node pool) of the node pool to
-    /// update. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The Kubernetes version to change the nodes to (typically an
-    /// upgrade).
-    /// 
-    /// Users may specify either explicit versions offered by Kubernetes Engine or
-    /// version aliases, which have the following behavior:
-    /// 
-    /// - "latest": picks the highest valid Kubernetes version
-    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
-    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
-    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
-    /// - "-": picks the Kubernetes master version
-    #[serde(rename="nodeVersion")]
-    pub node_version: Option<String>,
-    /// Deprecated. The name of the cluster to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The desired image type for the node pool.
-    #[serde(rename="imageType")]
-    pub image_type: Option<String>,
-    /// Deprecated. The name of the node pool to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="nodePoolId")]
-    pub node_pool_id: Option<String>,
+pub struct NodeTaint {
+    /// Key for taint.
+    pub key: Option<String>,
+    /// Effect for taint.
+    pub effect: Option<String>,
+    /// Value for taint.
+    pub value: Option<String>,
 }
 
-impl RequestValue for UpdateNodePoolRequest {}
+impl Part for NodeTaint {}
 
 
 /// SetLoggingServiceRequest sets the logging service of a cluster.
@@ -1630,6 +1721,9 @@ impl ResponseResult for ListNodePoolsResponse {}
 pub struct NodePool {
     /// [Output only] The status of the nodes in this pool instance.
     pub status: Option<String>,
+    /// [Output only] Server-defined URL for the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
     /// NodeManagement configuration for this NodePool.
     pub management: Option<NodeManagement>,
     /// The name of the node pool.
@@ -1650,51 +1744,49 @@ pub struct NodePool {
     /// firewall and routes quota.
     #[serde(rename="initialNodeCount")]
     pub initial_node_count: Option<i32>,
+    /// The node configuration of the pool.
+    pub config: Option<NodeConfig>,
+    /// Which conditions caused the current node pool state.
+    pub conditions: Option<Vec<StatusCondition>>,
     /// [Output only] Additional information about the current status of this
     /// node pool instance, if available.
     #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
-    /// The node configuration of the pool.
-    pub config: Option<NodeConfig>,
-    /// [Output only] Server-defined URL for the resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
 }
 
 impl ResponseResult for NodePool {}
 
 
-/// CreateClusterRequest creates a cluster.
+/// Configuration options for the NetworkPolicy feature.
+/// https://kubernetes.io/docs/concepts/services-networking/networkpolicies/
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters create projects](struct.ProjectLocationClusterCreateCall.html) (request)
-/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateClusterRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the parent field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
-    pub zone: Option<String>,
-    /// The parent (project and location) where the cluster will be created.
-    /// Specified in the format 'projects/*/locations/*'.
-    pub parent: Option<String>,
-    /// A [cluster
-    /// resource](/container-engine/reference/rest/v1/projects.zones.clusters)
-    pub cluster: Option<Cluster>,
+pub struct NetworkPolicy {
+    /// Whether network policy is enabled on the cluster.
+    pub enabled: Option<bool>,
+    /// The selected network policy provider.
+    pub provider: Option<String>,
 }
 
-impl RequestValue for CreateClusterRequest {}
+impl Part for NetworkPolicy {}
+
+
+/// StatusCondition describes why a cluster or a node pool has a certain status
+/// (e.g., ERROR or DEGRADED).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StatusCondition {
+    /// Human-friendly representation of the condition
+    pub message: Option<String>,
+    /// Machine-friendly representation of the condition
+    pub code: Option<String>,
+}
+
+impl Part for StatusCondition {}
 
 
 /// UpdateMasterRequest updates the master of the cluster.
@@ -1779,11 +1871,6 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetLegacyAbacRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
     /// Deprecated. The name of the cluster to update.
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
@@ -1798,6 +1885,11 @@ pub struct SetLegacyAbacRequest {
     /// resides.
     /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
 }
 
 impl RequestValue for SetLegacyAbacRequest {}
@@ -1852,8 +1944,8 @@ impl Part for NodePoolAutoscaling {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MasterAuth {
     /// The username to use for HTTP basic authentication to the master endpoint.
-    /// For clusters v1.6.0 and later, you can disable basic authentication by
-    /// providing an empty username.
+    /// For clusters v1.6.0 and later, basic authentication can be disabled by
+    /// leaving username unspecified (or setting it to the empty string).
     pub username: Option<String>,
     /// The password to use for HTTP basic authentication to the master endpoint.
     /// Because the master endpoint is open to the Internet, you should create a
@@ -1903,16 +1995,16 @@ pub struct UpdateClusterRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
-    /// A description of the update.
-    pub update: Option<ClusterUpdate>,
+    /// The name (project, location, cluster) of the cluster to update.
+    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
     /// [zone](/compute/docs/zones#available) in which the cluster
     /// resides.
     /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
-    /// The name (project, location, cluster) of the cluster to update.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub name: Option<String>,
+    /// A description of the update.
+    pub update: Option<ClusterUpdate>,
 }
 
 impl RequestValue for UpdateClusterRequest {}
@@ -1948,12 +2040,21 @@ pub struct Cluster {
     #[serde(rename="addonsConfig")]
     pub addons_config: Option<AddonsConfig>,
     /// The list of Google Compute Engine
-    /// [locations](/compute/docs/zones#available) in which the cluster's nodes
+    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
     /// should be located.
     pub locations: Option<Vec<String>>,
-    /// Configuration for the legacy ABAC authorization mode.
-    #[serde(rename="legacyAbac")]
-    pub legacy_abac: Option<LegacyAbac>,
+    /// Kubernetes alpha features are enabled on this cluster. This includes alpha
+    /// API groups (e.g. v1alpha1) and features that may not be production ready in
+    /// the kubernetes version of the master and nodes.
+    /// The cluster has no SLA for uptime and master/node upgrades are disabled.
+    /// Alpha enabled clusters are automatically deleted thirty days after
+    /// creation.
+    #[serde(rename="enableKubernetesAlpha")]
+    pub enable_kubernetes_alpha: Option<bool>,
+    /// The resource labels for the cluster to use to annotate any related
+    /// Google Compute Engine resources.
+    #[serde(rename="resourceLabels")]
+    pub resource_labels: Option<HashMap<String, String>>,
     /// The name of the Google Compute Engine
     /// [network](/compute/docs/networks-and-firewalls#networks) to which the
     /// cluster is connected. If left unspecified, the `default` network
@@ -1973,30 +2074,30 @@ pub struct Cluster {
     /// Configuration for cluster networking.
     #[serde(rename="networkConfig")]
     pub network_config: Option<NetworkConfig>,
-    /// Configuration for cluster IP allocation.
-    #[serde(rename="ipAllocationPolicy")]
-    pub ip_allocation_policy: Option<IPAllocationPolicy>,
-    /// [Output only] The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field is deprecated, use location instead.
-    pub zone: Option<String>,
-    /// [Output only] The IP address range of the Kubernetes services in
-    /// this cluster, in
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `1.2.3.4/29`). Service addresses are
-    /// typically put in the last `/16` from the container CIDR.
-    #[serde(rename="servicesIpv4Cidr")]
-    pub services_ipv4_cidr: Option<String>,
-    /// [Output only] Additional information about the current status of this
-    /// cluster, if available.
-    #[serde(rename="statusMessage")]
-    pub status_message: Option<String>,
+    /// The name of this cluster. The name must be unique within this project
+    /// and zone, and can be up to 40 characters with the following restrictions:
+    /// 
+    /// * Lowercase letters, numbers, and hyphens only.
+    /// * Must start with a letter.
+    /// * Must end with a number or a letter.
+    pub name: Option<String>,
     /// [Output only] The name of the Google Compute Engine
     /// [zone](/compute/docs/regions-zones/regions-zones#available) or
     /// [region](/compute/docs/regions-zones/regions-zones#available) in which
     /// the cluster resides.
     pub location: Option<String>,
+    /// Enable the ability to use Cloud TPUs in this cluster.
+    #[serde(rename="enableTpu")]
+    pub enable_tpu: Option<bool>,
+    /// Which conditions caused the current cluster state.
+    pub conditions: Option<Vec<StatusCondition>>,
+    /// [Output only] Additional information about the current status of this
+    /// cluster, if available.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
+    /// Configuration for cluster IP allocation.
+    #[serde(rename="ipAllocationPolicy")]
+    pub ip_allocation_policy: Option<IPAllocationPolicy>,
     /// [Output only] The current status of this cluster.
     pub status: Option<String>,
     /// An optional description of this cluster.
@@ -2015,6 +2116,10 @@ pub struct Cluster {
     #[serde(rename="currentMasterVersion")]
     pub current_master_version: Option<String>,
     /// The authentication information for accessing the master endpoint.
+    /// If unspecified, the defaults are used:
+    /// For clusters before v1.12, if master_auth is unspecified, `username` will
+    /// be set to "admin", a random password will be generated, and a client
+    /// certificate will be issued.
     #[serde(rename="masterAuth")]
     pub master_auth: Option<MasterAuth>,
     /// [Output only] The time the cluster will be automatically
@@ -2058,24 +2163,18 @@ pub struct Cluster {
     /// See the `masterAuth` property of this resource for username and
     /// password information.
     pub endpoint: Option<String>,
-    /// [Output only] The number of nodes currently in the cluster.
+    /// [Output only]  The number of nodes currently in the cluster. Deprecated.
+    /// Call Kubernetes API directly to retrieve node information.
     #[serde(rename="currentNodeCount")]
     pub current_node_count: Option<i32>,
-    /// The name of this cluster. The name must be unique within this project
-    /// and zone, and can be up to 40 characters with the following restrictions:
-    /// 
-    /// * Lowercase letters, numbers, and hyphens only.
-    /// * Must start with a letter.
-    /// * Must end with a number or a letter.
-    pub name: Option<String>,
-    /// Kubernetes alpha features are enabled on this cluster. This includes alpha
-    /// API groups (e.g. v1alpha1) and features that may not be production ready in
-    /// the kubernetes version of the master and nodes.
-    /// The cluster has no SLA for uptime and master/node upgrades are disabled.
-    /// Alpha enabled clusters are automatically deleted thirty days after
-    /// creation.
-    #[serde(rename="enableKubernetesAlpha")]
-    pub enable_kubernetes_alpha: Option<bool>,
+    /// [Output only] The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field is deprecated, use location instead.
+    pub zone: Option<String>,
+    /// Configuration for the legacy ABAC authorization mode.
+    #[serde(rename="legacyAbac")]
+    pub legacy_abac: Option<LegacyAbac>,
     /// The initial Kubernetes version for this cluster.  Valid versions are those
     /// found in validMasterVersions returned by getServerConfig.  The version can
     /// be upgraded over time; such upgrades are reflected in
@@ -2113,13 +2212,21 @@ pub struct Cluster {
     /// [subnetwork](/compute/docs/subnetworks) to which the
     /// cluster is connected.
     pub subnetwork: Option<String>,
-    /// The resource labels for the cluster to use to annotate any related
-    /// Google Compute Engine resources.
-    #[serde(rename="resourceLabels")]
-    pub resource_labels: Option<HashMap<String, String>>,
+    /// [Output only] The IP address range of the Kubernetes services in
+    /// this cluster, in
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `1.2.3.4/29`). Service addresses are
+    /// typically put in the last `/16` from the container CIDR.
+    #[serde(rename="servicesIpv4Cidr")]
+    pub services_ipv4_cidr: Option<String>,
     /// [Output only] Server-defined URL for the resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
+    /// [Output only] The IP address range of the Cloud TPUs in this cluster, in
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `1.2.3.4/29`).
+    #[serde(rename="tpuIpv4CidrBlock")]
+    pub tpu_ipv4_cidr_block: Option<String>,
 }
 
 impl ResponseResult for Cluster {}
@@ -2184,17 +2291,17 @@ pub struct SetNetworkPolicyRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
-    /// Configuration options for the NetworkPolicy feature.
-    #[serde(rename="networkPolicy")]
-    pub network_policy: Option<NetworkPolicy>,
+    /// The name (project, location, cluster id) of the cluster to set networking
+    /// policy. Specified in the format 'projects/*/locations/*/clusters/*'.
+    pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
     /// [zone](/compute/docs/zones#available) in which the cluster
     /// resides.
     /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
-    /// The name (project, location, cluster id) of the cluster to set networking
-    /// policy. Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub name: Option<String>,
+    /// Configuration options for the NetworkPolicy feature.
+    #[serde(rename="networkPolicy")]
+    pub network_policy: Option<NetworkPolicy>,
 }
 
 impl RequestValue for SetNetworkPolicyRequest {}
@@ -2276,6 +2383,23 @@ pub struct IPAllocationPolicy {
     /// to use.
     #[serde(rename="nodeIpv4CidrBlock")]
     pub node_ipv4_cidr_block: Option<String>,
+    /// The IP address range of the Cloud TPUs in this cluster. If unspecified, a
+    /// range will be automatically chosen with the default size.
+    /// 
+    /// This field is only applicable when `use_ip_aliases` is true.
+    /// 
+    /// If unspecified, the range will use the default size.
+    /// 
+    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
+    /// netmask.
+    /// 
+    /// Set to a
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
+    /// to use.
+    #[serde(rename="tpuIpv4CidrBlock")]
+    pub tpu_ipv4_cidr_block: Option<String>,
     /// This field is deprecated, use cluster_ipv4_cidr_block.
     #[serde(rename="clusterIpv4Cidr")]
     pub cluster_ipv4_cidr: Option<String>,
@@ -2301,37 +2425,23 @@ pub struct IPAllocationPolicy {
 impl Part for IPAllocationPolicy {}
 
 
-/// CancelOperationRequest cancels a single operation.
+/// GetJSONWebKeysResponse is a valid JSON Web Key Set as specififed in rfc 7517
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [zones operations cancel projects](struct.ProjectZoneOperationCancelCall.html) (request)
-/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (request)
+/// * [locations clusters get jwks projects](struct.ProjectLocationClusterGetJwkCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The name (project, location, operation id) of the operation to cancel.
-    /// Specified in the format 'projects/*/locations/*/operations/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the operation resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-    /// Deprecated. The server-assigned `name` of the operation.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+pub struct GetJSONWebKeysResponse {
+    /// The public component of the keys used by the cluster to sign token
+    /// requests.
+    pub keys: Option<Vec<Jwk>>,
 }
 
-impl RequestValue for CancelOperationRequest {}
+impl ResponseResult for GetJSONWebKeysResponse {}
 
 
 /// SetNodePoolSizeRequest sets the size a node
@@ -2425,6 +2535,61 @@ pub struct CidrBlock {
 impl Part for CidrBlock {}
 
 
+/// UpdateNodePoolRequests update a node pool's image and/or version.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools update projects](struct.ProjectZoneClusterNodePoolUpdateCall.html) (request)
+/// * [locations clusters node pools update projects](struct.ProjectLocationClusterNodePoolUpdateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateNodePoolRequest {
+    /// The name (project, location, cluster, node pool) of the node pool to
+    /// update. Specified in the format
+    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the name field.
+    pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The Kubernetes version to change the nodes to (typically an
+    /// upgrade).
+    /// 
+    /// Users may specify either explicit versions offered by Kubernetes Engine or
+    /// version aliases, which have the following behavior:
+    /// 
+    /// - "latest": picks the highest valid Kubernetes version
+    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
+    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
+    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
+    /// - "-": picks the Kubernetes master version
+    #[serde(rename="nodeVersion")]
+    pub node_version: Option<String>,
+    /// Deprecated. The name of the cluster to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The desired image type for the node pool.
+    #[serde(rename="imageType")]
+    pub image_type: Option<String>,
+    /// Deprecated. The name of the node pool to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="nodePoolId")]
+    pub node_pool_id: Option<String>,
+}
+
+impl RequestValue for UpdateNodePoolRequest {}
+
+
 
 // ###################
 // MethodBuilders ###
@@ -2454,7 +2619,7 @@ impl Part for CidrBlock {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Container::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
+/// // like `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2723,6 +2888,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// GetJSONWebKeys gets the public component of the cluster signing keys in
+    /// JSON Web Key format.
+    /// This API is not yet intended for general use, and is not available for all
+    /// clusters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - The cluster (project, location, cluster id) to get keys for. Specified in
+    ///              the format 'projects/*/locations/*/clusters/*'.
+    pub fn locations_clusters_get_jwks(&self, parent: &str) -> ProjectLocationClusterGetJwkCall<'a, C, A> {
+        ProjectLocationClusterGetJwkCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Enables or disables the ABAC authorization mechanism on a cluster.
     /// 
     /// # Arguments
@@ -2781,20 +2967,20 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all clusters owned by a project in either the specified zone or all
-    /// zones.
+    /// GetOpenIDConfig gets the OIDC discovery document for the cluster.
+    /// See the OpenID Connect Discovery 1.0 specification for details.
+    /// https://openid.net/specs/openid-connect-discovery-1_0.html
+    /// This API is not yet intended for general use, and is not available for all
+    /// clusters.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The parent (project and location) where the clusters will be listed.
-    ///              Specified in the format 'projects/*/locations/*'.
-    ///              Location "-" matches all zones and all regions.
-    pub fn locations_clusters_list(&self, parent: &str) -> ProjectLocationClusterListCall<'a, C, A> {
-        ProjectLocationClusterListCall {
+    /// * `parent` - The cluster (project, location, cluster id) to get the discovery document
+    ///              for. Specified in the format 'projects/*/locations/*/clusters/*'.
+    pub fn locations_clusters_well_known_get_openid_configuration(&self, parent: &str) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {
+        ProjectLocationClusterWell-knownGetOpenid-configurationCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _zone: Default::default(),
-            _project_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2979,8 +3165,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name (project and location) of the server config to get
-    ///            Specified in the format 'projects/*/locations/*'.
+    /// * `name` - The name (project and location) of the server config to get,
+    ///            specified in the format 'projects/*/locations/*'.
     pub fn locations_get_server_config(&self, name: &str) -> ProjectLocationGetServerConfigCall<'a, C, A> {
         ProjectLocationGetServerConfigCall {
             hub: self.hub,
@@ -3398,6 +3584,28 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all clusters owned by a project in either the specified zone or all
+    /// zones.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - The parent (project and location) where the clusters will be listed.
+    ///              Specified in the format 'projects/*/locations/*'.
+    ///              Location "-" matches all zones and all regions.
+    pub fn locations_clusters_list(&self, parent: &str) -> ProjectLocationClusterListCall<'a, C, A> {
+        ProjectLocationClusterListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _zone: Default::default(),
+            _project_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4118,10 +4326,7 @@ impl<'a, C, A> ProjectZoneOperationCancelCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4153,7 +4358,7 @@ impl<'a, C, A> ProjectZoneOperationCancelCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4268,7 +4473,7 @@ impl<'a, C, A> ProjectZoneOperationCancelCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4409,7 +4614,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, C, A> where 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4425,10 +4630,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, C, A> where 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4460,7 +4662,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, C, A> where 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4552,7 +4754,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, C, A> where 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4709,10 +4911,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolCreateCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4744,7 +4943,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolCreateCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4860,7 +5059,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolCreateCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5017,10 +5216,7 @@ impl<'a, C, A> ProjectZoneClusterMonitoringCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5052,7 +5248,7 @@ impl<'a, C, A> ProjectZoneClusterMonitoringCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5168,7 +5364,7 @@ impl<'a, C, A> ProjectZoneClusterMonitoringCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5322,7 +5518,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolGetCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5338,10 +5534,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolGetCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5361,7 +5554,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolGetCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5476,7 +5669,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolGetCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5633,7 +5826,7 @@ impl<'a, C, A> ProjectLocationClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5649,10 +5842,7 @@ impl<'a, C, A> ProjectLocationClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5672,7 +5862,7 @@ impl<'a, C, A> ProjectLocationClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5778,7 +5968,7 @@ impl<'a, C, A> ProjectLocationClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5938,10 +6128,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolRollbackCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5973,7 +6160,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolRollbackCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6100,7 +6287,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolRollbackCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6263,10 +6450,7 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6286,7 +6470,7 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6398,7 +6582,7 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6551,10 +6735,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6574,7 +6755,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6651,8 +6832,8 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
         self._zone = new_value.to_string();
         self
     }
-    /// The name (project and location) of the server config to get
-    /// Specified in the format 'projects/*/locations/*'.
+    /// The name (project and location) of the server config to get,
+    /// specified in the format 'projects/*/locations/*'.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
@@ -6674,7 +6855,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6711,6 +6892,258 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneGetServerconfigCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// GetJSONWebKeys gets the public component of the cluster signing keys in
+/// JSON Web Key format.
+/// This API is not yet intended for general use, and is not available for all
+/// clusters.
+///
+/// A builder for the *locations.clusters.getJwks* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1 as container1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_clusters_get_jwks("parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationClusterGetJwkCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationClusterGetJwkCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationClusterGetJwkCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GetJSONWebKeysResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.locations.clusters.getJwks",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/jwks";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The cluster (project, location, cluster id) to get keys for. Specified in
+    /// the format 'projects/*/locations/*/clusters/*'.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterGetJwkCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterGetJwkCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterGetJwkCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterGetJwkCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6831,10 +7264,7 @@ impl<'a, C, A> ProjectZoneClusterLegacyAbacCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6866,7 +7296,7 @@ impl<'a, C, A> ProjectZoneClusterLegacyAbacCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6982,7 +7412,7 @@ impl<'a, C, A> ProjectZoneClusterLegacyAbacCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7139,10 +7569,7 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7174,7 +7601,7 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7290,7 +7717,7 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7338,10 +7765,13 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Lists all clusters owned by a project in either the specified zone or all
-/// zones.
+/// GetOpenIDConfig gets the OIDC discovery document for the cluster.
+/// See the OpenID Connect Discovery 1.0 specification for details.
+/// https://openid.net/specs/openid-connect-discovery-1_0.html
+/// This API is not yet intended for general use, and is not available for all
+/// clusters.
 ///
-/// A builder for the *locations.clusters.list* method supported by a *project* resource.
+/// A builder for the *locations.clusters.well-known.getOpenid-configuration* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -7366,31 +7796,27 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_clusters_list("parent")
-///              .zone("et")
-///              .project_id("duo")
+/// let result = hub.projects().locations_clusters_well_known_get_openid_configuration("parent")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationClusterListCall<'a, C, A>
+pub struct ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Container<C, A>,
     _parent: String,
-    _zone: Option<String>,
-    _project_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationClusterListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClustersResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GetOpenIDConfigResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -7399,17 +7825,11 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "container.projects.locations.clusters.list",
+        dlg.begin(MethodInfo { id: "container.projects.locations.clusters.well-known.getOpenid-configuration",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._zone {
-            params.push(("zone", value.to_string()));
-        }
-        if let Some(value) = self._project_id {
-            params.push(("projectId", value.to_string()));
-        }
-        for &field in ["alt", "parent", "zone", "projectId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7421,7 +7841,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/clusters";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/.well-known/openid-configuration";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7435,7 +7855,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7451,10 +7871,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7474,7 +7891,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7527,35 +7944,15 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The parent (project and location) where the clusters will be listed.
-    /// Specified in the format 'projects/*/locations/*'.
-    /// Location "-" matches all zones and all regions.
+    /// The cluster (project, location, cluster id) to get the discovery document
+    /// for. Specified in the format 'projects/*/locations/*/clusters/*'.
     ///
     /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides, or "-" for all zones.
-    /// This field has been deprecated and replaced by the parent field.
-    ///
-    /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, C, A> {
-        self._zone = Some(new_value.to_string());
-        self
-    }
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the parent field.
-    ///
-    /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, C, A> {
-        self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7564,7 +7961,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7573,7 +7970,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7589,7 +7986,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7609,7 +8006,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7714,7 +8111,7 @@ impl<'a, C, A> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7730,10 +8127,7 @@ impl<'a, C, A> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7765,7 +8159,7 @@ impl<'a, C, A> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> where C: B
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7856,7 +8250,7 @@ impl<'a, C, A> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7932,10 +8326,10 @@ impl<'a, C, A> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_node_pools_delete("name")
-///              .zone("sanctus")
-///              .project_id("et")
-///              .node_pool_id("amet")
-///              .cluster_id("et")
+///              .zone("eirmod")
+///              .project_id("sanctus")
+///              .node_pool_id("et")
+///              .cluster_id("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -8010,7 +8404,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8026,10 +8420,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8049,7 +8440,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> where C: Borro
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8164,7 +8555,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8321,10 +8712,7 @@ impl<'a, C, A> ProjectZoneClusterStartIpRotationCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8356,7 +8744,7 @@ impl<'a, C, A> ProjectZoneClusterStartIpRotationCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8472,7 +8860,7 @@ impl<'a, C, A> ProjectZoneClusterStartIpRotationCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8548,7 +8936,7 @@ impl<'a, C, A> ProjectZoneClusterStartIpRotationCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_get("name")
-///              .zone("dolor")
+///              .zone("sed")
 ///              .project_id("dolor")
 ///              .cluster_id("dolor")
 ///              .doit();
@@ -8621,7 +9009,7 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8637,10 +9025,7 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8660,7 +9045,7 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8766,7 +9151,7 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8933,10 +9318,7 @@ impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8968,7 +9350,7 @@ impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9073,7 +9455,7 @@ impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9214,7 +9596,7 @@ impl<'a, C, A> ProjectLocationClusterSetAddonCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9230,10 +9612,7 @@ impl<'a, C, A> ProjectLocationClusterSetAddonCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9265,7 +9644,7 @@ impl<'a, C, A> ProjectLocationClusterSetAddonCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9356,7 +9735,7 @@ impl<'a, C, A> ProjectLocationClusterSetAddonCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9432,9 +9811,9 @@ impl<'a, C, A> ProjectLocationClusterSetAddonCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_node_pools_list("parent")
-///              .zone("Lorem")
-///              .project_id("gubergren")
-///              .cluster_id("justo")
+///              .zone("voluptua.")
+///              .project_id("Lorem")
+///              .cluster_id("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -9505,7 +9884,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9521,10 +9900,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9544,7 +9920,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9650,7 +10026,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9726,8 +10102,8 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_get_server_config("name")
-///              .zone("vero")
-///              .project_id("diam")
+///              .zone("sit")
+///              .project_id("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -9794,7 +10170,7 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9810,10 +10186,7 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9833,7 +10206,7 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9886,8 +10259,8 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// The name (project and location) of the server config to get
-    /// Specified in the format 'projects/*/locations/*'.
+    /// The name (project and location) of the server config to get,
+    /// specified in the format 'projects/*/locations/*'.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9930,7 +10303,7 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10006,7 +10379,7 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_list("projectId", "zone", "clusterId")
-///              .parent("vero")
+///              .parent("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -10085,10 +10458,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolListCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10108,7 +10478,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolListCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10220,7 +10590,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10361,7 +10731,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10377,10 +10747,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10412,7 +10779,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10504,7 +10871,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10645,7 +11012,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10661,10 +11028,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10696,7 +11060,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10788,7 +11152,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10929,7 +11293,7 @@ impl<'a, C, A> ProjectLocationClusterSetNetworkPolicyCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10945,10 +11309,7 @@ impl<'a, C, A> ProjectLocationClusterSetNetworkPolicyCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10980,7 +11341,7 @@ impl<'a, C, A> ProjectLocationClusterSetNetworkPolicyCall<'a, C, A> where C: Bor
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11071,7 +11432,7 @@ impl<'a, C, A> ProjectLocationClusterSetNetworkPolicyCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11230,10 +11591,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetManagementCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11265,7 +11623,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetManagementCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11392,7 +11750,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetManagementCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11468,7 +11826,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetManagementCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_get("projectId", "zone", "operationId")
-///              .name("takimata")
+///              .name("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -11547,10 +11905,7 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11570,7 +11925,7 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11682,7 +12037,7 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11823,7 +12178,7 @@ impl<'a, C, A> ProjectLocationClusterSetMonitoringCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11839,10 +12194,7 @@ impl<'a, C, A> ProjectLocationClusterSetMonitoringCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11874,7 +12226,7 @@ impl<'a, C, A> ProjectLocationClusterSetMonitoringCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11965,7 +12317,7 @@ impl<'a, C, A> ProjectLocationClusterSetMonitoringCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12106,7 +12458,7 @@ impl<'a, C, A> ProjectLocationClusterSetLocationCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12122,10 +12474,7 @@ impl<'a, C, A> ProjectLocationClusterSetLocationCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12157,7 +12506,7 @@ impl<'a, C, A> ProjectLocationClusterSetLocationCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12248,7 +12597,7 @@ impl<'a, C, A> ProjectLocationClusterSetLocationCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12405,10 +12754,7 @@ impl<'a, C, A> ProjectZoneClusterLoggingCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12440,7 +12786,7 @@ impl<'a, C, A> ProjectZoneClusterLoggingCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12556,7 +12902,7 @@ impl<'a, C, A> ProjectZoneClusterLoggingCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12713,10 +13059,7 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12748,7 +13091,7 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12864,7 +13207,7 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12941,7 +13284,7 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_list("projectId", "zone")
-///              .parent("dolore")
+///              .parent("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -13018,10 +13361,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13041,7 +13381,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13143,7 +13483,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13302,10 +13642,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolAutoscalingCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13337,7 +13674,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolAutoscalingCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13464,7 +13801,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolAutoscalingCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13623,10 +13960,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetSizeCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13658,7 +13992,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetSizeCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13785,7 +14119,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetSizeCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13926,7 +14260,7 @@ impl<'a, C, A> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13942,10 +14276,7 @@ impl<'a, C, A> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13977,7 +14308,7 @@ impl<'a, C, A> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14068,7 +14399,7 @@ impl<'a, C, A> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14221,7 +14552,7 @@ impl<'a, C, A> ProjectLocationClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14237,10 +14568,7 @@ impl<'a, C, A> ProjectLocationClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14272,7 +14600,7 @@ impl<'a, C, A> ProjectLocationClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14363,7 +14691,7 @@ impl<'a, C, A> ProjectLocationClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14504,7 +14832,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> where C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14520,10 +14848,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> where C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14555,7 +14880,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> where C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14647,7 +14972,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> where C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14684,6 +15009,286 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> where C
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists all clusters owned by a project in either the specified zone or all
+/// zones.
+///
+/// A builder for the *locations.clusters.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1 as container1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_clusters_list("parent")
+///              .zone("eos")
+///              .project_id("tempor")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationClusterListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _parent: String,
+    _zone: Option<String>,
+    _project_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationClusterListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClustersResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.locations.clusters.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._zone {
+            params.push(("zone", value.to_string()));
+        }
+        if let Some(value) = self._project_id {
+            params.push(("projectId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "zone", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/clusters";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The parent (project and location) where the clusters will be listed.
+    /// Specified in the format 'projects/*/locations/*'.
+    /// Location "-" matches all zones and all regions.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides, or "-" for all zones.
+    /// This field has been deprecated and replaced by the parent field.
+    ///
+    /// Sets the *zone* query property to the given value.
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, C, A> {
+        self._zone = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the parent field.
+    ///
+    /// Sets the *project id* query property to the given value.
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, C, A> {
+        self._project_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14788,7 +15393,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateMasterCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14804,10 +15409,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateMasterCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14839,7 +15441,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateMasterCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14930,7 +15532,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateMasterCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15087,10 +15689,7 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15122,7 +15721,7 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15235,7 +15834,7 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15377,7 +15976,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolRollbackCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -15393,10 +15992,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolRollbackCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15428,7 +16024,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolRollbackCall<'a, C, A> where C: Bor
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15520,7 +16116,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolRollbackCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15661,7 +16257,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -15677,10 +16273,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15712,7 +16305,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15803,7 +16396,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15879,7 +16472,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_delete("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("justo")
+///              .name("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -15960,10 +16553,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15983,7 +16573,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16107,7 +16697,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16264,10 +16854,7 @@ impl<'a, C, A> ProjectZoneClusterLocationCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16299,7 +16886,7 @@ impl<'a, C, A> ProjectZoneClusterLocationCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16415,7 +17002,7 @@ impl<'a, C, A> ProjectZoneClusterLocationCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16556,7 +17143,7 @@ impl<'a, C, A> ProjectLocationClusterStartIpRotationCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -16572,10 +17159,7 @@ impl<'a, C, A> ProjectLocationClusterStartIpRotationCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16607,7 +17191,7 @@ impl<'a, C, A> ProjectLocationClusterStartIpRotationCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16698,7 +17282,7 @@ impl<'a, C, A> ProjectLocationClusterStartIpRotationCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16774,8 +17358,8 @@ impl<'a, C, A> ProjectLocationClusterStartIpRotationCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("parent")
-///              .zone("justo")
-///              .project_id("est")
+///              .zone("clita")
+///              .project_id("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -16842,7 +17426,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -16858,10 +17442,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16881,7 +17462,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16979,7 +17560,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17120,7 +17701,7 @@ impl<'a, C, A> ProjectLocationClusterSetResourceLabelCall<'a, C, A> where C: Bor
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -17136,10 +17717,7 @@ impl<'a, C, A> ProjectLocationClusterSetResourceLabelCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -17171,7 +17749,7 @@ impl<'a, C, A> ProjectLocationClusterSetResourceLabelCall<'a, C, A> where C: Bor
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17262,7 +17840,7 @@ impl<'a, C, A> ProjectLocationClusterSetResourceLabelCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17403,7 +17981,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolCreateCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -17419,10 +17997,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolCreateCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -17454,7 +18029,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolCreateCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17546,7 +18121,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolCreateCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17622,7 +18197,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolCreateCall<'a, C, A> where C: Borro
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_get("projectId", "zone", "clusterId")
-///              .name("voluptua.")
+///              .name("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -17701,10 +18276,7 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17724,7 +18296,7 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17836,7 +18408,7 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17993,10 +18565,7 @@ impl<'a, C, A> ProjectZoneClusterMasterCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18028,7 +18597,7 @@ impl<'a, C, A> ProjectZoneClusterMasterCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18144,7 +18713,7 @@ impl<'a, C, A> ProjectZoneClusterMasterCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18303,10 +18872,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolUpdateCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18338,7 +18904,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolUpdateCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18465,7 +19031,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolUpdateCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18622,10 +19188,7 @@ impl<'a, C, A> ProjectZoneClusterSetNetworkPolicyCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18657,7 +19220,7 @@ impl<'a, C, A> ProjectZoneClusterSetNetworkPolicyCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18773,7 +19336,7 @@ impl<'a, C, A> ProjectZoneClusterSetNetworkPolicyCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18914,7 +19477,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -18930,10 +19493,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18965,7 +19525,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19057,7 +19617,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19133,7 +19693,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_get("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("At")
+///              .name("et")
 ///              .doit();
 /// # }
 /// ```
@@ -19214,10 +19774,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolGetCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -19237,7 +19794,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolGetCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19361,7 +19918,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19520,10 +20077,7 @@ impl<'a, C, A> ProjectZoneClusterSetMasterAuthCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -19555,7 +20109,7 @@ impl<'a, C, A> ProjectZoneClusterSetMasterAuthCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19671,7 +20225,7 @@ impl<'a, C, A> ProjectZoneClusterSetMasterAuthCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19814,7 +20368,7 @@ impl<'a, C, A> ProjectLocationClusterSetMasterAuthCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -19830,10 +20384,7 @@ impl<'a, C, A> ProjectLocationClusterSetMasterAuthCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -19865,7 +20416,7 @@ impl<'a, C, A> ProjectLocationClusterSetMasterAuthCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19956,7 +20507,7 @@ impl<'a, C, A> ProjectLocationClusterSetMasterAuthCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20113,10 +20664,7 @@ impl<'a, C, A> ProjectZoneClusterCompleteIpRotationCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -20148,7 +20696,7 @@ impl<'a, C, A> ProjectZoneClusterCompleteIpRotationCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20264,7 +20812,7 @@ impl<'a, C, A> ProjectZoneClusterCompleteIpRotationCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20421,10 +20969,7 @@ impl<'a, C, A> ProjectZoneClusterResourceLabelCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -20456,7 +21001,7 @@ impl<'a, C, A> ProjectZoneClusterResourceLabelCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20572,7 +21117,7 @@ impl<'a, C, A> ProjectZoneClusterResourceLabelCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20713,7 +21258,7 @@ impl<'a, C, A> ProjectLocationClusterSetLoggingCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -20729,10 +21274,7 @@ impl<'a, C, A> ProjectLocationClusterSetLoggingCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -20764,7 +21306,7 @@ impl<'a, C, A> ProjectLocationClusterSetLoggingCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20855,7 +21397,7 @@ impl<'a, C, A> ProjectLocationClusterSetLoggingCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20931,7 +21473,7 @@ impl<'a, C, A> ProjectLocationClusterSetLoggingCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_list("projectId", "zone")
-///              .parent("amet.")
+///              .parent("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -21008,10 +21550,7 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -21031,7 +21570,7 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21132,7 +21671,7 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21273,7 +21812,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -21289,10 +21828,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -21324,7 +21860,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -21415,7 +21951,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21491,9 +22027,9 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_get("name")
-///              .zone("dolor")
-///              .project_id("sea")
-///              .operation_id("ut")
+///              .zone("ut")
+///              .project_id("eirmod")
+///              .operation_id("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -21564,7 +22100,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -21580,10 +22116,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -21603,7 +22136,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21709,7 +22242,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

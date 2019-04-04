@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Deployment Manager* crate version *1.0.8+20180609*, where *20180609* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Deployment Manager* crate version *1.0.8+20181207*, where *20181207* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Deployment Manager* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/).
@@ -675,12 +675,12 @@ impl ResponseResult for OperationsListResponse {}
 pub struct Type {
     /// Output only. The Operation that most recently ran, or is currently running, on this type.
     pub operation: Option<Operation>,
-    /// Output only. Timestamp when the type was created, in RFC3339 text format.
+    /// Output only. Creation timestamp in RFC3339 text format.
     #[serde(rename="insertTime")]
     pub insert_time: Option<String>,
-    /// Output only. Unique identifier for the resource; defined by the server.
+    /// no description provided
     pub id: Option<String>,
-    /// Output only. Self link for the type.
+    /// Output only. Server defined URL for the resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the type.
@@ -760,6 +760,8 @@ impl Part for DeploymentLabelEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LogConfigDataAccessOptions {
     /// Whether Gin logging should happen in a fail-closed manner at the caller. This is relevant only in the LocalIAM implementation, for now.
+    /// 
+    /// NOTE: Logging to Gin in a fail-closed manner is currently unsupported while work is being done to satisfy the requirements of go/345. Currently, setting LOG_FAIL_CLOSED mode will have no effect, but still exists because there is active work being done to support it (b/115874152).
     #[serde(rename="logMode")]
     pub log_mode: Option<String>,
 }
@@ -780,7 +782,7 @@ impl Part for LogConfigDataAccessOptions {}
 pub struct GlobalSetPolicyRequest {
     /// REQUIRED: The complete policy to be applied to the 'resource'. The size of the policy is limited to a few 10s of KB. An empty policy is in general a valid policy but certain services (like Projects) might reject them.
     pub policy: Option<Policy>,
-    /// Flatten Policy to create a backwacd compatible wire-format. Deprecated. Use 'policy' to specify bindings.
+    /// Flatten Policy to create a backward compatible wire-format. Deprecated. Use 'policy' to specify bindings.
     pub bindings: Option<Vec<Binding>>,
     /// Flatten Policy to create a backward compatible wire-format. Deprecated. Use 'policy' to specify the etag.
     pub etag: Option<String>,
@@ -845,6 +847,9 @@ impl ResponseResult for DeploymentsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Deployment {
+    /// Output only. Update timestamp in RFC3339 text format.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
     /// An optional user-provided description of the deployment.
     pub description: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
@@ -855,7 +860,7 @@ pub struct Deployment {
     pub update: Option<DeploymentUpdate>,
     /// Output only. URL of the manifest representing the last manifest that was successfully deployed.
     pub manifest: Option<String>,
-    /// Output only. Timestamp when the deployment was created, in RFC3339 text format .
+    /// Output only. Creation timestamp in RFC3339 text format.
     #[serde(rename="insertTime")]
     pub insert_time: Option<String>,
     /// Provides a fingerprint to use in requests to modify a deployment, such as update(), stop(), and cancelPreview() requests. A fingerprint is a randomly generated value that must be provided with update(), stop(), and cancelPreview() requests to perform optimistic locking. This ensures optimistic concurrency so that only one request happens at a time.
@@ -864,9 +869,9 @@ pub struct Deployment {
     pub fingerprint: Option<String>,
     /// Output only. The Operation that most recently ran, or is currently running, on this deployment.
     pub operation: Option<Operation>,
-    /// Output only. Unique identifier for the resource; defined by the server.
+    /// no description provided
     pub id: Option<String>,
-    /// Output only. Self link for the deployment.
+    /// Output only. Server defined URL for the resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Input Only] The parameters that define your deployment, including the deployment configuration and relevant templates.
@@ -955,7 +960,7 @@ pub struct ResourceType {
     /// Output only. The evaluated properties of the resource with references expanded. Returned as serialized YAML.
     #[serde(rename="finalProperties")]
     pub final_properties: Option<String>,
-    /// Output only. Timestamp when the resource was updated, in RFC3339 text format .
+    /// Output only. Update timestamp in RFC3339 text format.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
     /// Output only. The name of the resource as it appears in the YAML config.
@@ -968,10 +973,10 @@ pub struct ResourceType {
     pub update: Option<ResourceUpdate>,
     /// Output only. URL of the manifest representing the current configuration of this resource.
     pub manifest: Option<String>,
-    /// Output only. Timestamp when the resource was created or acquired, in RFC3339 text format .
+    /// Output only. Creation timestamp in RFC3339 text format.
     #[serde(rename="insertTime")]
     pub insert_time: Option<String>,
-    /// Output only. Unique identifier for the resource; defined by the server.
+    /// no description provided
     pub id: Option<String>,
     /// Output only. The type of the resource, for example compute.v1.instance, or cloudfunctions.v1beta1.function.
     #[serde(rename="type")]
@@ -1078,12 +1083,12 @@ pub struct Manifest {
     pub expanded_config: Option<String>,
     /// Output only. The imported files for this manifest.
     pub imports: Option<Vec<ImportFile>>,
-    /// Output only. Timestamp when the manifest was created, in RFC3339 text format.
+    /// Output only. Creation timestamp in RFC3339 text format.
     #[serde(rename="insertTime")]
     pub insert_time: Option<String>,
     /// Output only. The YAML configuration for this manifest.
     pub config: Option<ConfigFile>,
-    /// Output only. Unique identifier for the resource; defined by the server.
+    /// no description provided
     pub id: Option<String>,
     /// Output only. Self link for the manifest.
     #[serde(rename="selfLink")]
@@ -1331,7 +1336,7 @@ impl Part for ResourceUpdateWarnings {}
 pub struct Binding {
     /// Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
-    /// The condition that is associated with this binding. NOTE: an unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently. This field is only visible as GOOGLE_INTERNAL or CONDITION_TRUSTED_TESTER.
+    /// Unimplemented. The condition that is associated with this binding. NOTE: an unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently.
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values:
     /// 
@@ -1362,11 +1367,11 @@ impl Part for Binding {}
 /// 
 /// Field names correspond to IAM request parameters and field values are their respective values.
 /// 
-/// At present the only supported field names are - "iam_principal", corresponding to IAMContext.principal; - "" (empty string), resulting in one aggretated counter with no field.
+/// Supported field names: - "authority", which is "[token]" if IAMContext.token is present, otherwise the value of IAMContext.authority_selector if present, and otherwise a representation of IAMContext.principal; or - "iam_principal", a representation of IAMContext.principal even if a token or authority selector is present; or - "" (empty string), resulting in a counter with no fields.
 /// 
 /// Examples: counter { metric: "/debug_access_count" field: "iam_principal" } ==> increment counter /iam/policy/backend_debug_access_count {iam_principal=[value of IAMContext.principal]}
 /// 
-/// At this time we do not support: * multiple field names (though this may be supported in the future) * decrementing the counter * incrementing it by anything other than 1
+/// At this time we do not support multiple field names (though this may be supported in the future).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1901,7 +1906,7 @@ impl<'a, C, A> DeploymentMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
-    /// * `resource` - Name of the resource for this request.
+    /// * `resource` - Name or id of the resource for this request.
     pub fn test_iam_permissions(&self, request: TestPermissionsRequest, project: &str, resource: &str) -> DeploymentTestIamPermissionCall<'a, C, A> {
         DeploymentTestIamPermissionCall {
             hub: self.hub,
@@ -1921,7 +1926,7 @@ impl<'a, C, A> DeploymentMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `project` - Project ID for this request.
-    /// * `resource` - Name of the resource for this request.
+    /// * `resource` - Name or id of the resource for this request.
     pub fn get_iam_policy(&self, project: &str, resource: &str) -> DeploymentGetIamPolicyCall<'a, C, A> {
         DeploymentGetIamPolicyCall {
             hub: self.hub,
@@ -2028,7 +2033,7 @@ impl<'a, C, A> DeploymentMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
-    /// * `resource` - Name of the resource for this request.
+    /// * `resource` - Name or id of the resource for this request.
     pub fn set_iam_policy(&self, request: GlobalSetPolicyRequest, project: &str, resource: &str) -> DeploymentSetIamPolicyCall<'a, C, A> {
         DeploymentSetIamPolicyCall {
             hub: self.hub,
@@ -2170,10 +2175,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2193,7 +2195,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2281,7 +2283,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2443,10 +2445,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2466,7 +2465,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2582,7 +2581,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2746,10 +2745,7 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2769,7 +2765,7 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2895,7 +2891,7 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3041,10 +3037,7 @@ impl<'a, C, A> ManifestGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3064,7 +3057,7 @@ impl<'a, C, A> ManifestGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3162,7 +3155,7 @@ impl<'a, C, A> ManifestGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3324,10 +3317,7 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3347,7 +3337,7 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3463,7 +3453,7 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3609,10 +3599,7 @@ impl<'a, C, A> ResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3632,7 +3619,7 @@ impl<'a, C, A> ResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3730,7 +3717,7 @@ impl<'a, C, A> ResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3894,10 +3881,7 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3917,7 +3901,7 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4043,7 +4027,7 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4209,10 +4193,7 @@ impl<'a, C, A> DeploymentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4244,7 +4225,7 @@ impl<'a, C, A> DeploymentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4365,7 +4346,7 @@ impl<'a, C, A> DeploymentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4509,10 +4490,7 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4532,7 +4510,7 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4620,7 +4598,7 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4779,10 +4757,7 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4814,7 +4789,7 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4918,7 +4893,7 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5069,10 +5044,7 @@ impl<'a, C, A> DeploymentTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5104,7 +5076,7 @@ impl<'a, C, A> DeploymentTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5179,7 +5151,7 @@ impl<'a, C, A> DeploymentTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
         self._project = new_value.to_string();
         self
     }
-    /// Name of the resource for this request.
+    /// Name or id of the resource for this request.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -5204,7 +5176,7 @@ impl<'a, C, A> DeploymentTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5348,10 +5320,7 @@ impl<'a, C, A> DeploymentGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5371,7 +5340,7 @@ impl<'a, C, A> DeploymentGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5434,7 +5403,7 @@ impl<'a, C, A> DeploymentGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project = new_value.to_string();
         self
     }
-    /// Name of the resource for this request.
+    /// Name or id of the resource for this request.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -5459,7 +5428,7 @@ impl<'a, C, A> DeploymentGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5610,10 +5579,7 @@ impl<'a, C, A> DeploymentCancelPreviewCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5645,7 +5611,7 @@ impl<'a, C, A> DeploymentCancelPreviewCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5745,7 +5711,7 @@ impl<'a, C, A> DeploymentCancelPreviewCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5907,10 +5873,7 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5930,7 +5893,7 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6046,7 +6009,7 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6212,10 +6175,7 @@ impl<'a, C, A> DeploymentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6247,7 +6207,7 @@ impl<'a, C, A> DeploymentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6368,7 +6328,7 @@ impl<'a, C, A> DeploymentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6519,10 +6479,7 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6554,7 +6511,7 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6654,7 +6611,7 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6805,10 +6762,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6840,7 +6794,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6915,7 +6869,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project = new_value.to_string();
         self
     }
-    /// Name of the resource for this request.
+    /// Name or id of the resource for this request.
     ///
     /// Sets the *resource* path property to the given value.
     ///
@@ -6940,7 +6894,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7089,10 +7043,7 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7112,7 +7063,7 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7207,7 +7158,7 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

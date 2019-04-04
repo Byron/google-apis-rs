@@ -1,0 +1,42 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-pagespeedonline5-cli"
+version = "1.0.8+20190129"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with pagespeedonline (protocol v5)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline5-cli"
+homepage = "https://developers.google.com/speed/docs/insights/v5/get-started"
+documentation = "http://byron.github.io/google-apis-rs/google_pagespeedonline5_cli"
+license = "MIT"
+keywords = ["pagespeedonline", "google", "cli"]
+autobins = false
+
+[[bin]]
+name = "pagespeedonline5"
+path = "src/main.rs"
+
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
+[dependencies]
+hyper = "^ 0.10"
+mime = "^ 0.2.0"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
+yup-oauth2 = "^ 1.0"
+strsim = "^0.5"
+hyper-rustls = "^0.6"
+yup-hyper-mock = "^2.0"
+clap = "^2.0"
+
+[features]
+
+
+
+[dependencies.google-pagespeedonline5]
+path = "../pagespeedonline5"
+version = "1.0.8+20190129"

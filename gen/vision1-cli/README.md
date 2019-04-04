@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Vision* API at revision *20181001*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Vision* API at revision *20190314*. The CLI is at version *1.0.8*.
 
 ```bash
 vision1 [options]
@@ -40,6 +40,25 @@ vision1 [options]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list <name> [-p <v>]... [-o <out>]
+        projects
+                locations-product-sets-add-product <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-product-sets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-product-sets-delete <name> [-p <v>]... [-o <out>]
+                locations-product-sets-get <name> [-p <v>]... [-o <out>]
+                locations-product-sets-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-product-sets-list <parent> [-p <v>]... [-o <out>]
+                locations-product-sets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-product-sets-products-list <name> [-p <v>]... [-o <out>]
+                locations-product-sets-remove-product <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-products-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-products-delete <name> [-p <v>]... [-o <out>]
+                locations-products-get <name> [-p <v>]... [-o <out>]
+                locations-products-list <parent> [-p <v>]... [-o <out>]
+                locations-products-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-products-reference-images-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-products-reference-images-delete <name> [-p <v>]... [-o <out>]
+                locations-products-reference-images-get <name> [-p <v>]... [-o <out>]
+                locations-products-reference-images-list <parent> [-p <v>]... [-o <out>]
   vision1 --help
 
 Configuration:

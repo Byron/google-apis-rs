@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *1.0.8+20181002*, where *20181002* is the exact revision of the *datastore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *datastore* crate version *1.0.8+20190105*, where *20190105* is the exact revision of the *datastore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *datastore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/datastore/).
@@ -451,7 +451,7 @@ pub struct PartitionId {
 impl Part for PartitionId {}
 
 
-/// Next tag: 3
+/// A property of an index.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -586,31 +586,40 @@ pub struct RunQueryResponse {
 impl ResponseResult for RunQueryResponse {}
 
 
-/// A mutation to apply to an entity.
+/// A minimal index definition.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [indexes get projects](struct.ProjectIndexeGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Mutation {
-    /// The entity to insert. The entity must not already exist.
-    /// The entity key's final path element may be incomplete.
-    pub insert: Option<Entity>,
-    /// The key of the entity to delete. The entity may or may not already exist.
-    /// Must have a complete key path and must not be reserved/read-only.
-    pub delete: Option<Key>,
-    /// The entity to update. The entity must already exist.
-    /// Must have a complete key path.
-    pub update: Option<Entity>,
-    /// The version of the entity that this mutation is being applied to. If this
-    /// does not match the current version on the server, the mutation conflicts.
-    #[serde(rename="baseVersion")]
-    pub base_version: Option<String>,
-    /// The entity to upsert. The entity may or may not already exist.
-    /// The entity key's final path element may be incomplete.
-    pub upsert: Option<Entity>,
+pub struct GoogleDatastoreAdminV1Index {
+    /// The entity kind to which this index applies.
+    /// Required.
+    pub kind: Option<String>,
+    /// Project ID.
+    /// Output only.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The index's ancestor mode.  Must not be ANCESTOR_MODE_UNSPECIFIED.
+    /// Required.
+    pub ancestor: Option<String>,
+    /// The resource ID of the index.
+    /// Output only.
+    #[serde(rename="indexId")]
+    pub index_id: Option<String>,
+    /// The state of the index.
+    /// Output only.
+    pub state: Option<String>,
+    /// An ordered sequence of property names and their index attributes.
+    /// Required.
+    pub properties: Option<Vec<GoogleDatastoreAdminV1IndexedProperty>>,
 }
 
-impl Part for Mutation {}
+impl ResponseResult for GoogleDatastoreAdminV1Index {}
 
 
 /// An array value.
@@ -650,304 +659,6 @@ impl Part for ArrayValue {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
-
-
-/// Options for beginning a new transaction.
-/// 
-/// Transactions can be created explicitly with calls to
-/// Datastore.BeginTransaction or implicitly by setting
-/// ReadOptions.new_transaction in read requests.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TransactionOptions {
-    /// The transaction should allow both reads and writes.
-    #[serde(rename="readWrite")]
-    pub read_write: Option<ReadWrite>,
-    /// The transaction should only allow reads.
-    #[serde(rename="readOnly")]
-    pub read_only: Option<ReadOnly>,
-}
-
-impl Part for TransactionOptions {}
-
-
-/// A batch of results produced by a query.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QueryResultBatch {
-    /// The state of the query after the current batch.
-    #[serde(rename="moreResults")]
-    pub more_results: Option<String>,
-    /// The result type for every entity in `entity_results`.
-    #[serde(rename="entityResultType")]
-    pub entity_result_type: Option<String>,
-    /// The version number of the snapshot this batch was returned from.
-    /// This applies to the range of results from the query's `start_cursor` (or
-    /// the beginning of the query if no cursor was given) to this batch's
-    /// `end_cursor` (not the query's `end_cursor`).
-    /// 
-    /// In a single transaction, subsequent query result batches for the same query
-    /// can have a greater snapshot version number. Each batch's snapshot version
-    /// is valid for all preceding batches.
-    /// The value will be zero for eventually consistent queries.
-    #[serde(rename="snapshotVersion")]
-    pub snapshot_version: Option<String>,
-    /// The number of results skipped, typically because of an offset.
-    #[serde(rename="skippedResults")]
-    pub skipped_results: Option<i32>,
-    /// A cursor that points to the position after the last result in the batch.
-    #[serde(rename="endCursor")]
-    pub end_cursor: Option<String>,
-    /// A cursor that points to the position after the last skipped result.
-    /// Will be set when `skipped_results` != 0.
-    #[serde(rename="skippedCursor")]
-    pub skipped_cursor: Option<String>,
-    /// The results for this batch.
-    #[serde(rename="entityResults")]
-    pub entity_results: Option<Vec<EntityResult>>,
-}
-
-impl Part for QueryResultBatch {}
-
-
-/// A reference to a property relative to the kind expressions.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PropertyReference {
-    /// The name of the property.
-    /// If name includes "."s, it may be interpreted as a property name path.
-    pub name: Option<String>,
-}
-
-impl Part for PropertyReference {}
-
-
-/// The response for Datastore.Commit.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [commit projects](struct.ProjectCommitCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CommitResponse {
-    /// The result of performing the mutations.
-    /// The i-th mutation result corresponds to the i-th mutation in the request.
-    #[serde(rename="mutationResults")]
-    pub mutation_results: Option<Vec<MutationResult>>,
-    /// The number of index entries updated during the commit, or zero if none were
-    /// updated.
-    #[serde(rename="indexUpdates")]
-    pub index_updates: Option<i32>,
-}
-
-impl ResponseResult for CommitResponse {}
-
-
-/// The result of fetching an entity from Datastore.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EntityResult {
-    /// A cursor that points to the position after the result entity.
-    /// Set only when the `EntityResult` is part of a `QueryResultBatch` message.
-    pub cursor: Option<String>,
-    /// The version of the entity, a strictly positive number that monotonically
-    /// increases with changes to the entity.
-    /// 
-    /// This field is set for `FULL` entity
-    /// results.
-    /// 
-    /// For missing entities in `LookupResponse`, this
-    /// is the version of the snapshot that was used to look up the entity, and it
-    /// is always set except for eventually consistent reads.
-    pub version: Option<String>,
-    /// The resulting entity.
-    pub entity: Option<Entity>,
-}
-
-impl Part for EntityResult {}
-
-
-/// The response for Datastore.Rollback.
-/// (an empty message).
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [rollback projects](struct.ProjectRollbackCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RollbackResponse { _never_set: Option<bool> }
-
-impl ResponseResult for RollbackResponse {}
-
-
-/// The request for Datastore.BeginTransaction.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [begin transaction projects](struct.ProjectBeginTransactionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BeginTransactionRequest {
-    /// Options for a new transaction.
-    #[serde(rename="transactionOptions")]
-    pub transaction_options: Option<TransactionOptions>,
-}
-
-impl RequestValue for BeginTransactionRequest {}
-
-
-/// The result of applying a mutation.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MutationResult {
-    /// The version of the entity on the server after processing the mutation. If
-    /// the mutation doesn't change anything on the server, then the version will
-    /// be the version of the current entity or, if no entity is present, a version
-    /// that is strictly greater than the version of any previous entity and less
-    /// than the version of any possible future entity.
-    pub version: Option<String>,
-    /// Whether a conflict was detected for this mutation. Always false when a
-    /// conflict detection strategy field is not set in the mutation.
-    #[serde(rename="conflictDetected")]
-    pub conflict_detected: Option<bool>,
-    /// The automatically allocated key.
-    /// Set only when the mutation allocated a key.
-    pub key: Option<Key>,
-}
-
-impl Part for MutationResult {}
-
-
-/// A unique identifier for an entity.
-/// If a key's partition ID or any of its path kinds or names are
-/// reserved/read-only, the key is reserved/read-only.
-/// A reserved/read-only key is forbidden in certain documented contexts.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Key {
-    /// The entity path.
-    /// An entity path consists of one or more elements composed of a kind and a
-    /// string or numerical identifier, which identify entities. The first
-    /// element identifies a _root entity_, the second element identifies
-    /// a _child_ of the root entity, the third element identifies a child of the
-    /// second entity, and so forth. The entities identified by all prefixes of
-    /// the path are called the element's _ancestors_.
-    /// 
-    /// An entity path is always fully complete: *all* of the entity's ancestors
-    /// are required to be in the path along with the entity identifier itself.
-    /// The only exception is that in some documented cases, the identifier in the
-    /// last path element (for the entity) itself may be omitted. For example,
-    /// the last path element of the key of `Mutation.insert` may have no
-    /// identifier.
-    /// 
-    /// A path can never be empty, and a path can have at most 100 elements.
-    pub path: Option<Vec<PathElement>>,
-    /// Entities are partitioned into subsets, currently identified by a project
-    /// ID and namespace ID.
-    /// Queries are scoped to a single partition.
-    #[serde(rename="partitionId")]
-    pub partition_id: Option<PartitionId>,
-}
-
-impl Part for Key {}
-
-
-/// A [GQL query](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GqlQuery {
-    /// A string of the format described
-    /// [here](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
-    #[serde(rename="queryString")]
-    pub query_string: Option<String>,
-    /// Numbered binding site @1 references the first numbered parameter,
-    /// effectively using 1-based indexing, rather than the usual 0.
-    /// 
-    /// For each binding site numbered i in `query_string`, there must be an i-th
-    /// numbered parameter. The inverse must also be true.
-    #[serde(rename="positionalBindings")]
-    pub positional_bindings: Option<Vec<GqlQueryParameter>>,
-    /// For each non-reserved named binding site in the query string, there must be
-    /// a named parameter with that name, but not necessarily the inverse.
-    /// 
-    /// Key must match regex `A-Za-z_$*`, must not match regex
-    /// `__.*__`, and must not be `""`.
-    #[serde(rename="namedBindings")]
-    pub named_bindings: Option<HashMap<String, GqlQueryParameter>>,
-    /// When false, the query string must not contain any literals and instead must
-    /// bind all values. For example,
-    /// `SELECT * FROM Kind WHERE a = 'string literal'` is not allowed, while
-    /// `SELECT * FROM Kind WHERE a = @value` is.
-    #[serde(rename="allowLiterals")]
-    pub allow_literals: Option<bool>,
-}
-
-impl Part for GqlQuery {}
-
-
-/// The request for
-/// google.datastore.admin.v1.DatastoreAdmin.ExportEntities.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [export projects](struct.ProjectExportCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleDatastoreAdminV1ExportEntitiesRequest {
-    /// Location for the export metadata and data files.
-    /// 
-    /// The full resource URL of the external storage location. Currently, only
-    /// Google Cloud Storage is supported. So output_url_prefix should be of the
-    /// form: `gs://BUCKET_NAME[/NAMESPACE_PATH]`, where `BUCKET_NAME` is the
-    /// name of the Cloud Storage bucket and `NAMESPACE_PATH` is an optional Cloud
-    /// Storage namespace path (this is not a Cloud Datastore namespace). For more
-    /// information about Cloud Storage namespace paths, see
-    /// [Object name
-    /// considerations](https://cloud.google.com/storage/docs/naming#object-considerations).
-    /// 
-    /// The resulting files will be nested deeper than the specified URL prefix.
-    /// The final output URL will be provided in the
-    /// google.datastore.admin.v1.ExportEntitiesResponse.output_url field. That
-    /// value should be used for subsequent ImportEntities operations.
-    /// 
-    /// By nesting the data files deeper, the same Cloud Storage bucket can be used
-    /// in multiple ExportEntities operations without conflict.
-    #[serde(rename="outputUrlPrefix")]
-    pub output_url_prefix: Option<String>,
-    /// Client-assigned labels.
-    pub labels: Option<HashMap<String, String>>,
-    /// Description of what data from the project is included in the export.
-    #[serde(rename="entityFilter")]
-    pub entity_filter: Option<GoogleDatastoreAdminV1EntityFilter>,
-}
-
-impl RequestValue for GoogleDatastoreAdminV1ExportEntitiesRequest {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different
@@ -1019,6 +730,290 @@ pub struct Status {
 }
 
 impl Part for Status {}
+
+
+/// A batch of results produced by a query.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryResultBatch {
+    /// The state of the query after the current batch.
+    #[serde(rename="moreResults")]
+    pub more_results: Option<String>,
+    /// The result type for every entity in `entity_results`.
+    #[serde(rename="entityResultType")]
+    pub entity_result_type: Option<String>,
+    /// The version number of the snapshot this batch was returned from.
+    /// This applies to the range of results from the query's `start_cursor` (or
+    /// the beginning of the query if no cursor was given) to this batch's
+    /// `end_cursor` (not the query's `end_cursor`).
+    /// 
+    /// In a single transaction, subsequent query result batches for the same query
+    /// can have a greater snapshot version number. Each batch's snapshot version
+    /// is valid for all preceding batches.
+    /// The value will be zero for eventually consistent queries.
+    #[serde(rename="snapshotVersion")]
+    pub snapshot_version: Option<String>,
+    /// The number of results skipped, typically because of an offset.
+    #[serde(rename="skippedResults")]
+    pub skipped_results: Option<i32>,
+    /// A cursor that points to the position after the last result in the batch.
+    #[serde(rename="endCursor")]
+    pub end_cursor: Option<String>,
+    /// A cursor that points to the position after the last skipped result.
+    /// Will be set when `skipped_results` != 0.
+    #[serde(rename="skippedCursor")]
+    pub skipped_cursor: Option<String>,
+    /// The results for this batch.
+    #[serde(rename="entityResults")]
+    pub entity_results: Option<Vec<EntityResult>>,
+}
+
+impl Part for QueryResultBatch {}
+
+
+/// The response for Datastore.Commit.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [commit projects](struct.ProjectCommitCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommitResponse {
+    /// The number of index entries updated during the commit, or zero if none were
+    /// updated.
+    #[serde(rename="indexUpdates")]
+    pub index_updates: Option<i32>,
+    /// The result of performing the mutations.
+    /// The i-th mutation result corresponds to the i-th mutation in the request.
+    #[serde(rename="mutationResults")]
+    pub mutation_results: Option<Vec<MutationResult>>,
+}
+
+impl ResponseResult for CommitResponse {}
+
+
+/// The result of fetching an entity from Datastore.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EntityResult {
+    /// A cursor that points to the position after the result entity.
+    /// Set only when the `EntityResult` is part of a `QueryResultBatch` message.
+    pub cursor: Option<String>,
+    /// The version of the entity, a strictly positive number that monotonically
+    /// increases with changes to the entity.
+    /// 
+    /// This field is set for `FULL` entity
+    /// results.
+    /// 
+    /// For missing entities in `LookupResponse`, this
+    /// is the version of the snapshot that was used to look up the entity, and it
+    /// is always set except for eventually consistent reads.
+    pub version: Option<String>,
+    /// The resulting entity.
+    pub entity: Option<Entity>,
+}
+
+impl Part for EntityResult {}
+
+
+/// The response for Datastore.Rollback.
+/// (an empty message).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [rollback projects](struct.ProjectRollbackCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RollbackResponse { _never_set: Option<bool> }
+
+impl ResponseResult for RollbackResponse {}
+
+
+/// The request for Datastore.BeginTransaction.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [begin transaction projects](struct.ProjectBeginTransactionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BeginTransactionRequest {
+    /// Options for a new transaction.
+    #[serde(rename="transactionOptions")]
+    pub transaction_options: Option<TransactionOptions>,
+}
+
+impl RequestValue for BeginTransactionRequest {}
+
+
+/// A [GQL query](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GqlQuery {
+    /// For each non-reserved named binding site in the query string, there must be
+    /// a named parameter with that name, but not necessarily the inverse.
+    /// 
+    /// Key must match regex `A-Za-z_$*`, must not match regex
+    /// `__.*__`, and must not be `""`.
+    #[serde(rename="namedBindings")]
+    pub named_bindings: Option<HashMap<String, GqlQueryParameter>>,
+    /// Numbered binding site @1 references the first numbered parameter,
+    /// effectively using 1-based indexing, rather than the usual 0.
+    /// 
+    /// For each binding site numbered i in `query_string`, there must be an i-th
+    /// numbered parameter. The inverse must also be true.
+    #[serde(rename="positionalBindings")]
+    pub positional_bindings: Option<Vec<GqlQueryParameter>>,
+    /// A string of the format described
+    /// [here](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
+    #[serde(rename="queryString")]
+    pub query_string: Option<String>,
+    /// When false, the query string must not contain any literals and instead must
+    /// bind all values. For example,
+    /// `SELECT * FROM Kind WHERE a = 'string literal'` is not allowed, while
+    /// `SELECT * FROM Kind WHERE a = @value` is.
+    #[serde(rename="allowLiterals")]
+    pub allow_literals: Option<bool>,
+}
+
+impl Part for GqlQuery {}
+
+
+/// A unique identifier for an entity.
+/// If a key's partition ID or any of its path kinds or names are
+/// reserved/read-only, the key is reserved/read-only.
+/// A reserved/read-only key is forbidden in certain documented contexts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Key {
+    /// The entity path.
+    /// An entity path consists of one or more elements composed of a kind and a
+    /// string or numerical identifier, which identify entities. The first
+    /// element identifies a _root entity_, the second element identifies
+    /// a _child_ of the root entity, the third element identifies a child of the
+    /// second entity, and so forth. The entities identified by all prefixes of
+    /// the path are called the element's _ancestors_.
+    /// 
+    /// An entity path is always fully complete: *all* of the entity's ancestors
+    /// are required to be in the path along with the entity identifier itself.
+    /// The only exception is that in some documented cases, the identifier in the
+    /// last path element (for the entity) itself may be omitted. For example,
+    /// the last path element of the key of `Mutation.insert` may have no
+    /// identifier.
+    /// 
+    /// A path can never be empty, and a path can have at most 100 elements.
+    pub path: Option<Vec<PathElement>>,
+    /// Entities are partitioned into subsets, currently identified by a project
+    /// ID and namespace ID.
+    /// Queries are scoped to a single partition.
+    #[serde(rename="partitionId")]
+    pub partition_id: Option<PartitionId>,
+}
+
+impl Part for Key {}
+
+
+/// The result of applying a mutation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MutationResult {
+    /// The version of the entity on the server after processing the mutation. If
+    /// the mutation doesn't change anything on the server, then the version will
+    /// be the version of the current entity or, if no entity is present, a version
+    /// that is strictly greater than the version of any previous entity and less
+    /// than the version of any possible future entity.
+    pub version: Option<String>,
+    /// Whether a conflict was detected for this mutation. Always false when a
+    /// conflict detection strategy field is not set in the mutation.
+    #[serde(rename="conflictDetected")]
+    pub conflict_detected: Option<bool>,
+    /// The automatically allocated key.
+    /// Set only when the mutation allocated a key.
+    pub key: Option<Key>,
+}
+
+impl Part for MutationResult {}
+
+
+/// The request for
+/// google.datastore.admin.v1.DatastoreAdmin.ExportEntities.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [export projects](struct.ProjectExportCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleDatastoreAdminV1ExportEntitiesRequest {
+    /// Location for the export metadata and data files.
+    /// 
+    /// The full resource URL of the external storage location. Currently, only
+    /// Google Cloud Storage is supported. So output_url_prefix should be of the
+    /// form: `gs://BUCKET_NAME[/NAMESPACE_PATH]`, where `BUCKET_NAME` is the
+    /// name of the Cloud Storage bucket and `NAMESPACE_PATH` is an optional Cloud
+    /// Storage namespace path (this is not a Cloud Datastore namespace). For more
+    /// information about Cloud Storage namespace paths, see
+    /// [Object name
+    /// considerations](https://cloud.google.com/storage/docs/naming#object-considerations).
+    /// 
+    /// The resulting files will be nested deeper than the specified URL prefix.
+    /// The final output URL will be provided in the
+    /// google.datastore.admin.v1.ExportEntitiesResponse.output_url field. That
+    /// value should be used for subsequent ImportEntities operations.
+    /// 
+    /// By nesting the data files deeper, the same Cloud Storage bucket can be used
+    /// in multiple ExportEntities operations without conflict.
+    #[serde(rename="outputUrlPrefix")]
+    pub output_url_prefix: Option<String>,
+    /// Client-assigned labels.
+    pub labels: Option<HashMap<String, String>>,
+    /// Description of what data from the project is included in the export.
+    #[serde(rename="entityFilter")]
+    pub entity_filter: Option<GoogleDatastoreAdminV1EntityFilter>,
+}
+
+impl RequestValue for GoogleDatastoreAdminV1ExportEntitiesRequest {}
+
+
+/// Options for beginning a new transaction.
+/// 
+/// Transactions can be created explicitly with calls to
+/// Datastore.BeginTransaction or implicitly by setting
+/// ReadOptions.new_transaction in read requests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransactionOptions {
+    /// The transaction should allow both reads and writes.
+    #[serde(rename="readWrite")]
+    pub read_write: Option<ReadWrite>,
+    /// The transaction should only allow reads.
+    #[serde(rename="readOnly")]
+    pub read_only: Option<ReadOnly>,
+}
+
+impl Part for TransactionOptions {}
 
 
 /// The request for Datastore.ReserveIds.
@@ -1095,85 +1090,48 @@ pub struct GqlQueryParameter {
 impl Part for GqlQueryParameter {}
 
 
-/// A message that can hold any of the supported value types and associated
-/// metadata.
+/// A representation of a kind.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Value {
-    /// An entity value.
-    /// 
-    /// - May have no key.
-    /// - May have a key with an incomplete key path.
-    /// - May have a reserved/read-only key.
-    #[serde(rename="entityValue")]
-    pub entity_value: Option<Entity>,
-    /// A timestamp value.
-    /// When stored in the Datastore, precise only to microseconds;
-    /// any additional precision is rounded down.
-    #[serde(rename="timestampValue")]
-    pub timestamp_value: Option<String>,
-    /// A UTF-8 encoded string value.
-    /// When `exclude_from_indexes` is false (it is indexed) , may have at most 1500 bytes.
-    /// Otherwise, may be set to at least 1,000,000 bytes.
-    #[serde(rename="stringValue")]
-    pub string_value: Option<String>,
-    /// A double value.
-    #[serde(rename="doubleValue")]
-    pub double_value: Option<f64>,
-    /// The `meaning` field should only be populated for backwards compatibility.
-    pub meaning: Option<i32>,
-    /// If the value should be excluded from all indexes including those defined
-    /// explicitly.
-    #[serde(rename="excludeFromIndexes")]
-    pub exclude_from_indexes: Option<bool>,
-    /// A blob value.
-    /// May have at most 1,000,000 bytes.
-    /// When `exclude_from_indexes` is false, may have at most 1500 bytes.
-    /// In JSON requests, must be base64-encoded.
-    #[serde(rename="blobValue")]
-    pub blob_value: Option<String>,
-    /// A key value.
-    #[serde(rename="keyValue")]
-    pub key_value: Option<Key>,
-    /// A boolean value.
-    #[serde(rename="booleanValue")]
-    pub boolean_value: Option<bool>,
-    /// An array value.
-    /// Cannot contain another array value.
-    /// A `Value` instance that sets field `array_value` must not set fields
-    /// `meaning` or `exclude_from_indexes`.
-    #[serde(rename="arrayValue")]
-    pub array_value: Option<ArrayValue>,
-    /// An integer value.
-    #[serde(rename="integerValue")]
-    pub integer_value: Option<String>,
-    /// A geo point value representing a point on the surface of Earth.
-    #[serde(rename="geoPointValue")]
-    pub geo_point_value: Option<LatLng>,
-    /// A null value.
-    #[serde(rename="nullValue")]
-    pub null_value: Option<String>,
+pub struct KindExpression {
+    /// The name of the kind.
+    pub name: Option<String>,
 }
 
-impl Part for Value {}
+impl Part for KindExpression {}
 
 
-/// A filter that merges multiple other filters using the given operator.
+/// A holder for any type of filter.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CompositeFilter {
-    /// The list of filters to combine.
-    /// Must contain at least one filter.
-    pub filters: Option<Vec<Filter>>,
-    /// The operator for combining multiple filters.
-    pub op: Option<String>,
+pub struct Filter {
+    /// A composite filter.
+    #[serde(rename="compositeFilter")]
+    pub composite_filter: Option<CompositeFilter>,
+    /// A filter on a property.
+    #[serde(rename="propertyFilter")]
+    pub property_filter: Option<PropertyFilter>,
 }
 
-impl Part for CompositeFilter {}
+impl Part for Filter {}
+
+
+/// A reference to a property relative to the kind expressions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PropertyReference {
+    /// The name of the property.
+    /// If name includes "."s, it may be interpreted as a property name path.
+    pub name: Option<String>,
+}
+
+impl Part for PropertyReference {}
 
 
 /// The response message for Operations.ListOperations.
@@ -1197,17 +1155,69 @@ pub struct GoogleLongrunningListOperationsResponse {
 impl ResponseResult for GoogleLongrunningListOperationsResponse {}
 
 
-/// A representation of a kind.
+/// A message that can hold any of the supported value types and associated
+/// metadata.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct KindExpression {
-    /// The name of the kind.
-    pub name: Option<String>,
+pub struct Value {
+    /// An entity value.
+    /// 
+    /// - May have no key.
+    /// - May have a key with an incomplete key path.
+    /// - May have a reserved/read-only key.
+    #[serde(rename="entityValue")]
+    pub entity_value: Option<Entity>,
+    /// A timestamp value.
+    /// When stored in the Datastore, precise only to microseconds;
+    /// any additional precision is rounded down.
+    #[serde(rename="timestampValue")]
+    pub timestamp_value: Option<String>,
+    /// A geo point value representing a point on the surface of Earth.
+    #[serde(rename="geoPointValue")]
+    pub geo_point_value: Option<LatLng>,
+    /// A blob value.
+    /// May have at most 1,000,000 bytes.
+    /// When `exclude_from_indexes` is false, may have at most 1500 bytes.
+    /// In JSON requests, must be base64-encoded.
+    #[serde(rename="blobValue")]
+    pub blob_value: Option<String>,
+    /// A double value.
+    #[serde(rename="doubleValue")]
+    pub double_value: Option<f64>,
+    /// The `meaning` field should only be populated for backwards compatibility.
+    pub meaning: Option<i32>,
+    /// If the value should be excluded from all indexes including those defined
+    /// explicitly.
+    #[serde(rename="excludeFromIndexes")]
+    pub exclude_from_indexes: Option<bool>,
+    /// A UTF-8 encoded string value.
+    /// When `exclude_from_indexes` is false (it is indexed) , may have at most 1500 bytes.
+    /// Otherwise, may be set to at least 1,000,000 bytes.
+    #[serde(rename="stringValue")]
+    pub string_value: Option<String>,
+    /// A key value.
+    #[serde(rename="keyValue")]
+    pub key_value: Option<Key>,
+    /// A boolean value.
+    #[serde(rename="booleanValue")]
+    pub boolean_value: Option<bool>,
+    /// An array value.
+    /// Cannot contain another array value.
+    /// A `Value` instance that sets field `array_value` must not set fields
+    /// `meaning` or `exclude_from_indexes`.
+    #[serde(rename="arrayValue")]
+    pub array_value: Option<ArrayValue>,
+    /// An integer value.
+    #[serde(rename="integerValue")]
+    pub integer_value: Option<String>,
+    /// A null value.
+    #[serde(rename="nullValue")]
+    pub null_value: Option<String>,
 }
 
-impl Part for KindExpression {}
+impl Part for Value {}
 
 
 /// The response for Datastore.Lookup.
@@ -1238,36 +1248,33 @@ pub struct LookupResponse {
 impl ResponseResult for LookupResponse {}
 
 
-/// The response for Datastore.ReserveIds.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [reserve ids projects](struct.ProjectReserveIdCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReserveIdsResponse { _never_set: Option<bool> }
-
-impl ResponseResult for ReserveIdsResponse {}
-
-
-/// A holder for any type of filter.
+/// A representation of a property in a projection.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Filter {
-    /// A composite filter.
-    #[serde(rename="compositeFilter")]
-    pub composite_filter: Option<CompositeFilter>,
-    /// A filter on a property.
-    #[serde(rename="propertyFilter")]
-    pub property_filter: Option<PropertyFilter>,
+pub struct Projection {
+    /// The property to project.
+    pub property: Option<PropertyReference>,
 }
 
-impl Part for Filter {}
+impl Part for Projection {}
+
+
+/// A filter that merges multiple other filters using the given operator.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CompositeFilter {
+    /// The list of filters to combine.
+    /// Must contain at least one filter.
+    pub filters: Option<Vec<Filter>>,
+    /// The operator for combining multiple filters.
+    pub op: Option<String>,
+}
+
+impl Part for CompositeFilter {}
 
 
 /// The response for
@@ -1307,6 +1314,8 @@ pub struct CommitRequest {
     /// transaction identifier is returned by a call to
     /// Datastore.BeginTransaction.
     pub transaction: Option<String>,
+    /// The type of commit to perform. Defaults to `TRANSACTIONAL`.
+    pub mode: Option<String>,
     /// The mutations to perform.
     /// 
     /// When mode is `TRANSACTIONAL`, mutations affecting a single entity are
@@ -1321,24 +1330,24 @@ pub struct CommitRequest {
     /// When mode is `NON_TRANSACTIONAL`, no two mutations may affect a single
     /// entity.
     pub mutations: Option<Vec<Mutation>>,
-    /// The type of commit to perform. Defaults to `TRANSACTIONAL`.
-    pub mode: Option<String>,
 }
 
 impl RequestValue for CommitRequest {}
 
 
-/// A representation of a property in a projection.
+/// The response for Datastore.ReserveIds.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reserve ids projects](struct.ProjectReserveIdCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Projection {
-    /// The property to project.
-    pub property: Option<PropertyReference>,
-}
+pub struct ReserveIdsResponse { _never_set: Option<bool> }
 
-impl Part for Projection {}
+impl ResponseResult for ReserveIdsResponse {}
 
 
 /// Options specific to read / write transactions.
@@ -1610,41 +1619,31 @@ pub struct Query {
 impl Part for Query {}
 
 
-/// A minimal index definition.
-/// Next tag: 8
+/// A mutation to apply to an entity.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [indexes get projects](struct.ProjectIndexeGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleDatastoreAdminV1Index {
-    /// The entity kind to which this index applies.
-    /// Required.
-    pub kind: Option<String>,
-    /// Project ID.
-    /// Output only.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The index's ancestor mode.  Must not be ANCESTOR_MODE_UNSPECIFIED.
-    /// Required.
-    pub ancestor: Option<String>,
-    /// The resource ID of the index.
-    /// Output only.
-    #[serde(rename="indexId")]
-    pub index_id: Option<String>,
-    /// The state of the index.
-    /// Output only.
-    pub state: Option<String>,
-    /// An ordered sequence of property names and their index attributes.
-    /// Required.
-    pub properties: Option<Vec<GoogleDatastoreAdminV1IndexedProperty>>,
+pub struct Mutation {
+    /// The entity to insert. The entity must not already exist.
+    /// The entity key's final path element may be incomplete.
+    pub insert: Option<Entity>,
+    /// The key of the entity to delete. The entity may or may not already exist.
+    /// Must have a complete key path and must not be reserved/read-only.
+    pub delete: Option<Key>,
+    /// The entity to update. The entity must already exist.
+    /// Must have a complete key path.
+    pub update: Option<Entity>,
+    /// The version of the entity that this mutation is being applied to. If this
+    /// does not match the current version on the server, the mutation conflicts.
+    #[serde(rename="baseVersion")]
+    pub base_version: Option<String>,
+    /// The entity to upsert. The entity may or may not already exist.
+    /// The entity key's final path element may be incomplete.
+    pub upsert: Option<Entity>,
 }
 
-impl ResponseResult for GoogleDatastoreAdminV1Index {}
+impl Part for Mutation {}
 
 
 
@@ -1952,18 +1951,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Imports entities into Google Cloud Datastore. Existing entities with the
-    /// same key are overwritten. The import occurs in the background and its
-    /// progress can be monitored and managed via the Operation resource that is
-    /// created. If an ImportEntities operation is cancelled, it is possible
-    /// that a subset of the data has already been imported to Cloud Datastore.
+    /// Begins a new transaction.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - Project ID against which to make the request.
-    pub fn import(&self, request: GoogleDatastoreAdminV1ImportEntitiesRequest, project_id: &str) -> ProjectImportCall<'a, C, A> {
-        ProjectImportCall {
+    /// * `projectId` - The ID of the project against which to make the request.
+    pub fn begin_transaction(&self, request: BeginTransactionRequest, project_id: &str) -> ProjectBeginTransactionCall<'a, C, A> {
+        ProjectBeginTransactionCall {
             hub: self.hub,
             _request: request,
             _project_id: project_id.to_string(),
@@ -1994,14 +1989,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Begins a new transaction.
+    /// Imports entities into Google Cloud Datastore. Existing entities with the
+    /// same key are overwritten. The import occurs in the background and its
+    /// progress can be monitored and managed via the Operation resource that is
+    /// created. If an ImportEntities operation is cancelled, it is possible
+    /// that a subset of the data has already been imported to Cloud Datastore.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
-    pub fn begin_transaction(&self, request: BeginTransactionRequest, project_id: &str) -> ProjectBeginTransactionCall<'a, C, A> {
-        ProjectBeginTransactionCall {
+    /// * `projectId` - Project ID against which to make the request.
+    pub fn import(&self, request: GoogleDatastoreAdminV1ImportEntitiesRequest, project_id: &str) -> ProjectImportCall<'a, C, A> {
+        ProjectImportCall {
             hub: self.hub,
             _request: request,
             _project_id: project_id.to_string(),
@@ -2130,7 +2129,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2146,10 +2145,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2169,7 +2165,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2268,7 +2264,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2276,12 +2272,12 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, C, A>
@@ -2428,10 +2424,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2463,7 +2456,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2553,7 +2546,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2561,12 +2554,12 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectExportCall<'a, C, A>
@@ -2706,10 +2699,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2741,7 +2731,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2831,7 +2821,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2839,12 +2829,12 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRunQueryCall<'a, C, A>
@@ -2985,10 +2975,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3020,7 +3007,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3110,7 +3097,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3118,12 +3105,12 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectReserveIdCall<'a, C, A>
@@ -3263,10 +3250,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3298,7 +3282,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3388,7 +3372,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3396,12 +3380,12 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLookupCall<'a, C, A>
@@ -3542,10 +3526,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3577,7 +3558,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3667,7 +3648,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3675,12 +3656,12 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectCommitCall<'a, C, A>
@@ -3821,10 +3802,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3856,7 +3834,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3946,7 +3924,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3954,12 +3932,12 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAllocateIdCall<'a, C, A>
@@ -4083,7 +4061,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4099,10 +4077,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4122,7 +4097,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4200,7 +4175,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4208,12 +4183,12 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a, C, A>
@@ -4336,7 +4311,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4352,10 +4327,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4375,7 +4347,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4453,7 +4425,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4461,12 +4433,12 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, C, A>
@@ -4596,7 +4568,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4612,10 +4584,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4635,7 +4604,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4713,7 +4682,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4721,12 +4690,12 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a, C, A>
@@ -4861,10 +4830,7 @@ impl<'a, C, A> ProjectIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4884,7 +4850,7 @@ impl<'a, C, A> ProjectIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4972,7 +4938,7 @@ impl<'a, C, A> ProjectIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4980,12 +4946,12 @@ impl<'a, C, A> ProjectIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeGetCall<'a, C, A>
@@ -5135,10 +5101,7 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5158,7 +5121,7 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5257,7 +5220,7 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5265,12 +5228,12 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeListCall<'a, C, A>
@@ -5294,6 +5257,556 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIndexeListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Begins a new transaction.
+///
+/// A builder for the *beginTransaction* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_datastore1 as datastore1;
+/// use datastore1::BeginTransactionRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use datastore1::Datastore;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BeginTransactionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().begin_transaction(req, "projectId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectBeginTransactionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Datastore<C, A>,
+    _request: BeginTransactionRequest,
+    _project_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectBeginTransactionCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BeginTransactionResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "datastore.projects.beginTransaction",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        for &field in ["alt", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:beginTransaction";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BeginTransactionRequest) -> ProjectBeginTransactionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the project against which to make the request.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectBeginTransactionCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectBeginTransactionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBeginTransactionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBeginTransactionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Rolls back a transaction.
+///
+/// A builder for the *rollback* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_datastore1 as datastore1;
+/// use datastore1::RollbackRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use datastore1::Datastore;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RollbackRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().rollback(req, "projectId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRollbackCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Datastore<C, A>,
+    _request: RollbackRequest,
+    _project_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRollbackCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, RollbackResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "datastore.projects.rollback",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        for &field in ["alt", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:rollback";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RollbackRequest) -> ProjectRollbackCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the project against which to make the request.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectRollbackCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectRollbackCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRollbackCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRollbackCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5414,10 +5927,7 @@ impl<'a, C, A> ProjectImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5449,7 +5959,7 @@ impl<'a, C, A> ProjectImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5539,7 +6049,7 @@ impl<'a, C, A> ProjectImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5547,12 +6057,12 @@ impl<'a, C, A> ProjectImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectImportCall<'a, C, A>
@@ -5576,562 +6086,6 @@ impl<'a, C, A> ProjectImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectImportCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Rolls back a transaction.
-///
-/// A builder for the *rollback* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_datastore1 as datastore1;
-/// use datastore1::RollbackRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use datastore1::Datastore;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = RollbackRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().rollback(req, "projectId")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectRollbackCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Datastore<C, A>,
-    _request: RollbackRequest,
-    _project_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectRollbackCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, RollbackResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "datastore.projects.rollback",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("projectId", self._project_id.to_string()));
-        for &field in ["alt", "projectId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:rollback";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["projectId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RollbackRequest) -> ProjectRollbackCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the project against which to make the request.
-    ///
-    /// Sets the *project id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRollbackCall<'a, C, A> {
-        self._project_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectRollbackCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRollbackCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRollbackCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Begins a new transaction.
-///
-/// A builder for the *beginTransaction* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_datastore1 as datastore1;
-/// use datastore1::BeginTransactionRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use datastore1::Datastore;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = BeginTransactionRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().begin_transaction(req, "projectId")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectBeginTransactionCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Datastore<C, A>,
-    _request: BeginTransactionRequest,
-    _project_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectBeginTransactionCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, BeginTransactionResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "datastore.projects.beginTransaction",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("projectId", self._project_id.to_string()));
-        for &field in ["alt", "projectId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:beginTransaction";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["projectId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BeginTransactionRequest) -> ProjectBeginTransactionCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the project against which to make the request.
-    ///
-    /// Sets the *project id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectBeginTransactionCall<'a, C, A> {
-        self._project_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectBeginTransactionCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBeginTransactionCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBeginTransactionCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

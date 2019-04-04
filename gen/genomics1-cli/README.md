@@ -25,75 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20181010*. The CLI is at version *1.0.8*.
+This documentation was generated from the *genomics* API at revision *20190402*. The CLI is at version *1.0.8*.
 
 ```bash
 genomics1 [options]
-        annotations
-                batch-create (-r <kv>)... [-p <v>]... [-o <out>]
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                delete <annotation-id> [-p <v>]... [-o <out>]
-                get <annotation-id> [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-                update <annotation-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        annotationsets
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                delete <annotation-set-id> [-p <v>]... [-o <out>]
-                get <annotation-set-id> [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-                update <annotation-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        callsets
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                delete <call-set-id> [-p <v>]... [-o <out>]
-                get <call-set-id> [-p <v>]... [-o <out>]
-                patch <call-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-        datasets
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                delete <dataset-id> [-p <v>]... [-o <out>]
-                get <dataset-id> [-p <v>]... [-o <out>]
-                get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
-                patch <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                undelete <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list <name> [-p <v>]... [-o <out>]
-        readgroupsets
-                coveragebuckets-list <read-group-set-id> [-p <v>]... [-o <out>]
-                delete <read-group-set-id> [-p <v>]... [-o <out>]
-                export <read-group-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                get <read-group-set-id> [-p <v>]... [-o <out>]
-                import (-r <kv>)... [-p <v>]... [-o <out>]
-                patch <read-group-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-        reads
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-        references
-                bases-list <reference-id> [-p <v>]... [-o <out>]
-                get <reference-id> [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-        referencesets
-                get <reference-set-id> [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-        variants
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                delete <variant-id> [-p <v>]... [-o <out>]
-                get <variant-id> [-p <v>]... [-o <out>]
-                import (-r <kv>)... [-p <v>]... [-o <out>]
-                merge (-r <kv>)... [-p <v>]... [-o <out>]
-                patch <variant-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
-        variantsets
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                delete <variant-set-id> [-p <v>]... [-o <out>]
-                export <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                get <variant-set-id> [-p <v>]... [-o <out>]
-                patch <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                search (-r <kv>)... [-p <v>]... [-o <out>]
   genomics1 --help
 
 Configuration:

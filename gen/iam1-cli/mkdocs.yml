@@ -1,4 +1,4 @@
-site_name: iam v1.0.8+20181005
+site_name: iam v1.0.8+20190321
 site_url: http://byron.github.io/google-apis-rs/google-iam1-cli
 site_description: A complete library to interact with iam (protocol v1)
 
@@ -26,6 +26,8 @@ pages:
 - ['projects_roles-undelete.md', 'Projects', 'Roles Undelete']
 - ['projects_service-accounts-create.md', 'Projects', 'Service Accounts Create']
 - ['projects_service-accounts-delete.md', 'Projects', 'Service Accounts Delete']
+- ['projects_service-accounts-disable.md', 'Projects', 'Service Accounts Disable']
+- ['projects_service-accounts-enable.md', 'Projects', 'Service Accounts Enable']
 - ['projects_service-accounts-get.md', 'Projects', 'Service Accounts Get']
 - ['projects_service-accounts-get-iam-policy.md', 'Projects', 'Service Accounts Get Iam Policy']
 - ['projects_service-accounts-keys-create.md', 'Projects', 'Service Accounts Keys Create']
@@ -33,10 +35,12 @@ pages:
 - ['projects_service-accounts-keys-get.md', 'Projects', 'Service Accounts Keys Get']
 - ['projects_service-accounts-keys-list.md', 'Projects', 'Service Accounts Keys List']
 - ['projects_service-accounts-list.md', 'Projects', 'Service Accounts List']
+- ['projects_service-accounts-patch.md', 'Projects', 'Service Accounts Patch']
 - ['projects_service-accounts-set-iam-policy.md', 'Projects', 'Service Accounts Set Iam Policy']
 - ['projects_service-accounts-sign-blob.md', 'Projects', 'Service Accounts Sign Blob']
 - ['projects_service-accounts-sign-jwt.md', 'Projects', 'Service Accounts Sign Jwt']
 - ['projects_service-accounts-test-iam-permissions.md', 'Projects', 'Service Accounts Test Iam Permissions']
+- ['projects_service-accounts-undelete.md', 'Projects', 'Service Accounts Undelete']
 - ['projects_service-accounts-update.md', 'Projects', 'Service Accounts Update']
 - ['roles_get.md', 'Roles', 'Get']
 - ['roles_list.md', 'Roles', 'List']

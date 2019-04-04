@@ -74,13 +74,13 @@ impl<'n> Engine<'n> {
                     "code-bucket" => Some(("codeBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-bucket" => Some(("defaultBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-cookie-expiration" => Some(("defaultCookieExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "iap", "id", "location", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -500,8 +500,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "split.shard-by" => Some(("split.shardBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "split.allocations" => Some(("split.allocations", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Map })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["allocations", "id", "name", "shard-by", "split"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -597,9 +597,9 @@ impl<'n> Engine<'n> {
                     "endpoints-api-service.rollout-strategy" => Some(("endpointsApiService.rolloutStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "endpoints-api-service.disable-trace-sampling" => Some(("endpointsApiService.disableTraceSampling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "endpoints-api-service.name" => Some(("endpointsApiService.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vm" => Some(("vm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "instance-class" => Some(("instanceClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -622,9 +622,9 @@ impl<'n> Engine<'n> {
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.min-pending-latency" => Some(("automaticScaling.minPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-bytes-per-sec" => Some(("automaticScaling.networkUtilization.targetReceivedBytesPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.network-utilization.target-sent-bytes-per-sec" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-packets-per-sec" => Some(("automaticScaling.networkUtilization.targetSentPacketsPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-packets-per-sec" => Some(("automaticScaling.networkUtilization.targetReceivedPacketsPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.network-utilization.target-sent-bytes-per-sec" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1161,9 +1161,9 @@ impl<'n> Engine<'n> {
                     "endpoints-api-service.rollout-strategy" => Some(("endpointsApiService.rolloutStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "endpoints-api-service.disable-trace-sampling" => Some(("endpointsApiService.disableTraceSampling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "endpoints-api-service.name" => Some(("endpointsApiService.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vm" => Some(("vm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "instance-class" => Some(("instanceClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1186,9 +1186,9 @@ impl<'n> Engine<'n> {
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.min-pending-latency" => Some(("automaticScaling.minPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-bytes-per-sec" => Some(("automaticScaling.networkUtilization.targetReceivedBytesPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.network-utilization.target-sent-bytes-per-sec" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-packets-per-sec" => Some(("automaticScaling.networkUtilization.targetSentPacketsPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-packets-per-sec" => Some(("automaticScaling.networkUtilization.targetReceivedPacketsPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.network-utilization.target-sent-bytes-per-sec" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1426,13 +1426,13 @@ impl<'n> Engine<'n> {
                     "code-bucket" => Some(("codeBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-bucket" => Some(("defaultBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-cookie-expiration" => Some(("defaultCookieExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "iap", "id", "location", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *fitness* API at revision *20170922*. The CLI is at version *1.0.8*.
+This documentation was generated from the *fitness* API at revision *20190403*. The CLI is at version *1.0.8*.
 
 ```bash
 fitness1 [options]
@@ -38,7 +38,6 @@ fitness1 [options]
                 data-sources-delete <user-id> <data-source-id> [-p <v>]... [-o <out>]
                 data-sources-get <user-id> <data-source-id> [-p <v>]... [-o <out>]
                 data-sources-list <user-id> [-p <v>]... [-o <out>]
-                data-sources-patch <user-id> <data-source-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 data-sources-update <user-id> <data-source-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 dataset-aggregate <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 sessions-delete <user-id> <session-id> [-p <v>]...

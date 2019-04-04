@@ -1,4 +1,4 @@
-site_name: Firebase Hosting v1.0.8+20181011
+site_name: Firebase Hosting v1.0.8+20190318
 site_url: http://byron.github.io/google-apis-rs/google-firebasehosting1_beta1-cli
 site_description: A complete library to interact with Firebase Hosting (protocol v1beta1)
 
@@ -14,8 +14,10 @@ pages:
 - ['sites_domains-get.md', 'Sites', 'Domains Get']
 - ['sites_domains-list.md', 'Sites', 'Domains List']
 - ['sites_domains-update.md', 'Sites', 'Domains Update']
+- ['sites_get-config.md', 'Sites', 'Get Config']
 - ['sites_releases-create.md', 'Sites', 'Releases Create']
 - ['sites_releases-list.md', 'Sites', 'Releases List']
+- ['sites_update-config.md', 'Sites', 'Update Config']
 - ['sites_versions-create.md', 'Sites', 'Versions Create']
 - ['sites_versions-delete.md', 'Sites', 'Versions Delete']
 - ['sites_versions-files-list.md', 'Sites', 'Versions Files List']

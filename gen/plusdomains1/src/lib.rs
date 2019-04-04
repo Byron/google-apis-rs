@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plusDomains* crate version *1.0.8+20181007*, where *20181007* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *plusDomains* crate version *1.0.8+20190328*, where *20190328* is the exact revision of the *plusDomains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *plusDomains* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/domains/).
@@ -12,13 +12,13 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.PlusDomains.html) ... 
 //! 
 //! * [activities](struct.Activity.html)
-//!  * [*get*](struct.ActivityGetCall.html), [*insert*](struct.ActivityInsertCall.html) and [*list*](struct.ActivityListCall.html)
+//!  * [*get*](struct.ActivityGetCall.html) and [*list*](struct.ActivityListCall.html)
 //! * [audiences](struct.Audience.html)
 //!  * [*list*](struct.AudienceListCall.html)
 //! * [circles](struct.Circle.html)
-//!  * [*add people*](struct.CircleAddPeopleCall.html), [*get*](struct.CircleGetCall.html), [*insert*](struct.CircleInsertCall.html), [*list*](struct.CircleListCall.html), [*patch*](struct.CirclePatchCall.html), [*remove*](struct.CircleRemoveCall.html), [*remove people*](struct.CircleRemovePeopleCall.html) and [*update*](struct.CircleUpdateCall.html)
+//!  * [*list*](struct.CircleListCall.html)
 //! * [comments](struct.Comment.html)
-//!  * [*get*](struct.CommentGetCall.html), [*insert*](struct.CommentInsertCall.html) and [*list*](struct.CommentListCall.html)
+//!  * [*get*](struct.CommentGetCall.html) and [*list*](struct.CommentListCall.html)
 //! * [media](struct.Media.html)
 //!  * [*insert*](struct.MediaInsertCall.html)
 //! * people
@@ -61,14 +61,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.circles().remove_people(...).doit()
-//! let r = hub.circles().insert(...).doit()
-//! let r = hub.circles().add_people(...).doit()
-//! let r = hub.circles().get(...).doit()
-//! let r = hub.circles().list(...).doit()
-//! let r = hub.circles().update(...).doit()
-//! let r = hub.circles().patch(...).doit()
-//! let r = hub.circles().remove(...).doit()
+//! let r = hub.people().list_by_circle(...).doit()
+//! let r = hub.people().list_by_activity(...).doit()
+//! let r = hub.people().list(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -123,9 +118,10 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.circles().remove_people("circleId")
-//!              .add_user_id("et")
-//!              .add_email("dolores")
+//! let result = hub.people().list("userId", "collection")
+//!              .page_token("accusam")
+//!              .order_by("takimata")
+//!              .max_results(31)
 //!              .doit();
 //! 
 //! match result {
@@ -248,11 +244,11 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// Know the list of people in your circles, your age range, and language
+    /// View your basic profile info, including your age range and language
     PluLogin,
 
-    /// View your basic profile info
-    UserinfoProfile,
+    /// Send your photos and videos to Google+
+    PluMediaUpload,
 
     /// View your Google+ posts, comments, and stream
     PluStreamRead,
@@ -263,17 +259,11 @@ pub enum Scope {
     /// View your own Google+ profile and profiles visible to you
     PluProfileRead,
 
-    /// Manage your circles and add people and pages. People and pages you add to your circles will be notified. Others may see this information publicly. People you add to circles can use Hangouts with you.
-    PluCircleWrite,
-
     /// View your email address
     UserinfoEmail,
 
-    /// Send your photos and videos to Google+
-    PluMediaUpload,
-
-    /// Manage your Google+ posts, comments, and stream
-    PluStreamWrite,
+    /// See your personal info, including any personal info you've made publicly available
+    UserinfoProfile,
 
     /// Know who you are on Google
     PluMe,
@@ -283,14 +273,12 @@ impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
             Scope::PluLogin => "https://www.googleapis.com/auth/plus.login",
-            Scope::UserinfoProfile => "https://www.googleapis.com/auth/userinfo.profile",
+            Scope::PluMediaUpload => "https://www.googleapis.com/auth/plus.media.upload",
             Scope::PluStreamRead => "https://www.googleapis.com/auth/plus.stream.read",
             Scope::PluCircleRead => "https://www.googleapis.com/auth/plus.circles.read",
             Scope::PluProfileRead => "https://www.googleapis.com/auth/plus.profiles.read",
-            Scope::PluCircleWrite => "https://www.googleapis.com/auth/plus.circles.write",
             Scope::UserinfoEmail => "https://www.googleapis.com/auth/userinfo.email",
-            Scope::PluMediaUpload => "https://www.googleapis.com/auth/plus.media.upload",
-            Scope::PluStreamWrite => "https://www.googleapis.com/auth/plus.stream.write",
+            Scope::UserinfoProfile => "https://www.googleapis.com/auth/userinfo.profile",
             Scope::PluMe => "https://www.googleapis.com/auth/plus.me",
         }
     }
@@ -340,9 +328,10 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().remove_people("circleId")
-///              .add_user_id("accusam")
-///              .add_email("takimata")
+/// let result = hub.people().list("userId", "collection")
+///              .page_token("labore")
+///              .order_by("sea")
+///              .max_results(11)
 ///              .doit();
 /// 
 /// match result {
@@ -650,7 +639,6 @@ impl Part for PersonOrganizations {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert activities](struct.ActivityInsertCall.html) (request|response)
 /// * [get activities](struct.ActivityGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -702,7 +690,6 @@ pub struct Activity {
     pub published: Option<String>,
 }
 
-impl RequestValue for Activity {}
 impl ResponseResult for Activity {}
 
 
@@ -880,14 +867,7 @@ impl Part for ActivityObjectAttachmentsImage {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [remove people circles](struct.CircleRemovePeopleCall.html) (none)
-/// * [insert circles](struct.CircleInsertCall.html) (request|response)
-/// * [add people circles](struct.CircleAddPeopleCall.html) (response)
-/// * [get circles](struct.CircleGetCall.html) (response)
 /// * [list circles](struct.CircleListCall.html) (none)
-/// * [update circles](struct.CircleUpdateCall.html) (request|response)
-/// * [patch circles](struct.CirclePatchCall.html) (request|response)
-/// * [remove circles](struct.CircleRemoveCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Circle {
@@ -909,9 +889,7 @@ pub struct Circle {
     pub self_link: Option<String>,
 }
 
-impl RequestValue for Circle {}
 impl Resource for Circle {}
-impl ResponseResult for Circle {}
 
 
 /// The activity this comment replied to.
@@ -1702,7 +1680,6 @@ impl Part for ActivityActorImage {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert comments](struct.CommentInsertCall.html) (request|response)
 /// * [get comments](struct.CommentGetCall.html) (response)
 /// * [list comments](struct.CommentListCall.html) (none)
 /// 
@@ -1735,7 +1712,6 @@ pub struct Comment {
     pub self_link: Option<String>,
 }
 
-impl RequestValue for Comment {}
 impl Resource for Comment {}
 impl ResponseResult for Comment {}
 
@@ -1964,7 +1940,7 @@ impl Part for ActivityActorVerification {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `add_people(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)`, `remove(...)`, `remove_people(...)` and `update(...)`
+/// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.circles();
 /// # }
@@ -1981,81 +1957,7 @@ impl<'a, C, A> CircleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove a person from a circle.
-    /// 
-    /// # Arguments
-    ///
-    /// * `circleId` - The ID of the circle to remove the person from.
-    pub fn remove_people(&self, circle_id: &str) -> CircleRemovePeopleCall<'a, C, A> {
-        CircleRemovePeopleCall {
-            hub: self.hub,
-            _circle_id: circle_id.to_string(),
-            _user_id: Default::default(),
-            _email: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Create a new circle for the authenticated user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `userId` - The ID of the user to create the circle on behalf of. The value "me" can be used to indicate the authenticated user.
-    pub fn insert(&self, request: Circle, user_id: &str) -> CircleInsertCall<'a, C, A> {
-        CircleInsertCall {
-            hub: self.hub,
-            _request: request,
-            _user_id: user_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Add a person to a circle. Google+ limits certain circle operations, including the number of circle adds. Learn More.
-    /// 
-    /// # Arguments
-    ///
-    /// * `circleId` - The ID of the circle to add the person to.
-    pub fn add_people(&self, circle_id: &str) -> CircleAddPeopleCall<'a, C, A> {
-        CircleAddPeopleCall {
-            hub: self.hub,
-            _circle_id: circle_id.to_string(),
-            _user_id: Default::default(),
-            _email: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Get a circle.
-    /// 
-    /// # Arguments
-    ///
-    /// * `circleId` - The ID of the circle to get.
-    pub fn get(&self, circle_id: &str) -> CircleGetCall<'a, C, A> {
-        CircleGetCall {
-            hub: self.hub,
-            _circle_id: circle_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// List all of the circles for a user.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2066,61 +1968,6 @@ impl<'a, C, A> CircleMethods<'a, C, A> {
             _user_id: user_id.to_string(),
             _page_token: Default::default(),
             _max_results: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Update a circle's description.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `circleId` - The ID of the circle to update.
-    pub fn update(&self, request: Circle, circle_id: &str) -> CircleUpdateCall<'a, C, A> {
-        CircleUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _circle_id: circle_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Update a circle's description. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `circleId` - The ID of the circle to update.
-    pub fn patch(&self, request: Circle, circle_id: &str) -> CirclePatchCall<'a, C, A> {
-        CirclePatchCall {
-            hub: self.hub,
-            _request: request,
-            _circle_id: circle_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Delete a circle.
-    /// 
-    /// # Arguments
-    ///
-    /// * `circleId` - The ID of the circle to delete.
-    pub fn remove(&self, circle_id: &str) -> CircleRemoveCall<'a, C, A> {
-        CircleRemoveCall {
-            hub: self.hub,
-            _circle_id: circle_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2154,7 +2001,7 @@ impl<'a, C, A> CircleMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `insert(...)` and `list(...)`
+/// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.activities();
 /// # }
@@ -2171,27 +2018,7 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new activity for the authenticated user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `userId` - The ID of the user to create the activity on behalf of. Its value should be "me", to indicate the authenticated user.
-    pub fn insert(&self, request: Activity, user_id: &str) -> ActivityInsertCall<'a, C, A> {
-        ActivityInsertCall {
-            hub: self.hub,
-            _request: request,
-            _user_id: user_id.to_string(),
-            _preview: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Get an activity.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2208,7 +2035,7 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all of the activities in the specified collection for a particular user.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2271,7 +2098,7 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all of the people who are members of a circle.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2329,7 +2156,7 @@ impl<'a, C, A> PeopleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all of the people in the specified collection for a particular activity.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2392,7 +2219,7 @@ impl<'a, C, A> MediaMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a new media item to an album. The current upload size limitations are 36MB for a photo and 1GB for a video. Uploads do not count against quota if photos are less than 2048 pixels on their longest side or videos are less than 15 minutes in length.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2438,7 +2265,7 @@ impl<'a, C, A> MediaMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `insert(...)` and `list(...)`
+/// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.comments();
 /// # }
@@ -2455,26 +2282,7 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new comment in reply to an activity.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `activityId` - The ID of the activity to reply to.
-    pub fn insert(&self, request: Comment, activity_id: &str) -> CommentInsertCall<'a, C, A> {
-        CommentInsertCall {
-            hub: self.hub,
-            _request: request,
-            _activity_id: activity_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// List all of the comments for an activity.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2494,7 +2302,7 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a comment.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2553,7 +2361,7 @@ impl<'a, C, A> AudienceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all of the audiences to which a user can share.
+    /// Shut down. See https://developers.google.com/+/api-shutdown for more details.
     /// 
     /// # Arguments
     ///
@@ -2579,1059 +2387,7 @@ impl<'a, C, A> AudienceMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Remove a person from a circle.
-///
-/// A builder for the *removePeople* method supported by a *circle* resource.
-/// It is not used directly, but through a `CircleMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().remove_people("circleId")
-///              .add_user_id("amet.")
-///              .add_email("erat")
-///              .doit();
-/// # }
-/// ```
-pub struct CircleRemovePeopleCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _circle_id: String,
-    _user_id: Vec<String>,
-    _email: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CircleRemovePeopleCall<'a, C, A> {}
-
-impl<'a, C, A> CircleRemovePeopleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.circles.removePeople",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("circleId", self._circle_id.to_string()));
-        if self._user_id.len() > 0 {
-            for f in self._user_id.iter() {
-                params.push(("userId", f.to_string()));
-            }
-        }
-        if self._email.len() > 0 {
-            for f in self._email.iter() {
-                params.push(("email", f.to_string()));
-            }
-        }
-        for &field in ["circleId", "userId", "email"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}/people";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["circleId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the circle to remove the person from.
-    ///
-    /// Sets the *circle id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn circle_id(mut self, new_value: &str) -> CircleRemovePeopleCall<'a, C, A> {
-        self._circle_id = new_value.to_string();
-        self
-    }
-    /// IDs of the people to remove from the circle. Optional, can be repeated.
-    ///
-    /// Append the given value to the *user id* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_user_id(mut self, new_value: &str) -> CircleRemovePeopleCall<'a, C, A> {
-        self._user_id.push(new_value.to_string());
-        self
-    }
-    /// Email of the people to add to the circle. Optional, can be repeated.
-    ///
-    /// Append the given value to the *email* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_email(mut self, new_value: &str) -> CircleRemovePeopleCall<'a, C, A> {
-        self._email.push(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleRemovePeopleCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CircleRemovePeopleCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluCircleWrite`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CircleRemovePeopleCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Create a new circle for the authenticated user.
-///
-/// A builder for the *insert* method supported by a *circle* resource.
-/// It is not used directly, but through a `CircleMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// use plusdomains1::Circle;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Circle::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().insert(req, "userId")
-///              .doit();
-/// # }
-/// ```
-pub struct CircleInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _request: Circle,
-    _user_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CircleInsertCall<'a, C, A> {}
-
-impl<'a, C, A> CircleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Circle)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.circles.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("userId", self._user_id.to_string()));
-        for &field in ["alt", "userId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "people/{userId}/circles";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userId}", "userId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Circle) -> CircleInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the user to create the circle on behalf of. The value "me" can be used to indicate the authenticated user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> CircleInsertCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CircleInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluCircleWrite`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CircleInsertCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Add a person to a circle. Google+ limits certain circle operations, including the number of circle adds. Learn More.
-///
-/// A builder for the *addPeople* method supported by a *circle* resource.
-/// It is not used directly, but through a `CircleMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().add_people("circleId")
-///              .add_user_id("nonumy")
-///              .add_email("dolores")
-///              .doit();
-/// # }
-/// ```
-pub struct CircleAddPeopleCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _circle_id: String,
-    _user_id: Vec<String>,
-    _email: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CircleAddPeopleCall<'a, C, A> {}
-
-impl<'a, C, A> CircleAddPeopleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Circle)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.circles.addPeople",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("circleId", self._circle_id.to_string()));
-        if self._user_id.len() > 0 {
-            for f in self._user_id.iter() {
-                params.push(("userId", f.to_string()));
-            }
-        }
-        if self._email.len() > 0 {
-            for f in self._email.iter() {
-                params.push(("email", f.to_string()));
-            }
-        }
-        for &field in ["alt", "circleId", "userId", "email"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}/people";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["circleId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the circle to add the person to.
-    ///
-    /// Sets the *circle id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn circle_id(mut self, new_value: &str) -> CircleAddPeopleCall<'a, C, A> {
-        self._circle_id = new_value.to_string();
-        self
-    }
-    /// IDs of the people to add to the circle. Optional, can be repeated.
-    ///
-    /// Append the given value to the *user id* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_user_id(mut self, new_value: &str) -> CircleAddPeopleCall<'a, C, A> {
-        self._user_id.push(new_value.to_string());
-        self
-    }
-    /// Email of the people to add to the circle. Optional, can be repeated.
-    ///
-    /// Append the given value to the *email* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_email(mut self, new_value: &str) -> CircleAddPeopleCall<'a, C, A> {
-        self._email.push(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleAddPeopleCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CircleAddPeopleCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluCircleWrite`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CircleAddPeopleCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Get a circle.
-///
-/// A builder for the *get* method supported by a *circle* resource.
-/// It is not used directly, but through a `CircleMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().get("circleId")
-///              .doit();
-/// # }
-/// ```
-pub struct CircleGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _circle_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CircleGetCall<'a, C, A> {}
-
-impl<'a, C, A> CircleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Circle)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.circles.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("circleId", self._circle_id.to_string()));
-        for &field in ["alt", "circleId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleRead.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["circleId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the circle to get.
-    ///
-    /// Sets the *circle id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn circle_id(mut self, new_value: &str) -> CircleGetCall<'a, C, A> {
-        self._circle_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CircleGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluCircleRead`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CircleGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// List all of the circles for a user.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *list* method supported by a *circle* resource.
 /// It is not used directly, but through a `CircleMethods` instance.
@@ -3659,8 +2415,8 @@ impl<'a, C, A> CircleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.circles().list("userId")
-///              .page_token("aliquyam")
-///              .max_results(35)
+///              .page_token("gubergren")
+///              .max_results(6)
 ///              .doit();
 /// # }
 /// ```
@@ -3739,10 +2495,7 @@ impl<'a, C, A> CircleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3762,7 +2515,7 @@ impl<'a, C, A> CircleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3854,7 +2607,7 @@ impl<'a, C, A> CircleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3898,1073 +2651,7 @@ impl<'a, C, A> CircleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Update a circle's description.
-///
-/// A builder for the *update* method supported by a *circle* resource.
-/// It is not used directly, but through a `CircleMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// use plusdomains1::Circle;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Circle::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().update(req, "circleId")
-///              .doit();
-/// # }
-/// ```
-pub struct CircleUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _request: Circle,
-    _circle_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CircleUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> CircleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Circle)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.circles.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("circleId", self._circle_id.to_string()));
-        for &field in ["alt", "circleId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["circleId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Circle) -> CircleUpdateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the circle to update.
-    ///
-    /// Sets the *circle id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn circle_id(mut self, new_value: &str) -> CircleUpdateCall<'a, C, A> {
-        self._circle_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CircleUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluCircleWrite`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CircleUpdateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Update a circle's description. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *circle* resource.
-/// It is not used directly, but through a `CircleMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// use plusdomains1::Circle;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Circle::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().patch(req, "circleId")
-///              .doit();
-/// # }
-/// ```
-pub struct CirclePatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _request: Circle,
-    _circle_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CirclePatchCall<'a, C, A> {}
-
-impl<'a, C, A> CirclePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Circle)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.circles.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("circleId", self._circle_id.to_string()));
-        for &field in ["alt", "circleId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["circleId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Circle) -> CirclePatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the circle to update.
-    ///
-    /// Sets the *circle id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn circle_id(mut self, new_value: &str) -> CirclePatchCall<'a, C, A> {
-        self._circle_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CirclePatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CirclePatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluCircleWrite`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CirclePatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Delete a circle.
-///
-/// A builder for the *remove* method supported by a *circle* resource.
-/// It is not used directly, but through a `CircleMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.circles().remove("circleId")
-///              .doit();
-/// # }
-/// ```
-pub struct CircleRemoveCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _circle_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CircleRemoveCall<'a, C, A> {}
-
-impl<'a, C, A> CircleRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.circles.remove",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("circleId", self._circle_id.to_string()));
-        for &field in ["circleId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "circles/{circleId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluCircleWrite.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{circleId}", "circleId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["circleId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the circle to delete.
-    ///
-    /// Sets the *circle id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn circle_id(mut self, new_value: &str) -> CircleRemoveCall<'a, C, A> {
-        self._circle_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CircleRemoveCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CircleRemoveCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluCircleWrite`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CircleRemoveCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Create a new activity for the authenticated user.
-///
-/// A builder for the *insert* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// use plusdomains1::Activity;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Activity::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.activities().insert(req, "userId")
-///              .preview(true)
-///              .doit();
-/// # }
-/// ```
-pub struct ActivityInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _request: Activity,
-    _user_id: String,
-    _preview: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ActivityInsertCall<'a, C, A> {}
-
-impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Activity)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.activities.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("userId", self._user_id.to_string()));
-        if let Some(value) = self._preview {
-            params.push(("preview", value.to_string()));
-        }
-        for &field in ["alt", "userId", "preview"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "people/{userId}/activities";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userId}", "userId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["userId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Activity) -> ActivityInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the user to create the activity on behalf of. Its value should be "me", to indicate the authenticated user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> ActivityInsertCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// If "true", extract the potential media attachments for a URL. The response will include all possible attachments for a URL, including video, photos, and articles based on the content of the page.
-    ///
-    /// Sets the *preview* query property to the given value.
-    pub fn preview(mut self, new_value: bool) -> ActivityInsertCall<'a, C, A> {
-        self._preview = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluLogin`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityInsertCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Get an activity.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *get* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethods` instance.
@@ -5062,10 +2749,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5085,7 +2769,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5163,7 +2847,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5207,7 +2891,7 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// List all of the activities in the specified collection for a particular user.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *list* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethods` instance.
@@ -5235,8 +2919,8 @@ impl<'a, C, A> ActivityGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("userId", "collection")
-///              .page_token("et")
-///              .max_results(31)
+///              .page_token("justo")
+///              .max_results(80)
 ///              .doit();
 /// # }
 /// ```
@@ -5317,10 +3001,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5340,7 +3021,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5442,7 +3123,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5486,7 +3167,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// List all of the people who are members of a circle.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *listByCircle* method supported by a *people* resource.
 /// It is not used directly, but through a `PeopleMethods` instance.
@@ -5514,8 +3195,8 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().list_by_circle("circleId")
-///              .page_token("sea")
-///              .max_results(46)
+///              .page_token("et")
+///              .max_results(60)
 ///              .doit();
 /// # }
 /// ```
@@ -5594,10 +3275,7 @@ impl<'a, C, A> PeopleListByCircleCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5617,7 +3295,7 @@ impl<'a, C, A> PeopleListByCircleCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5709,7 +3387,7 @@ impl<'a, C, A> PeopleListByCircleCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5781,9 +3459,9 @@ impl<'a, C, A> PeopleListByCircleCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().list("userId", "collection")
-///              .page_token("sadipscing")
-///              .order_by("dolor")
-///              .max_results(62)
+///              .page_token("et")
+///              .order_by("duo")
+///              .max_results(69)
 ///              .doit();
 /// # }
 /// ```
@@ -5868,10 +3546,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5891,7 +3566,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6000,7 +3675,7 @@ impl<'a, C, A> PeopleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6142,10 +3817,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6165,7 +3837,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6243,7 +3915,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6287,7 +3959,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// List all of the people in the specified collection for a particular activity.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *listByActivity* method supported by a *people* resource.
 /// It is not used directly, but through a `PeopleMethods` instance.
@@ -6315,8 +3987,8 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.people().list_by_activity("activityId", "collection")
-///              .page_token("labore")
-///              .max_results(62)
+///              .page_token("erat")
+///              .max_results(6)
 ///              .doit();
 /// # }
 /// ```
@@ -6397,10 +4069,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6420,7 +4089,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6522,7 +4191,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6566,7 +4235,7 @@ impl<'a, C, A> PeopleListByActivityCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Add a new media item to an album. The current upload size limitations are 36MB for a photo and 1GB for a video. Uploads do not count against quota if photos are less than 2048 pixels on their longest side or videos are less than 15 minutes in length.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *insert* method supported by a *media* resource.
 /// It is not used directly, but through a `MediaMethods` instance.
@@ -6683,10 +4352,7 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6745,7 +4411,7 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                         _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone())
                         .header(content_type)
@@ -6917,7 +4583,7 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6961,281 +4627,7 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Create a new comment in reply to an activity.
-///
-/// A builder for the *insert* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_plusdomains1 as plusdomains1;
-/// use plusdomains1::Comment;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use plusdomains1::PlusDomains;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = PlusDomains::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Comment::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.comments().insert(req, "activityId")
-///              .doit();
-/// # }
-/// ```
-pub struct CommentInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a PlusDomains<C, A>,
-    _request: Comment,
-    _activity_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CommentInsertCall<'a, C, A> {}
-
-impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Comment)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "plusDomains.comments.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("activityId", self._activity_id.to_string()));
-        for &field in ["alt", "activityId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "activities/{activityId}/comments";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::PluLogin.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{activityId}", "activityId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["activityId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the activity to reply to.
-    ///
-    /// Sets the *activity id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn activity_id(mut self, new_value: &str) -> CommentInsertCall<'a, C, A> {
-        self._activity_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::PluLogin`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentInsertCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// List all of the comments for an activity.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *list* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -7263,9 +4655,9 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("activityId")
-///              .sort_order("Lorem")
-///              .page_token("sea")
-///              .max_results(80)
+///              .sort_order("amet")
+///              .page_token("no")
+///              .max_results(65)
 ///              .doit();
 /// # }
 /// ```
@@ -7348,10 +4740,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7371,7 +4760,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7470,7 +4859,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7514,7 +4903,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Get a comment.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *get* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -7612,10 +5001,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7635,7 +5021,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7713,7 +5099,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7757,7 +5143,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// List all of the audiences to which a user can share.
+/// Shut down. See https://developers.google.com/+/api-shutdown for more details.
 ///
 /// A builder for the *list* method supported by a *audience* resource.
 /// It is not used directly, but through a `AudienceMethods` instance.
@@ -7785,8 +5171,8 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.audiences().list("userId")
-///              .page_token("eirmod")
-///              .max_results(43)
+///              .page_token("invidunt")
+///              .max_results(19)
 ///              .doit();
 /// # }
 /// ```
@@ -7865,10 +5251,7 @@ impl<'a, C, A> AudienceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7888,7 +5271,7 @@ impl<'a, C, A> AudienceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7980,7 +5363,7 @@ impl<'a, C, A> AudienceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

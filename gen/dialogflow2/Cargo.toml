@@ -4,12 +4,12 @@
 [package]
 
 name = "google-dialogflow2"
-version = "1.0.8+20181009"
+version = "1.0.8+20190402"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dialogflow (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow2"
 homepage = "https://cloud.google.com/dialogflow-enterprise/"
-documentation = "https://docs.rs/google-dialogflow2/1.0.8+20181009"
+documentation = "https://docs.rs/google-dialogflow2/1.0.8+20190402"
 license = "MIT"
 keywords = ["dialogflow", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

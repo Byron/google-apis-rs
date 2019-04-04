@@ -705,12 +705,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "add-target.documents.documents" => Some(("addTarget.documents.documents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "add-target.resume-token" => Some(("addTarget.resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.target-id" => Some(("addTarget.targetId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.limit" => Some(("addTarget.query.structuredQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "add-target.query.structured-query.where.unary-filter.field.field-path" => Some(("addTarget.query.structuredQuery.where.unaryFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "add-target.query.structured-query.where.unary-filter.op" => Some(("addTarget.query.structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.composite-filter.op" => Some(("addTarget.query.structuredQuery.where.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.field.field-path" => Some(("addTarget.query.structuredQuery.where.fieldFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.bytes-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.timestamp-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -723,14 +723,14 @@ impl<'n> Engine<'n> {
                     "add-target.query.structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.op" => Some(("addTarget.query.structuredQuery.where.fieldFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "add-target.query.structured-query.where.composite-filter.op" => Some(("addTarget.query.structuredQuery.where.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.unary-filter.field.field-path" => Some(("addTarget.query.structuredQuery.where.unaryFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.unary-filter.op" => Some(("addTarget.query.structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.start-at.before" => Some(("addTarget.query.structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.end-at.before" => Some(("addTarget.query.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.offset" => Some(("addTarget.query.structuredQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.query.parent" => Some(("addTarget.query.parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.once" => Some(("addTarget.once", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.read-time" => Some(("addTarget.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "remove-target" => Some(("removeTarget", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "documents", "double-value", "end-at", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "where"]);
@@ -1005,8 +1005,7 @@ impl<'n> Engine<'n> {
                     "new-transaction.read-only.read-time" => Some(("newTransaction.readOnly.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.limit" => Some(("structuredQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "structured-query.where.unary-filter.field.field-path" => Some(("structuredQuery.where.unaryFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "structured-query.where.unary-filter.op" => Some(("structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.where.composite-filter.op" => Some(("structuredQuery.where.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.field.field-path" => Some(("structuredQuery.where.fieldFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.bytes-value" => Some(("structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.timestamp-value" => Some(("structuredQuery.where.fieldFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1019,7 +1018,8 @@ impl<'n> Engine<'n> {
                     "structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.op" => Some(("structuredQuery.where.fieldFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "structured-query.where.composite-filter.op" => Some(("structuredQuery.where.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.where.unary-filter.field.field-path" => Some(("structuredQuery.where.unaryFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.where.unary-filter.op" => Some(("structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.start-at.before" => Some(("structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-query.end-at.before" => Some(("structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-query.offset" => Some(("structuredQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2325,7 +2325,7 @@ fn main() {
     
     let mut app = App::new("firestore1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181001")
+           .version("1.0.8+20190105")
            .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli")

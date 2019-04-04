@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AlertCenter* API at revision *20181011*. The CLI is at version *1.0.8*.
+This documentation was generated from the *AlertCenter* API at revision *20190329*. The CLI is at version *1.0.8*.
 
 ```bash
 alertcenter1-beta1 [options]
@@ -35,9 +35,17 @@ alertcenter1-beta1 [options]
                 feedback-list <alert-id> [-p <v>]... [-o <out>]
                 get <alert-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+                undelete <alert-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        methods
+                get-settings [-p <v>]... [-o <out>]
+                update-settings (-r <kv>)... [-p <v>]... [-o <out>]
   alertcenter1-beta1 --help
 
 Configuration:
+  [--scope <url>]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.

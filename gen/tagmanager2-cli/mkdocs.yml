@@ -1,4 +1,4 @@
-site_name: Tag Manager v1.0.8+20171108
+site_name: Tag Manager v1.0.8+20190220
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager2-cli
 site_description: A complete library to interact with Tag Manager (protocol v2)
 
@@ -15,7 +15,6 @@ pages:
 - ['accounts_containers-environments-delete.md', 'Accounts', 'Containers Environments Delete']
 - ['accounts_containers-environments-get.md', 'Accounts', 'Containers Environments Get']
 - ['accounts_containers-environments-list.md', 'Accounts', 'Containers Environments List']
-- ['accounts_containers-environments-patch.md', 'Accounts', 'Containers Environments Patch']
 - ['accounts_containers-environments-reauthorize.md', 'Accounts', 'Containers Environments Reauthorize']
 - ['accounts_containers-environments-update.md', 'Accounts', 'Containers Environments Update']
 - ['accounts_containers-get.md', 'Accounts', 'Containers Get']
@@ -46,11 +45,8 @@ pages:
 - ['accounts_containers-workspaces-folders-revert.md', 'Accounts', 'Containers Workspaces Folders Revert']
 - ['accounts_containers-workspaces-folders-update.md', 'Accounts', 'Containers Workspaces Folders Update']
 - ['accounts_containers-workspaces-get.md', 'Accounts', 'Containers Workspaces Get']
-- ['accounts_containers-workspaces-get-proposal.md', 'Accounts', 'Containers Workspaces Get Proposal']
 - ['accounts_containers-workspaces-get-status.md', 'Accounts', 'Containers Workspaces Get Status']
 - ['accounts_containers-workspaces-list.md', 'Accounts', 'Containers Workspaces List']
-- ['accounts_containers-workspaces-proposal-create.md', 'Accounts', 'Containers Workspaces Proposal Create']
-- ['accounts_containers-workspaces-proposal-delete.md', 'Accounts', 'Containers Workspaces Proposal Delete']
 - ['accounts_containers-workspaces-quick-preview.md', 'Accounts', 'Containers Workspaces Quick Preview']
 - ['accounts_containers-workspaces-resolve-conflict.md', 'Accounts', 'Containers Workspaces Resolve Conflict']
 - ['accounts_containers-workspaces-sync.md', 'Accounts', 'Containers Workspaces Sync']
@@ -67,13 +63,18 @@ pages:
 - ['accounts_containers-workspaces-triggers-revert.md', 'Accounts', 'Containers Workspaces Triggers Revert']
 - ['accounts_containers-workspaces-triggers-update.md', 'Accounts', 'Containers Workspaces Triggers Update']
 - ['accounts_containers-workspaces-update.md', 'Accounts', 'Containers Workspaces Update']
-- ['accounts_containers-workspaces-update-proposal.md', 'Accounts', 'Containers Workspaces Update Proposal']
 - ['accounts_containers-workspaces-variables-create.md', 'Accounts', 'Containers Workspaces Variables Create']
 - ['accounts_containers-workspaces-variables-delete.md', 'Accounts', 'Containers Workspaces Variables Delete']
 - ['accounts_containers-workspaces-variables-get.md', 'Accounts', 'Containers Workspaces Variables Get']
 - ['accounts_containers-workspaces-variables-list.md', 'Accounts', 'Containers Workspaces Variables List']
 - ['accounts_containers-workspaces-variables-revert.md', 'Accounts', 'Containers Workspaces Variables Revert']
 - ['accounts_containers-workspaces-variables-update.md', 'Accounts', 'Containers Workspaces Variables Update']
+- ['accounts_containers-workspaces-zones-create.md', 'Accounts', 'Containers Workspaces Zones Create']
+- ['accounts_containers-workspaces-zones-delete.md', 'Accounts', 'Containers Workspaces Zones Delete']
+- ['accounts_containers-workspaces-zones-get.md', 'Accounts', 'Containers Workspaces Zones Get']
+- ['accounts_containers-workspaces-zones-list.md', 'Accounts', 'Containers Workspaces Zones List']
+- ['accounts_containers-workspaces-zones-revert.md', 'Accounts', 'Containers Workspaces Zones Revert']
+- ['accounts_containers-workspaces-zones-update.md', 'Accounts', 'Containers Workspaces Zones Update']
 - ['accounts_get.md', 'Accounts', 'Get']
 - ['accounts_list.md', 'Accounts', 'List']
 - ['accounts_update.md', 'Accounts', 'Update']

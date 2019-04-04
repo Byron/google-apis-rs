@@ -25,12 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AnalyticsReporting* API at revision *20181008*. The CLI is at version *1.0.8*.
+This documentation was generated from the *AnalyticsReporting* API at revision *20190401*. The CLI is at version *1.0.8*.
 
 ```bash
 analyticsreporting4 [options]
         reports
                 batch-get (-r <kv>)... [-p <v>]... [-o <out>]
+        user-activity
+                search (-r <kv>)... [-p <v>]... [-o <out>]
   analyticsreporting4 --help
 
 Configuration:

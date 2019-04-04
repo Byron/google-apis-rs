@@ -4,7 +4,7 @@
 [package]
 
 name = "google-pagespeedonline4-cli"
-version = "1.0.8+20180822"
+version = "1.0.8+20190129"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with pagespeedonline (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline4-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-pagespeedonline4]
 path = "../pagespeedonline4"
-version = "1.0.8+20180822"
+version = "1.0.8+20190129"

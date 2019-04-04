@@ -128,8 +128,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -481,8 +481,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -651,8 +651,8 @@ impl<'n> Engine<'n> {
                     "age-range" => Some(("ageRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.deleted" => Some(("metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.linked-people-resource-names" => Some(("metadata.linkedPeopleResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.object-type" => Some(("metadata.objectType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -919,8 +919,8 @@ impl<'n> Engine<'n> {
                     "age-range" => Some(("ageRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.deleted" => Some(("metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.linked-people-resource-names" => Some(("metadata.linkedPeopleResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.object-type" => Some(("metadata.objectType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -1237,7 +1237,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("members-modify",
-                    Some(r##"Modify the members of a contact group owned by the authenticated user."##),
+                    Some(r##"Modify the members of a contact group owned by the authenticated user.
+        <br>
+        The only system contact groups that can have members added are
+        `contactGroups/myContacts` and `contactGroups/starred`. Other system
+        contact groups are deprecated and can only have contacts removed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/contact-groups_members-modify",
                   vec![
                     (Some(r##"resource-name"##),
@@ -1465,7 +1469,7 @@ fn main() {
     
     let mut app = App::new("people1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181010")
+           .version("1.0.8+20190330")
            .about("Provides access to information about profiles and contacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_people1_cli")
            .arg(Arg::with_name("url")

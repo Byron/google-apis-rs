@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Reporting* crate version *1.0.8+20181010*, where *20181010* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *YouTube Reporting* crate version *1.0.8+20190403*, where *20190403* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *YouTube Reporting* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/reporting/v1/reports/).
@@ -434,11 +434,11 @@ impl Part for GdataDownloadParameters {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GdataContentTypeInfo {
     /// gdata
-    #[serde(rename="fromBytes")]
-    pub from_bytes: Option<String>,
-    /// gdata
     #[serde(rename="bestGuess")]
     pub best_guess: Option<String>,
+    /// gdata
+    #[serde(rename="fromBytes")]
+    pub from_bytes: Option<String>,
     /// gdata
     #[serde(rename="fromFileName")]
     pub from_file_name: Option<String>,
@@ -480,9 +480,9 @@ pub struct GdataCompositeMedia {
     #[serde(rename="blobRef")]
     pub blob_ref: Option<String>,
     /// gdata
-    pub path: Option<String>,
-    /// gdata
     pub inline: Option<String>,
+    /// gdata
+    pub path: Option<String>,
     /// gdata
     #[serde(rename="referenceType")]
     pub reference_type: Option<String>,
@@ -524,32 +524,6 @@ impl ResponseResult for ListJobsResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GdataDiffChecksumsResponse {
-    /// gdata
-    #[serde(rename="objectSizeBytes")]
-    pub object_size_bytes: Option<String>,
-    /// gdata
-    #[serde(rename="chunkSizeBytes")]
-    pub chunk_size_bytes: Option<String>,
-    /// gdata
-    #[serde(rename="checksumsLocation")]
-    pub checksums_location: Option<GdataCompositeMedia>,
-    /// gdata
-    #[serde(rename="objectLocation")]
-    pub object_location: Option<GdataCompositeMedia>,
-    /// gdata
-    #[serde(rename="objectVersion")]
-    pub object_version: Option<String>,
-}
-
-impl Part for GdataDiffChecksumsResponse {}
-
-
-/// gdata
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GdataDiffUploadResponse {
     /// gdata
     #[serde(rename="originalObject")]
@@ -573,6 +547,9 @@ impl Part for GdataDiffUploadResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportType {
+    /// The date/time when this report type was/will be deprecated.
+    #[serde(rename="deprecateTime")]
+    pub deprecate_time: Option<String>,
     /// True if this a system-managed report type; otherwise false. Reporting jobs
     /// for system-managed report types are created automatically and can thus not
     /// be used in the `CreateJob` method.
@@ -582,9 +559,6 @@ pub struct ReportType {
     pub id: Option<String>,
     /// The name of the report type (max. 100 characters).
     pub name: Option<String>,
-    /// The date/time when this report type was/will be deprecated.
-    #[serde(rename="deprecateTime")]
-    pub deprecate_time: Option<String>,
 }
 
 impl Resource for ReportType {}
@@ -618,13 +592,25 @@ impl ResponseResult for Empty {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GdataDiffDownloadResponse {
+pub struct GdataBlobstore2Info {
     /// gdata
-    #[serde(rename="objectLocation")]
-    pub object_location: Option<GdataCompositeMedia>,
+    #[serde(rename="blobId")]
+    pub blob_id: Option<String>,
+    /// gdata
+    #[serde(rename="readToken")]
+    pub read_token: Option<String>,
+    /// gdata
+    #[serde(rename="downloadReadHandle")]
+    pub download_read_handle: Option<String>,
+    /// gdata
+    #[serde(rename="blobGeneration")]
+    pub blob_generation: Option<String>,
+    /// gdata
+    #[serde(rename="uploadMetadataContainer")]
+    pub upload_metadata_container: Option<String>,
 }
 
-impl Part for GdataDiffDownloadResponse {}
+impl Part for GdataBlobstore2Info {}
 
 
 /// gdata
@@ -671,6 +657,20 @@ pub struct ListReportTypesResponse {
 }
 
 impl ResponseResult for ListReportTypesResponse {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataDiffDownloadResponse {
+    /// gdata
+    #[serde(rename="objectLocation")]
+    pub object_location: Option<GdataCompositeMedia>,
+}
+
+impl Part for GdataDiffDownloadResponse {}
 
 
 /// gdata
@@ -776,25 +776,25 @@ impl ResponseResult for GdataMedia {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GdataBlobstore2Info {
+pub struct GdataDiffChecksumsResponse {
     /// gdata
-    #[serde(rename="blobId")]
-    pub blob_id: Option<String>,
+    #[serde(rename="objectSizeBytes")]
+    pub object_size_bytes: Option<String>,
     /// gdata
-    #[serde(rename="readToken")]
-    pub read_token: Option<String>,
+    #[serde(rename="chunkSizeBytes")]
+    pub chunk_size_bytes: Option<String>,
     /// gdata
-    #[serde(rename="downloadReadHandle")]
-    pub download_read_handle: Option<String>,
+    #[serde(rename="checksumsLocation")]
+    pub checksums_location: Option<GdataCompositeMedia>,
     /// gdata
-    #[serde(rename="blobGeneration")]
-    pub blob_generation: Option<String>,
+    #[serde(rename="objectLocation")]
+    pub object_location: Option<GdataCompositeMedia>,
     /// gdata
-    #[serde(rename="uploadMetadataContainer")]
-    pub upload_metadata_container: Option<String>,
+    #[serde(rename="objectVersion")]
+    pub object_version: Option<String>,
 }
 
-impl Part for GdataBlobstore2Info {}
+impl Part for GdataDiffChecksumsResponse {}
 
 
 /// gdata
@@ -846,11 +846,11 @@ pub struct Job {
     /// otherwise false.
     #[serde(rename="systemManaged")]
     pub system_managed: Option<bool>,
+    /// The server-generated ID of the job (max. 40 characters).
+    pub id: Option<String>,
     /// The creation date/time of the job.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// The server-generated ID of the job (max. 40 characters).
-    pub id: Option<String>,
 }
 
 impl RequestValue for Job {}
@@ -1315,7 +1315,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1331,10 +1331,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1354,7 +1351,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1432,7 +1429,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1575,10 +1572,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1598,7 +1592,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1701,7 +1695,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1852,10 +1846,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1875,7 +1866,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1961,7 +1952,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2114,10 +2105,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2137,7 +2125,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2233,7 +2221,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2384,10 +2372,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2407,7 +2392,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2493,7 +2478,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2670,10 +2655,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2693,7 +2675,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2820,7 +2802,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2963,10 +2945,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2986,7 +2965,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3089,7 +3068,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3224,10 +3203,7 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3259,7 +3235,7 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3347,7 +3323,7 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

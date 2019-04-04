@@ -4,11 +4,11 @@
 [package]
 
 name = "google-cloudasset1_beta1-cli"
-version = "1.0.8+20181008"
+version = "1.0.8+20190327"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Asset (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudasset1_beta1-cli"
-homepage = "https://console.cloud.google.com/apis/api/cloudasset.googleapis.com/overview"
+homepage = "https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli"
 license = "MIT"
 keywords = ["cloudasset", "google", "cli"]
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-cloudasset1_beta1]
 path = "../cloudasset1_beta1"
-version = "1.0.8+20181008"
+version = "1.0.8+20190327"

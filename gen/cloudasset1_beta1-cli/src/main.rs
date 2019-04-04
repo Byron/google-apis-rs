@@ -46,6 +46,146 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _folders_export_assets(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "asset-types" => Some(("assetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.gcs-destination.uri" => Some(("outputConfig.gcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["asset-types", "content-type", "gcs-destination", "output-config", "read-time", "uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ExportAssetsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().export_assets(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _folders_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _organizations_batch_get_assets_history(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.organizations().batch_get_assets_history(opt.value_of("parent").unwrap_or(""));
@@ -135,9 +275,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "asset-types" => Some(("assetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-config.gcs-destination.uri" => Some(("outputConfig.gcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["asset-types", "content-type", "gcs-destination", "output-config", "read-time", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -340,9 +480,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "asset-types" => Some(("assetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-config.gcs-destination.uri" => Some(("outputConfig.gcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["asset-types", "content-type", "gcs-destination", "output-config", "read-time", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -461,6 +601,20 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("folders", Some(opt)) => {
+                match opt.subcommand() {
+                    ("export-assets", Some(opt)) => {
+                        call_result = self._folders_export_assets(opt, dry_run, &mut err);
+                    },
+                    ("operations-get", Some(opt)) => {
+                        call_result = self._folders_operations_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("folders".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("organizations", Some(opt)) => {
                 match opt.subcommand() {
                     ("batch-get-assets-history", Some(opt)) => {
@@ -580,13 +734,76 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("folders", "methods: 'export-assets' and 'operations-get'", vec![
+            ("export-assets",
+                    Some(r##"Exports assets with time and resource types to a given Cloud Storage
+        location. The output format is newline-delimited JSON.
+        This API implements the google.longrunning.Operation API allowing you
+        to keep track of the export."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/folders_export-assets",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The relative name of the root asset. This can only be an
+        organization number (such as "organizations/123"), a project ID (such as
+        "projects/my-project-id"), a project number (such as "projects/12345"), or
+        a folder number (such as "folders/123")."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("operations-get",
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/folders_operations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("organizations", "methods: 'batch-get-assets-history', 'export-assets' and 'operations-get'", vec![
             ("batch-get-assets-history",
                     Some(r##"Batch gets the update history of assets that overlap a time window.
         For RESOURCE content, this API outputs history with asset in both
         non-delete or deleted status.
         For IAM_POLICY content, this API outputs history when the asset and its
-        attached IAM POLICY both exist. This can create gaps in the output history."##),
+        attached IAM POLICY both exist. This can create gaps in the output history.
+        If a specified asset does not exist, this API returns an INVALID_ARGUMENT
+        error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/organizations_batch-get-assets-history",
                   vec![
                     (Some(r##"parent"##),
@@ -618,9 +835,10 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The relative name of the root asset. This can only be an organization
-        number (such as "organizations/123"), a project ID (such as
-        "projects/my-project-id"), or a project number (such as "projects/12345")."##),
+                     Some(r##"Required. The relative name of the root asset. This can only be an
+        organization number (such as "organizations/123"), a project ID (such as
+        "projects/my-project-id"), a project number (such as "projects/12345"), or
+        a folder number (such as "folders/123")."##),
                      Some(true),
                      Some(false)),
         
@@ -674,7 +892,9 @@ fn main() {
         For RESOURCE content, this API outputs history with asset in both
         non-delete or deleted status.
         For IAM_POLICY content, this API outputs history when the asset and its
-        attached IAM POLICY both exist. This can create gaps in the output history."##),
+        attached IAM POLICY both exist. This can create gaps in the output history.
+        If a specified asset does not exist, this API returns an INVALID_ARGUMENT
+        error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/projects_batch-get-assets-history",
                   vec![
                     (Some(r##"parent"##),
@@ -706,9 +926,10 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The relative name of the root asset. This can only be an organization
-        number (such as "organizations/123"), a project ID (such as
-        "projects/my-project-id"), or a project number (such as "projects/12345")."##),
+                     Some(r##"Required. The relative name of the root asset. This can only be an
+        organization number (such as "organizations/123"), a project ID (such as
+        "projects/my-project-id"), a project number (such as "projects/12345"), or
+        a folder number (such as "folders/123")."##),
                      Some(true),
                      Some(false)),
         
@@ -760,7 +981,7 @@ fn main() {
     
     let mut app = App::new("cloudasset1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181008")
+           .version("1.0.8+20190327")
            .about("The cloud asset API manages the history and inventory of cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AnalyticsReporting* crate version *1.0.8+20181008*, where *20181008* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *AnalyticsReporting* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *AnalyticsReporting* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/devguides/reporting/core/v4/).
@@ -13,6 +13,8 @@
 //! 
 //! * [reports](struct.Report.html)
 //!  * [*batch get*](struct.ReportBatchGetCall.html)
+//! * user activity
+//!  * [*search*](struct.UserActivitySearchCall.html)
 //! 
 //! 
 //! 
@@ -47,7 +49,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.reports().batch_get(...).doit()
+//! let r = hub.user_activity().search(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -81,7 +83,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_analyticsreporting4 as analyticsreporting4;
-//! use analyticsreporting4::GetReportsRequest;
+//! use analyticsreporting4::SearchUserActivityRequest;
 //! use analyticsreporting4::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -103,12 +105,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GetReportsRequest::default();
+//! let mut req = SearchUserActivityRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.reports().batch_get(req)
+//! let result = hub.user_activity().search(req)
 //!              .doit();
 //! 
 //! match result {
@@ -270,7 +272,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_analyticsreporting4 as analyticsreporting4;
-/// use analyticsreporting4::GetReportsRequest;
+/// use analyticsreporting4::SearchUserActivityRequest;
 /// use analyticsreporting4::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -292,12 +294,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GetReportsRequest::default();
+/// let mut req = SearchUserActivityRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().batch_get(req)
+/// let result = hub.user_activity().search(req)
 ///              .doit();
 /// 
 /// match result {
@@ -343,6 +345,9 @@ impl<'a, C, A> AnalyticsReporting<C, A>
 
     pub fn reports(&'a self) -> ReportMethods<'a, C, A> {
         ReportMethods { hub: &self }
+    }
+    pub fn user_activity(&'a self) -> UserActivityMethods<'a, C, A> {
+        UserActivityMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
@@ -517,6 +522,23 @@ pub struct DateRange {
 impl Part for DateRange {}
 
 
+/// The headers for the metrics.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MetricHeader {
+    /// Headers for the metrics in the response.
+    #[serde(rename="metricHeaderEntries")]
+    pub metric_header_entries: Option<Vec<MetricHeaderEntry>>,
+    /// Headers for the pivots in the response.
+    #[serde(rename="pivotHeaders")]
+    pub pivot_headers: Option<Vec<PivotHeader>>,
+}
+
+impl Part for MetricHeader {}
+
+
 /// The main response class which holds the reports from the Reporting API
 /// `batchGet` call.
 /// 
@@ -569,16 +591,15 @@ pub struct ReportRequest {
     /// Requests must specify at least one metric. Requests can have a
     /// total of 10 metrics.
     pub metrics: Option<Vec<Metric>>,
-    /// Page size is for paging and specifies the maximum number of returned rows.
-    /// Page size should be >= 0. A query returns the default of 1,000 rows.
-    /// The Analytics Core Reporting API returns a maximum of 100,000 rows per
-    /// request, no matter how many you ask for. It can also return fewer rows
-    /// than requested, if there aren't as many dimension segments as you expect.
-    /// For instance, there are fewer than 300 possible values for `ga:country`,
-    /// so when segmenting only by country, you can't get more than 300 rows,
-    /// even if you set `pageSize` to a higher value.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
+    /// Dimension or metric filters that restrict the data returned for your
+    /// request. To use the `filtersExpression`, supply a dimension or metric on
+    /// which to filter, followed by the filter expression. For example, the
+    /// following expression selects `ga:browser` dimension which starts with
+    /// Firefox; `ga:browser=~^Firefox`. For more information on dimensions
+    /// and metric filters, see
+    /// [Filters reference](https://developers.google.com/analytics/devguides/reporting/core/v3/reference#filters).
+    #[serde(rename="filtersExpression")]
+    pub filters_expression: Option<String>,
     /// The Analytics
     /// [view ID](https://support.google.com/analytics/answer/1009618)
     /// from which to retrieve data. Every [ReportRequest](#ReportRequest)
@@ -619,15 +640,25 @@ pub struct ReportRequest {
     /// metrics are aggregated.
     #[serde(rename="metricFilterClauses")]
     pub metric_filter_clauses: Option<Vec<MetricFilterClause>>,
+    /// The dimensions requested.
+    /// Requests can have a total of 7 dimensions.
+    pub dimensions: Option<Vec<Dimension>>,
     /// The pivot definitions. Requests can have a maximum of 2 pivots.
     pub pivots: Option<Vec<Pivot>>,
     /// If set to true, hides the total of all metrics for all the matching rows,
     /// for every date range. The default false and will return the totals.
     #[serde(rename="hideTotals")]
     pub hide_totals: Option<bool>,
-    /// The dimensions requested.
-    /// Requests can have a total of 7 dimensions.
-    pub dimensions: Option<Vec<Dimension>>,
+    /// Page size is for paging and specifies the maximum number of returned rows.
+    /// Page size should be >= 0. A query returns the default of 1,000 rows.
+    /// The Analytics Core Reporting API returns a maximum of 100,000 rows per
+    /// request, no matter how many you ask for. It can also return fewer rows
+    /// than requested, if there aren't as many dimension segments as you expect.
+    /// For instance, there are fewer than 300 possible values for `ga:country`,
+    /// so when segmenting only by country, you can't get more than 300 rows,
+    /// even if you set `pageSize` to a higher value.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
     /// The dimension filter clauses for filtering Dimension Values. They are
     /// logically combined with the `AND` operator. Note that filtering occurs
     /// before any dimensions are aggregated, so that the returned metrics
@@ -650,15 +681,6 @@ pub struct ReportRequest {
     /// ranges in the output get the same row order.
     #[serde(rename="orderBys")]
     pub order_bys: Option<Vec<OrderBy>>,
-    /// Dimension or metric filters that restrict the data returned for your
-    /// request. To use the `filtersExpression`, supply a dimension or metric on
-    /// which to filter, followed by the filter expression. For example, the
-    /// following expression selects `ga:browser` dimension which starts with
-    /// Firefox; `ga:browser=~^Firefox`. For more information on dimensions
-    /// and metric filters, see
-    /// [Filters reference](https://developers.google.com/analytics/devguides/reporting/core/v3/reference#filters).
-    #[serde(rename="filtersExpression")]
-    pub filters_expression: Option<String>,
     /// A continuation token to get the next page of the results. Adding this to
     /// the request will return the rows after the pageToken. The pageToken should
     /// be the value returned in the nextPageToken parameter in the response to
@@ -672,6 +694,93 @@ pub struct ReportRequest {
 }
 
 impl Part for ReportRequest {}
+
+
+/// The response from `userActivity:get` call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [search user activity](struct.UserActivitySearchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchUserActivityResponse {
+    /// This token should be passed to
+    /// [SearchUserActivityRequest](#SearchUserActivityRequest) to retrieve the
+    /// next page.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// This field represents the
+    /// [sampling rate](https://support.google.com/analytics/answer/2637192) for
+    /// the given request and is a number between 0.0 to 1.0. See
+    /// [developer guide](/analytics/devguides/reporting/core/v4/basics#sampling)
+    /// for details.
+    #[serde(rename="sampleRate")]
+    pub sample_rate: Option<f64>,
+    /// Total rows returned by this query (across different pages).
+    #[serde(rename="totalRows")]
+    pub total_rows: Option<i32>,
+    /// Each record represents a session (device details, duration, etc).
+    pub sessions: Option<Vec<UserActivitySession>>,
+}
+
+impl ResponseResult for SearchUserActivityResponse {}
+
+
+/// Details of the products in an e-commerce transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProductData {
+    /// Unique code that represents the product.
+    #[serde(rename="productSku")]
+    pub product_sku: Option<String>,
+    /// The total revenue from purchased product items.
+    #[serde(rename="itemRevenue")]
+    pub item_revenue: Option<f64>,
+    /// Total number of this product units in the transaction.
+    #[serde(rename="productQuantity")]
+    pub product_quantity: Option<String>,
+    /// The product name, supplied by the e-commerce tracking application, for
+    /// the purchased items.
+    #[serde(rename="productName")]
+    pub product_name: Option<String>,
+}
+
+impl Part for ProductData {}
+
+
+/// This represents a user session performed on a specific device at a certain
+/// time over a period of time.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserActivitySession {
+    /// Represents a detailed view into each of the activity in this session.
+    pub activities: Option<Vec<Activity>>,
+    /// Unique ID of the session.
+    #[serde(rename="sessionId")]
+    pub session_id: Option<String>,
+    /// Date of this session in ISO-8601 format.
+    #[serde(rename="sessionDate")]
+    pub session_date: Option<String>,
+    /// The data source of a hit. By default, hits sent from analytics.js are
+    /// reported as "web" and hits sent from the mobile SDKs are reported as "app".
+    /// These values can be overridden in the Measurement Protocol.
+    #[serde(rename="dataSource")]
+    pub data_source: Option<String>,
+    /// Platform on which the activity happened: "android", "ios" etc.
+    pub platform: Option<String>,
+    /// The type of device used: "mobile", "tablet" etc.
+    #[serde(rename="deviceCategory")]
+    pub device_category: Option<String>,
+}
+
+impl Part for UserActivitySession {}
 
 
 /// Represents a group of metric filters.
@@ -735,27 +844,20 @@ pub struct SegmentFilter {
 impl Part for SegmentFilter {}
 
 
-/// Specifies the sorting options.
+/// Custom dimension.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderBy {
-    /// The order type. The default orderType is `VALUE`.
-    #[serde(rename="orderType")]
-    pub order_type: Option<String>,
-    /// The field which to sort by. The default sort order is ascending. Example:
-    /// `ga:browser`.
-    /// Note, that you can only specify one field for sort here. For example,
-    /// `ga:browser, ga:city` is not valid.
-    #[serde(rename="fieldName")]
-    pub field_name: Option<String>,
-    /// The sorting order for the field.
-    #[serde(rename="sortOrder")]
-    pub sort_order: Option<String>,
+pub struct CustomDimension {
+    /// Slot number of custom dimension.
+    pub index: Option<i32>,
+    /// Value of the custom dimension. Default value (i.e. empty string) indicates
+    /// clearing sesion/visitor scope custom dimension value.
+    pub value: Option<String>,
 }
 
-impl Part for OrderBy {}
+impl Part for CustomDimension {}
 
 
 /// Sequence conditions consist of one or more steps, where each step is defined
@@ -791,6 +893,54 @@ pub struct PivotValueRegion {
 impl Part for PivotValueRegion {}
 
 
+/// The request to fetch User Report from Reporting API `userActivity:get` call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [search user activity](struct.UserActivitySearchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchUserActivityRequest {
+    /// A continuation token to get the next page of the results. Adding this to
+    /// the request will return the rows after the pageToken. The pageToken should
+    /// be the value returned in the nextPageToken parameter in the response to
+    /// the [SearchUserActivityRequest](#SearchUserActivityRequest) request.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// Required. Unique user Id to query for. Every
+    /// [SearchUserActivityRequest](#SearchUserActivityRequest) must contain this
+    /// field.
+    pub user: Option<User>,
+    /// Page size is for paging and specifies the maximum number of returned rows.
+    /// Page size should be > 0. If the value is 0 or if the field isn't specified,
+    /// the request returns the default of 1000 rows per page.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+    /// Date range for which to retrieve the user activity. If a date range is not
+    /// provided, the default date range is (startDate: current date - 7 days,
+    /// endDate: current date - 1 day).
+    #[serde(rename="dateRange")]
+    pub date_range: Option<DateRange>,
+    /// Set of all activity types being requested. Only acvities matching these
+    /// types will be returned in the response. If empty, all activies will be
+    /// returned.
+    #[serde(rename="activityTypes")]
+    pub activity_types: Option<Vec<String>>,
+    /// Required. The Analytics
+    /// [view ID](https://support.google.com/analytics/answer/1009618)
+    /// from which to retrieve data. Every
+    /// [SearchUserActivityRequest](#SearchUserActivityRequest) must contain the
+    /// `viewId`.
+    #[serde(rename="viewId")]
+    pub view_id: Option<String>,
+}
+
+impl RequestValue for SearchUserActivityRequest {}
+
+
 /// Column headers.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -805,6 +955,31 @@ pub struct ColumnHeader {
 }
 
 impl Part for ColumnHeader {}
+
+
+/// Represents details collected when the visitor performs a transaction on the
+/// page.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransactionData {
+    /// Total tax for the transaction.
+    #[serde(rename="transactionTax")]
+    pub transaction_tax: Option<f64>,
+    /// The transaction ID, supplied by the e-commerce tracking method, for the
+    /// purchase in the shopping cart.
+    #[serde(rename="transactionId")]
+    pub transaction_id: Option<String>,
+    /// The total sale revenue (excluding shipping and tax) of the transaction.
+    #[serde(rename="transactionRevenue")]
+    pub transaction_revenue: Option<f64>,
+    /// Total cost of shipping.
+    #[serde(rename="transactionShipping")]
+    pub transaction_shipping: Option<f64>,
+}
+
+impl Part for TransactionData {}
 
 
 /// Dynamic segment definition for defining the segment within the request.
@@ -841,6 +1016,24 @@ pub struct MetricHeaderEntry {
 }
 
 impl Part for MetricHeaderEntry {}
+
+
+/// Contains information to identify a particular user uniquely.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct User {
+    /// Type of the user in the request. The field `userId` is associated with this
+    /// type.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Unique Id of the user for which the data is being requested.
+    #[serde(rename="userId")]
+    pub user_id: Option<String>,
+}
+
+impl Part for User {}
 
 
 /// The data response corresponding to the request.
@@ -936,6 +1129,27 @@ pub struct PivotHeader {
 impl Part for PivotHeader {}
 
 
+/// E-commerce details associated with the user activity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EcommerceData {
+    /// The type of this e-commerce activity.
+    #[serde(rename="ecommerceType")]
+    pub ecommerce_type: Option<String>,
+    /// Transaction details of this e-commerce action.
+    pub transaction: Option<TransactionData>,
+    /// Action associated with this e-commerce action.
+    #[serde(rename="actionType")]
+    pub action_type: Option<String>,
+    /// Details of the products in this transaction.
+    pub products: Option<Vec<ProductData>>,
+}
+
+impl Part for EcommerceData {}
+
+
 /// A Simple segment conditions consist of one or more dimension/metric
 /// conditions that can be combined.
 /// 
@@ -970,6 +1184,23 @@ pub struct PivotHeaderEntry {
 }
 
 impl Part for PivotHeaderEntry {}
+
+
+/// Represents details collected when the visitor views a page.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PageviewData {
+    /// The title of the page that the visitor viewed.
+    #[serde(rename="pageTitle")]
+    pub page_title: Option<String>,
+    /// The URL of the page that the visitor viewed.
+    #[serde(rename="pagePath")]
+    pub page_path: Option<String>,
+}
+
+impl Part for PageviewData {}
 
 
 /// Used to return a list of metrics for a single DateRange / dimension
@@ -1046,6 +1277,41 @@ pub struct CohortGroup {
 impl Part for CohortGroup {}
 
 
+/// Represents all the details pertaining to a goal.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoalData {
+    /// Total number of goal completions in this activity.
+    #[serde(rename="goalCompletions")]
+    pub goal_completions: Option<String>,
+    /// Value in this goal.
+    #[serde(rename="goalValue")]
+    pub goal_value: Option<f64>,
+    /// Name of the goal.
+    #[serde(rename="goalName")]
+    pub goal_name: Option<String>,
+    /// URL of the page one step prior to the goal completion.
+    #[serde(rename="goalPreviousStep1")]
+    pub goal_previous_step1: Option<String>,
+    /// URL of the page three steps prior to the goal completion.
+    #[serde(rename="goalPreviousStep3")]
+    pub goal_previous_step3: Option<String>,
+    /// URL of the page two steps prior to the goal completion.
+    #[serde(rename="goalPreviousStep2")]
+    pub goal_previous_step2: Option<String>,
+    /// This identifies the goal as configured for the profile.
+    #[serde(rename="goalIndex")]
+    pub goal_index: Option<i32>,
+    /// URL of the page where this goal was completed.
+    #[serde(rename="goalCompletionLocation")]
+    pub goal_completion_location: Option<String>,
+}
+
+impl Part for GoalData {}
+
+
 /// Dimension filter specifies the filtering options on a dimension.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1055,8 +1321,9 @@ pub struct DimensionFilter {
     /// The dimension to filter on. A DimensionFilter must contain a dimension.
     #[serde(rename="dimensionName")]
     pub dimension_name: Option<String>,
-    /// How to match the dimension to the expression. The default is REGEXP.
-    pub operator: Option<String>,
+    /// Should the match be case sensitive? Default is false.
+    #[serde(rename="caseSensitive")]
+    pub case_sensitive: Option<bool>,
     /// Strings or regular expression to match against. Only the first value of
     /// the list is used for comparison unless the operator is `IN_LIST`.
     /// If `IN_LIST` operator, then the entire list is used to filter the
@@ -1065,29 +1332,86 @@ pub struct DimensionFilter {
     /// Logical `NOT` operator. If this boolean is set to true, then the matching
     /// dimension values will be excluded in the report. The default is false.
     pub not: Option<bool>,
-    /// Should the match be case sensitive? Default is false.
-    #[serde(rename="caseSensitive")]
-    pub case_sensitive: Option<bool>,
+    /// How to match the dimension to the expression. The default is REGEXP.
+    pub operator: Option<String>,
 }
 
 impl Part for DimensionFilter {}
 
 
-/// The headers for the metrics.
+/// An Activity represents data for an activity of a user. Note that an
+/// Activity is different from a hit.
+/// A hit might result in multiple Activity's. For example, if a hit
+/// includes a transaction and a goal completion, there will be two
+/// Activity protos for this hit, one for ECOMMERCE and one for GOAL.
+/// Conversely, multiple hits can also construct one Activity. In classic
+/// e-commerce, data for one transaction might be sent through multiple hits.
+/// These hits will be merged into one ECOMMERCE Activity.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MetricHeader {
-    /// Headers for the pivots in the response.
-    #[serde(rename="pivotHeaders")]
-    pub pivot_headers: Option<Vec<PivotHeader>>,
-    /// Headers for the metrics in the response.
-    #[serde(rename="metricHeaderEntries")]
-    pub metric_header_entries: Option<Vec<MetricHeaderEntry>>,
+pub struct Activity {
+    /// A list of all custom dimensions associated with this activity.
+    #[serde(rename="customDimension")]
+    pub custom_dimension: Option<Vec<CustomDimension>>,
+    /// The first page in users' sessions, or the landing page.
+    #[serde(rename="landingPagePath")]
+    pub landing_page_path: Option<String>,
+    /// The hostname from which the tracking request was made.
+    pub hostname: Option<String>,
+    /// This will be set if `activity_type` equals `ECOMMERCE`.
+    pub ecommerce: Option<EcommerceData>,
+    /// For manual campaign tracking, it is the value of the utm_term campaign
+    /// tracking parameter. For AdWords traffic, it contains the best matching
+    /// targeting criteria. For the display network, where multiple targeting
+    /// criteria could have caused the ad to show up, it returns the best matching
+    /// targeting criteria as selected by Ads. This could be display_keyword, site
+    /// placement, boomuserlist, user_interest, age, or gender. Otherwise its value
+    /// is (not set).
+    pub keyword: Option<String>,
+    /// For manual campaign tracking, it is the value of the utm_campaign campaign
+    /// tracking parameter. For AdWords autotagging, it is the name(s) of the
+    /// online ad campaign(s) you use for the property. If you use neither, its
+    /// value is (not set).
+    pub campaign: Option<String>,
+    /// Type of this activity.
+    #[serde(rename="activityType")]
+    pub activity_type: Option<String>,
+    /// This will be set if `activity_type` equals `PAGEVIEW`. This field
+    /// contains all the details about the visitor and the page that was visited.
+    pub pageview: Option<PageviewData>,
+    /// This will be set if `activity_type` equals `SCREEN_VIEW`.
+    pub appview: Option<ScreenviewData>,
+    /// The source of referrals. For manual campaign tracking, it is the value of
+    /// the utm_source campaign tracking parameter. For AdWords autotagging, it is
+    /// google. If you use neither, it is the domain of the source
+    /// (e.g., document.referrer) referring the users. It may also contain a port
+    /// address. If users arrived without a referrer, its value is (direct).
+    pub source: Option<String>,
+    /// The type of referrals. For manual campaign tracking, it is the value of the
+    /// utm_medium campaign tracking parameter. For AdWords autotagging, it is cpc.
+    /// If users came from a search engine detected by Google Analytics, it is
+    /// organic. If the referrer is not a search engine, it is referral. If users
+    /// came directly to the property and document.referrer is empty, its value is
+    /// (none).
+    pub medium: Option<String>,
+    /// The Channel Group associated with an end user's session for this View
+    /// (defined by the View's Channel Groupings).
+    #[serde(rename="channelGrouping")]
+    pub channel_grouping: Option<String>,
+    /// Timestamp of the activity.
+    #[serde(rename="activityTime")]
+    pub activity_time: Option<String>,
+    /// This field contains all the details pertaining to an event and will be
+    /// set if `activity_type` equals `EVENT`.
+    pub event: Option<EventData>,
+    /// This field contains a list of all the goals that were reached in this
+    /// activity when `activity_type` equals `GOAL`.
+    pub goals: Option<GoalSetData>,
 }
 
-impl Part for MetricHeader {}
+impl Part for Activity {}
 
 
 /// A segment sequence definition.
@@ -1164,14 +1488,14 @@ impl Part for Dimension {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricFilter {
+    /// Logical `NOT` operator. If this boolean is set to true, then the matching
+    /// metric values will be excluded in the report. The default is false.
+    pub not: Option<bool>,
     /// Is the metric `EQUAL`, `LESS_THAN` or `GREATER_THAN` the
     /// comparisonValue, the default is `EQUAL`. If the operator is
     /// `IS_MISSING`, checks if the metric is missing and would ignore the
     /// comparisonValue.
     pub operator: Option<String>,
-    /// Logical `NOT` operator. If this boolean is set to true, then the matching
-    /// metric values will be excluded in the report. The default is false.
-    pub not: Option<bool>,
     /// The value to compare against.
     #[serde(rename="comparisonValue")]
     pub comparison_value: Option<String>,
@@ -1183,6 +1507,55 @@ pub struct MetricFilter {
 }
 
 impl Part for MetricFilter {}
+
+
+/// Represents all the details pertaining to an event.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventData {
+    /// Label attached with the event.
+    #[serde(rename="eventLabel")]
+    pub event_label: Option<String>,
+    /// Numeric value associated with the event.
+    #[serde(rename="eventValue")]
+    pub event_value: Option<String>,
+    /// Type of interaction with the object. Eg: 'play'.
+    #[serde(rename="eventAction")]
+    pub event_action: Option<String>,
+    /// The object on the page that was interacted with. Eg: 'Video'.
+    #[serde(rename="eventCategory")]
+    pub event_category: Option<String>,
+    /// Number of such events in this activity.
+    #[serde(rename="eventCount")]
+    pub event_count: Option<i64>,
+}
+
+impl Part for EventData {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ScreenviewData {
+    /// Mobile manufacturer or branded name. Eg: "Google", "Apple" etc.
+    #[serde(rename="mobileDeviceBranding")]
+    pub mobile_device_branding: Option<String>,
+    /// Mobile device model. Eg: "Pixel", "iPhone" etc.
+    #[serde(rename="mobileDeviceModel")]
+    pub mobile_device_model: Option<String>,
+    /// The application name.
+    #[serde(rename="appName")]
+    pub app_name: Option<String>,
+    /// The name of the screen.
+    #[serde(rename="screenName")]
+    pub screen_name: Option<String>,
+}
+
+impl Part for ScreenviewData {}
 
 
 /// [Metrics](https://support.google.com/analytics/answer/1033861)
@@ -1259,6 +1632,19 @@ pub struct OrFiltersForSegment {
 impl Part for OrFiltersForSegment {}
 
 
+/// Represents a set of goals that were reached in an activity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoalSetData {
+    /// All the goals that were reached in the current activity.
+    pub goals: Option<Vec<GoalData>>,
+}
+
+impl Part for GoalSetData {}
+
+
 /// Filter Clause to be used in a segment definition, can be wither a metric or
 /// a dimension filter.
 /// 
@@ -1277,6 +1663,29 @@ pub struct SegmentFilterClause {
 }
 
 impl Part for SegmentFilterClause {}
+
+
+/// Specifies the sorting options.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderBy {
+    /// The order type. The default orderType is `VALUE`.
+    #[serde(rename="orderType")]
+    pub order_type: Option<String>,
+    /// The field which to sort by. The default sort order is ascending. Example:
+    /// `ga:browser`.
+    /// Note, that you can only specify one field for sort here. For example,
+    /// `ga:browser, ga:city` is not valid.
+    #[serde(rename="fieldName")]
+    pub field_name: Option<String>,
+    /// The sorting order for the field.
+    #[serde(rename="sortOrder")]
+    pub sort_order: Option<String>,
+}
+
+impl Part for OrderBy {}
 
 
 /// A group of dimension filters. Set the operator value to specify how
@@ -1338,6 +1747,23 @@ pub struct Pivot {
     /// The pivot metrics. Pivot metrics are part of the
     /// restriction on total number of metrics allowed in the request.
     pub metrics: Option<Vec<Metric>>,
+    /// A list of dimensions to show as pivot columns. A Pivot can have a maximum
+    /// of 4 dimensions. Pivot dimensions are part of the restriction on the
+    /// total number of dimensions allowed in the request.
+    pub dimensions: Option<Vec<Dimension>>,
+    /// Specifies the maximum number of groups to return.
+    /// The default value is 10, also the maximum value is 1,000.
+    #[serde(rename="maxGroupCount")]
+    pub max_group_count: Option<i32>,
+    /// DimensionFilterClauses are logically combined with an `AND` operator: only
+    /// data that is included by all these DimensionFilterClauses contributes to
+    /// the values in this pivot region. Dimension filters can be used to restrict
+    /// the columns shown in the pivot region. For example if you have
+    /// `ga:browser` as the requested dimension in the pivot region, and you
+    /// specify key filters to restrict `ga:browser` to only "IE" or "Firefox",
+    /// then only those two browsers would show up as columns.
+    #[serde(rename="dimensionFilterClauses")]
+    pub dimension_filter_clauses: Option<Vec<DimensionFilterClause>>,
     /// If k metrics were requested, then the response will contain some
     /// data-dependent multiple of k columns in the report.  E.g., if you pivoted
     /// on the dimension `ga:browser` then you'd get k columns for "Firefox", k
@@ -1353,23 +1779,6 @@ pub struct Pivot {
     /// included in the response.
     #[serde(rename="startGroup")]
     pub start_group: Option<i32>,
-    /// Specifies the maximum number of groups to return.
-    /// The default value is 10, also the maximum value is 1,000.
-    #[serde(rename="maxGroupCount")]
-    pub max_group_count: Option<i32>,
-    /// DimensionFilterClauses are logically combined with an `AND` operator: only
-    /// data that is included by all these DimensionFilterClauses contributes to
-    /// the values in this pivot region. Dimension filters can be used to restrict
-    /// the columns shown in the pivot region. For example if you have
-    /// `ga:browser` as the requested dimension in the pivot region, and you
-    /// specify key filters to restrict `ga:browser` to only "IE" or "Firefox",
-    /// then only those two browsers would show up as columns.
-    #[serde(rename="dimensionFilterClauses")]
-    pub dimension_filter_clauses: Option<Vec<DimensionFilterClause>>,
-    /// A list of dimensions to show as pivot columns. A Pivot can have a maximum
-    /// of 4 dimensions. Pivot dimensions are part of the restriction on the
-    /// total number of dimensions allowed in the request.
-    pub dimensions: Option<Vec<Dimension>>,
 }
 
 impl Part for Pivot {}
@@ -1379,6 +1788,65 @@ impl Part for Pivot {}
 // ###################
 // MethodBuilders ###
 // #################
+
+/// A builder providing access to all methods supported on *userActivity* resources.
+/// It is not used directly, but through the `AnalyticsReporting` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_analyticsreporting4 as analyticsreporting4;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use analyticsreporting4::AnalyticsReporting;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = AnalyticsReporting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `search(...)`
+/// // to build up your call.
+/// let rb = hub.user_activity();
+/// # }
+/// ```
+pub struct UserActivityMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AnalyticsReporting<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for UserActivityMethods<'a, C, A> {}
+
+impl<'a, C, A> UserActivityMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns User Activity data.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn search(&self, request: SearchUserActivityRequest) -> UserActivitySearchCall<'a, C, A> {
+        UserActivitySearchCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
 
 /// A builder providing access to all methods supported on *report* resources.
 /// It is not used directly, but through the `AnalyticsReporting` hub.
@@ -1444,6 +1912,248 @@ impl<'a, C, A> ReportMethods<'a, C, A> {
 // ###################
 // CallBuilders   ###
 // #################
+
+/// Returns User Activity data.
+///
+/// A builder for the *search* method supported by a *userActivity* resource.
+/// It is not used directly, but through a `UserActivityMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_analyticsreporting4 as analyticsreporting4;
+/// use analyticsreporting4::SearchUserActivityRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use analyticsreporting4::AnalyticsReporting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AnalyticsReporting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SearchUserActivityRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.user_activity().search(req)
+///              .doit();
+/// # }
+/// ```
+pub struct UserActivitySearchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AnalyticsReporting<C, A>,
+    _request: SearchUserActivityRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserActivitySearchCall<'a, C, A> {}
+
+impl<'a, C, A> UserActivitySearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SearchUserActivityResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "analyticsreporting.userActivity.search",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v4/userActivity:search";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Analytic.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SearchUserActivityRequest) -> UserActivitySearchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserActivitySearchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> UserActivitySearchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Analytic`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserActivitySearchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
 
 /// Returns the Analytics data.
 ///
@@ -1527,10 +2237,7 @@ impl<'a, C, A> ReportBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1562,7 +2269,7 @@ impl<'a, C, A> ReportBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1642,7 +2349,7 @@ impl<'a, C, A> ReportBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1650,12 +2357,12 @@ impl<'a, C, A> ReportBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ReportBatchGetCall<'a, C, A>

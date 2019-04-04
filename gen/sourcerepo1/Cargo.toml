@@ -4,12 +4,12 @@
 [package]
 
 name = "google-sourcerepo1"
-version = "1.0.8+20180718"
+version = "1.0.8+20190221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Source Repositories (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sourcerepo1"
 homepage = "https://cloud.google.com/source-repositories/docs/apis"
-documentation = "https://docs.rs/google-sourcerepo1/1.0.8+20180718"
+documentation = "https://docs.rs/google-sourcerepo1/1.0.8+20190221"
 license = "MIT"
 keywords = ["sourcerepo", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

@@ -25,10 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20181009*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20190325*. The CLI is at version *1.0.8*.
 
 ```bash
 ml1 [options]
+        operations
+                delete <name> [-p <v>]... [-o <out>]
         projects
                 get-config <name> [-p <v>]... [-o <out>]
                 jobs-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -56,7 +58,6 @@ ml1 [options]
                 models-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-versions-set-default <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-cancel <name> [-p <v>]... [-o <out>]
-                operations-delete <name> [-p <v>]... [-o <out>]
                 operations-get <name> [-p <v>]... [-o <out>]
                 operations-list <name> [-p <v>]... [-o <out>]
                 predict <name> (-r <kv>)... [-p <v>]... [-o <out>]

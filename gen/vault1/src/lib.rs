@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Vault* crate version *1.0.8+20180827*, where *20180827* is the exact revision of the *vault:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Vault* crate version *1.0.8+20190312*, where *20190312* is the exact revision of the *vault:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Vault* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/vault).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Vault.html) ... 
 //! 
 //! * [matters](struct.Matter.html)
-//!  * [*add permissions*](struct.MatterAddPermissionCall.html), [*close*](struct.MatterCloseCall.html), [*create*](struct.MatterCreateCall.html), [*delete*](struct.MatterDeleteCall.html), [*exports create*](struct.MatterExportCreateCall.html), [*exports delete*](struct.MatterExportDeleteCall.html), [*exports get*](struct.MatterExportGetCall.html), [*exports list*](struct.MatterExportListCall.html), [*get*](struct.MatterGetCall.html), [*holds accounts create*](struct.MatterHoldAccountCreateCall.html), [*holds accounts delete*](struct.MatterHoldAccountDeleteCall.html), [*holds accounts list*](struct.MatterHoldAccountListCall.html), [*holds add held accounts*](struct.MatterHoldAddHeldAccountCall.html), [*holds create*](struct.MatterHoldCreateCall.html), [*holds delete*](struct.MatterHoldDeleteCall.html), [*holds get*](struct.MatterHoldGetCall.html), [*holds list*](struct.MatterHoldListCall.html), [*holds remove held accounts*](struct.MatterHoldRemoveHeldAccountCall.html), [*holds update*](struct.MatterHoldUpdateCall.html), [*list*](struct.MatterListCall.html), [*remove permissions*](struct.MatterRemovePermissionCall.html), [*reopen*](struct.MatterReopenCall.html), [*undelete*](struct.MatterUndeleteCall.html) and [*update*](struct.MatterUpdateCall.html)
+//!  * [*add permissions*](struct.MatterAddPermissionCall.html), [*close*](struct.MatterCloseCall.html), [*create*](struct.MatterCreateCall.html), [*delete*](struct.MatterDeleteCall.html), [*exports create*](struct.MatterExportCreateCall.html), [*exports delete*](struct.MatterExportDeleteCall.html), [*exports get*](struct.MatterExportGetCall.html), [*exports list*](struct.MatterExportListCall.html), [*get*](struct.MatterGetCall.html), [*holds accounts create*](struct.MatterHoldAccountCreateCall.html), [*holds accounts delete*](struct.MatterHoldAccountDeleteCall.html), [*holds accounts list*](struct.MatterHoldAccountListCall.html), [*holds add held accounts*](struct.MatterHoldAddHeldAccountCall.html), [*holds create*](struct.MatterHoldCreateCall.html), [*holds delete*](struct.MatterHoldDeleteCall.html), [*holds get*](struct.MatterHoldGetCall.html), [*holds list*](struct.MatterHoldListCall.html), [*holds remove held accounts*](struct.MatterHoldRemoveHeldAccountCall.html), [*holds update*](struct.MatterHoldUpdateCall.html), [*list*](struct.MatterListCall.html), [*remove permissions*](struct.MatterRemovePermissionCall.html), [*reopen*](struct.MatterReopenCall.html), [*saved queries create*](struct.MatterSavedQueryCreateCall.html), [*saved queries delete*](struct.MatterSavedQueryDeleteCall.html), [*saved queries get*](struct.MatterSavedQueryGetCall.html), [*saved queries list*](struct.MatterSavedQueryListCall.html), [*undelete*](struct.MatterUndeleteCall.html) and [*update*](struct.MatterUpdateCall.html)
 //! 
 //! 
 //! 
@@ -49,15 +49,17 @@
 //! ```ignore
 //! let r = hub.matters().holds_delete(...).doit()
 //! let r = hub.matters().holds_list(...).doit()
+//! let r = hub.matters().saved_queries_delete(...).doit()
 //! let r = hub.matters().exports_create(...).doit()
 //! let r = hub.matters().update(...).doit()
 //! let r = hub.matters().holds_get(...).doit()
 //! let r = hub.matters().holds_accounts_list(...).doit()
+//! let r = hub.matters().exports_list(...).doit()
 //! let r = hub.matters().exports_get(...).doit()
 //! let r = hub.matters().holds_add_held_accounts(...).doit()
 //! let r = hub.matters().undelete(...).doit()
 //! let r = hub.matters().remove_permissions(...).doit()
-//! let r = hub.matters().holds_accounts_delete(...).doit()
+//! let r = hub.matters().saved_queries_list(...).doit()
 //! let r = hub.matters().add_permissions(...).doit()
 //! let r = hub.matters().holds_update(...).doit()
 //! let r = hub.matters().close(...).doit()
@@ -67,10 +69,12 @@
 //! let r = hub.matters().create(...).doit()
 //! let r = hub.matters().list(...).doit()
 //! let r = hub.matters().reopen(...).doit()
-//! let r = hub.matters().exports_list(...).doit()
+//! let r = hub.matters().holds_accounts_delete(...).doit()
 //! let r = hub.matters().exports_delete(...).doit()
 //! let r = hub.matters().holds_accounts_create(...).doit()
+//! let r = hub.matters().saved_queries_create(...).doit()
 //! let r = hub.matters().delete(...).doit()
+//! let r = hub.matters().saved_queries_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -447,17 +451,22 @@ pub struct HangoutsChatInfo {
 impl Part for HangoutsChatInfo {}
 
 
-/// Accounts to search
+/// Response for batch create held accounts.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [holds add held accounts matters](struct.MatterHoldAddHeldAccountCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AccountInfo {
-    /// A set of accounts to search.
-    pub emails: Option<Vec<String>>,
+pub struct AddHeldAccountsResponse {
+    /// The list of responses, in the same order as the batch request.
+    pub responses: Option<Vec<AddHeldAccountResult>>,
 }
 
-impl Part for AccountInfo {}
+impl ResponseResult for AddHeldAccountsResponse {}
 
 
 /// Export advanced options
@@ -466,12 +475,14 @@ impl Part for AccountInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportOptions {
-    /// Option available for mail export.
-    #[serde(rename="mailOptions")]
-    pub mail_options: Option<MailExportOptions>,
     /// Option available for Drive export.
     #[serde(rename="driveOptions")]
     pub drive_options: Option<DriveExportOptions>,
+    /// The requested export location.
+    pub region: Option<String>,
+    /// Option available for mail export.
+    #[serde(rename="mailOptions")]
+    pub mail_options: Option<MailExportOptions>,
     /// Option available for hangouts chat export.
     #[serde(rename="hangoutsChatOptions")]
     pub hangouts_chat_options: Option<HangoutsChatExportOptions>,
@@ -682,66 +693,6 @@ pub struct HangoutsChatExportOptions {
 impl Part for HangoutsChatExportOptions {}
 
 
-/// Stats of an export.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ExportStats {
-    /// The size of export in bytes.
-    #[serde(rename="sizeInBytes")]
-    pub size_in_bytes: Option<String>,
-    /// The number of documents already processed by the export.
-    #[serde(rename="exportedArtifactCount")]
-    pub exported_artifact_count: Option<i64>,
-    /// The number of documents to be exported.
-    #[serde(rename="totalArtifactCount")]
-    pub total_artifact_count: Option<i64>,
-}
-
-impl Part for ExportStats {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [holds delete matters](struct.MatterHoldDeleteCall.html) (response)
-/// * [holds accounts delete matters](struct.MatterHoldAccountDeleteCall.html) (response)
-/// * [exports delete matters](struct.MatterExportDeleteCall.html) (response)
-/// * [remove permissions matters](struct.MatterRemovePermissionCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
-
-
-/// The options for mail export.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MailExportOptions {
-    /// The export file format.
-    #[serde(rename="exportFormat")]
-    pub export_format: Option<String>,
-}
-
-impl Part for MailExportOptions {}
-
-
 /// An export file on cloud storage
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -764,6 +715,70 @@ pub struct CloudStorageFile {
 }
 
 impl Part for CloudStorageFile {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [holds delete matters](struct.MatterHoldDeleteCall.html) (response)
+/// * [holds accounts delete matters](struct.MatterHoldAccountDeleteCall.html) (response)
+/// * [saved queries delete matters](struct.MatterSavedQueryDeleteCall.html) (response)
+/// * [exports delete matters](struct.MatterExportDeleteCall.html) (response)
+/// * [remove permissions matters](struct.MatterRemovePermissionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// The options for mail export.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MailExportOptions {
+    /// Set to true to export confidential mode content.
+    #[serde(rename="showConfidentialModeContent")]
+    pub show_confidential_mode_content: Option<bool>,
+    /// The export file format.
+    #[serde(rename="exportFormat")]
+    pub export_format: Option<String>,
+}
+
+impl Part for MailExportOptions {}
+
+
+/// Stats of an export.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExportStats {
+    /// The size of export in bytes.
+    #[serde(rename="sizeInBytes")]
+    pub size_in_bytes: Option<String>,
+    /// The number of documents already processed by the export.
+    #[serde(rename="exportedArtifactCount")]
+    pub exported_artifact_count: Option<i64>,
+    /// The number of documents to be exported.
+    #[serde(rename="totalArtifactCount")]
+    pub total_artifact_count: Option<i64>,
+}
+
+impl Part for ExportStats {}
 
 
 /// Represents a hold within Vault. A hold restricts purging of
@@ -920,15 +935,17 @@ impl RequestValue for AddHeldAccountsRequest {}
 /// 
 /// * [holds delete matters](struct.MatterHoldDeleteCall.html) (none)
 /// * [holds list matters](struct.MatterHoldListCall.html) (none)
+/// * [saved queries delete matters](struct.MatterSavedQueryDeleteCall.html) (none)
 /// * [exports create matters](struct.MatterExportCreateCall.html) (none)
 /// * [update matters](struct.MatterUpdateCall.html) (request|response)
 /// * [holds get matters](struct.MatterHoldGetCall.html) (none)
 /// * [holds accounts list matters](struct.MatterHoldAccountListCall.html) (none)
+/// * [exports list matters](struct.MatterExportListCall.html) (none)
 /// * [exports get matters](struct.MatterExportGetCall.html) (none)
 /// * [holds add held accounts matters](struct.MatterHoldAddHeldAccountCall.html) (none)
 /// * [undelete matters](struct.MatterUndeleteCall.html) (response)
 /// * [remove permissions matters](struct.MatterRemovePermissionCall.html) (none)
-/// * [holds accounts delete matters](struct.MatterHoldAccountDeleteCall.html) (none)
+/// * [saved queries list matters](struct.MatterSavedQueryListCall.html) (none)
 /// * [add permissions matters](struct.MatterAddPermissionCall.html) (none)
 /// * [holds update matters](struct.MatterHoldUpdateCall.html) (none)
 /// * [close matters](struct.MatterCloseCall.html) (none)
@@ -938,27 +955,29 @@ impl RequestValue for AddHeldAccountsRequest {}
 /// * [create matters](struct.MatterCreateCall.html) (request|response)
 /// * [list matters](struct.MatterListCall.html) (none)
 /// * [reopen matters](struct.MatterReopenCall.html) (none)
-/// * [exports list matters](struct.MatterExportListCall.html) (none)
+/// * [holds accounts delete matters](struct.MatterHoldAccountDeleteCall.html) (none)
 /// * [exports delete matters](struct.MatterExportDeleteCall.html) (none)
 /// * [holds accounts create matters](struct.MatterHoldAccountCreateCall.html) (none)
+/// * [saved queries create matters](struct.MatterSavedQueryCreateCall.html) (none)
 /// * [delete matters](struct.MatterDeleteCall.html) (response)
+/// * [saved queries get matters](struct.MatterSavedQueryGetCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Matter {
-    /// List of users and access to the matter. Currently there is no programmer
-    /// defined limit on the number of permissions a matter can have.
-    #[serde(rename="matterPermissions")]
-    pub matter_permissions: Option<Vec<MatterPermission>>,
     /// The matter ID which is generated by the server.
     /// Should be blank when creating a new matter.
     #[serde(rename="matterId")]
     pub matter_id: Option<String>,
+    /// List of users and access to the matter. Currently there is no programmer
+    /// defined limit on the number of permissions a matter can have.
+    #[serde(rename="matterPermissions")]
+    pub matter_permissions: Option<Vec<MatterPermission>>,
     /// The state of the matter.
     pub state: Option<String>,
-    /// The name of the matter.
-    pub name: Option<String>,
     /// The description of the matter.
     pub description: Option<String>,
+    /// The name of the matter.
+    pub name: Option<String>,
 }
 
 impl RequestValue for Matter {}
@@ -1032,6 +1051,69 @@ pub struct AddHeldAccountResult {
 }
 
 impl Part for AddHeldAccountResult {}
+
+
+/// A query definition relevant for search & export.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Query {
+    /// The corpus-specific
+    /// <a href="https://support.google.com/vault/answer/2474474">search operators</a>
+    /// used to generate search results.
+    pub terms: Option<String>,
+    /// When 'TEAM_DRIVE' is chosen as search method, team_drive_info needs to be
+    /// specified.
+    #[serde(rename="teamDriveInfo")]
+    pub team_drive_info: Option<TeamDriveInfo>,
+    /// For mail search, specify more options in this field.
+    #[serde(rename="mailOptions")]
+    pub mail_options: Option<MailOptions>,
+    /// The search method to use.
+    #[serde(rename="searchMethod")]
+    pub search_method: Option<String>,
+    /// When 'ROOM' is chosen as search method, hangout_chats_info needs to be
+    /// specified. (read-only)
+    #[serde(rename="hangoutsChatInfo")]
+    pub hangouts_chat_info: Option<HangoutsChatInfo>,
+    /// When 'ACCOUNT' is chosen as search method,
+    /// account_info needs to be specified.
+    #[serde(rename="accountInfo")]
+    pub account_info: Option<AccountInfo>,
+    /// For Drive search, specify more options in this field.
+    #[serde(rename="driveOptions")]
+    pub drive_options: Option<DriveOptions>,
+    /// The start time range for the search query. These timestamps are in GMT and
+    /// rounded down to the start of the given date.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// When 'ORG_UNIT' is chosen as as search method, org_unit_info needs
+    /// to be specified.
+    #[serde(rename="orgUnitInfo")]
+    pub org_unit_info: Option<OrgUnitInfo>,
+    /// The time zone name.
+    /// It should be an IANA TZ name, such as "America/Los_Angeles".
+    /// For more information, see
+    /// <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">Time
+    /// Zone</a>.
+    #[serde(rename="timeZone")]
+    pub time_zone: Option<String>,
+    /// The corpus to search.
+    pub corpus: Option<String>,
+    /// The end time range for the search query. These timestamps are in GMT and
+    /// rounded down to the start of the given date.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The data source to search from.
+    #[serde(rename="dataScope")]
+    pub data_scope: Option<String>,
+    /// For hangouts chat search, specify more options in this field. (read-only)
+    #[serde(rename="hangoutsChatOptions")]
+    pub hangouts_chat_options: Option<HangoutsChatOptions>,
+}
+
+impl Part for Query {}
 
 
 /// Remove a list of accounts from a hold.
@@ -1144,22 +1226,25 @@ pub struct AddMatterPermissionsRequest {
 impl RequestValue for AddMatterPermissionsRequest {}
 
 
-/// Returns a list of held accounts for a hold.
+/// Query options for group holds.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [holds accounts list matters](struct.MatterHoldAccountListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListHeldAccountsResponse {
-    /// The held accounts on a hold.
-    pub accounts: Option<Vec<HeldAccount>>,
+pub struct HeldGroupsQuery {
+    /// The end time range for the search query. These timestamps are in GMT and
+    /// rounded down to the start of the given date.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The search terms for the hold.
+    pub terms: Option<String>,
+    /// The start time range for the search query. These timestamps are in GMT and
+    /// rounded down to the start of the given date.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
 }
 
-impl ResponseResult for ListHeldAccountsResponse {}
+impl Part for HeldGroupsQuery {}
 
 
 /// Query options for mail holds.
@@ -1221,43 +1306,58 @@ pub struct RemoveMatterPermissionsRequest {
 impl RequestValue for RemoveMatterPermissionsRequest {}
 
 
-/// Response for batch create held accounts.
+/// Definition of the response for method ListSaveQuery.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [holds add held accounts matters](struct.MatterHoldAddHeldAccountCall.html) (response)
+/// * [saved queries list matters](struct.MatterSavedQueryListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddHeldAccountsResponse {
-    /// The list of responses, in the same order as the batch request.
-    pub responses: Option<Vec<AddHeldAccountResult>>,
+pub struct ListSavedQueriesResponse {
+    /// Page token to retrieve the next page of results in the list.
+    /// If this is empty, then there are no more saved queries to list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of output saved queries.
+    #[serde(rename="savedQueries")]
+    pub saved_queries: Option<Vec<SavedQuery>>,
 }
 
-impl ResponseResult for AddHeldAccountsResponse {}
+impl ResponseResult for ListSavedQueriesResponse {}
 
 
-/// Query options for group holds.
+/// Accounts to search
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HeldGroupsQuery {
-    /// The end time range for the search query. These timestamps are in GMT and
-    /// rounded down to the start of the given date.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// The search terms for the hold.
-    pub terms: Option<String>,
-    /// The start time range for the search query. These timestamps are in GMT and
-    /// rounded down to the start of the given date.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
+pub struct AccountInfo {
+    /// A set of accounts to search.
+    pub emails: Option<Vec<String>>,
 }
 
-impl Part for HeldGroupsQuery {}
+impl Part for AccountInfo {}
+
+
+/// Returns a list of held accounts for a hold.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [holds accounts list matters](struct.MatterHoldAccountListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListHeldAccountsResponse {
+    /// The held accounts on a hold.
+    pub accounts: Option<Vec<HeldAccount>>,
+}
+
+impl ResponseResult for ListHeldAccountsResponse {}
 
 
 /// An export
@@ -1318,67 +1418,40 @@ pub struct UserInfo {
 impl Part for UserInfo {}
 
 
-/// A query definition relevant for search & export.
+/// Definition of the saved query.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [saved queries create matters](struct.MatterSavedQueryCreateCall.html) (request|response)
+/// * [saved queries get matters](struct.MatterSavedQueryGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Query {
-    /// The corpus-specific
-    /// <a href="https://support.google.com/vault/answer/2474474">search operators</a>
-    /// used to generate search results.
-    pub terms: Option<String>,
-    /// When 'TEAM_DRIVE' is chosen as search method, team_drive_info needs to be
-    /// specified.
-    #[serde(rename="teamDriveInfo")]
-    pub team_drive_info: Option<TeamDriveInfo>,
-    /// For mail search, specify more options in this field.
-    #[serde(rename="mailOptions")]
-    pub mail_options: Option<MailOptions>,
-    /// The search method to use.
-    #[serde(rename="searchMethod")]
-    pub search_method: Option<String>,
-    /// When 'ROOM' is chosen as search method, hangout_chats_info needs to be
-    /// specified. (read-only)
-    #[serde(rename="hangoutsChatInfo")]
-    pub hangouts_chat_info: Option<HangoutsChatInfo>,
-    /// When 'ACCOUNT' is chosen as search method,
-    /// account_info needs to be specified.
-    #[serde(rename="accountInfo")]
-    pub account_info: Option<AccountInfo>,
-    /// For Drive search, specify more options in this field.
-    #[serde(rename="driveOptions")]
-    pub drive_options: Option<DriveOptions>,
-    /// The start time range for the search query. These timestamps are in GMT and
-    /// rounded down to the start of the given date.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// When 'ORG_UNIT' is chosen as as search method, org_unit_info needs
-    /// to be specified.
-    #[serde(rename="orgUnitInfo")]
-    pub org_unit_info: Option<OrgUnitInfo>,
-    /// The time zone name.
-    /// It should be an IANA TZ name, such as "America/Los_Angeles".
-    /// For more information, see
-    /// <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">Time
-    /// Zone</a>.
-    #[serde(rename="timeZone")]
-    pub time_zone: Option<String>,
-    /// The corpus to search.
-    pub corpus: Option<String>,
-    /// The end time range for the search query. These timestamps are in GMT and
-    /// rounded down to the start of the given date.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// The data source to search from.
-    #[serde(rename="dataScope")]
-    pub data_scope: Option<String>,
-    /// For hangouts chat search, specify more options in this field. (read-only)
-    #[serde(rename="hangoutsChatOptions")]
-    pub hangouts_chat_options: Option<HangoutsChatOptions>,
+pub struct SavedQuery {
+    /// Output only. The matter id of the associated matter.
+    /// The server does not look at this field during create and always uses matter
+    /// id in the URL.
+    #[serde(rename="matterId")]
+    pub matter_id: Option<String>,
+    /// The underlying Query object which contains all the information of the saved
+    /// query.
+    pub query: Option<Query>,
+    /// A unique identifier for the saved query.
+    #[serde(rename="savedQueryId")]
+    pub saved_query_id: Option<String>,
+    /// Name of the saved query.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Output only. The server generated timestamp at which saved query was
+    /// created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
 }
 
-impl Part for Query {}
+impl RequestValue for SavedQuery {}
+impl ResponseResult for SavedQuery {}
 
 
 /// Provides the list of matters.
@@ -1445,7 +1518,7 @@ impl Part for HeldDriveQuery {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Vault::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `add_permissions(...)`, `close(...)`, `create(...)`, `delete(...)`, `exports_create(...)`, `exports_delete(...)`, `exports_get(...)`, `exports_list(...)`, `get(...)`, `holds_accounts_create(...)`, `holds_accounts_delete(...)`, `holds_accounts_list(...)`, `holds_add_held_accounts(...)`, `holds_create(...)`, `holds_delete(...)`, `holds_get(...)`, `holds_list(...)`, `holds_remove_held_accounts(...)`, `holds_update(...)`, `list(...)`, `remove_permissions(...)`, `reopen(...)`, `undelete(...)` and `update(...)`
+/// // like `add_permissions(...)`, `close(...)`, `create(...)`, `delete(...)`, `exports_create(...)`, `exports_delete(...)`, `exports_get(...)`, `exports_list(...)`, `get(...)`, `holds_accounts_create(...)`, `holds_accounts_delete(...)`, `holds_accounts_list(...)`, `holds_add_held_accounts(...)`, `holds_create(...)`, `holds_delete(...)`, `holds_get(...)`, `holds_list(...)`, `holds_remove_held_accounts(...)`, `holds_update(...)`, `list(...)`, `remove_permissions(...)`, `reopen(...)`, `saved_queries_create(...)`, `saved_queries_delete(...)`, `saved_queries_get(...)`, `saved_queries_list(...)`, `undelete(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.matters();
 /// # }
@@ -1494,6 +1567,26 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
             _view: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a saved query by Id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matterId` - The matter id of the parent matter for which the saved query is to be
+    ///                deleted.
+    /// * `savedQueryId` - Id of the saved query to be deleted.
+    pub fn saved_queries_delete(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryDeleteCall<'a, C, A> {
+        MatterSavedQueryDeleteCall {
+            hub: self.hub,
+            _matter_id: matter_id.to_string(),
+            _saved_query_id: saved_query_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1585,6 +1678,25 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists Exports.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matterId` - The matter ID.
+    pub fn exports_list(&self, matter_id: &str) -> MatterExportListCall<'a, C, A> {
+        MatterExportListCall {
+            hub: self.hub,
+            _matter_id: matter_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets an Export.
     /// 
     /// # Arguments
@@ -1665,20 +1777,19 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a HeldAccount from a hold. If this request leaves the hold with
-    /// no held accounts, the hold will not apply to any accounts.
+    /// Lists saved queries within a matter. An empty page token in
+    /// ListSavedQueriesResponse denotes no more saved queries to list.
     /// 
     /// # Arguments
     ///
-    /// * `matterId` - The matter ID.
-    /// * `holdId` - The hold ID.
-    /// * `accountId` - The ID of the account to remove from the hold.
-    pub fn holds_accounts_delete(&self, matter_id: &str, hold_id: &str, account_id: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
-        MatterHoldAccountDeleteCall {
+    /// * `matterId` - The matter id of the parent matter for which the saved queries are to be
+    ///                retrieved.
+    pub fn saved_queries_list(&self, matter_id: &str) -> MatterSavedQueryListCall<'a, C, A> {
+        MatterSavedQueryListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
-            _hold_id: hold_id.to_string(),
-            _account_id: account_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1862,17 +1973,20 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists Exports.
+    /// Removes a HeldAccount from a hold. If this request leaves the hold with
+    /// no held accounts, the hold will not apply to any accounts.
     /// 
     /// # Arguments
     ///
     /// * `matterId` - The matter ID.
-    pub fn exports_list(&self, matter_id: &str) -> MatterExportListCall<'a, C, A> {
-        MatterExportListCall {
+    /// * `holdId` - The hold ID.
+    /// * `accountId` - The ID of the account to remove from the hold.
+    pub fn holds_accounts_delete(&self, matter_id: &str, hold_id: &str, account_id: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
+        MatterHoldAccountDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
+            _hold_id: hold_id.to_string(),
+            _account_id: account_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1923,6 +2037,26 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a saved query.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `matterId` - The matter id of the parent matter for which the saved query is to be
+    ///                created.
+    pub fn saved_queries_create(&self, request: SavedQuery, matter_id: &str) -> MatterSavedQueryCreateCall<'a, C, A> {
+        MatterSavedQueryCreateCall {
+            hub: self.hub,
+            _request: request,
+            _matter_id: matter_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes the specified matter. Returns matter with updated state.
     /// 
     /// # Arguments
@@ -1932,6 +2066,26 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
         MatterDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves a saved query by Id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matterId` - The matter id of the parent matter for which the saved query is to be
+    ///                retrieved.
+    /// * `savedQueryId` - Id of the saved query to be retrieved.
+    pub fn saved_queries_get(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryGetCall<'a, C, A> {
+        MatterSavedQueryGetCall {
+            hub: self.hub,
+            _matter_id: matter_id.to_string(),
+            _saved_query_id: saved_query_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2047,10 +2201,7 @@ impl<'a, C, A> MatterHoldDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2070,7 +2221,7 @@ impl<'a, C, A> MatterHoldDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2158,7 +2309,7 @@ impl<'a, C, A> MatterHoldDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2320,10 +2471,7 @@ impl<'a, C, A> MatterHoldListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2343,7 +2491,7 @@ impl<'a, C, A> MatterHoldListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2444,7 +2592,7 @@ impl<'a, C, A> MatterHoldListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2481,6 +2629,263 @@ impl<'a, C, A> MatterHoldListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a saved query by Id.
+///
+/// A builder for the *savedQueries.delete* method supported by a *matter* resource.
+/// It is not used directly, but through a `MatterMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vault1 as vault1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vault1::Vault;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vault::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.matters().saved_queries_delete("matterId", "savedQueryId")
+///              .doit();
+/// # }
+/// ```
+pub struct MatterSavedQueryDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vault<C, A>,
+    _matter_id: String,
+    _saved_query_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MatterSavedQueryDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> MatterSavedQueryDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vault.matters.savedQueries.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("matterId", self._matter_id.to_string()));
+        params.push(("savedQueryId", self._saved_query_id.to_string()));
+        for &field in ["alt", "matterId", "savedQueryId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/savedQueries/{savedQueryId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Ediscovery.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{matterId}", "matterId"), ("{savedQueryId}", "savedQueryId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["savedQueryId", "matterId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The matter id of the parent matter for which the saved query is to be
+    /// deleted.
+    ///
+    /// Sets the *matter id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a, C, A> {
+        self._matter_id = new_value.to_string();
+        self
+    }
+    /// Id of the saved query to be deleted.
+    ///
+    /// Sets the *saved query id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a, C, A> {
+        self._saved_query_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterSavedQueryDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Ediscovery`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2597,10 +3002,7 @@ impl<'a, C, A> MatterExportCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2632,7 +3034,7 @@ impl<'a, C, A> MatterExportCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2722,7 +3124,7 @@ impl<'a, C, A> MatterExportCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2878,10 +3280,7 @@ impl<'a, C, A> MatterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2913,7 +3312,7 @@ impl<'a, C, A> MatterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3003,7 +3402,7 @@ impl<'a, C, A> MatterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3079,7 +3478,7 @@ impl<'a, C, A> MatterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().holds_get("matterId", "holdId")
-///              .view("justo")
+///              .view("et")
 ///              .doit();
 /// # }
 /// ```
@@ -3156,10 +3555,7 @@ impl<'a, C, A> MatterHoldGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3179,7 +3575,7 @@ impl<'a, C, A> MatterHoldGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3274,7 +3670,7 @@ impl<'a, C, A> MatterHoldGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3425,10 +3821,7 @@ impl<'a, C, A> MatterHoldAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3448,7 +3841,7 @@ impl<'a, C, A> MatterHoldAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3536,7 +3929,7 @@ impl<'a, C, A> MatterHoldAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3573,6 +3966,274 @@ impl<'a, C, A> MatterHoldAccountListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists Exports.
+///
+/// A builder for the *exports.list* method supported by a *matter* resource.
+/// It is not used directly, but through a `MatterMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vault1 as vault1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vault1::Vault;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vault::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.matters().exports_list("matterId")
+///              .page_token("et")
+///              .page_size(-70)
+///              .doit();
+/// # }
+/// ```
+pub struct MatterExportListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vault<C, A>,
+    _matter_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MatterExportListCall<'a, C, A> {}
+
+impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListExportsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vault.matters.exports.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("matterId", self._matter_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "matterId", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/exports";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EdiscoveryReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{matterId}", "matterId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["matterId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The matter ID.
+    ///
+    /// Sets the *matter id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportListCall<'a, C, A> {
+        self._matter_id = new_value.to_string();
+        self
+    }
+    /// The pagination token as returned in the response.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> MatterExportListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The number of exports to return in the response.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> MatterExportListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterExportListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EdiscoveryReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3684,10 +4345,7 @@ impl<'a, C, A> MatterExportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3707,7 +4365,7 @@ impl<'a, C, A> MatterExportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3795,7 +4453,7 @@ impl<'a, C, A> MatterExportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3952,10 +4610,7 @@ impl<'a, C, A> MatterHoldAddHeldAccountCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3987,7 +4642,7 @@ impl<'a, C, A> MatterHoldAddHeldAccountCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4087,7 +4742,7 @@ impl<'a, C, A> MatterHoldAddHeldAccountCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4240,10 +4895,7 @@ impl<'a, C, A> MatterUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4275,7 +4927,7 @@ impl<'a, C, A> MatterUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4365,7 +5017,7 @@ impl<'a, C, A> MatterUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4518,10 +5170,7 @@ impl<'a, C, A> MatterRemovePermissionCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4553,7 +5202,7 @@ impl<'a, C, A> MatterRemovePermissionCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4643,7 +5292,7 @@ impl<'a, C, A> MatterRemovePermissionCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4691,10 +5340,10 @@ impl<'a, C, A> MatterRemovePermissionCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Removes a HeldAccount from a hold. If this request leaves the hold with
-/// no held accounts, the hold will not apply to any accounts.
+/// Lists saved queries within a matter. An empty page token in
+/// ListSavedQueriesResponse denotes no more saved queries to list.
 ///
-/// A builder for the *holds.accounts.delete* method supported by a *matter* resource.
+/// A builder for the *savedQueries.list* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
 ///
 /// # Example
@@ -4719,29 +5368,31 @@ impl<'a, C, A> MatterRemovePermissionCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.matters().holds_accounts_delete("matterId", "holdId", "accountId")
+/// let result = hub.matters().saved_queries_list("matterId")
+///              .page_token("eirmod")
+///              .page_size(-43)
 ///              .doit();
 /// # }
 /// ```
-pub struct MatterHoldAccountDeleteCall<'a, C, A>
+pub struct MatterSavedQueryListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Vault<C, A>,
     _matter_id: String,
-    _hold_id: String,
-    _account_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for MatterHoldAccountDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MatterSavedQueryListCall<'a, C, A> {}
 
-impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MatterSavedQueryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListSavedQueriesResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -4749,13 +5400,17 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "vault.matters.holds.accounts.delete",
-                               http_method: hyper::method::Method::Delete });
+        dlg.begin(MethodInfo { id: "vault.matters.savedQueries.list",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("matterId", self._matter_id.to_string()));
-        params.push(("holdId", self._hold_id.to_string()));
-        params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "matterId", "holdId", "accountId"].iter() {
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "matterId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4767,12 +5422,12 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/holds/{holdId}/accounts/{accountId}";
+        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/savedQueries";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Ediscovery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EdiscoveryReadonly.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{matterId}", "matterId"), ("{holdId}", "holdId"), ("{accountId}", "accountId")].iter() {
+        for &(find_this, param_name) in [("{matterId}", "matterId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -4783,8 +5438,8 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["accountId", "holdId", "matterId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["matterId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -4794,10 +5449,7 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4817,7 +5469,7 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4870,34 +5522,30 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The matter ID.
+    /// The matter id of the parent matter for which the saved queries are to be
+    /// retrieved.
     ///
     /// Sets the *matter id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryListCall<'a, C, A> {
         self._matter_id = new_value.to_string();
         self
     }
-    /// The hold ID.
+    /// The pagination token as returned in the previous response.
+    /// An empty token means start from the beginning.
     ///
-    /// Sets the *hold id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
-        self._hold_id = new_value.to_string();
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> MatterSavedQueryListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
         self
     }
-    /// The ID of the account to remove from the hold.
+    /// The maximum number of saved queries to return.
     ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
-        self._account_id = new_value.to_string();
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> MatterSavedQueryListCall<'a, C, A> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4906,7 +5554,7 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterHoldAccountDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterSavedQueryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4915,7 +5563,7 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4931,7 +5579,7 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4940,7 +5588,7 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Ediscovery`.
+    /// `Scope::EdiscoveryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4951,7 +5599,7 @@ impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5068,10 +5716,7 @@ impl<'a, C, A> MatterAddPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5103,7 +5748,7 @@ impl<'a, C, A> MatterAddPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5193,7 +5838,7 @@ impl<'a, C, A> MatterAddPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5350,10 +5995,7 @@ impl<'a, C, A> MatterHoldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5385,7 +6027,7 @@ impl<'a, C, A> MatterHoldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5485,7 +6127,7 @@ impl<'a, C, A> MatterHoldUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5638,10 +6280,7 @@ impl<'a, C, A> MatterCloseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5673,7 +6312,7 @@ impl<'a, C, A> MatterCloseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5763,7 +6402,7 @@ impl<'a, C, A> MatterCloseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5839,7 +6478,7 @@ impl<'a, C, A> MatterCloseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().get("matterId")
-///              .view("amet")
+///              .view("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -5914,10 +6553,7 @@ impl<'a, C, A> MatterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5937,7 +6573,7 @@ impl<'a, C, A> MatterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6022,7 +6658,7 @@ impl<'a, C, A> MatterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6175,10 +6811,7 @@ impl<'a, C, A> MatterHoldCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6210,7 +6843,7 @@ impl<'a, C, A> MatterHoldCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6300,7 +6933,7 @@ impl<'a, C, A> MatterHoldCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6457,10 +7090,7 @@ impl<'a, C, A> MatterHoldRemoveHeldAccountCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6492,7 +7122,7 @@ impl<'a, C, A> MatterHoldRemoveHeldAccountCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6592,7 +7222,7 @@ impl<'a, C, A> MatterHoldRemoveHeldAccountCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6724,10 +7354,7 @@ impl<'a, C, A> MatterCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6759,7 +7386,7 @@ impl<'a, C, A> MatterCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6839,7 +7466,7 @@ impl<'a, C, A> MatterCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6915,10 +7542,10 @@ impl<'a, C, A> MatterCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.matters().list()
-///              .view("dolore")
-///              .state("invidunt")
-///              .page_token("aliquyam")
-///              .page_size(-73)
+///              .view("sea")
+///              .state("et")
+///              .page_token("duo")
+///              .page_size(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -6982,10 +7609,7 @@ impl<'a, C, A> MatterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7005,7 +7629,7 @@ impl<'a, C, A> MatterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7103,7 +7727,7 @@ impl<'a, C, A> MatterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7256,10 +7880,7 @@ impl<'a, C, A> MatterReopenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7291,7 +7912,7 @@ impl<'a, C, A> MatterReopenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7381,7 +8002,7 @@ impl<'a, C, A> MatterReopenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7429,9 +8050,10 @@ impl<'a, C, A> MatterReopenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Lists Exports.
+/// Removes a HeldAccount from a hold. If this request leaves the hold with
+/// no held accounts, the hold will not apply to any accounts.
 ///
-/// A builder for the *exports.list* method supported by a *matter* resource.
+/// A builder for the *holds.accounts.delete* method supported by a *matter* resource.
 /// It is not used directly, but through a `MatterMethods` instance.
 ///
 /// # Example
@@ -7456,31 +8078,29 @@ impl<'a, C, A> MatterReopenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.matters().exports_list("matterId")
-///              .page_token("et")
-///              .page_size(-70)
+/// let result = hub.matters().holds_accounts_delete("matterId", "holdId", "accountId")
 ///              .doit();
 /// # }
 /// ```
-pub struct MatterExportListCall<'a, C, A>
+pub struct MatterHoldAccountDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Vault<C, A>,
     _matter_id: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
+    _hold_id: String,
+    _account_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for MatterExportListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MatterHoldAccountDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MatterHoldAccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListExportsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7488,17 +8108,13 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "vault.matters.exports.list",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "vault.matters.holds.accounts.delete",
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("matterId", self._matter_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "matterId", "pageToken", "pageSize"].iter() {
+        params.push(("holdId", self._hold_id.to_string()));
+        params.push(("accountId", self._account_id.to_string()));
+        for &field in ["alt", "matterId", "holdId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7510,12 +8126,12 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/exports";
+        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/holds/{holdId}/accounts/{accountId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::EdiscoveryReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Ediscovery.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{matterId}", "matterId")].iter() {
+        for &(find_this, param_name) in [("{matterId}", "matterId"), ("{holdId}", "holdId"), ("{accountId}", "accountId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -7526,8 +8142,8 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["matterId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["accountId", "holdId", "matterId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -7537,10 +8153,7 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7560,7 +8173,7 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7619,22 +8232,28 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportListCall<'a, C, A> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
         self._matter_id = new_value.to_string();
         self
     }
-    /// The pagination token as returned in the response.
+    /// The hold ID.
     ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterExportListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
+    /// Sets the *hold id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
+        self._hold_id = new_value.to_string();
         self
     }
-    /// The number of exports to return in the response.
+    /// The ID of the account to remove from the hold.
     ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterExportListCall<'a, C, A> {
-        self._page_size = Some(new_value);
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C, A> {
+        self._account_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7643,7 +8262,7 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterExportListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterHoldAccountDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7652,7 +8271,7 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7668,7 +8287,7 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7677,7 +8296,7 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::EdiscoveryReadonly`.
+    /// `Scope::Ediscovery`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7688,7 +8307,7 @@ impl<'a, C, A> MatterExportListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7800,10 +8419,7 @@ impl<'a, C, A> MatterExportDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7823,7 +8439,7 @@ impl<'a, C, A> MatterExportDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7911,7 +8527,7 @@ impl<'a, C, A> MatterExportDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8068,10 +8684,7 @@ impl<'a, C, A> MatterHoldAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8103,7 +8716,7 @@ impl<'a, C, A> MatterHoldAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8203,7 +8816,7 @@ impl<'a, C, A> MatterHoldAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8240,6 +8853,282 @@ impl<'a, C, A> MatterHoldAccountCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a saved query.
+///
+/// A builder for the *savedQueries.create* method supported by a *matter* resource.
+/// It is not used directly, but through a `MatterMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vault1 as vault1;
+/// use vault1::SavedQuery;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vault1::Vault;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vault::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SavedQuery::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.matters().saved_queries_create(req, "matterId")
+///              .doit();
+/// # }
+/// ```
+pub struct MatterSavedQueryCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vault<C, A>,
+    _request: SavedQuery,
+    _matter_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MatterSavedQueryCreateCall<'a, C, A> {}
+
+impl<'a, C, A> MatterSavedQueryCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SavedQuery)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vault.matters.savedQueries.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("matterId", self._matter_id.to_string()));
+        for &field in ["alt", "matterId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/savedQueries";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Ediscovery.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{matterId}", "matterId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["matterId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SavedQuery) -> MatterSavedQueryCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The matter id of the parent matter for which the saved query is to be
+    /// created.
+    ///
+    /// Sets the *matter id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryCreateCall<'a, C, A> {
+        self._matter_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterSavedQueryCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Ediscovery`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8349,10 +9238,7 @@ impl<'a, C, A> MatterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8372,7 +9258,7 @@ impl<'a, C, A> MatterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8450,7 +9336,7 @@ impl<'a, C, A> MatterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8487,6 +9373,263 @@ impl<'a, C, A> MatterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MatterDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves a saved query by Id.
+///
+/// A builder for the *savedQueries.get* method supported by a *matter* resource.
+/// It is not used directly, but through a `MatterMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vault1 as vault1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vault1::Vault;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vault::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.matters().saved_queries_get("matterId", "savedQueryId")
+///              .doit();
+/// # }
+/// ```
+pub struct MatterSavedQueryGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vault<C, A>,
+    _matter_id: String,
+    _saved_query_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MatterSavedQueryGetCall<'a, C, A> {}
+
+impl<'a, C, A> MatterSavedQueryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SavedQuery)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vault.matters.savedQueries.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("matterId", self._matter_id.to_string()));
+        params.push(("savedQueryId", self._saved_query_id.to_string()));
+        for &field in ["alt", "matterId", "savedQueryId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/matters/{matterId}/savedQueries/{savedQueryId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EdiscoveryReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{matterId}", "matterId"), ("{savedQueryId}", "savedQueryId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["savedQueryId", "matterId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The matter id of the parent matter for which the saved query is to be
+    /// retrieved.
+    ///
+    /// Sets the *matter id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a, C, A> {
+        self._matter_id = new_value.to_string();
+        self
+    }
+    /// Id of the saved query to be retrieved.
+    ///
+    /// Sets the *saved query id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a, C, A> {
+        self._saved_query_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MatterSavedQueryGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EdiscoveryReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

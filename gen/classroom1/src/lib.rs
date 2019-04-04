@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *1.0.8+20181009*, where *20181009* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *classroom* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Classroom.html) ... 
 //! 
 //! * [courses](struct.Course.html)
-//!  * [*aliases create*](struct.CourseAliaseCreateCall.html), [*aliases delete*](struct.CourseAliaseDeleteCall.html), [*aliases list*](struct.CourseAliaseListCall.html), [*announcements create*](struct.CourseAnnouncementCreateCall.html), [*announcements delete*](struct.CourseAnnouncementDeleteCall.html), [*announcements get*](struct.CourseAnnouncementGetCall.html), [*announcements list*](struct.CourseAnnouncementListCall.html), [*announcements modify assignees*](struct.CourseAnnouncementModifyAssigneeCall.html), [*announcements patch*](struct.CourseAnnouncementPatchCall.html), [*course work create*](struct.CourseCourseWorkCreateCall.html), [*course work delete*](struct.CourseCourseWorkDeleteCall.html), [*course work get*](struct.CourseCourseWorkGetCall.html), [*course work list*](struct.CourseCourseWorkListCall.html), [*course work modify assignees*](struct.CourseCourseWorkModifyAssigneeCall.html), [*course work patch*](struct.CourseCourseWorkPatchCall.html), [*course work student submissions get*](struct.CourseCourseWorkStudentSubmissionGetCall.html), [*course work student submissions list*](struct.CourseCourseWorkStudentSubmissionListCall.html), [*course work student submissions modify attachments*](struct.CourseCourseWorkStudentSubmissionModifyAttachmentCall.html), [*course work student submissions patch*](struct.CourseCourseWorkStudentSubmissionPatchCall.html), [*course work student submissions reclaim*](struct.CourseCourseWorkStudentSubmissionReclaimCall.html), [*course work student submissions return*](struct.CourseCourseWorkStudentSubmissionReturnCall.html), [*course work student submissions turn in*](struct.CourseCourseWorkStudentSubmissionTurnInCall.html), [*create*](struct.CourseCreateCall.html), [*delete*](struct.CourseDeleteCall.html), [*get*](struct.CourseGetCall.html), [*list*](struct.CourseListCall.html), [*patch*](struct.CoursePatchCall.html), [*students create*](struct.CourseStudentCreateCall.html), [*students delete*](struct.CourseStudentDeleteCall.html), [*students get*](struct.CourseStudentGetCall.html), [*students list*](struct.CourseStudentListCall.html), [*teachers create*](struct.CourseTeacherCreateCall.html), [*teachers delete*](struct.CourseTeacherDeleteCall.html), [*teachers get*](struct.CourseTeacherGetCall.html), [*teachers list*](struct.CourseTeacherListCall.html) and [*update*](struct.CourseUpdateCall.html)
+//!  * [*aliases create*](struct.CourseAliaseCreateCall.html), [*aliases delete*](struct.CourseAliaseDeleteCall.html), [*aliases list*](struct.CourseAliaseListCall.html), [*announcements create*](struct.CourseAnnouncementCreateCall.html), [*announcements delete*](struct.CourseAnnouncementDeleteCall.html), [*announcements get*](struct.CourseAnnouncementGetCall.html), [*announcements list*](struct.CourseAnnouncementListCall.html), [*announcements modify assignees*](struct.CourseAnnouncementModifyAssigneeCall.html), [*announcements patch*](struct.CourseAnnouncementPatchCall.html), [*course work create*](struct.CourseCourseWorkCreateCall.html), [*course work delete*](struct.CourseCourseWorkDeleteCall.html), [*course work get*](struct.CourseCourseWorkGetCall.html), [*course work list*](struct.CourseCourseWorkListCall.html), [*course work modify assignees*](struct.CourseCourseWorkModifyAssigneeCall.html), [*course work patch*](struct.CourseCourseWorkPatchCall.html), [*course work student submissions get*](struct.CourseCourseWorkStudentSubmissionGetCall.html), [*course work student submissions list*](struct.CourseCourseWorkStudentSubmissionListCall.html), [*course work student submissions modify attachments*](struct.CourseCourseWorkStudentSubmissionModifyAttachmentCall.html), [*course work student submissions patch*](struct.CourseCourseWorkStudentSubmissionPatchCall.html), [*course work student submissions reclaim*](struct.CourseCourseWorkStudentSubmissionReclaimCall.html), [*course work student submissions return*](struct.CourseCourseWorkStudentSubmissionReturnCall.html), [*course work student submissions turn in*](struct.CourseCourseWorkStudentSubmissionTurnInCall.html), [*create*](struct.CourseCreateCall.html), [*delete*](struct.CourseDeleteCall.html), [*get*](struct.CourseGetCall.html), [*list*](struct.CourseListCall.html), [*patch*](struct.CoursePatchCall.html), [*students create*](struct.CourseStudentCreateCall.html), [*students delete*](struct.CourseStudentDeleteCall.html), [*students get*](struct.CourseStudentGetCall.html), [*students list*](struct.CourseStudentListCall.html), [*teachers create*](struct.CourseTeacherCreateCall.html), [*teachers delete*](struct.CourseTeacherDeleteCall.html), [*teachers get*](struct.CourseTeacherGetCall.html), [*teachers list*](struct.CourseTeacherListCall.html), [*topics create*](struct.CourseTopicCreateCall.html), [*topics delete*](struct.CourseTopicDeleteCall.html), [*topics get*](struct.CourseTopicGetCall.html), [*topics list*](struct.CourseTopicListCall.html), [*topics patch*](struct.CourseTopicPatchCall.html) and [*update*](struct.CourseUpdateCall.html)
 //! * [invitations](struct.Invitation.html)
 //!  * [*accept*](struct.InvitationAcceptCall.html), [*create*](struct.InvitationCreateCall.html), [*delete*](struct.InvitationDeleteCall.html), [*get*](struct.InvitationGetCall.html) and [*list*](struct.InvitationListCall.html)
 //! * [registrations](struct.Registration.html)
@@ -56,23 +56,25 @@
 //! let r = hub.courses().announcements_modify_assignees(...).doit()
 //! let r = hub.courses().course_work_student_submissions_patch(...).doit()
 //! let r = hub.courses().announcements_list(...).doit()
-//! let r = hub.courses().course_work_student_submissions_reclaim(...).doit()
+//! let r = hub.courses().teachers_list(...).doit()
 //! let r = hub.courses().get(...).doit()
 //! let r = hub.courses().update(...).doit()
-//! let r = hub.courses().students_delete(...).doit()
+//! let r = hub.courses().students_get(...).doit()
 //! let r = hub.courses().teachers_get(...).doit()
 //! let r = hub.courses().course_work_list(...).doit()
-//! let r = hub.courses().course_work_get(...).doit()
+//! let r = hub.courses().topics_list(...).doit()
+//! let r = hub.courses().course_work_student_submissions_reclaim(...).doit()
 //! let r = hub.courses().course_work_student_submissions_list(...).doit()
 //! let r = hub.courses().course_work_student_submissions_turn_in(...).doit()
 //! let r = hub.courses().course_work_student_submissions_modify_attachments(...).doit()
 //! let r = hub.courses().announcements_get(...).doit()
-//! let r = hub.courses().teachers_list(...).doit()
 //! let r = hub.courses().course_work_student_submissions_return(...).doit()
 //! let r = hub.courses().aliases_list(...).doit()
+//! let r = hub.courses().course_work_get(...).doit()
 //! let r = hub.courses().course_work_create(...).doit()
 //! let r = hub.courses().list(...).doit()
 //! let r = hub.courses().announcements_create(...).doit()
+//! let r = hub.courses().topics_patch(...).doit()
 //! let r = hub.courses().announcements_patch(...).doit()
 //! let r = hub.courses().aliases_create(...).doit()
 //! let r = hub.courses().students_create(...).doit()
@@ -83,12 +85,15 @@
 //! let r = hub.courses().students_list(...).doit()
 //! let r = hub.courses().delete(...).doit()
 //! let r = hub.courses().course_work_patch(...).doit()
+//! let r = hub.courses().topics_delete(...).doit()
 //! let r = hub.courses().patch(...).doit()
-//! let r = hub.courses().students_get(...).doit()
+//! let r = hub.courses().students_delete(...).doit()
 //! let r = hub.courses().teachers_delete(...).doit()
 //! let r = hub.courses().teachers_create(...).doit()
 //! let r = hub.courses().course_work_student_submissions_get(...).doit()
+//! let r = hub.courses().topics_get(...).doit()
 //! let r = hub.courses().announcements_delete(...).doit()
+//! let r = hub.courses().topics_create(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -280,11 +285,11 @@ pub enum Scope {
     /// View and manage announcements in Google Classroom
     Announcement,
 
+    /// Manage your Google Classroom classes
+    Course,
+
     /// View the profile photos of people in your classes
     ProfilePhoto,
-
-    /// View your course work and grades in Google Classroom
-    CourseworkMeReadonly,
 
     /// View guardians for students in your Google Classroom classes
     GuardianlinkStudentReadonly,
@@ -307,11 +312,11 @@ pub enum Scope {
     /// View your Google Classroom class rosters
     RosterReadonly,
 
-    /// Manage your Google Classroom classes
-    Course,
-
     /// View course work and grades for students in the Google Classroom classes you teach or administer
     CourseworkStudentReadonly,
+
+    /// View your course work and grades in Google Classroom
+    CourseworkMeReadonly,
 
     /// View announcements in Google Classroom
     AnnouncementReadonly,
@@ -324,6 +329,12 @@ pub enum Scope {
 
     /// Receive notifications about your Google Classroom data
     PushNotification,
+
+    /// View topics in Google Classroom
+    TopicReadonly,
+
+    /// See, create, and edit topics in Google Classroom
+    Topic,
 }
 
 impl AsRef<str> for Scope {
@@ -332,8 +343,8 @@ impl AsRef<str> for Scope {
             Scope::ProfileEmail => "https://www.googleapis.com/auth/classroom.profile.emails",
             Scope::GuardianlinkStudent => "https://www.googleapis.com/auth/classroom.guardianlinks.students",
             Scope::Announcement => "https://www.googleapis.com/auth/classroom.announcements",
+            Scope::Course => "https://www.googleapis.com/auth/classroom.courses",
             Scope::ProfilePhoto => "https://www.googleapis.com/auth/classroom.profile.photos",
-            Scope::CourseworkMeReadonly => "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
             Scope::GuardianlinkStudentReadonly => "https://www.googleapis.com/auth/classroom.guardianlinks.students.readonly",
             Scope::StudentSubmissionStudentReadonly => "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
             Scope::Roster => "https://www.googleapis.com/auth/classroom.rosters",
@@ -341,19 +352,21 @@ impl AsRef<str> for Scope {
             Scope::CourseworkMe => "https://www.googleapis.com/auth/classroom.coursework.me",
             Scope::StudentSubmissionMeReadonly => "https://www.googleapis.com/auth/classroom.student-submissions.me.readonly",
             Scope::RosterReadonly => "https://www.googleapis.com/auth/classroom.rosters.readonly",
-            Scope::Course => "https://www.googleapis.com/auth/classroom.courses",
             Scope::CourseworkStudentReadonly => "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+            Scope::CourseworkMeReadonly => "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
             Scope::AnnouncementReadonly => "https://www.googleapis.com/auth/classroom.announcements.readonly",
             Scope::CourseworkStudent => "https://www.googleapis.com/auth/classroom.coursework.students",
             Scope::CourseReadonly => "https://www.googleapis.com/auth/classroom.courses.readonly",
             Scope::PushNotification => "https://www.googleapis.com/auth/classroom.push-notifications",
+            Scope::TopicReadonly => "https://www.googleapis.com/auth/classroom.topics.readonly",
+            Scope::Topic => "https://www.googleapis.com/auth/classroom.topics",
         }
     }
 }
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::CourseworkMeReadonly
+        Scope::GuardianlinkStudentReadonly
     }
 }
 
@@ -670,24 +683,27 @@ pub struct Attachment {
 impl Part for Attachment {}
 
 
-/// Student work for an assignment.
+/// Represents a time of day. The date and time zone are either not significant
+/// or are specified elsewhere. An API may choose to allow leap seconds. Related
+/// types are google.type.Date and `google.protobuf.Timestamp`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AssignmentSubmission {
-    /// Attachments added by the student.
-    /// Drive files that correspond to materials with a share mode of
-    /// STUDENT_COPY may not exist yet if the student has not accessed the
-    /// assignment in Classroom.
-    /// 
-    /// Some attachment metadata is only populated if the requesting user has
-    /// permission to access it. Identifier and alternate_link fields are always
-    /// available, but others (e.g. title) may not be.
-    pub attachments: Option<Vec<Attachment>>,
+pub struct TimeOfDay {
+    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
+    /// to allow the value "24:00:00" for scenarios like business closing time.
+    pub hours: Option<i32>,
+    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
+    pub nanos: Option<i32>,
+    /// Minutes of hour of day. Must be from 0 to 59.
+    pub minutes: Option<i32>,
+    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
+    /// allow the value 60 if it allows leap-seconds.
+    pub seconds: Option<i32>,
 }
 
-impl Part for AssignmentSubmission {}
+impl Part for TimeOfDay {}
 
 
 /// Request to return a student submission.
@@ -721,15 +737,16 @@ impl RequestValue for ReturnStudentSubmissionRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete invitations](struct.InvitationDeleteCall.html) (response)
-/// * [course work delete courses](struct.CourseCourseWorkDeleteCall.html) (response)
+/// * [course work student submissions turn in courses](struct.CourseCourseWorkStudentSubmissionTurnInCall.html) (response)
 /// * [course work student submissions reclaim courses](struct.CourseCourseWorkStudentSubmissionReclaimCall.html) (response)
 /// * [delete courses](struct.CourseDeleteCall.html) (response)
 /// * [teachers delete courses](struct.CourseTeacherDeleteCall.html) (response)
 /// * [guardians delete user profiles](struct.UserProfileGuardianDeleteCall.html) (response)
 /// * [students delete courses](struct.CourseStudentDeleteCall.html) (response)
 /// * [aliases delete courses](struct.CourseAliaseDeleteCall.html) (response)
-/// * [course work student submissions turn in courses](struct.CourseCourseWorkStudentSubmissionTurnInCall.html) (response)
+/// * [course work delete courses](struct.CourseCourseWorkDeleteCall.html) (response)
 /// * [course work student submissions return courses](struct.CourseCourseWorkStudentSubmissionReturnCall.html) (response)
+/// * [topics delete courses](struct.CourseTopicDeleteCall.html) (response)
 /// * [delete registrations](struct.RegistrationDeleteCall.html) (response)
 /// * [announcements delete courses](struct.CourseAnnouncementDeleteCall.html) (response)
 /// * [accept invitations](struct.InvitationAcceptCall.html) (response)
@@ -810,27 +827,24 @@ pub struct CourseMaterialSet {
 impl Part for CourseMaterialSet {}
 
 
-/// Represents a time of day. The date and time zone are either not significant
-/// or are specified elsewhere. An API may choose to allow leap seconds. Related
-/// types are google.type.Date and `google.protobuf.Timestamp`.
+/// Student work for an assignment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TimeOfDay {
-    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
-    /// to allow the value "24:00:00" for scenarios like business closing time.
-    pub hours: Option<i32>,
-    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
-    pub nanos: Option<i32>,
-    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
-    /// allow the value 60 if it allows leap-seconds.
-    pub seconds: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
-    pub minutes: Option<i32>,
+pub struct AssignmentSubmission {
+    /// Attachments added by the student.
+    /// Drive files that correspond to materials with a share mode of
+    /// STUDENT_COPY may not exist yet if the student has not accessed the
+    /// assignment in Classroom.
+    /// 
+    /// Some attachment metadata is only populated if the requesting user has
+    /// permission to access it. Identifier and alternate_link fields are always
+    /// available, but others (e.g. title) may not be.
+    pub attachments: Option<Vec<Attachment>>,
 }
 
-impl Part for TimeOfDay {}
+impl Part for AssignmentSubmission {}
 
 
 /// Google Forms item.
@@ -873,23 +887,25 @@ impl Part for Form {}
 /// * [announcements modify assignees courses](struct.CourseAnnouncementModifyAssigneeCall.html) (none)
 /// * [course work student submissions patch courses](struct.CourseCourseWorkStudentSubmissionPatchCall.html) (none)
 /// * [announcements list courses](struct.CourseAnnouncementListCall.html) (none)
-/// * [course work student submissions reclaim courses](struct.CourseCourseWorkStudentSubmissionReclaimCall.html) (none)
+/// * [teachers list courses](struct.CourseTeacherListCall.html) (none)
 /// * [get courses](struct.CourseGetCall.html) (response)
 /// * [update courses](struct.CourseUpdateCall.html) (request|response)
-/// * [students delete courses](struct.CourseStudentDeleteCall.html) (none)
+/// * [students get courses](struct.CourseStudentGetCall.html) (none)
 /// * [teachers get courses](struct.CourseTeacherGetCall.html) (none)
 /// * [course work list courses](struct.CourseCourseWorkListCall.html) (none)
-/// * [course work get courses](struct.CourseCourseWorkGetCall.html) (none)
+/// * [topics list courses](struct.CourseTopicListCall.html) (none)
+/// * [course work student submissions reclaim courses](struct.CourseCourseWorkStudentSubmissionReclaimCall.html) (none)
 /// * [course work student submissions list courses](struct.CourseCourseWorkStudentSubmissionListCall.html) (none)
 /// * [course work student submissions turn in courses](struct.CourseCourseWorkStudentSubmissionTurnInCall.html) (none)
 /// * [course work student submissions modify attachments courses](struct.CourseCourseWorkStudentSubmissionModifyAttachmentCall.html) (none)
 /// * [announcements get courses](struct.CourseAnnouncementGetCall.html) (none)
-/// * [teachers list courses](struct.CourseTeacherListCall.html) (none)
 /// * [course work student submissions return courses](struct.CourseCourseWorkStudentSubmissionReturnCall.html) (none)
 /// * [aliases list courses](struct.CourseAliaseListCall.html) (none)
+/// * [course work get courses](struct.CourseCourseWorkGetCall.html) (none)
 /// * [course work create courses](struct.CourseCourseWorkCreateCall.html) (none)
 /// * [list courses](struct.CourseListCall.html) (none)
 /// * [announcements create courses](struct.CourseAnnouncementCreateCall.html) (none)
+/// * [topics patch courses](struct.CourseTopicPatchCall.html) (none)
 /// * [announcements patch courses](struct.CourseAnnouncementPatchCall.html) (none)
 /// * [aliases create courses](struct.CourseAliaseCreateCall.html) (none)
 /// * [students create courses](struct.CourseStudentCreateCall.html) (none)
@@ -900,12 +916,15 @@ impl Part for Form {}
 /// * [students list courses](struct.CourseStudentListCall.html) (none)
 /// * [delete courses](struct.CourseDeleteCall.html) (none)
 /// * [course work patch courses](struct.CourseCourseWorkPatchCall.html) (none)
+/// * [topics delete courses](struct.CourseTopicDeleteCall.html) (none)
 /// * [patch courses](struct.CoursePatchCall.html) (request|response)
-/// * [students get courses](struct.CourseStudentGetCall.html) (none)
+/// * [students delete courses](struct.CourseStudentDeleteCall.html) (none)
 /// * [teachers delete courses](struct.CourseTeacherDeleteCall.html) (none)
 /// * [teachers create courses](struct.CourseTeacherCreateCall.html) (none)
 /// * [course work student submissions get courses](struct.CourseCourseWorkStudentSubmissionGetCall.html) (none)
+/// * [topics get courses](struct.CourseTopicGetCall.html) (none)
 /// * [announcements delete courses](struct.CourseAnnouncementDeleteCall.html) (none)
+/// * [topics create courses](struct.CourseTopicCreateCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Course {
@@ -1094,10 +1113,11 @@ impl Part for Material {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct YouTubeVideo {
-    /// Title of the YouTube video.
+    /// URL that can be used to view the YouTube video.
     /// 
     /// Read-only.
-    pub title: Option<String>,
+    #[serde(rename="alternateLink")]
+    pub alternate_link: Option<String>,
     /// URL of a thumbnail image of the YouTube video.
     /// 
     /// Read-only.
@@ -1105,11 +1125,10 @@ pub struct YouTubeVideo {
     pub thumbnail_url: Option<String>,
     /// YouTube API resource ID.
     pub id: Option<String>,
-    /// URL that can be used to view the YouTube video.
+    /// Title of the YouTube video.
     /// 
     /// Read-only.
-    #[serde(rename="alternateLink")]
-    pub alternate_link: Option<String>,
+    pub title: Option<String>,
 }
 
 impl Part for YouTubeVideo {}
@@ -1166,10 +1185,11 @@ impl ResponseResult for ListGuardiansResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveFile {
-    /// Title of the Drive item.
+    /// URL that can be used to access the Drive item.
     /// 
     /// Read-only.
-    pub title: Option<String>,
+    #[serde(rename="alternateLink")]
+    pub alternate_link: Option<String>,
     /// URL of a thumbnail image of the Drive item.
     /// 
     /// Read-only.
@@ -1177,11 +1197,10 @@ pub struct DriveFile {
     pub thumbnail_url: Option<String>,
     /// Drive API resource ID.
     pub id: Option<String>,
-    /// URL that can be used to access the Drive item.
+    /// Title of the Drive item.
     /// 
     /// Read-only.
-    #[serde(rename="alternateLink")]
-    pub alternate_link: Option<String>,
+    pub title: Option<String>,
 }
 
 impl Part for DriveFile {}
@@ -1253,26 +1272,34 @@ impl RequestValue for Student {}
 impl ResponseResult for Student {}
 
 
-/// Response when listing course work.
+/// Represents a whole or partial calendar date, e.g. a birthday. The time of day
+/// and time zone are either specified elsewhere or are not significant. The date
+/// is relative to the Proleptic Gregorian Calendar. This can represent:
 /// 
-/// # Activities
+/// * A full date, with non-zero year, month and day values
+/// * A month and day value, with a zero year, e.g. an anniversary
+/// * A year on its own, with zero month and day values
+/// * A year and month value, with a zero day, e.g. a credit card expiration date
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.
 /// 
-/// * [announcements list courses](struct.CourseAnnouncementListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListAnnouncementsResponse {
-    /// Token identifying the next page of results to return. If empty, no further
-    /// results are available.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Announcement items that match the request.
-    pub announcements: Option<Vec<Announcement>>,
+pub struct Date {
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
+    pub month: Option<i32>,
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
+    /// if specifying a year by itself or a year and month where the day is not
+    /// significant.
+    pub day: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
-impl ResponseResult for ListAnnouncementsResponse {}
+impl Part for Date {}
 
 
 /// Drive file that is used as material for course work.
@@ -1292,17 +1319,27 @@ pub struct SharedDriveFile {
 impl Part for SharedDriveFile {}
 
 
-/// Additional details for multiple-choice questions.
+/// Response when listing student submissions.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [course work student submissions list courses](struct.CourseCourseWorkStudentSubmissionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MultipleChoiceQuestion {
-    /// Possible choices.
-    pub choices: Option<Vec<String>>,
+pub struct ListStudentSubmissionsResponse {
+    /// Token identifying the next page of results to return. If empty, no further
+    /// results are available.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Student work that matches the request.
+    #[serde(rename="studentSubmissions")]
+    pub student_submissions: Option<Vec<StudentSubmission>>,
 }
 
-impl Part for MultipleChoiceQuestion {}
+impl ResponseResult for ListStudentSubmissionsResponse {}
 
 
 /// Response when listing courses.
@@ -1356,14 +1393,14 @@ impl ResponseResult for ListGuardianInvitationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseMaterial {
-    /// Youtube video attachment.
-    #[serde(rename="youTubeVideo")]
-    pub you_tube_video: Option<YouTubeVideo>,
+    /// Link atatchment.
+    pub link: Option<Link>,
     /// Google Drive file attachment.
     #[serde(rename="driveFile")]
     pub drive_file: Option<DriveFile>,
-    /// Link atatchment.
-    pub link: Option<Link>,
+    /// Youtube video attachment.
+    #[serde(rename="youTubeVideo")]
+    pub you_tube_video: Option<YouTubeVideo>,
     /// Google Forms attachment.
     pub form: Option<Form>,
 }
@@ -1380,16 +1417,16 @@ pub struct GradeHistory {
     /// When the grade of the submission was changed.
     #[serde(rename="gradeTimestamp")]
     pub grade_timestamp: Option<String>,
+    /// The teacher who made the grade change.
+    #[serde(rename="actorUserId")]
+    pub actor_user_id: Option<String>,
+    /// The numerator of the grade at this time in the submission grade history.
+    #[serde(rename="pointsEarned")]
+    pub points_earned: Option<f64>,
     /// The denominator of the grade at this time in the submission grade
     /// history.
     #[serde(rename="maxPoints")]
     pub max_points: Option<f64>,
-    /// The numerator of the grade at this time in the submission grade history.
-    #[serde(rename="pointsEarned")]
-    pub points_earned: Option<f64>,
-    /// The teacher who made the grade change.
-    #[serde(rename="actorUserId")]
-    pub actor_user_id: Option<String>,
     /// The type of grade change at this time in the submission grade history.
     #[serde(rename="gradeChangeType")]
     pub grade_change_type: Option<String>,
@@ -1447,40 +1484,34 @@ pub struct ListInvitationsResponse {
 impl ResponseResult for ListInvitationsResponse {}
 
 
-/// An instruction to Classroom to send notifications from the `feed` to the
-/// provided destination.
+/// Association between a student and a guardian of that student. The guardian
+/// may receive information about the student's course work.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [delete registrations](struct.RegistrationDeleteCall.html) (none)
-/// * [create registrations](struct.RegistrationCreateCall.html) (request|response)
+/// * [guardians get user profiles](struct.UserProfileGuardianGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Registration {
-    /// Specification for the class of notifications that Classroom should deliver
-    /// to the destination.
-    pub feed: Option<Feed>,
-    /// A server-generated unique identifier for this `Registration`.
-    /// 
-    /// Read-only.
-    #[serde(rename="registrationId")]
-    pub registration_id: Option<String>,
-    /// The time until which the `Registration` is effective.
-    /// 
-    /// This is a read-only field assigned by the server.
-    #[serde(rename="expiryTime")]
-    pub expiry_time: Option<String>,
-    /// The Cloud Pub/Sub topic that notifications are to be sent to.
-    #[serde(rename="cloudPubsubTopic")]
-    pub cloud_pubsub_topic: Option<CloudPubsubTopic>,
+pub struct Guardian {
+    /// Identifier for the guardian.
+    #[serde(rename="guardianId")]
+    pub guardian_id: Option<String>,
+    /// The email address to which the initial guardian invitation was sent.
+    /// This field is only visible to domain administrators.
+    #[serde(rename="invitedEmailAddress")]
+    pub invited_email_address: Option<String>,
+    /// Identifier for the student to whom the guardian relationship applies.
+    #[serde(rename="studentId")]
+    pub student_id: Option<String>,
+    /// User profile for the guardian.
+    #[serde(rename="guardianProfile")]
+    pub guardian_profile: Option<UserProfile>,
 }
 
-impl RequestValue for Registration {}
-impl Resource for Registration {}
-impl ResponseResult for Registration {}
+impl ResponseResult for Guardian {}
 
 
 /// The history of the submission. This currently includes state and grade
@@ -1507,50 +1538,42 @@ impl Part for SubmissionHistory {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveFolder {
-    /// Title of the Drive folder.
-    /// 
-    /// Read-only.
-    pub title: Option<String>,
-    /// Drive API resource ID.
-    pub id: Option<String>,
     /// URL that can be used to access the Drive folder.
     /// 
     /// Read-only.
     #[serde(rename="alternateLink")]
     pub alternate_link: Option<String>,
+    /// Drive API resource ID.
+    pub id: Option<String>,
+    /// Title of the Drive folder.
+    /// 
+    /// Read-only.
+    pub title: Option<String>,
 }
 
 impl Part for DriveFolder {}
 
 
-/// Represents a whole or partial calendar date, e.g. a birthday. The time of day
-/// and time zone are either specified elsewhere or are not significant. The date
-/// is relative to the Proleptic Gregorian Calendar. This can represent:
+/// Response when listing course work.
 /// 
-/// * A full date, with non-zero year, month and day values
-/// * A month and day value, with a zero year, e.g. an anniversary
-/// * A year on its own, with zero month and day values
-/// * A year and month value, with a zero day, e.g. a credit card expiration date
+/// # Activities
 /// 
-/// Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [announcements list courses](struct.CourseAnnouncementListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Date {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
-    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
-    /// if specifying a year by itself or a year and month where the day is not
-    /// significant.
-    pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
-    /// month and day.
-    pub month: Option<i32>,
+pub struct ListAnnouncementsResponse {
+    /// Token identifying the next page of results to return. If empty, no further
+    /// results are available.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Announcement items that match the request.
+    pub announcements: Option<Vec<Announcement>>,
 }
 
-impl Part for Date {}
+impl ResponseResult for ListAnnouncementsResponse {}
 
 
 /// An invitation to join a course.
@@ -1606,12 +1629,12 @@ impl ResponseResult for Invitation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListStudentsResponse {
-    /// Students who match the list request.
-    pub students: Option<Vec<Student>>,
     /// Token identifying the next page of results to return. If empty, no further
     /// results are available.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Students who match the list request.
+    pub students: Option<Vec<Student>>,
 }
 
 impl ResponseResult for ListStudentsResponse {}
@@ -1657,27 +1680,17 @@ pub struct ModifyAnnouncementAssigneesRequest {
 impl RequestValue for ModifyAnnouncementAssigneesRequest {}
 
 
-/// Response when listing student submissions.
+/// Additional details for multiple-choice questions.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [course work student submissions list courses](struct.CourseCourseWorkStudentSubmissionListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListStudentSubmissionsResponse {
-    /// Token identifying the next page of results to return. If empty, no further
-    /// results are available.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Student work that matches the request.
-    #[serde(rename="studentSubmissions")]
-    pub student_submissions: Option<Vec<StudentSubmission>>,
+pub struct MultipleChoiceQuestion {
+    /// Possible choices.
+    pub choices: Option<Vec<String>>,
 }
 
-impl ResponseResult for ListStudentSubmissionsResponse {}
+impl Part for MultipleChoiceQuestion {}
 
 
 /// A class of notifications that an application can register to receive.
@@ -1754,6 +1767,10 @@ impl RequestValue for ReclaimStudentSubmissionRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseWork {
+    /// Identifier for the topic that this coursework is associated with.
+    /// Must match an existing topic in the course.
+    #[serde(rename="topicId")]
+    pub topic_id: Option<String>,
     /// Timestamp of the most recent change to this course work.
     /// 
     /// Read-only.
@@ -1794,7 +1811,7 @@ pub struct CourseWork {
     /// This must be a non-negative integer value.
     #[serde(rename="maxPoints")]
     pub max_points: Option<f64>,
-    /// Optional date, in UTC, that submissions for this this course work are due.
+    /// Optional date, in UTC, that submissions for this course work are due.
     /// This must be specified if `due_time` is specified.
     #[serde(rename="dueDate")]
     pub due_date: Option<Date>,
@@ -1807,17 +1824,17 @@ pub struct CourseWork {
     /// If unspecified, the default value is `MODIFIABLE_UNTIL_TURNED_IN`.
     #[serde(rename="submissionModificationMode")]
     pub submission_modification_mode: Option<String>,
+    /// Identifier for the user that created the coursework.
+    /// 
+    /// Read-only.
+    #[serde(rename="creatorUserId")]
+    pub creator_user_id: Option<String>,
     /// Absolute link to this course work in the Classroom web UI.
     /// This is only populated if `state` is `PUBLISHED`.
     /// 
     /// Read-only.
     #[serde(rename="alternateLink")]
     pub alternate_link: Option<String>,
-    /// Identifier for the user that created the coursework.
-    /// 
-    /// Read-only.
-    #[serde(rename="creatorUserId")]
-    pub creator_user_id: Option<String>,
     /// Timestamp when this course work was created.
     /// 
     /// Read-only.
@@ -1844,7 +1861,7 @@ pub struct CourseWork {
     /// specified in this field will be assigned the coursework.
     #[serde(rename="individualStudentsOptions")]
     pub individual_students_options: Option<IndividualStudentsOptions>,
-    /// Optional time of day, in UTC, that submissions for this this course work
+    /// Optional time of day, in UTC, that submissions for this course work
     /// are due.
     /// This must be specified if `due_date` is specified.
     #[serde(rename="dueTime")]
@@ -1977,6 +1994,28 @@ impl RequestValue for StudentSubmission {}
 impl ResponseResult for StudentSubmission {}
 
 
+/// Response when listing topics.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics list courses](struct.CourseTopicListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListTopicResponse {
+    /// Token identifying the next page of results to return. If empty, no further
+    /// results are available.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Topic items that match the request.
+    pub topic: Option<Vec<Topic>>,
+}
+
+impl ResponseResult for ListTopicResponse {}
+
+
 /// Information about a `Feed` with a `feed_type` of `COURSE_ROSTER_CHANGES`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2003,15 +2042,15 @@ impl Part for CourseRosterChangesInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Teacher {
-    /// Global user information for the teacher.
-    /// 
-    /// Read-only.
-    pub profile: Option<UserProfile>,
     /// Identifier of the course.
     /// 
     /// Read-only.
     #[serde(rename="courseId")]
     pub course_id: Option<String>,
+    /// Global user information for the teacher.
+    /// 
+    /// Read-only.
+    pub profile: Option<UserProfile>,
     /// Identifier of the user.
     /// 
     /// When specified as a parameter of a request, this identifier can be one of
@@ -2026,6 +2065,46 @@ pub struct Teacher {
 
 impl RequestValue for Teacher {}
 impl ResponseResult for Teacher {}
+
+
+/// Topic created by a teacher for the course
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics create courses](struct.CourseTopicCreateCall.html) (request|response)
+/// * [topics patch courses](struct.CourseTopicPatchCall.html) (request|response)
+/// * [topics get courses](struct.CourseTopicGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Topic {
+    /// Identifier of the course.
+    /// 
+    /// Read-only.
+    #[serde(rename="courseId")]
+    pub course_id: Option<String>,
+    /// Unique identifier for the topic.
+    /// 
+    /// Read-only.
+    #[serde(rename="topicId")]
+    pub topic_id: Option<String>,
+    /// The time the topic was last updated by the system.
+    /// 
+    /// Read-only.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// The name of the topic, generated by the user.
+    /// Leading and trailing whitespaces, if any, will be trimmed. Also, multiple
+    /// consecutive whitespaces will be collapsed into one inside the name. The
+    /// result must be a non-empty string. Topic names are case sensitive, and must
+    /// be no longer than 100 characters.
+    pub name: Option<String>,
+}
+
+impl RequestValue for Topic {}
+impl ResponseResult for Topic {}
 
 
 /// Request to modify assignee mode and options of a coursework.
@@ -2106,34 +2185,40 @@ impl RequestValue for CourseAlias {}
 impl ResponseResult for CourseAlias {}
 
 
-/// Association between a student and a guardian of that student. The guardian
-/// may receive information about the student's course work.
+/// An instruction to Classroom to send notifications from the `feed` to the
+/// provided destination.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [guardians get user profiles](struct.UserProfileGuardianGetCall.html) (response)
+/// * [delete registrations](struct.RegistrationDeleteCall.html) (none)
+/// * [create registrations](struct.RegistrationCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Guardian {
-    /// Identifier for the guardian.
-    #[serde(rename="guardianId")]
-    pub guardian_id: Option<String>,
-    /// The email address to which the initial guardian invitation was sent.
-    /// This field is only visible to domain administrators.
-    #[serde(rename="invitedEmailAddress")]
-    pub invited_email_address: Option<String>,
-    /// Identifier for the student to whom the guardian relationship applies.
-    #[serde(rename="studentId")]
-    pub student_id: Option<String>,
-    /// User profile for the guardian.
-    #[serde(rename="guardianProfile")]
-    pub guardian_profile: Option<UserProfile>,
+pub struct Registration {
+    /// Specification for the class of notifications that Classroom should deliver
+    /// to the destination.
+    pub feed: Option<Feed>,
+    /// A server-generated unique identifier for this `Registration`.
+    /// 
+    /// Read-only.
+    #[serde(rename="registrationId")]
+    pub registration_id: Option<String>,
+    /// The time until which the `Registration` is effective.
+    /// 
+    /// This is a read-only field assigned by the server.
+    #[serde(rename="expiryTime")]
+    pub expiry_time: Option<String>,
+    /// The Cloud Pub/Sub topic that notifications are to be sent to.
+    #[serde(rename="cloudPubsubTopic")]
+    pub cloud_pubsub_topic: Option<CloudPubsubTopic>,
 }
 
-impl ResponseResult for Guardian {}
+impl RequestValue for Registration {}
+impl Resource for Registration {}
+impl ResponseResult for Registration {}
 
 
 /// Global user permission description.
@@ -2218,12 +2303,12 @@ pub struct GuardianInvitation {
     /// Read-only.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// The state that this invitation is in.
-    pub state: Option<String>,
     /// Email address that the invitation was sent to.
     /// This field is only visible to domain administrators.
     #[serde(rename="invitedEmailAddress")]
     pub invited_email_address: Option<String>,
+    /// The state that this invitation is in.
+    pub state: Option<String>,
 }
 
 impl RequestValue for GuardianInvitation {}
@@ -2259,7 +2344,7 @@ impl ResponseResult for GuardianInvitation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `aliases_create(...)`, `aliases_delete(...)`, `aliases_list(...)`, `announcements_create(...)`, `announcements_delete(...)`, `announcements_get(...)`, `announcements_list(...)`, `announcements_modify_assignees(...)`, `announcements_patch(...)`, `course_work_create(...)`, `course_work_delete(...)`, `course_work_get(...)`, `course_work_list(...)`, `course_work_modify_assignees(...)`, `course_work_patch(...)`, `course_work_student_submissions_get(...)`, `course_work_student_submissions_list(...)`, `course_work_student_submissions_modify_attachments(...)`, `course_work_student_submissions_patch(...)`, `course_work_student_submissions_reclaim(...)`, `course_work_student_submissions_return(...)`, `course_work_student_submissions_turn_in(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)`, `students_create(...)`, `students_delete(...)`, `students_get(...)`, `students_list(...)`, `teachers_create(...)`, `teachers_delete(...)`, `teachers_get(...)`, `teachers_list(...)` and `update(...)`
+/// // like `aliases_create(...)`, `aliases_delete(...)`, `aliases_list(...)`, `announcements_create(...)`, `announcements_delete(...)`, `announcements_get(...)`, `announcements_list(...)`, `announcements_modify_assignees(...)`, `announcements_patch(...)`, `course_work_create(...)`, `course_work_delete(...)`, `course_work_get(...)`, `course_work_list(...)`, `course_work_modify_assignees(...)`, `course_work_patch(...)`, `course_work_student_submissions_get(...)`, `course_work_student_submissions_list(...)`, `course_work_student_submissions_modify_attachments(...)`, `course_work_student_submissions_patch(...)`, `course_work_student_submissions_reclaim(...)`, `course_work_student_submissions_return(...)`, `course_work_student_submissions_turn_in(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)`, `students_create(...)`, `students_delete(...)`, `students_get(...)`, `students_list(...)`, `teachers_create(...)`, `teachers_delete(...)`, `teachers_get(...)`, `teachers_list(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_list(...)`, `topics_patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.courses();
 /// # }
@@ -2385,43 +2470,25 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Reclaims a student submission on behalf of the student that owns it.
-    /// 
-    /// Reclaiming a student submission transfers ownership of attached Drive
-    /// files to the student and update the submission state.
-    /// 
-    /// Only the student that owns the requested student submission may call this
-    /// method, and only for a student submission that has been turned in.
-    /// 
-    /// This request must be made by the Developer Console project of the
-    /// [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
-    /// create the corresponding course work item.
+    /// Returns a list of teachers of this course that the requester
+    /// is permitted to view.
     /// 
     /// This method returns the following error codes:
     /// 
-    /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-    /// requested course or course work, unsubmit the requested student submission,
-    /// or for access errors.
-    /// * `FAILED_PRECONDITION` if the student submission has not been turned in.
-    /// * `INVALID_ARGUMENT` if the request is malformed.
-    /// * `NOT_FOUND` if the requested course, course work, or student submission
-    /// does not exist.
+    /// * `NOT_FOUND` if the course does not exist.
+    /// * `PERMISSION_DENIED` for access errors.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course.
     ///                This identifier can be either the Classroom-assigned identifier or an
     ///                alias.
-    /// * `courseWorkId` - Identifier of the course work.
-    /// * `id` - Identifier of the student submission.
-    pub fn course_work_student_submissions_reclaim(&self, request: ReclaimStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
-        CourseCourseWorkStudentSubmissionReclaimCall {
+    pub fn teachers_list(&self, course_id: &str) -> CourseTeacherListCall<'a, C, A> {
+        CourseTeacherListCall {
             hub: self.hub,
-            _request: request,
             _course_id: course_id.to_string(),
-            _course_work_id: course_work_id.to_string(),
-            _id: id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2484,11 +2551,11 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a student of a course.
+    /// Returns a student of a course.
     /// 
     /// This method returns the following error codes:
     /// 
-    /// * `PERMISSION_DENIED` if the requesting user is not permitted to delete
+    /// * `PERMISSION_DENIED` if the requesting user is not permitted to view
     /// students of this course or for access errors.
     /// * `NOT_FOUND` if no student of this course has the requested ID or if the
     /// course does not exist.
@@ -2498,13 +2565,13 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// * `courseId` - Identifier of the course.
     ///                This identifier can be either the Classroom-assigned identifier or an
     ///                alias.
-    /// * `userId` - Identifier of the student to delete. The identifier can be one of the
+    /// * `userId` - Identifier of the student to return. The identifier can be one of the
     ///              following:
     ///              * the numeric identifier for the user
     ///              * the email address of the user
     ///              * the string literal `"me"`, indicating the requesting user
-    pub fn students_delete(&self, course_id: &str, user_id: &str) -> CourseStudentDeleteCall<'a, C, A> {
-        CourseStudentDeleteCall {
+    pub fn students_get(&self, course_id: &str, user_id: &str) -> CourseStudentGetCall<'a, C, A> {
+        CourseStudentGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
             _user_id: user_id.to_string(),
@@ -2581,25 +2648,70 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns course work.
+    /// Returns the list of topics that the requester is permitted to view.
     /// 
     /// This method returns the following error codes:
     /// 
-    /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-    /// requested course or course work, or for access errors.
+    /// * `PERMISSION_DENIED` if the requesting user is not permitted to access
+    /// the requested course or for access errors.
     /// * `INVALID_ARGUMENT` if the request is malformed.
-    /// * `NOT_FOUND` if the requested course or course work does not exist.
+    /// * `NOT_FOUND` if the requested course does not exist.
     /// 
     /// # Arguments
     ///
     /// * `courseId` - Identifier of the course.
     ///                This identifier can be either the Classroom-assigned identifier or an
     ///                alias.
-    /// * `id` - Identifier of the course work.
-    pub fn course_work_get(&self, course_id: &str, id: &str) -> CourseCourseWorkGetCall<'a, C, A> {
-        CourseCourseWorkGetCall {
+    pub fn topics_list(&self, course_id: &str) -> CourseTopicListCall<'a, C, A> {
+        CourseTopicListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Reclaims a student submission on behalf of the student that owns it.
+    /// 
+    /// Reclaiming a student submission transfers ownership of attached Drive
+    /// files to the student and updates the submission state.
+    /// 
+    /// Only the student that owns the requested student submission may call this
+    /// method, and only for a student submission that has been turned in.
+    /// 
+    /// This request must be made by the Developer Console project of the
+    /// [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+    /// create the corresponding course work item.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+    /// requested course or course work, unsubmit the requested student submission,
+    /// or for access errors.
+    /// * `FAILED_PRECONDITION` if the student submission has not been turned in.
+    /// * `INVALID_ARGUMENT` if the request is malformed.
+    /// * `NOT_FOUND` if the requested course, course work, or student submission
+    /// does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Identifier of the course.
+    ///                This identifier can be either the Classroom-assigned identifier or an
+    ///                alias.
+    /// * `courseWorkId` - Identifier of the course work.
+    /// * `id` - Identifier of the student submission.
+    pub fn course_work_student_submissions_reclaim(&self, request: ReclaimStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+        CourseCourseWorkStudentSubmissionReclaimCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _course_work_id: course_work_id.to_string(),
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2764,33 +2876,6 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of teachers of this course that the requester
-    /// is permitted to view.
-    /// 
-    /// This method returns the following error codes:
-    /// 
-    /// * `NOT_FOUND` if the course does not exist.
-    /// * `PERMISSION_DENIED` for access errors.
-    /// 
-    /// # Arguments
-    ///
-    /// * `courseId` - Identifier of the course.
-    ///                This identifier can be either the Classroom-assigned identifier or an
-    ///                alias.
-    pub fn teachers_list(&self, course_id: &str) -> CourseTeacherListCall<'a, C, A> {
-        CourseTeacherListCall {
-            hub: self.hub,
-            _course_id: course_id.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Returns a student submission.
     /// 
     /// Returning a student submission transfers ownership of attached Drive
@@ -2856,6 +2941,34 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
             _course_id: course_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns course work.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+    /// requested course or course work, or for access errors.
+    /// * `INVALID_ARGUMENT` if the request is malformed.
+    /// * `NOT_FOUND` if the requested course or course work does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Identifier of the course.
+    ///                This identifier can be either the Classroom-assigned identifier or an
+    ///                alias.
+    /// * `id` - Identifier of the course work.
+    pub fn course_work_get(&self, course_id: &str, id: &str) -> CourseCourseWorkGetCall<'a, C, A> {
+        CourseCourseWorkGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2950,6 +3063,37 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _course_id: course_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates one or more fields of a topic.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if the requesting developer project did not create
+    /// the corresponding topic or for access errors.
+    /// * `INVALID_ARGUMENT` if the request is malformed.
+    /// * `NOT_FOUND` if the requested course or topic does not exist
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Identifier of the course.
+    ///                This identifier can be either the Classroom-assigned identifier or an
+    ///                alias.
+    /// * `id` - Identifier of the topic.
+    pub fn topics_patch(&self, request: Topic, course_id: &str, id: &str) -> CourseTopicPatchCall<'a, C, A> {
+        CourseTopicPatchCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _id: id.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3282,6 +3426,35 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes a topic.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if the requesting user is not allowed to delete the
+    /// requested topic or for access errors.
+    /// * `FAILED_PRECONDITION` if the requested topic has already been
+    /// deleted.
+    /// * `NOT_FOUND` if no course or topic exists with the requested ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Identifier of the course.
+    ///                This identifier can be either the Classroom-assigned identifier or an
+    ///                alias.
+    /// * `id` - Identifier of the topic to delete.
+    pub fn topics_delete(&self, course_id: &str, id: &str) -> CourseTopicDeleteCall<'a, C, A> {
+        CourseTopicDeleteCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _id: id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates one or more fields in a course.
     /// 
     /// This method returns the following error codes:
@@ -3314,11 +3487,11 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a student of a course.
+    /// Deletes a student of a course.
     /// 
     /// This method returns the following error codes:
     /// 
-    /// * `PERMISSION_DENIED` if the requesting user is not permitted to view
+    /// * `PERMISSION_DENIED` if the requesting user is not permitted to delete
     /// students of this course or for access errors.
     /// * `NOT_FOUND` if no student of this course has the requested ID or if the
     /// course does not exist.
@@ -3328,13 +3501,13 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// * `courseId` - Identifier of the course.
     ///                This identifier can be either the Classroom-assigned identifier or an
     ///                alias.
-    /// * `userId` - Identifier of the student to return. The identifier can be one of the
+    /// * `userId` - Identifier of the student to delete. The identifier can be one of the
     ///              following:
     ///              * the numeric identifier for the user
     ///              * the email address of the user
     ///              * the string literal `"me"`, indicating the requesting user
-    pub fn students_get(&self, course_id: &str, user_id: &str) -> CourseStudentGetCall<'a, C, A> {
-        CourseStudentGetCall {
+    pub fn students_delete(&self, course_id: &str, user_id: &str) -> CourseStudentDeleteCall<'a, C, A> {
+        CourseStudentDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
             _user_id: user_id.to_string(),
@@ -3445,6 +3618,32 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Returns a topic.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+    /// requested course or topic, or for access errors.
+    /// * `INVALID_ARGUMENT` if the request is malformed.
+    /// * `NOT_FOUND` if the requested course or topic does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Identifier of the course.
+    /// * `id` - Identifier of the topic.
+    pub fn topics_get(&self, course_id: &str, id: &str) -> CourseTopicGetCall<'a, C, A> {
+        CourseTopicGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _id: id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes an announcement.
     /// 
     /// This request must be made by the Developer Console project of the
@@ -3472,6 +3671,35 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
             hub: self.hub,
             _course_id: course_id.to_string(),
             _id: id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a topic.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+    /// requested course, create a topic in the requested course,
+    /// or for access errors.
+    /// * `INVALID_ARGUMENT` if the request is malformed.
+    /// * `NOT_FOUND` if the requested course does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Identifier of the course.
+    ///                This identifier can be either the Classroom-assigned identifier or an
+    ///                alias.
+    pub fn topics_create(&self, request: Topic, course_id: &str) -> CourseTopicCreateCall<'a, C, A> {
+        CourseTopicCreateCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3606,6 +3834,45 @@ impl<'a, C, A> UserProfileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Modifies a guardian invitation.
+    /// 
+    /// Currently, the only valid modification is to change the `state` from
+    /// `PENDING` to `COMPLETE`. This has the effect of withdrawing the invitation.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if the current user does not have permission to
+    ///   manage guardians, if guardians are not enabled for the domain in question
+    ///   or for other access errors.
+    /// * `FAILED_PRECONDITION` if the guardian link is not in the `PENDING` state.
+    /// * `INVALID_ARGUMENT` if the format of the student ID provided
+    ///   cannot be recognized (it is not an email address, nor a `user_id` from
+    ///   this API), or if the passed `GuardianInvitation` has a `state` other than
+    ///   `COMPLETE`, or if it modifies fields other than `state`.
+    /// * `NOT_FOUND` if the student ID provided is a valid student ID, but
+    ///   Classroom has no record of that student, or if the `id` field does not
+    ///   refer to a guardian invitation known to Classroom.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `studentId` - The ID of the student whose guardian invitation is to be modified.
+    /// * `invitationId` - The `id` field of the `GuardianInvitation` to be modified.
+    pub fn guardian_invitations_patch(&self, request: GuardianInvitation, student_id: &str, invitation_id: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
+        UserProfileGuardianInvitationPatchCall {
+            hub: self.hub,
+            _request: request,
+            _student_id: student_id.to_string(),
+            _invitation_id: invitation_id.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes a guardian.
     /// 
     /// The guardian will no longer receive guardian notifications and the guardian
@@ -3664,45 +3931,6 @@ impl<'a, C, A> UserProfileMethods<'a, C, A> {
         UserProfileGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Modifies a guardian invitation.
-    /// 
-    /// Currently, the only valid modification is to change the `state` from
-    /// `PENDING` to `COMPLETE`. This has the effect of withdrawing the invitation.
-    /// 
-    /// This method returns the following error codes:
-    /// 
-    /// * `PERMISSION_DENIED` if the current user does not have permission to
-    ///   manage guardians, if guardians are not enabled for the domain in question
-    ///   or for other access errors.
-    /// * `FAILED_PRECONDITION` if the guardian link is not in the `PENDING` state.
-    /// * `INVALID_ARGUMENT` if the format of the student ID provided
-    ///   cannot be recognized (it is not an email address, nor a `user_id` from
-    ///   this API), or if the passed `GuardianInvitation` has a `state` other than
-    ///   `COMPLETE`, or if it modifies fields other than `state`.
-    /// * `NOT_FOUND` if the student ID provided is a valid student ID, but
-    ///   Classroom has no record of that student, or if the `id` field does not
-    ///   refer to a guardian invitation known to Classroom.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `studentId` - The ID of the student whose guardian invitation is to be modified.
-    /// * `invitationId` - The `id` field of the `GuardianInvitation` to be modified.
-    pub fn guardian_invitations_patch(&self, request: GuardianInvitation, student_id: &str, invitation_id: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
-        UserProfileGuardianInvitationPatchCall {
-            hub: self.hub,
-            _request: request,
-            _student_id: student_id.to_string(),
-            _invitation_id: invitation_id.to_string(),
-            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4232,10 +4460,7 @@ impl<'a, C, A> CourseAnnouncementModifyAssigneeCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4267,7 +4492,7 @@ impl<'a, C, A> CourseAnnouncementModifyAssigneeCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4369,7 +4594,7 @@ impl<'a, C, A> CourseAnnouncementModifyAssigneeCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4548,10 +4773,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionPatchCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4583,7 +4805,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionPatchCall<'a, C, A> where C: Bor
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4709,7 +4931,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionPatchCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4887,10 +5109,7 @@ impl<'a, C, A> CourseAnnouncementListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4910,7 +5129,7 @@ impl<'a, C, A> CourseAnnouncementListCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5033,7 +5252,7 @@ impl<'a, C, A> CourseAnnouncementListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5081,29 +5300,15 @@ impl<'a, C, A> CourseAnnouncementListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Reclaims a student submission on behalf of the student that owns it.
-/// 
-/// Reclaiming a student submission transfers ownership of attached Drive
-/// files to the student and update the submission state.
-/// 
-/// Only the student that owns the requested student submission may call this
-/// method, and only for a student submission that has been turned in.
-/// 
-/// This request must be made by the Developer Console project of the
-/// [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
-/// create the corresponding course work item.
+/// Returns a list of teachers of this course that the requester
+/// is permitted to view.
 /// 
 /// This method returns the following error codes:
 /// 
-/// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-/// requested course or course work, unsubmit the requested student submission,
-/// or for access errors.
-/// * `FAILED_PRECONDITION` if the student submission has not been turned in.
-/// * `INVALID_ARGUMENT` if the request is malformed.
-/// * `NOT_FOUND` if the requested course, course work, or student submission
-/// does not exist.
+/// * `NOT_FOUND` if the course does not exist.
+/// * `PERMISSION_DENIED` for access errors.
 ///
-/// A builder for the *courseWork.studentSubmissions.reclaim* method supported by a *course* resource.
+/// A builder for the *teachers.list* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
 ///
 /// # Example
@@ -5115,7 +5320,6 @@ impl<'a, C, A> CourseAnnouncementListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_classroom1 as classroom1;
-/// use classroom1::ReclaimStudentSubmissionRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5126,38 +5330,34 @@ impl<'a, C, A> CourseAnnouncementListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ReclaimStudentSubmissionRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.courses().course_work_student_submissions_reclaim(req, "courseId", "courseWorkId", "id")
+/// let result = hub.courses().teachers_list("courseId")
+///              .page_token("eos")
+///              .page_size(-81)
 ///              .doit();
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A>
+pub struct CourseTeacherListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Classroom<C, A>,
-    _request: ReclaimStudentSubmissionRequest,
     _course_id: String,
-    _course_work_id: String,
-    _id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for CourseTeacherListCall<'a, C, A> {}
 
-impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> CourseTeacherListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListTeachersResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5165,13 +5365,17 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "classroom.courses.courseWork.studentSubmissions.reclaim",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "classroom.courses.teachers.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("courseId", self._course_id.to_string()));
-        params.push(("courseWorkId", self._course_work_id.to_string()));
-        params.push(("id", self._id.to_string()));
-        for &field in ["alt", "courseId", "courseWorkId", "id"].iter() {
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "courseId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5183,12 +5387,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:reclaim";
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/teachers";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CourseworkMe.as_ref().to_string(), ());
+            self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{courseWorkId}", "courseWorkId"), ("{id}", "id")].iter() {
+        for &(find_this, param_name) in [("{courseId}", "courseId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -5199,8 +5403,8 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["id", "courseWorkId", "courseId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["courseId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -5210,22 +5414,8 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5242,15 +5432,11 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -5301,15 +5487,6 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReclaimStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
     /// Identifier of the course.
     /// This identifier can be either the Classroom-assigned identifier or an
     /// alias.
@@ -5318,28 +5495,30 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTeacherListCall<'a, C, A> {
         self._course_id = new_value.to_string();
         self
     }
-    /// Identifier of the course work.
+    /// nextPageToken
+    /// value returned from a previous
+    /// list call, indicating that
+    /// the subsequent page of results should be returned.
+    /// 
+    /// The list request must be
+    /// otherwise identical to the one that resulted in this token.
     ///
-    /// Sets the *course work id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
-        self._course_work_id = new_value.to_string();
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CourseTeacherListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
         self
     }
-    /// Identifier of the student submission.
+    /// Maximum number of items to return. Zero means no maximum.
+    /// 
+    /// The server may return fewer than the specified number of results.
     ///
-    /// Sets the *id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
-        self._id = new_value.to_string();
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CourseTeacherListCall<'a, C, A> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5348,7 +5527,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseTeacherListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5357,7 +5536,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5373,7 +5552,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5382,7 +5561,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CourseworkMe`.
+    /// `Scope::RosterReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5393,7 +5572,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTeacherListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5509,10 +5688,7 @@ impl<'a, C, A> CourseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5532,7 +5708,7 @@ impl<'a, C, A> CourseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5612,7 +5788,7 @@ impl<'a, C, A> CourseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5773,10 +5949,7 @@ impl<'a, C, A> CourseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5808,7 +5981,7 @@ impl<'a, C, A> CourseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5900,7 +6073,7 @@ impl<'a, C, A> CourseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5948,16 +6121,16 @@ impl<'a, C, A> CourseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Deletes a student of a course.
+/// Returns a student of a course.
 /// 
 /// This method returns the following error codes:
 /// 
-/// * `PERMISSION_DENIED` if the requesting user is not permitted to delete
+/// * `PERMISSION_DENIED` if the requesting user is not permitted to view
 /// students of this course or for access errors.
 /// * `NOT_FOUND` if no student of this course has the requested ID or if the
 /// course does not exist.
 ///
-/// A builder for the *students.delete* method supported by a *course* resource.
+/// A builder for the *students.get* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
 ///
 /// # Example
@@ -5982,11 +6155,11 @@ impl<'a, C, A> CourseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.courses().students_delete("courseId", "userId")
+/// let result = hub.courses().students_get("courseId", "userId")
 ///              .doit();
 /// # }
 /// ```
-pub struct CourseStudentDeleteCall<'a, C, A>
+pub struct CourseStudentGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Classroom<C, A>,
@@ -5997,13 +6170,13 @@ pub struct CourseStudentDeleteCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for CourseStudentDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for CourseStudentGetCall<'a, C, A> {}
 
-impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Student)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6011,8 +6184,8 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "classroom.courses.students.delete",
-                               http_method: hyper::method::Method::Delete });
+        dlg.begin(MethodInfo { id: "classroom.courses.students.get",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("courseId", self._course_id.to_string()));
         params.push(("userId", self._user_id.to_string()));
@@ -6030,7 +6203,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/students/{userId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
+            self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{courseId}", "courseId"), ("{userId}", "userId")].iter() {
@@ -6055,10 +6228,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6078,7 +6248,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6139,11 +6309,11 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a, C, A> {
+    pub fn course_id(mut self, new_value: &str) -> CourseStudentGetCall<'a, C, A> {
         self._course_id = new_value.to_string();
         self
     }
-    /// Identifier of the student to delete. The identifier can be one of the
+    /// Identifier of the student to return. The identifier can be one of the
     /// following:
     /// 
     /// * the numeric identifier for the user
@@ -6154,7 +6324,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a, C, A> {
+    pub fn user_id(mut self, new_value: &str) -> CourseStudentGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -6164,7 +6334,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseStudentDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseStudentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6173,7 +6343,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6189,7 +6359,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6198,7 +6368,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Roster`.
+    /// `Scope::RosterReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6209,7 +6379,7 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6328,10 +6498,7 @@ impl<'a, C, A> CourseTeacherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6351,7 +6518,7 @@ impl<'a, C, A> CourseTeacherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6446,7 +6613,7 @@ impl<'a, C, A> CourseTeacherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6624,10 +6791,7 @@ impl<'a, C, A> CourseCourseWorkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6647,7 +6811,7 @@ impl<'a, C, A> CourseCourseWorkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6771,7 +6935,7 @@ impl<'a, C, A> CourseCourseWorkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6819,16 +6983,16 @@ impl<'a, C, A> CourseCourseWorkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Returns course work.
+/// Returns the list of topics that the requester is permitted to view.
 /// 
 /// This method returns the following error codes:
 /// 
-/// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-/// requested course or course work, or for access errors.
+/// * `PERMISSION_DENIED` if the requesting user is not permitted to access
+/// the requested course or for access errors.
 /// * `INVALID_ARGUMENT` if the request is malformed.
-/// * `NOT_FOUND` if the requested course or course work does not exist.
+/// * `NOT_FOUND` if the requested course does not exist.
 ///
-/// A builder for the *courseWork.get* method supported by a *course* resource.
+/// A builder for the *topics.list* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
 ///
 /// # Example
@@ -6853,28 +7017,31 @@ impl<'a, C, A> CourseCourseWorkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.courses().course_work_get("courseId", "id")
+/// let result = hub.courses().topics_list("courseId")
+///              .page_token("Lorem")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```
-pub struct CourseCourseWorkGetCall<'a, C, A>
+pub struct CourseTopicListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Classroom<C, A>,
     _course_id: String,
-    _id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for CourseCourseWorkGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for CourseTopicListCall<'a, C, A> {}
 
-impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> CourseTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, CourseWork)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListTopicResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6882,12 +7049,17 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "classroom.courses.courseWork.get",
+        dlg.begin(MethodInfo { id: "classroom.courses.topics.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("courseId", self._course_id.to_string()));
-        params.push(("id", self._id.to_string()));
-        for &field in ["alt", "courseId", "id"].iter() {
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "courseId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6899,12 +7071,12 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{id}";
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/topics";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CourseworkMeReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::TopicReadonly.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{id}", "id")].iter() {
+        for &(find_this, param_name) in [("{courseId}", "courseId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -6915,8 +7087,8 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["id", "courseId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["courseId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -6926,10 +7098,7 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6949,7 +7118,7 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7010,18 +7179,31 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a, C, A> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicListCall<'a, C, A> {
         self._course_id = new_value.to_string();
         self
     }
-    /// Identifier of the course work.
+    /// nextPageToken
+    /// value returned from a previous
+    /// list call,
+    /// indicating that the subsequent page of results should be returned.
+    /// 
+    /// The list request
+    /// must be otherwise identical to the one that resulted in this token.
     ///
-    /// Sets the *id* path property to the given value.
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CourseTopicListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of items to return. Zero or unspecified indicates that the
+    /// server may assign a maximum.
+    /// 
+    /// The server may return fewer than the specified number of results.
     ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a, C, A> {
-        self._id = new_value.to_string();
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CourseTopicListCall<'a, C, A> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7030,7 +7212,7 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseCourseWorkGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseTopicListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7039,7 +7221,7 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7055,7 +7237,7 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7064,7 +7246,7 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CourseworkMeReadonly`.
+    /// `Scope::TopicReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7075,7 +7257,328 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Reclaims a student submission on behalf of the student that owns it.
+/// 
+/// Reclaiming a student submission transfers ownership of attached Drive
+/// files to the student and updates the submission state.
+/// 
+/// Only the student that owns the requested student submission may call this
+/// method, and only for a student submission that has been turned in.
+/// 
+/// This request must be made by the Developer Console project of the
+/// [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to
+/// create the corresponding course work item.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+/// requested course or course work, unsubmit the requested student submission,
+/// or for access errors.
+/// * `FAILED_PRECONDITION` if the student submission has not been turned in.
+/// * `INVALID_ARGUMENT` if the request is malformed.
+/// * `NOT_FOUND` if the requested course, course work, or student submission
+/// does not exist.
+///
+/// A builder for the *courseWork.studentSubmissions.reclaim* method supported by a *course* resource.
+/// It is not used directly, but through a `CourseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::ReclaimStudentSubmissionRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ReclaimStudentSubmissionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_student_submissions_reclaim(req, "courseId", "courseWorkId", "id")
+///              .doit();
+/// # }
+/// ```
+pub struct CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _request: ReclaimStudentSubmissionRequest,
+    _course_id: String,
+    _course_work_id: String,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {}
+
+impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.courses.courseWork.studentSubmissions.reclaim",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("courseId", self._course_id.to_string()));
+        params.push(("courseWorkId", self._course_work_id.to_string()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["alt", "courseId", "courseWorkId", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:reclaim";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CourseworkMe.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{courseWorkId}", "courseWorkId"), ("{id}", "id")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["id", "courseWorkId", "courseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ReclaimStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier of the course.
+    /// This identifier can be either the Classroom-assigned identifier or an
+    /// alias.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the course work.
+    ///
+    /// Sets the *course work id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+        self._course_work_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the student submission.
+    ///
+    /// Sets the *id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CourseworkMe`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7128,11 +7631,11 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-///              .user_id("duo")
-///              .add_states("et")
-///              .page_token("eirmod")
-///              .page_size(-58)
-///              .late("et")
+///              .user_id("et")
+///              .add_states("amet")
+///              .page_token("et")
+///              .page_size(-45)
+///              .late("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -7227,10 +7730,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionListCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7250,7 +7750,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionListCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7396,7 +7896,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionListCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7572,10 +8072,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionTurnInCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7607,7 +8104,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionTurnInCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7719,7 +8216,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionTurnInCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7893,10 +8390,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, C, A> w
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7928,7 +8422,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, C, A> w
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8040,7 +8534,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, C, A> w
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8195,10 +8689,7 @@ impl<'a, C, A> CourseAnnouncementGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8218,7 +8709,7 @@ impl<'a, C, A> CourseAnnouncementGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8308,7 +8799,7 @@ impl<'a, C, A> CourseAnnouncementGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8345,293 +8836,6 @@ impl<'a, C, A> CourseAnnouncementGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Returns a list of teachers of this course that the requester
-/// is permitted to view.
-/// 
-/// This method returns the following error codes:
-/// 
-/// * `NOT_FOUND` if the course does not exist.
-/// * `PERMISSION_DENIED` for access errors.
-///
-/// A builder for the *teachers.list* method supported by a *course* resource.
-/// It is not used directly, but through a `CourseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_classroom1 as classroom1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use classroom1::Classroom;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.courses().teachers_list("courseId")
-///              .page_token("et")
-///              .page_size(-96)
-///              .doit();
-/// # }
-/// ```
-pub struct CourseTeacherListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Classroom<C, A>,
-    _course_id: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CourseTeacherListCall<'a, C, A> {}
-
-impl<'a, C, A> CourseTeacherListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListTeachersResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "classroom.courses.teachers.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("courseId", self._course_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "courseId", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/teachers";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{courseId}", "courseId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["courseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifier of the course.
-    /// This identifier can be either the Classroom-assigned identifier or an
-    /// alias.
-    ///
-    /// Sets the *course id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTeacherListCall<'a, C, A> {
-        self._course_id = new_value.to_string();
-        self
-    }
-    /// nextPageToken
-    /// value returned from a previous
-    /// list call, indicating that
-    /// the subsequent page of results should be returned.
-    /// 
-    /// The list request must be
-    /// otherwise identical to the one that resulted in this token.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseTeacherListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum number of items to return. Zero means no maximum.
-    /// 
-    /// The server may return fewer than the specified number of results.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseTeacherListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseTeacherListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::RosterReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTeacherListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8773,10 +8977,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReturnCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8808,7 +9009,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReturnCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8920,7 +9121,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReturnCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9002,8 +9203,8 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReturnCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().aliases_list("courseId")
-///              .page_token("justo")
-///              .page_size(-52)
+///              .page_token("sit")
+///              .page_size(-26)
 ///              .doit();
 /// # }
 /// ```
@@ -9082,10 +9283,7 @@ impl<'a, C, A> CourseAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9105,7 +9303,7 @@ impl<'a, C, A> CourseAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9208,7 +9406,7 @@ impl<'a, C, A> CourseAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9245,6 +9443,271 @@ impl<'a, C, A> CourseAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> CourseAliaseListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns course work.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+/// requested course or course work, or for access errors.
+/// * `INVALID_ARGUMENT` if the request is malformed.
+/// * `NOT_FOUND` if the requested course or course work does not exist.
+///
+/// A builder for the *courseWork.get* method supported by a *course* resource.
+/// It is not used directly, but through a `CourseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_get("courseId", "id")
+///              .doit();
+/// # }
+/// ```
+pub struct CourseCourseWorkGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _course_id: String,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CourseCourseWorkGetCall<'a, C, A> {}
+
+impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CourseWork)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.courses.courseWork.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("courseId", self._course_id.to_string()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["alt", "courseId", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{id}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CourseworkMeReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{id}", "id")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["id", "courseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifier of the course.
+    /// This identifier can be either the Classroom-assigned identifier or an
+    /// alias.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a, C, A> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the course work.
+    ///
+    /// Sets the *id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseCourseWorkGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CourseworkMeReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9378,10 +9841,7 @@ impl<'a, C, A> CourseCourseWorkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9413,7 +9873,7 @@ impl<'a, C, A> CourseCourseWorkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9505,7 +9965,7 @@ impl<'a, C, A> CourseCourseWorkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9589,11 +10049,11 @@ impl<'a, C, A> CourseCourseWorkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().list()
-///              .teacher_id("diam")
-///              .student_id("rebum.")
-///              .page_token("consetetur")
-///              .page_size(-44)
-///              .add_course_states("vero")
+///              .teacher_id("sadipscing")
+///              .student_id("vero")
+///              .page_token("sadipscing")
+///              .page_size(-88)
+///              .add_course_states("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -9663,10 +10123,7 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9686,7 +10143,7 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9810,7 +10267,7 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9973,10 +10430,7 @@ impl<'a, C, A> CourseAnnouncementCreateCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10008,7 +10462,7 @@ impl<'a, C, A> CourseAnnouncementCreateCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10100,7 +10554,7 @@ impl<'a, C, A> CourseAnnouncementCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10137,6 +10591,324 @@ impl<'a, C, A> CourseAnnouncementCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates one or more fields of a topic.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if the requesting developer project did not create
+/// the corresponding topic or for access errors.
+/// * `INVALID_ARGUMENT` if the request is malformed.
+/// * `NOT_FOUND` if the requested course or topic does not exist
+///
+/// A builder for the *topics.patch* method supported by a *course* resource.
+/// It is not used directly, but through a `CourseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::Topic;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Topic::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().topics_patch(req, "courseId", "id")
+///              .update_mask("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct CourseTopicPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _request: Topic,
+    _course_id: String,
+    _id: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CourseTopicPatchCall<'a, C, A> {}
+
+impl<'a, C, A> CourseTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Topic)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.courses.topics.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("courseId", self._course_id.to_string()));
+        params.push(("id", self._id.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "courseId", "id", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/topics/{id}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Topic.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{id}", "id")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["id", "courseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Topic) -> CourseTopicPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier of the course.
+    /// This identifier can be either the Classroom-assigned identifier or an
+    /// alias.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicPatchCall<'a, C, A> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the topic.
+    ///
+    /// Sets the *id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CourseTopicPatchCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// Mask that identifies which fields on the topic to update.
+    /// This field is required to do an update. The update fails if invalid
+    /// fields are specified. If a field supports empty values, it can be cleared
+    /// by specifying it in the update mask and not in the Topic object. If a
+    /// field that does not support empty values is included in the update mask and
+    /// not set in the Topic object, an `INVALID_ARGUMENT` error will be
+    /// returned.
+    /// 
+    /// The following fields may be specified:
+    /// 
+    /// * `name`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> CourseTopicPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseTopicPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Topic`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10191,7 +10963,7 @@ impl<'a, C, A> CourseAnnouncementCreateCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().announcements_patch(req, "courseId", "id")
-///              .update_mask("dolore")
+///              .update_mask("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -10269,10 +11041,7 @@ impl<'a, C, A> CourseAnnouncementPatchCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10304,7 +11073,7 @@ impl<'a, C, A> CourseAnnouncementPatchCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10425,7 +11194,7 @@ impl<'a, C, A> CourseAnnouncementPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10588,10 +11357,7 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10623,7 +11389,7 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10715,7 +11481,7 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10810,7 +11576,7 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_create(req, "courseId")
-///              .enrollment_code("Lorem")
+///              .enrollment_code("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -10886,10 +11652,7 @@ impl<'a, C, A> CourseStudentCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10921,7 +11684,7 @@ impl<'a, C, A> CourseStudentCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11023,7 +11786,7 @@ impl<'a, C, A> CourseStudentCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11188,10 +11951,7 @@ impl<'a, C, A> CourseCourseWorkModifyAssigneeCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11223,7 +11983,7 @@ impl<'a, C, A> CourseCourseWorkModifyAssigneeCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11325,7 +12085,7 @@ impl<'a, C, A> CourseCourseWorkModifyAssigneeCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11482,10 +12242,7 @@ impl<'a, C, A> CourseAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11505,7 +12262,7 @@ impl<'a, C, A> CourseAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11596,7 +12353,7 @@ impl<'a, C, A> CourseAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11757,10 +12514,7 @@ impl<'a, C, A> CourseCourseWorkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11780,7 +12534,7 @@ impl<'a, C, A> CourseCourseWorkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11871,7 +12625,7 @@ impl<'a, C, A> CourseCourseWorkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12015,10 +12769,7 @@ impl<'a, C, A> CourseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12050,7 +12801,7 @@ impl<'a, C, A> CourseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12130,7 +12881,7 @@ impl<'a, C, A> CourseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12212,8 +12963,8 @@ impl<'a, C, A> CourseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_list("courseId")
-///              .page_token("takimata")
-///              .page_size(-27)
+///              .page_token("rebum.")
+///              .page_size(-33)
 ///              .doit();
 /// # }
 /// ```
@@ -12292,10 +13043,7 @@ impl<'a, C, A> CourseStudentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12315,7 +13063,7 @@ impl<'a, C, A> CourseStudentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12417,7 +13165,7 @@ impl<'a, C, A> CourseStudentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12569,10 +13317,7 @@ impl<'a, C, A> CourseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12592,7 +13337,7 @@ impl<'a, C, A> CourseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12672,7 +13417,7 @@ impl<'a, C, A> CourseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12773,7 +13518,7 @@ impl<'a, C, A> CourseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_patch(req, "courseId", "id")
-///              .update_mask("sadipscing")
+///              .update_mask("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -12851,10 +13596,7 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12886,7 +13628,7 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13012,7 +13754,7 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13049,6 +13791,272 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a topic.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if the requesting user is not allowed to delete the
+/// requested topic or for access errors.
+/// * `FAILED_PRECONDITION` if the requested topic has already been
+/// deleted.
+/// * `NOT_FOUND` if no course or topic exists with the requested ID.
+///
+/// A builder for the *topics.delete* method supported by a *course* resource.
+/// It is not used directly, but through a `CourseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().topics_delete("courseId", "id")
+///              .doit();
+/// # }
+/// ```
+pub struct CourseTopicDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _course_id: String,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CourseTopicDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> CourseTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.courses.topics.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("courseId", self._course_id.to_string()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["alt", "courseId", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/topics/{id}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Topic.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{id}", "id")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["id", "courseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifier of the course.
+    /// This identifier can be either the Classroom-assigned identifier or an
+    /// alias.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicDeleteCall<'a, C, A> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the topic to delete.
+    ///
+    /// Sets the *id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CourseTopicDeleteCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseTopicDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Topic`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13104,7 +14112,7 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().patch(req, "id")
-///              .update_mask("dolore")
+///              .update_mask("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -13180,10 +14188,7 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13215,7 +14220,7 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13332,7 +14337,7 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13380,16 +14385,16 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Returns a student of a course.
+/// Deletes a student of a course.
 /// 
 /// This method returns the following error codes:
 /// 
-/// * `PERMISSION_DENIED` if the requesting user is not permitted to view
+/// * `PERMISSION_DENIED` if the requesting user is not permitted to delete
 /// students of this course or for access errors.
 /// * `NOT_FOUND` if no student of this course has the requested ID or if the
 /// course does not exist.
 ///
-/// A builder for the *students.get* method supported by a *course* resource.
+/// A builder for the *students.delete* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
 ///
 /// # Example
@@ -13414,11 +14419,11 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.courses().students_get("courseId", "userId")
+/// let result = hub.courses().students_delete("courseId", "userId")
 ///              .doit();
 /// # }
 /// ```
-pub struct CourseStudentGetCall<'a, C, A>
+pub struct CourseStudentDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Classroom<C, A>,
@@ -13429,13 +14434,13 @@ pub struct CourseStudentGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for CourseStudentGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for CourseStudentDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Student)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -13443,8 +14448,8 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "classroom.courses.students.get",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "classroom.courses.students.delete",
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("courseId", self._course_id.to_string()));
         params.push(("userId", self._user_id.to_string()));
@@ -13462,7 +14467,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/students/{userId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::RosterReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{courseId}", "courseId"), ("{userId}", "userId")].iter() {
@@ -13487,10 +14492,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13510,7 +14512,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13571,11 +14573,11 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseStudentGetCall<'a, C, A> {
+    pub fn course_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a, C, A> {
         self._course_id = new_value.to_string();
         self
     }
-    /// Identifier of the student to return. The identifier can be one of the
+    /// Identifier of the student to delete. The identifier can be one of the
     /// following:
     /// 
     /// * the numeric identifier for the user
@@ -13586,7 +14588,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> CourseStudentGetCall<'a, C, A> {
+    pub fn user_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -13596,7 +14598,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseStudentGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseStudentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13605,7 +14607,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13621,7 +14623,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13630,7 +14632,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::RosterReadonly`.
+    /// `Scope::Roster`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13641,7 +14643,7 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13762,10 +14764,7 @@ impl<'a, C, A> CourseTeacherDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13785,7 +14784,7 @@ impl<'a, C, A> CourseTeacherDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13880,7 +14879,7 @@ impl<'a, C, A> CourseTeacherDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14047,10 +15046,7 @@ impl<'a, C, A> CourseTeacherCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14082,7 +15078,7 @@ impl<'a, C, A> CourseTeacherCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14174,7 +15170,7 @@ impl<'a, C, A> CourseTeacherCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14331,10 +15327,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionGetCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14354,7 +15347,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionGetCall<'a, C, A> where C: Borro
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14454,7 +15447,7 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionGetCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14491,6 +15484,269 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionGetCall<'a, C, A> where C: Borro
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns a topic.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+/// requested course or topic, or for access errors.
+/// * `INVALID_ARGUMENT` if the request is malformed.
+/// * `NOT_FOUND` if the requested course or topic does not exist.
+///
+/// A builder for the *topics.get* method supported by a *course* resource.
+/// It is not used directly, but through a `CourseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().topics_get("courseId", "id")
+///              .doit();
+/// # }
+/// ```
+pub struct CourseTopicGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _course_id: String,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CourseTopicGetCall<'a, C, A> {}
+
+impl<'a, C, A> CourseTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Topic)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.courses.topics.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("courseId", self._course_id.to_string()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["alt", "courseId", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/topics/{id}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::TopicReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{id}", "id")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["id", "courseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicGetCall<'a, C, A> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the topic.
+    ///
+    /// Sets the *id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> CourseTopicGetCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseTopicGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::TopicReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14615,10 +15871,7 @@ impl<'a, C, A> CourseAnnouncementDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14638,7 +15891,7 @@ impl<'a, C, A> CourseAnnouncementDeleteCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14729,7 +15982,7 @@ impl<'a, C, A> CourseAnnouncementDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14766,6 +16019,291 @@ impl<'a, C, A> CourseAnnouncementDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a topic.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
+/// requested course, create a topic in the requested course,
+/// or for access errors.
+/// * `INVALID_ARGUMENT` if the request is malformed.
+/// * `NOT_FOUND` if the requested course does not exist.
+///
+/// A builder for the *topics.create* method supported by a *course* resource.
+/// It is not used directly, but through a `CourseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::Topic;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Topic::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().topics_create(req, "courseId")
+///              .doit();
+/// # }
+/// ```
+pub struct CourseTopicCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _request: Topic,
+    _course_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CourseTopicCreateCall<'a, C, A> {}
+
+impl<'a, C, A> CourseTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Topic)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.courses.topics.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("courseId", self._course_id.to_string()));
+        for &field in ["alt", "courseId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/topics";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Topic.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["courseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Topic) -> CourseTopicCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier of the course.
+    /// This identifier can be either the Classroom-assigned identifier or an
+    /// alias.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicCreateCall<'a, C, A> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CourseTopicCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Topic`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14891,10 +16429,7 @@ impl<'a, C, A> UserProfileGuardianGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14914,7 +16449,7 @@ impl<'a, C, A> UserProfileGuardianGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15006,7 +16541,7 @@ impl<'a, C, A> UserProfileGuardianGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15188,10 +16723,7 @@ impl<'a, C, A> UserProfileGuardianInvitationCreateCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15223,7 +16755,7 @@ impl<'a, C, A> UserProfileGuardianInvitationCreateCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15313,7 +16845,7 @@ impl<'a, C, A> UserProfileGuardianInvitationCreateCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15350,6 +16882,330 @@ impl<'a, C, A> UserProfileGuardianInvitationCreateCall<'a, C, A> where C: Borrow
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Modifies a guardian invitation.
+/// 
+/// Currently, the only valid modification is to change the `state` from
+/// `PENDING` to `COMPLETE`. This has the effect of withdrawing the invitation.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if the current user does not have permission to
+///   manage guardians, if guardians are not enabled for the domain in question
+///   or for other access errors.
+/// * `FAILED_PRECONDITION` if the guardian link is not in the `PENDING` state.
+/// * `INVALID_ARGUMENT` if the format of the student ID provided
+///   cannot be recognized (it is not an email address, nor a `user_id` from
+///   this API), or if the passed `GuardianInvitation` has a `state` other than
+///   `COMPLETE`, or if it modifies fields other than `state`.
+/// * `NOT_FOUND` if the student ID provided is a valid student ID, but
+///   Classroom has no record of that student, or if the `id` field does not
+///   refer to a guardian invitation known to Classroom.
+///
+/// A builder for the *guardianInvitations.patch* method supported by a *userProfile* resource.
+/// It is not used directly, but through a `UserProfileMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::GuardianInvitation;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GuardianInvitation::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.user_profiles().guardian_invitations_patch(req, "studentId", "invitationId")
+///              .update_mask("diam")
+///              .doit();
+/// # }
+/// ```
+pub struct UserProfileGuardianInvitationPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _request: GuardianInvitation,
+    _student_id: String,
+    _invitation_id: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserProfileGuardianInvitationPatchCall<'a, C, A> {}
+
+impl<'a, C, A> UserProfileGuardianInvitationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GuardianInvitation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.userProfiles.guardianInvitations.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("studentId", self._student_id.to_string()));
+        params.push(("invitationId", self._invitation_id.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "studentId", "invitationId", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardianInvitations/{invitationId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::GuardianlinkStudent.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{studentId}", "studentId"), ("{invitationId}", "invitationId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["invitationId", "studentId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GuardianInvitation) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the student whose guardian invitation is to be modified.
+    ///
+    /// Sets the *student id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
+        self._student_id = new_value.to_string();
+        self
+    }
+    /// The `id` field of the `GuardianInvitation` to be modified.
+    ///
+    /// Sets the *invitation id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn invitation_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
+        self._invitation_id = new_value.to_string();
+        self
+    }
+    /// Mask that identifies which fields on the course to update.
+    /// This field is required to do an update. The update will fail if invalid
+    /// fields are specified. The following fields are valid:
+    /// 
+    /// * `state`
+    /// 
+    /// When set in a query parameter, this field should be specified as
+    /// 
+    /// `updateMask=<field1>,<field2>,...`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GuardianlinkStudent`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15478,10 +17334,7 @@ impl<'a, C, A> UserProfileGuardianDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15501,7 +17354,7 @@ impl<'a, C, A> UserProfileGuardianDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15593,7 +17446,7 @@ impl<'a, C, A> UserProfileGuardianDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15745,10 +17598,7 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15768,7 +17618,7 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15851,7 +17701,7 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15888,333 +17738,6 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Modifies a guardian invitation.
-/// 
-/// Currently, the only valid modification is to change the `state` from
-/// `PENDING` to `COMPLETE`. This has the effect of withdrawing the invitation.
-/// 
-/// This method returns the following error codes:
-/// 
-/// * `PERMISSION_DENIED` if the current user does not have permission to
-///   manage guardians, if guardians are not enabled for the domain in question
-///   or for other access errors.
-/// * `FAILED_PRECONDITION` if the guardian link is not in the `PENDING` state.
-/// * `INVALID_ARGUMENT` if the format of the student ID provided
-///   cannot be recognized (it is not an email address, nor a `user_id` from
-///   this API), or if the passed `GuardianInvitation` has a `state` other than
-///   `COMPLETE`, or if it modifies fields other than `state`.
-/// * `NOT_FOUND` if the student ID provided is a valid student ID, but
-///   Classroom has no record of that student, or if the `id` field does not
-///   refer to a guardian invitation known to Classroom.
-///
-/// A builder for the *guardianInvitations.patch* method supported by a *userProfile* resource.
-/// It is not used directly, but through a `UserProfileMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_classroom1 as classroom1;
-/// use classroom1::GuardianInvitation;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use classroom1::Classroom;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GuardianInvitation::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.user_profiles().guardian_invitations_patch(req, "studentId", "invitationId")
-///              .update_mask("sit")
-///              .doit();
-/// # }
-/// ```
-pub struct UserProfileGuardianInvitationPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Classroom<C, A>,
-    _request: GuardianInvitation,
-    _student_id: String,
-    _invitation_id: String,
-    _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for UserProfileGuardianInvitationPatchCall<'a, C, A> {}
-
-impl<'a, C, A> UserProfileGuardianInvitationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GuardianInvitation)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "classroom.userProfiles.guardianInvitations.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("studentId", self._student_id.to_string()));
-        params.push(("invitationId", self._invitation_id.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
-        }
-        for &field in ["alt", "studentId", "invitationId", "updateMask"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardianInvitations/{invitationId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GuardianlinkStudent.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{studentId}", "studentId"), ("{invitationId}", "invitationId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["invitationId", "studentId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GuardianInvitation) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the student whose guardian invitation is to be modified.
-    ///
-    /// Sets the *student id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
-        self._student_id = new_value.to_string();
-        self
-    }
-    /// The `id` field of the `GuardianInvitation` to be modified.
-    ///
-    /// Sets the *invitation id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn invitation_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
-        self._invitation_id = new_value.to_string();
-        self
-    }
-    /// Mask that identifies which fields on the course to update.
-    /// This field is required to do an update. The update will fail if invalid
-    /// fields are specified. The following fields are valid:
-    /// 
-    /// * `state`
-    /// 
-    /// When set in a query parameter, this field should be specified as
-    /// 
-    /// `updateMask=<field1>,<field2>,...`
-    ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
-        self._update_mask = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserProfileGuardianInvitationPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::GuardianlinkStudent`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16339,10 +17862,7 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16362,7 +17882,7 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16450,7 +17970,7 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16545,9 +18065,9 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardians_list("studentId")
-///              .page_token("est")
-///              .page_size(-46)
-///              .invited_email_address("accusam")
+///              .page_token("eos")
+///              .page_size(-78)
+///              .invited_email_address("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -16630,10 +18150,7 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16653,7 +18170,7 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16770,7 +18287,7 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16861,10 +18378,10 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_list("studentId")
-///              .add_states("diam")
-///              .page_token("justo")
-///              .page_size(-57)
-///              .invited_email_address("clita")
+///              .add_states("aliquyam")
+///              .page_token("ea")
+///              .page_size(-17)
+///              .invited_email_address("et")
 ///              .doit();
 /// # }
 /// ```
@@ -16953,10 +18470,7 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16976,7 +18490,7 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17102,7 +18616,7 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17262,10 +18776,7 @@ impl<'a, C, A> RegistrationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -17297,7 +18808,7 @@ impl<'a, C, A> RegistrationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17377,7 +18888,7 @@ impl<'a, C, A> RegistrationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17524,10 +19035,7 @@ impl<'a, C, A> RegistrationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17547,7 +19055,7 @@ impl<'a, C, A> RegistrationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17625,7 +19133,7 @@ impl<'a, C, A> RegistrationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17777,10 +19285,7 @@ impl<'a, C, A> InvitationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17800,7 +19305,7 @@ impl<'a, C, A> InvitationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17878,7 +19383,7 @@ impl<'a, C, A> InvitationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18019,10 +19524,7 @@ impl<'a, C, A> InvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18054,7 +19556,7 @@ impl<'a, C, A> InvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18134,7 +19636,7 @@ impl<'a, C, A> InvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18218,10 +19720,10 @@ impl<'a, C, A> InvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.invitations().list()
-///              .user_id("dolores")
-///              .page_token("eos")
-///              .page_size(-78)
-///              .course_id("duo")
+///              .user_id("kasd")
+///              .page_token("invidunt")
+///              .page_size(-15)
+///              .course_id("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -18285,10 +19787,7 @@ impl<'a, C, A> InvitationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -18308,7 +19807,7 @@ impl<'a, C, A> InvitationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18418,7 +19917,7 @@ impl<'a, C, A> InvitationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18570,10 +20069,7 @@ impl<'a, C, A> InvitationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -18593,7 +20089,7 @@ impl<'a, C, A> InvitationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18671,7 +20167,7 @@ impl<'a, C, A> InvitationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18830,10 +20326,7 @@ impl<'a, C, A> InvitationAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -18853,7 +20346,7 @@ impl<'a, C, A> InvitationAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18931,7 +20424,7 @@ impl<'a, C, A> InvitationAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

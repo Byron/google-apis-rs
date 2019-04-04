@@ -1,4 +1,4 @@
-site_name: YouTube v1.0.8+20180511
+site_name: YouTube v1.0.8+20190128
 site_url: http://byron.github.io/google-apis-rs/google-youtube3-cli
 site_description: A complete library to interact with YouTube (protocol v3)
 

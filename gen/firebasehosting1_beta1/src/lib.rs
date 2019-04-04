@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Hosting* crate version *1.0.8+20181011*, where *20181011* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Firebase Hosting* crate version *1.0.8+20190318*, where *20190318* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Firebase Hosting* *v1_beta1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/hosting/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.FirebaseHosting.html) ... 
 //! 
 //! * sites
-//!  * [*domains create*](struct.SiteDomainCreateCall.html), [*domains delete*](struct.SiteDomainDeleteCall.html), [*domains get*](struct.SiteDomainGetCall.html), [*domains list*](struct.SiteDomainListCall.html), [*domains update*](struct.SiteDomainUpdateCall.html), [*releases create*](struct.SiteReleaseCreateCall.html), [*releases list*](struct.SiteReleaseListCall.html), [*versions create*](struct.SiteVersionCreateCall.html), [*versions delete*](struct.SiteVersionDeleteCall.html), [*versions files list*](struct.SiteVersionFileListCall.html), [*versions patch*](struct.SiteVersionPatchCall.html) and [*versions populate files*](struct.SiteVersionPopulateFileCall.html)
+//!  * [*domains create*](struct.SiteDomainCreateCall.html), [*domains delete*](struct.SiteDomainDeleteCall.html), [*domains get*](struct.SiteDomainGetCall.html), [*domains list*](struct.SiteDomainListCall.html), [*domains update*](struct.SiteDomainUpdateCall.html), [*get config*](struct.SiteGetConfigCall.html), [*releases create*](struct.SiteReleaseCreateCall.html), [*releases list*](struct.SiteReleaseListCall.html), [*update config*](struct.SiteUpdateConfigCall.html), [*versions create*](struct.SiteVersionCreateCall.html), [*versions delete*](struct.SiteVersionDeleteCall.html), [*versions files list*](struct.SiteVersionFileListCall.html), [*versions patch*](struct.SiteVersionPatchCall.html) and [*versions populate files*](struct.SiteVersionPopulateFileCall.html)
 //! 
 //! 
 //! 
@@ -384,20 +384,21 @@ impl<'a, C, A> FirebaseHosting<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A `Redirect` represents the configuration for returning an HTTP redirect
-/// response given a matching request URL path.
+/// A [`redirect`](/docs/hosting/full-config#redirects) represents the
+/// configuration for returning an HTTP redirect response given a matching
+/// request URL path.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Redirect {
     /// Required. The user-supplied
-    /// [glob pattern](/docs/hosting/full-config#section-glob) to match against
-    /// the request URL path.
+    /// [glob pattern](/docs/hosting/full-config#glob_pattern_matching) to match
+    /// against the request URL path.
     pub glob: Option<String>,
     /// Required. The value to put in the HTTP location header of the response.
-    /// <br>The location can contain capture group values from the pattern using a
-    /// `":"` prefix to identify the segment and an optional `"*"` to capture the
+    /// <br>The location can contain capture group values from the pattern using
+    /// a `:` prefix to identify the segment and an optional `*` to capture the
     /// rest of the URL.
     /// For example:
     /// <code>"glob": "/:capture*",
@@ -470,23 +471,170 @@ pub struct CertDnsChallenge {
 impl Part for CertDnsChallenge {}
 
 
-/// Defines the behavior of a domain-level redirect. Domain redirects preserve
-/// the path of the redirect but replace the requested domain with the one
-/// specified in the redirect configuration.
+/// The intended behavior and status information of a domain.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [domains get sites](struct.SiteDomainGetCall.html) (response)
+/// * [domains update sites](struct.SiteDomainUpdateCall.html) (request|response)
+/// * [domains create sites](struct.SiteDomainCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Domain {
+    /// Output only. Additional status of the domain association.
+    pub status: Option<String>,
+    /// If set, the domain should redirect with the provided parameters.
+    #[serde(rename="domainRedirect")]
+    pub domain_redirect: Option<DomainRedirect>,
+    /// Required. The domain name of the association.
+    #[serde(rename="domainName")]
+    pub domain_name: Option<String>,
+    /// Required. The site name of the association.
+    pub site: Option<String>,
+    /// Output only. The time at which the domain was last updated.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Output only. Information about the provisioning of certificates and the
+    /// health of the DNS resolution for the domain.
+    pub provisioning: Option<DomainProvisioning>,
+}
+
+impl RequestValue for Domain {}
+impl ResponseResult for Domain {}
+
+
+/// A configured rewrite that will direct any requests to a Cloud Run service. If
+/// the Cloud Run service does not exist when setting or updating your Firebase
+/// Hosting configuration then the request will fail. Any errors from the Cloud
+/// Run service (including when the service has been deleted) will be passed back
+/// down to the end user.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DomainRedirect {
-    /// Required. The redirect status code.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Required. The domain name to redirect to.
-    #[serde(rename="domainName")]
-    pub domain_name: Option<String>,
+pub struct CloudRunRewrite {
+    /// Optional. The region where the Cloud Run service is hosted.  Defaults to
+    /// `us-central1` if not supplied.
+    pub region: Option<String>,
+    /// Required. User supplied ID of the Cloud Run service.
+    #[serde(rename="serviceId")]
+    pub service_id: Option<String>,
 }
 
-impl Part for DomainRedirect {}
+impl Part for CloudRunRewrite {}
+
+
+/// Represents an HTTP certificate challenge.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CertHttpChallenge {
+    /// The URL path on which to serve the specified token to satisfy the
+    /// certificate challenge.
+    pub path: Option<String>,
+    /// The token to serve at the specified URL path to satisfy the certificate
+    /// challenge.
+    pub token: Option<String>,
+}
+
+impl Part for CertHttpChallenge {}
+
+
+/// The configuration for how incoming requests to a site should be routed and
+/// processed before serving content. The patterns are matched and applied
+/// according to a specific
+/// [priority order](/docs/hosting/full-config#hosting_priority_order).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ServingConfig {
+    /// Defines whether to drop the file extension from uploaded files.
+    #[serde(rename="cleanUrls")]
+    pub clean_urls: Option<bool>,
+    /// A list of custom response headers that are added to the content if the
+    /// request URL path matches the glob.
+    pub headers: Option<Vec<Header>>,
+    /// A list of globs that will cause the response to redirect to another
+    /// location.
+    pub redirects: Option<Vec<Redirect>>,
+    /// How to handle well known App Association files.
+    #[serde(rename="appAssociation")]
+    pub app_association: Option<String>,
+    /// Defines how to handle a trailing slash in the URL path.
+    #[serde(rename="trailingSlashBehavior")]
+    pub trailing_slash_behavior: Option<String>,
+    /// A list of rewrites that will act as if the service were given the
+    /// destination URL.
+    pub rewrites: Option<Vec<Rewrite>>,
+}
+
+impl Part for ServingConfig {}
+
+
+/// A `Release` is a particular
+/// [collection of configurations and files](sites.versions)
+/// that is set to be public at a particular time.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [releases create sites](struct.SiteReleaseCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Release {
+    /// Output only.  The configuration and content that was released.
+    pub version: Option<Version>,
+    /// Output only. The unique identifier for the release, in the format:
+    /// <code>sites/<var>site-name</var>/releases/<var>releaseID</var></code>
+    /// This name is provided in the response body when you call the
+    /// [`CreateRelease`](sites.releases/create) endpoint.
+    pub name: Option<String>,
+    /// The deploy description when the release was created. The value can be up to
+    /// 512&nbsp;characters.
+    pub message: Option<String>,
+    /// Output only. The time at which the version is set to be public.
+    #[serde(rename="releaseTime")]
+    pub release_time: Option<String>,
+    /// Explains the reason for the release.
+    /// <br>Specify a value for this field only when creating a `SITE_DISABLE`
+    /// type release.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Output only. Identifies the user who created the release.
+    #[serde(rename="releaseUser")]
+    pub release_user: Option<ActingUser>,
+}
+
+impl RequestValue for Release {}
+impl ResponseResult for Release {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [domains list sites](struct.SiteDomainListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListDomainsResponse {
+    /// The list of domains, if any exist.
+    pub domains: Option<Vec<Domain>>,
+    /// The pagination token, if more results exist.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl ResponseResult for ListDomainsResponse {}
 
 
 /// Contains metadata about the user who performed an action, such as creating
@@ -507,21 +655,206 @@ pub struct ActingUser {
 impl Part for ActingUser {}
 
 
-/// Represents an HTTP certificate challenge.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [domains delete sites](struct.SiteDomainDeleteCall.html) (response)
+/// * [versions delete sites](struct.SiteVersionDeleteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// Defines the behavior of a domain-level redirect. Domain redirects preserve
+/// the path of the redirect but replace the requested domain with the one
+/// specified in the redirect configuration.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CertHttpChallenge {
-    /// The URL path on which to serve the specified token to satisfy the
-    /// certificate challenge.
-    pub path: Option<String>,
-    /// The token to serve at the specified URL path to satisfy the certificate
-    /// challenge.
-    pub token: Option<String>,
+pub struct DomainRedirect {
+    /// Required. The redirect status code.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Required. The domain name to redirect to.
+    #[serde(rename="domainName")]
+    pub domain_name: Option<String>,
 }
 
-impl Part for CertHttpChallenge {}
+impl Part for DomainRedirect {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [releases list sites](struct.SiteReleaseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListReleasesResponse {
+    /// If there are additional releases remaining beyond the ones in this
+    /// response, then supply this token in the next
+    /// [`list`](../sites.versions.files/list) call to continue with the next set
+    /// of releases.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of hashes of files that still need to be uploaded, if any exist.
+    pub releases: Option<Vec<Release>>,
+}
+
+impl ResponseResult for ListReleasesResponse {}
+
+
+/// The current certificate provisioning status information for a domain.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DomainProvisioning {
+    /// The HTTP challenge for generating a certificate.
+    #[serde(rename="certChallengeHttp")]
+    pub cert_challenge_http: Option<CertHttpChallenge>,
+    /// The list of IPs to which the domain is expected to resolve.
+    #[serde(rename="expectedIps")]
+    pub expected_ips: Option<Vec<String>>,
+    /// The TXT records (for the certificate challenge) that were found at the last
+    /// DNS fetch.
+    #[serde(rename="certChallengeDiscoveredTxt")]
+    pub cert_challenge_discovered_txt: Option<Vec<String>>,
+    /// The time at which the last DNS fetch occurred.
+    #[serde(rename="dnsFetchTime")]
+    pub dns_fetch_time: Option<String>,
+    /// The IPs found at the last DNS fetch.
+    #[serde(rename="discoveredIps")]
+    pub discovered_ips: Option<Vec<String>>,
+    /// The DNS challenge for generating a certificate.
+    #[serde(rename="certChallengeDns")]
+    pub cert_challenge_dns: Option<CertDnsChallenge>,
+    /// The DNS record match status as of the last DNS fetch.
+    #[serde(rename="dnsStatus")]
+    pub dns_status: Option<String>,
+    /// The certificate provisioning status; updated when Firebase Hosting
+    /// provisions an SSL certificate for the domain.
+    #[serde(rename="certStatus")]
+    pub cert_status: Option<String>,
+}
+
+impl Part for DomainProvisioning {}
+
+
+/// A [`rewrite`](/docs/hosting/full-config#rewrites) represents an internal
+/// content rewrite on the version. If the pattern matches, the request will be
+/// handled as if it were to the destination path specified in the
+/// configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Rewrite {
+    /// The function to proxy requests to. Must match the exported function
+    /// name exactly.
+    pub function: Option<String>,
+    /// The URL path to rewrite the request to.
+    pub path: Option<String>,
+    /// The request will be forwarded to Firebase Dynamic Links.
+    #[serde(rename="dynamicLinks")]
+    pub dynamic_links: Option<bool>,
+    /// The request will be forwarded to Cloud Run.
+    pub run: Option<CloudRunRewrite>,
+    /// Required. The user-supplied
+    /// [glob pattern](/docs/hosting/full-config#glob_pattern_matching) to match
+    /// against the request URL path.
+    pub glob: Option<String>,
+}
+
+impl Part for Rewrite {}
+
+
+/// A `SiteConfig` contains metadata associated with a specific site that
+/// controls Firebase Hosting serving behavior
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update config sites](struct.SiteUpdateConfigCall.html) (request|response)
+/// * [get config sites](struct.SiteGetConfigCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SiteConfig {
+    /// The number of FINALIZED versions that will be held for a site before
+    /// automatic deletion. When a new version is deployed, content for versions
+    /// in storage in excess of this number will be deleted, and will no longer be
+    /// billed for storage usage. Oldest versions will be deleted first; sites are
+    /// created with an unlimited number of max_versions by default.
+    #[serde(rename="maxVersions")]
+    pub max_versions: Option<String>,
+}
+
+impl RequestValue for SiteConfig {}
+impl ResponseResult for SiteConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [versions populate files sites](struct.SiteVersionPopulateFileCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PopulateVersionFilesResponse {
+    /// The content hashes of the specified files that need to be uploaded to the
+    /// specified endpoint.
+    #[serde(rename="uploadRequiredHashes")]
+    pub upload_required_hashes: Option<Vec<String>>,
+    /// The URL to which the files should be uploaded, in the format:
+    /// <br>"https://upload-firebasehosting.googleapis.com/upload/sites/<var>site-name</var>/versions/<var>versionID</var>/files".
+    /// <br>Perform a multipart `POST` of the Gzipped file contents to the URL
+    /// using a forward slash and the hash of the file appended to the end.
+    #[serde(rename="uploadUrl")]
+    pub upload_url: Option<String>,
+}
+
+impl ResponseResult for PopulateVersionFilesResponse {}
+
+
+/// A [`header`](/docs/hosting/full-config#headers) defines custom headers to
+/// add to a response should the request URL path match the pattern.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Header {
+    /// Required. The additional headers to add to the response.
+    pub headers: Option<HashMap<String, String>>,
+    /// Required. The user-supplied
+    /// [glob pattern](/docs/hosting/full-config#glob_pattern_matching) to match
+    /// against the request URL path.
+    pub glob: Option<String>,
+}
+
+impl Part for Header {}
 
 
 /// A `Version` is the collection of configuration and
@@ -594,288 +927,6 @@ impl RequestValue for Version {}
 impl ResponseResult for Version {}
 
 
-/// A `Release` is a particular
-/// [collection of configurations and files](sites.versions)
-/// that is set to be public at a particular time.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [releases create sites](struct.SiteReleaseCreateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Release {
-    /// Output only.  The configuration and content that was released.
-    pub version: Option<Version>,
-    /// Output only. The unique identifier for the release, in the format:
-    /// <code>sites/<var>site-name</var>/releases/<var>releaseID</var></code>
-    /// This name is provided in the response body when you call the
-    /// [`CreateRelease`](sites.releases/create) endpoint.
-    pub name: Option<String>,
-    /// The deploy description when the release was created. The value can be up to
-    /// 512&nbsp;characters.
-    pub message: Option<String>,
-    /// Output only. The time at which the version is set to be public.
-    #[serde(rename="releaseTime")]
-    pub release_time: Option<String>,
-    /// Explains the reason for the release.
-    /// <br>Specify a value for this field only when creating a `SITE_DISABLE`
-    /// type release.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Output only. Identifies the user who created the release.
-    #[serde(rename="releaseUser")]
-    pub release_user: Option<ActingUser>,
-}
-
-impl RequestValue for Release {}
-impl ResponseResult for Release {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [domains list sites](struct.SiteDomainListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListDomainsResponse {
-    /// The pagination token, if more results exist.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of domains, if any exist.
-    pub domains: Option<Vec<Domain>>,
-}
-
-impl ResponseResult for ListDomainsResponse {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [domains delete sites](struct.SiteDomainDeleteCall.html) (response)
-/// * [versions delete sites](struct.SiteVersionDeleteCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
-
-
-/// The intended behavior and status information of a domain.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [domains get sites](struct.SiteDomainGetCall.html) (response)
-/// * [domains update sites](struct.SiteDomainUpdateCall.html) (request|response)
-/// * [domains create sites](struct.SiteDomainCreateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Domain {
-    /// Output only. Additional status of the domain association.
-    pub status: Option<String>,
-    /// If set, the domain should redirect with the provided parameters.
-    #[serde(rename="domainRedirect")]
-    pub domain_redirect: Option<DomainRedirect>,
-    /// Required. The domain name of the association.
-    #[serde(rename="domainName")]
-    pub domain_name: Option<String>,
-    /// Required. The site name of the association.
-    pub site: Option<String>,
-    /// Output only. The time at which the domain was last updated.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Output only. Information about the provisioning of certificates and the
-    /// health of the DNS resolution for the domain.
-    pub provisioning: Option<DomainProvisioning>,
-}
-
-impl RequestValue for Domain {}
-impl ResponseResult for Domain {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [releases list sites](struct.SiteReleaseListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListReleasesResponse {
-    /// If there are additional releases remaining beyond the ones in this
-    /// response, then supply this token in the next
-    /// [`list`](../sites.versions.files/list) call to continue with the next set
-    /// of releases.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of hashes of files that still need to be uploaded, if any exist.
-    pub releases: Option<Vec<Release>>,
-}
-
-impl ResponseResult for ListReleasesResponse {}
-
-
-/// The current certificate provisioning status information for a domain.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DomainProvisioning {
-    /// The HTTP challenge for generating a certificate.
-    #[serde(rename="certChallengeHttp")]
-    pub cert_challenge_http: Option<CertHttpChallenge>,
-    /// The list of IPs to which the domain is expected to resolve.
-    #[serde(rename="expectedIps")]
-    pub expected_ips: Option<Vec<String>>,
-    /// The TXT records (for the certificate challenge) that were found at the last
-    /// DNS fetch.
-    #[serde(rename="certChallengeDiscoveredTxt")]
-    pub cert_challenge_discovered_txt: Option<Vec<String>>,
-    /// The time at which the last DNS fetch occurred.
-    #[serde(rename="dnsFetchTime")]
-    pub dns_fetch_time: Option<String>,
-    /// The IPs found at the last DNS fetch.
-    #[serde(rename="discoveredIps")]
-    pub discovered_ips: Option<Vec<String>>,
-    /// The DNS challenge for generating a certificate.
-    #[serde(rename="certChallengeDns")]
-    pub cert_challenge_dns: Option<CertDnsChallenge>,
-    /// The DNS record match status as of the last DNS fetch.
-    #[serde(rename="dnsStatus")]
-    pub dns_status: Option<String>,
-    /// The certificate provisioning status; updated when Firebase Hosting
-    /// provisions an SSL certificate for the domain.
-    #[serde(rename="certStatus")]
-    pub cert_status: Option<String>,
-}
-
-impl Part for DomainProvisioning {}
-
-
-/// A `Rewrite` represents an internal content rewrite on the version. If the
-/// pattern matches, the request will be handled as if it were to the
-/// destination path specified in the configuration.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Rewrite {
-    /// The function to proxy requests to. Must match the exported function
-    /// name exactly.
-    pub function: Option<String>,
-    /// The URL path to rewrite the request to.
-    pub path: Option<String>,
-    /// The request will be forwarded to Firebase Dynamic Links.
-    #[serde(rename="dynamicLinks")]
-    pub dynamic_links: Option<bool>,
-    /// Required. The user-supplied
-    /// [glob pattern](/docs/hosting/full-config#section-glob) to match against
-    /// the request URL path.
-    pub glob: Option<String>,
-}
-
-impl Part for Rewrite {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [versions populate files sites](struct.SiteVersionPopulateFileCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PopulateVersionFilesResponse {
-    /// The content hashes of the specified files that need to be uploaded to the
-    /// specified endpoint.
-    #[serde(rename="uploadRequiredHashes")]
-    pub upload_required_hashes: Option<Vec<String>>,
-    /// The URL to which the files should be uploaded, in the format:
-    /// <br>"https://upload-firebasehosting.googleapis.com/upload/sites/<var>site-name</var>/versions/<var>versionID</var>/files".
-    /// <br>Perform a multipart `POST` of the Gzipped file contents to the URL
-    /// using a forward slash and the hash of the file appended to the end.
-    #[serde(rename="uploadUrl")]
-    pub upload_url: Option<String>,
-}
-
-impl ResponseResult for PopulateVersionFilesResponse {}
-
-
-/// A `Header` defines custom headers to add to a response should the request
-/// URL path match the pattern.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Header {
-    /// Required. The additional headers to add to the response.
-    pub headers: Option<HashMap<String, String>>,
-    /// Required. The user-supplied
-    /// [glob pattern](/docs/hosting/full-config#section-glob) to match against
-    /// the request URL path.
-    pub glob: Option<String>,
-}
-
-impl Part for Header {}
-
-
-/// The configuration for how incoming requests to a site should be routed and
-/// processed before serving content. The patterns are matched and applied
-/// according to a specific
-/// [priority order](/docs/hosting/url-redirects-rewrites#section-priorities).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ServingConfig {
-    /// Defines whether to drop the file extension from uploaded files.
-    #[serde(rename="cleanUrls")]
-    pub clean_urls: Option<bool>,
-    /// A list of custom response headers that are added to the content if the
-    /// request URL path matches the glob.
-    pub headers: Option<Vec<Header>>,
-    /// A list of globs that will cause the response to redirect to another
-    /// location.
-    pub redirects: Option<Vec<Redirect>>,
-    /// How to handle well known App Association files.
-    #[serde(rename="appAssociation")]
-    pub app_association: Option<String>,
-    /// Defines how to handle a trailing slash in the URL path.
-    #[serde(rename="trailingSlashBehavior")]
-    pub trailing_slash_behavior: Option<String>,
-    /// A list of rewrites that will act as if the service were given the
-    /// destination URL.
-    pub rewrites: Option<Vec<Rewrite>>,
-}
-
-impl Part for ServingConfig {}
-
-
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -926,7 +977,7 @@ impl ResponseResult for ListVersionFilesResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `domains_create(...)`, `domains_delete(...)`, `domains_get(...)`, `domains_list(...)`, `domains_update(...)`, `releases_create(...)`, `releases_list(...)`, `versions_create(...)`, `versions_delete(...)`, `versions_files_list(...)`, `versions_patch(...)` and `versions_populate_files(...)`
+/// // like `domains_create(...)`, `domains_delete(...)`, `domains_get(...)`, `domains_list(...)`, `domains_update(...)`, `get_config(...)`, `releases_create(...)`, `releases_list(...)`, `update_config(...)`, `versions_create(...)`, `versions_delete(...)`, `versions_files_list(...)`, `versions_patch(...)` and `versions_populate_files(...)`
 /// // to build up your call.
 /// let rb = hub.sites();
 /// # }
@@ -1113,6 +1164,27 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Sets the Hosting metadata for a specific site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The site for which to update the SiteConfig, in the format:
+    ///            <code>sites/<var>site-name</var>/config</code>
+    pub fn update_config(&self, request: SiteConfig, name: &str) -> SiteUpdateConfigCall<'a, C, A> {
+        SiteUpdateConfigCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Adds content files to a version.
     /// 
     /// # Arguments
@@ -1125,6 +1197,24 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the Hosting metadata for a specific site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The site for which to get the SiteConfig, in the format:
+    ///            <code>sites/<var>site-name</var>/config</code>
+    pub fn get_config(&self, name: &str) -> SiteGetConfigCall<'a, C, A> {
+        SiteGetConfigCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1297,7 +1387,7 @@ impl<'a, C, A> SiteVersionFileListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1313,10 +1403,7 @@ impl<'a, C, A> SiteVersionFileListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1336,7 +1423,7 @@ impl<'a, C, A> SiteVersionFileListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1437,7 +1524,7 @@ impl<'a, C, A> SiteVersionFileListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1571,7 +1658,7 @@ impl<'a, C, A> SiteDomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1587,10 +1674,7 @@ impl<'a, C, A> SiteDomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1610,7 +1694,7 @@ impl<'a, C, A> SiteDomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1688,7 +1772,7 @@ impl<'a, C, A> SiteDomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1832,7 +1916,7 @@ impl<'a, C, A> SiteReleaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1848,10 +1932,7 @@ impl<'a, C, A> SiteReleaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1871,7 +1952,7 @@ impl<'a, C, A> SiteReleaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1964,7 +2045,7 @@ impl<'a, C, A> SiteReleaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2111,7 +2192,7 @@ impl<'a, C, A> SiteReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2127,10 +2208,7 @@ impl<'a, C, A> SiteReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2162,7 +2240,7 @@ impl<'a, C, A> SiteReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2266,7 +2344,7 @@ impl<'a, C, A> SiteReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2407,7 +2485,7 @@ impl<'a, C, A> SiteDomainCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2423,10 +2501,7 @@ impl<'a, C, A> SiteDomainCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2458,7 +2533,7 @@ impl<'a, C, A> SiteDomainCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2549,7 +2624,7 @@ impl<'a, C, A> SiteDomainCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2693,7 +2768,7 @@ impl<'a, C, A> SiteDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2709,10 +2784,7 @@ impl<'a, C, A> SiteDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2732,7 +2804,7 @@ impl<'a, C, A> SiteDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2825,7 +2897,7 @@ impl<'a, C, A> SiteDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2976,7 +3048,7 @@ impl<'a, C, A> SiteVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2992,10 +3064,7 @@ impl<'a, C, A> SiteVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3027,7 +3096,7 @@ impl<'a, C, A> SiteVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3134,7 +3203,7 @@ impl<'a, C, A> SiteVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3285,7 +3354,7 @@ impl<'a, C, A> SiteVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3301,10 +3370,7 @@ impl<'a, C, A> SiteVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3336,7 +3402,7 @@ impl<'a, C, A> SiteVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3440,7 +3506,7 @@ impl<'a, C, A> SiteVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3477,6 +3543,302 @@ impl<'a, C, A> SiteVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Sets the Hosting metadata for a specific site.
+///
+/// A builder for the *updateConfig* method supported by a *site* resource.
+/// It is not used directly, but through a `SiteMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// use firebasehosting1_beta1::SiteConfig;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SiteConfig::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.sites().update_config(req, "name")
+///              .update_mask("et")
+///              .doit();
+/// # }
+/// ```
+pub struct SiteUpdateConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _request: SiteConfig,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SiteUpdateConfigCall<'a, C, A> {}
+
+impl<'a, C, A> SiteUpdateConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SiteConfig)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.sites.updateConfig",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SiteConfig) -> SiteUpdateConfigCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The site for which to update the SiteConfig, in the format:
+    /// <code>sites/<var>site-name</var>/config</code>
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> SiteUpdateConfigCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// A set of field names from your [site configuration](../sites.SiteConfig)
+    /// that you want to update.
+    /// <br>A field will be overwritten if, and only if, it's in the mask.
+    /// <br>If a mask is not provided then a default mask of only
+    /// [`max_versions`](../sites.SiteConfig.max_versions) will be used.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> SiteUpdateConfigCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteUpdateConfigCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> SiteUpdateConfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteUpdateConfigCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3581,7 +3943,7 @@ impl<'a, C, A> SiteVersionPopulateFileCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3597,10 +3959,7 @@ impl<'a, C, A> SiteVersionPopulateFileCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3632,7 +3991,7 @@ impl<'a, C, A> SiteVersionPopulateFileCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3723,7 +4082,7 @@ impl<'a, C, A> SiteVersionPopulateFileCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3760,6 +4119,255 @@ impl<'a, C, A> SiteVersionPopulateFileCall<'a, C, A> where C: BorrowMut<hyper::C
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPopulateFileCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the Hosting metadata for a specific site.
+///
+/// A builder for the *getConfig* method supported by a *site* resource.
+/// It is not used directly, but through a `SiteMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.sites().get_config("name")
+///              .doit();
+/// # }
+/// ```
+pub struct SiteGetConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SiteGetConfigCall<'a, C, A> {}
+
+impl<'a, C, A> SiteGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SiteConfig)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.sites.getConfig",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::FirebaseReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The site for which to get the SiteConfig, in the format:
+    /// <code>sites/<var>site-name</var>/config</code>
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> SiteGetConfigCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteGetConfigCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> SiteGetConfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::FirebaseReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetConfigCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3857,7 +4465,7 @@ impl<'a, C, A> SiteDomainGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3873,10 +4481,7 @@ impl<'a, C, A> SiteDomainGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3896,7 +4501,7 @@ impl<'a, C, A> SiteDomainGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3974,7 +4579,7 @@ impl<'a, C, A> SiteDomainGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4108,7 +4713,7 @@ impl<'a, C, A> SiteVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4124,10 +4729,7 @@ impl<'a, C, A> SiteVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4147,7 +4749,7 @@ impl<'a, C, A> SiteVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4226,7 +4828,7 @@ impl<'a, C, A> SiteVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4368,7 +4970,7 @@ impl<'a, C, A> SiteDomainUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4384,10 +4986,7 @@ impl<'a, C, A> SiteDomainUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4419,7 +5018,7 @@ impl<'a, C, A> SiteDomainUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4510,7 +5109,7 @@ impl<'a, C, A> SiteDomainUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

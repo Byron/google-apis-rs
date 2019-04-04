@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Build* crate version *1.0.8+20181011*, where *20181011* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Build* crate version *1.0.8+20190323*, where *20190323* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Build* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/cloud-build/docs/).
@@ -374,21 +374,6 @@ impl<'a, C, A> CloudBuild<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The request message for Operations.CancelOperation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancel operations](struct.OperationCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelOperationRequest {}
-
-
 /// Start and end times for a build execution phase.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -491,25 +476,6 @@ impl RequestValue for RepoSource {}
 pub struct RetryBuildRequest { _never_set: Option<bool> }
 
 impl RequestValue for RetryBuildRequest {}
-
-
-/// An image built by the pipeline.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuiltImage {
-    /// Output only. Stores timing information for pushing the specified image.
-    #[serde(rename="pushTiming")]
-    pub push_timing: Option<TimeSpan>,
-    /// Name used to push the container image to Google Container Registry, as
-    /// presented to `docker push`.
-    pub name: Option<String>,
-    /// Docker Registry 2.0 digest.
-    pub digest: Option<String>,
-}
-
-impl Part for BuiltImage {}
 
 
 /// Location of the source in a supported storage service.
@@ -638,9 +604,12 @@ pub struct Build {
     /// Artifacts produced by the build that should be uploaded upon
     /// successful completion of all build steps.
     pub artifacts: Option<Artifacts>,
-    /// Output only. ID of the project.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
+    /// Google Cloud Storage bucket where logs should be written (see
+    /// [Bucket Name
+    /// Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
+    /// Logs file names will be of the format `${logs_bucket}/log-${build_id}.txt`.
+    #[serde(rename="logsBucket")]
+    pub logs_bucket: Option<String>,
     /// Substitutions data for `Build` resource.
     pub substitutions: Option<HashMap<String, String>>,
     /// The location of the source files to build.
@@ -653,12 +622,9 @@ pub struct Build {
     /// 
     /// Default time is ten minutes.
     pub timeout: Option<String>,
-    /// Google Cloud Storage bucket where logs should be written (see
-    /// [Bucket Name
-    /// Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
-    /// Logs file names will be of the format `${logs_bucket}/log-${build_id}.txt`.
-    #[serde(rename="logsBucket")]
-    pub logs_bucket: Option<String>,
+    /// Output only. ID of the project.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
     /// Special options for this build.
     pub options: Option<BuildOptions>,
     /// Output only. URL to logs for this build in Google Cloud Console.
@@ -694,38 +660,17 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The response message for Operations.ListOperations.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list operations](struct.OperationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
-}
-
-impl ResponseResult for ListOperationsResponse {}
-
-
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -786,24 +731,6 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Response containing existing `BuildTriggers`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [triggers list projects](struct.ProjectTriggerListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListBuildTriggersResponse {
-    /// `BuildTriggers` for the project, sorted by `create_time` descending.
-    pub triggers: Option<Vec<BuildTrigger>>,
-}
-
-impl ResponseResult for ListBuildTriggersResponse {}
-
-
 /// Container message for hash values.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -843,81 +770,25 @@ pub struct ArtifactObjects {
 impl Part for ArtifactObjects {}
 
 
-/// Optional arguments to enable specific features of builds.
+/// PullRequestFilter contains filter properties for matching GitHub Pull
+/// Requests.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildOptions {
-    /// Option to specify behavior when there is an error in the substitution
-    /// checks.
-    #[serde(rename="substitutionOption")]
-    pub substitution_option: Option<String>,
-    /// Compute Engine machine type on which to run the build.
-    #[serde(rename="machineType")]
-    pub machine_type: Option<String>,
-    /// Global list of volumes to mount for ALL build steps
+pub struct PullRequestFilter {
+    /// Whether to block builds on a "/gcbrun" comment from a repository owner or
+    /// collaborator.
+    #[serde(rename="commentControl")]
+    pub comment_control: Option<String>,
+    /// Regex of branches to match.
     /// 
-    /// Each volume is created as an empty volume prior to starting the build
-    /// process. Upon completion of the build, volumes and their contents are
-    /// discarded. Global volume names and paths cannot conflict with the volumes
-    /// defined a build step.
-    /// 
-    /// Using a global volume in a build with only one step is not valid as
-    /// it is indicative of a build request with an incorrect configuration.
-    pub volumes: Option<Vec<Volume>>,
-    /// Requested hash for SourceProvenance.
-    #[serde(rename="sourceProvenanceHash")]
-    pub source_provenance_hash: Option<Vec<String>>,
-    /// Option to define build log streaming behavior to Google Cloud
-    /// Storage.
-    #[serde(rename="logStreamingOption")]
-    pub log_streaming_option: Option<String>,
-    /// A list of global environment variables, which are encrypted using a Cloud
-    /// Key Management Service crypto key. These values must be specified in the
-    /// build's `Secret`. These variables will be available to all build steps
-    /// in this build.
-    #[serde(rename="secretEnv")]
-    pub secret_env: Option<Vec<String>>,
-    /// Requested disk size for the VM that runs the build. Note that this is *NOT*
-    /// "disk free"; some of the space will be used by the operating system and
-    /// build utilities. Also note that this is the minimum disk size that will be
-    /// allocated for the build -- the build may run with a larger disk than
-    /// requested. At present, the maximum disk size is 1000GB; builds that request
-    /// more than the maximum are rejected with an error.
-    #[serde(rename="diskSizeGb")]
-    pub disk_size_gb: Option<String>,
-    /// A list of global environment variable definitions that will exist for all
-    /// build steps in this build. If a variable is defined in both globally and in
-    /// a build step, the variable will use the build step value.
-    /// 
-    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
-    /// being given the value "VALUE".
-    pub env: Option<Vec<String>>,
-    /// Requested verifiability options.
-    #[serde(rename="requestedVerifyOption")]
-    pub requested_verify_option: Option<String>,
-    /// Option to specify the logging mode, which determines where the logs are
-    /// stored.
-    pub logging: Option<String>,
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    pub branch: Option<String>,
 }
 
-impl Part for BuildOptions {}
-
-
-/// Request to cancel an ongoing build.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [builds cancel projects](struct.ProjectBuildCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelBuildRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelBuildRequest {}
+impl Part for PullRequestFilter {}
 
 
 /// Configuration for an automated build in response to source repository
@@ -934,8 +805,13 @@ impl RequestValue for CancelBuildRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildTrigger {
+    /// GitHubEventsConfig describes the configuration of a trigger that creates
+    /// a build whenever a GitHub event is received.
+    pub github: Option<GitHubEventsConfig>,
     /// Human-readable description of this trigger.
     pub description: Option<String>,
+    /// Output only. Unique identifier of the trigger.
+    pub id: Option<String>,
     /// ignored_files and included_files are file glob matches using
     /// http://godoc/pkg/path/filepath#Match extended with support for "**".
     /// 
@@ -947,19 +823,12 @@ pub struct BuildTrigger {
     /// outside of the ignored_files globs, then we do not trigger a build.
     #[serde(rename="ignoredFiles")]
     pub ignored_files: Option<Vec<String>>,
-    /// Template describing the types of source changes to trigger a build.
-    /// 
-    /// Branch and tag names in trigger templates are interpreted as regular
-    /// expressions. Any branch or tag change that matches that regular expression
-    /// will trigger a build.
-    #[serde(rename="triggerTemplate")]
-    pub trigger_template: Option<RepoSource>,
-    /// Path, from the source root, to a file whose contents is used for the
-    /// template.
-    pub filename: Option<String>,
     /// Output only. Time when the trigger was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
+    /// Path, from the source root, to a file whose contents is used for the
+    /// template.
+    pub filename: Option<String>,
     /// If true, the trigger will never result in a build.
     pub disabled: Option<bool>,
     /// Contents of the build template.
@@ -976,43 +845,28 @@ pub struct BuildTrigger {
     pub included_files: Option<Vec<String>>,
     /// Substitutions data for Build resource.
     pub substitutions: Option<HashMap<String, String>>,
-    /// Output only. Unique identifier of the trigger.
-    pub id: Option<String>,
+    /// Template describing the types of source changes to trigger a build.
+    /// 
+    /// Branch and tag names in trigger templates are interpreted as regular
+    /// expressions. Any branch or tag change that matches that regular expression
+    /// will trigger a build.
+    #[serde(rename="triggerTemplate")]
+    pub trigger_template: Option<RepoSource>,
 }
 
 impl RequestValue for BuildTrigger {}
 impl ResponseResult for BuildTrigger {}
 
 
-/// Artifacts created by the build pipeline.
+/// A CheckSuiteFilter is a filter that indicates that we should build on all
+/// check suite events.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Results {
-    /// List of build step outputs, produced by builder images, in the order
-    /// corresponding to build step indices.
-    /// 
-    /// [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders)
-    /// can produce this output by writing to `$BUILDER_OUTPUT/output`.
-    /// Only the first 4KB of data is stored.
-    #[serde(rename="buildStepOutputs")]
-    pub build_step_outputs: Option<Vec<String>>,
-    /// Path to the artifact manifest. Only populated when artifacts are uploaded.
-    #[serde(rename="artifactManifest")]
-    pub artifact_manifest: Option<String>,
-    /// Container images that were built as a part of the build.
-    pub images: Option<Vec<BuiltImage>>,
-    /// List of build step digests, in the order corresponding to build step
-    /// indices.
-    #[serde(rename="buildStepImages")]
-    pub build_step_images: Option<Vec<String>>,
-    /// Number of artifacts uploaded. Only populated when artifacts are uploaded.
-    #[serde(rename="numArtifacts")]
-    pub num_artifacts: Option<String>,
-}
+pub struct CheckSuiteFilter { _never_set: Option<bool> }
 
-impl Part for Results {}
+impl Part for CheckSuiteFilter {}
 
 
 /// A step in the build pipeline.
@@ -1025,6 +879,31 @@ pub struct BuildStep {
     /// only updated on build completion; step status is not updated in real-time
     /// as the build progresses.
     pub status: Option<String>,
+    /// The ID(s) of the step(s) that this build step depends on.
+    /// This build step will not start until all the build steps in `wait_for`
+    /// have completed successfully. If `wait_for` is empty, this build step will
+    /// start when all previous build steps in the `Build.Steps` list have
+    /// completed successfully.
+    #[serde(rename="waitFor")]
+    pub wait_for: Option<Vec<String>>,
+    /// Required. The name of the container image that will run this particular
+    /// build step.
+    /// 
+    /// If the image is available in the host's Docker daemon's cache, it
+    /// will be run directly. If not, the host will attempt to pull the image
+    /// first, using the builder service account's credentials if necessary.
+    /// 
+    /// The Docker daemon's cache will already have the latest versions of all of
+    /// the officially supported build steps
+    /// ([https://github.com/GoogleCloudPlatform/cloud-builders](https://github.com/GoogleCloudPlatform/cloud-builders)).
+    /// The Docker daemon will also have cached many of the layers for some popular
+    /// images, like "ubuntu", "debian", but they will be refreshed at the time you
+    /// attempt to use them.
+    /// 
+    /// If you built an image in a previous build step, it will be stored in the
+    /// host's Docker daemon's cache and is available to use as the name for a
+    /// later build step.
+    pub name: Option<String>,
     /// A list of arguments that will be presented to the step when it is started.
     /// 
     /// If the image used to run the step's container has an entrypoint, the `args`
@@ -1036,22 +915,9 @@ pub struct BuildStep {
     /// time limit and will be allowed to continue to run until either it completes
     /// or the build itself times out.
     pub timeout: Option<String>,
-    /// List of volumes to mount into the build step.
-    /// 
-    /// Each volume is created as an empty volume prior to execution of the
-    /// build step. Upon completion of the build, volumes and their contents are
-    /// discarded.
-    /// 
-    /// Using a named volume in only one step is not valid as it is indicative
-    /// of a build request with an incorrect configuration.
-    pub volumes: Option<Vec<Volume>>,
-    /// The ID(s) of the step(s) that this build step depends on.
-    /// This build step will not start until all the build steps in `wait_for`
-    /// have completed successfully. If `wait_for` is empty, this build step will
-    /// start when all previous build steps in the `Build.Steps` list have
-    /// completed successfully.
-    #[serde(rename="waitFor")]
-    pub wait_for: Option<Vec<String>>,
+    /// Unique identifier for this build step, used in `wait_for` to
+    /// reference this build step as a dependency.
+    pub id: Option<String>,
     /// A list of environment variables which are encrypted using a Cloud Key
     /// Management Service crypto key. These values must be specified in the
     /// build's `Secret`.
@@ -1071,9 +937,15 @@ pub struct BuildStep {
     /// builder image only.
     #[serde(rename="pullTiming")]
     pub pull_timing: Option<TimeSpan>,
-    /// Unique identifier for this build step, used in `wait_for` to
-    /// reference this build step as a dependency.
-    pub id: Option<String>,
+    /// List of volumes to mount into the build step.
+    /// 
+    /// Each volume is created as an empty volume prior to execution of the
+    /// build step. Upon completion of the build, volumes and their contents are
+    /// discarded.
+    /// 
+    /// Using a named volume in only one step is not valid as it is indicative
+    /// of a build request with an incorrect configuration.
+    pub volumes: Option<Vec<Volume>>,
     /// Working directory to use when running this step's container.
     /// 
     /// If this value is a relative path, it is relative to the build's working
@@ -1085,24 +957,6 @@ pub struct BuildStep {
     /// which specifies an absolute path, the `RepoSource` `dir` is ignored for
     /// the step's execution.
     pub dir: Option<String>,
-    /// Required. The name of the container image that will run this particular
-    /// build step.
-    /// 
-    /// If the image is available in the host's Docker daemon's cache, it
-    /// will be run directly. If not, the host will attempt to pull the image
-    /// first, using the builder service account's credentials if necessary.
-    /// 
-    /// The Docker daemon's cache will already have the latest versions of all of
-    /// the officially supported build steps
-    /// ([https://github.com/GoogleCloudPlatform/cloud-builders](https://github.com/GoogleCloudPlatform/cloud-builders)).
-    /// The Docker daemon will also have cached many of the layers for some popular
-    /// images, like "ubuntu", "debian", but they will be refreshed at the time you
-    /// attempt to use them.
-    /// 
-    /// If you built an image in a previous build step, it will be stored in the
-    /// host's Docker daemon's cache and is available to use as the name for a
-    /// later build step.
-    pub name: Option<String>,
 }
 
 impl Part for BuildStep {}
@@ -1157,8 +1011,8 @@ pub struct SourceProvenance {
     #[serde(rename="resolvedRepoSource")]
     pub resolved_repo_source: Option<RepoSource>,
     /// Output only. Hash(es) of the build source, which can be used to verify that
-    /// the originalsource integrity was maintained in the build. Note that
-    /// `FileHashes` willonly be populated if `BuildOptions` has requested a
+    /// the original source integrity was maintained in the build. Note that
+    /// `FileHashes` will only be populated if `BuildOptions` has requested a
     /// `SourceProvenanceHash`.
     /// 
     /// The keys to this map are file paths used as build source and the values
@@ -1198,6 +1052,240 @@ pub struct StorageSource {
 }
 
 impl Part for StorageSource {}
+
+
+/// Response including listed builds.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [builds list projects](struct.ProjectBuildListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBuildsResponse {
+    /// Token to receive the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Builds will be sorted by `create_time`, descending.
+    pub builds: Option<Vec<Build>>,
+}
+
+impl ResponseResult for ListBuildsResponse {}
+
+
+/// Push contains filter properties for matching GitHub git pushes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PushFilter {
+    /// Regexes of tags to match.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    pub tag: Option<String>,
+    /// Regexes of branches to match.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    pub branch: Option<String>,
+}
+
+impl Part for PushFilter {}
+
+
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list operations](struct.OperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
+
+
+/// Response containing existing `BuildTriggers`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [triggers list projects](struct.ProjectTriggerListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBuildTriggersResponse {
+    /// Token to receive the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// `BuildTriggers` for the project, sorted by `create_time` descending.
+    pub triggers: Option<Vec<BuildTrigger>>,
+}
+
+impl ResponseResult for ListBuildTriggersResponse {}
+
+
+/// An image built by the pipeline.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuiltImage {
+    /// Output only. Stores timing information for pushing the specified image.
+    #[serde(rename="pushTiming")]
+    pub push_timing: Option<TimeSpan>,
+    /// Name used to push the container image to Google Container Registry, as
+    /// presented to `docker push`.
+    pub name: Option<String>,
+    /// Docker Registry 2.0 digest.
+    pub digest: Option<String>,
+}
+
+impl Part for BuiltImage {}
+
+
+/// Optional arguments to enable specific features of builds.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildOptions {
+    /// Option to specify behavior when there is an error in the substitution
+    /// checks.
+    #[serde(rename="substitutionOption")]
+    pub substitution_option: Option<String>,
+    /// Compute Engine machine type on which to run the build.
+    #[serde(rename="machineType")]
+    pub machine_type: Option<String>,
+    /// A list of global environment variable definitions that will exist for all
+    /// build steps in this build. If a variable is defined in both globally and in
+    /// a build step, the variable will use the build step value.
+    /// 
+    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
+    /// being given the value "VALUE".
+    pub env: Option<Vec<String>>,
+    /// Requested hash for SourceProvenance.
+    #[serde(rename="sourceProvenanceHash")]
+    pub source_provenance_hash: Option<Vec<String>>,
+    /// Option to define build log streaming behavior to Google Cloud
+    /// Storage.
+    #[serde(rename="logStreamingOption")]
+    pub log_streaming_option: Option<String>,
+    /// A list of global environment variables, which are encrypted using a Cloud
+    /// Key Management Service crypto key. These values must be specified in the
+    /// build's `Secret`. These variables will be available to all build steps
+    /// in this build.
+    #[serde(rename="secretEnv")]
+    pub secret_env: Option<Vec<String>>,
+    /// Requested disk size for the VM that runs the build. Note that this is *NOT*
+    /// "disk free"; some of the space will be used by the operating system and
+    /// build utilities. Also note that this is the minimum disk size that will be
+    /// allocated for the build -- the build may run with a larger disk than
+    /// requested. At present, the maximum disk size is 1000GB; builds that request
+    /// more than the maximum are rejected with an error.
+    #[serde(rename="diskSizeGb")]
+    pub disk_size_gb: Option<String>,
+    /// Option to specify the logging mode, which determines where the logs are
+    /// stored.
+    pub logging: Option<String>,
+    /// Global list of volumes to mount for ALL build steps
+    /// 
+    /// Each volume is created as an empty volume prior to starting the build
+    /// process. Upon completion of the build, volumes and their contents are
+    /// discarded. Global volume names and paths cannot conflict with the volumes
+    /// defined a build step.
+    /// 
+    /// Using a global volume in a build with only one step is not valid as
+    /// it is indicative of a build request with an incorrect configuration.
+    pub volumes: Option<Vec<Volume>>,
+    /// Requested verifiability options.
+    #[serde(rename="requestedVerifyOption")]
+    pub requested_verify_option: Option<String>,
+    /// Option to specify a `WorkerPool` for the build. User specifies the pool
+    /// with the format "[WORKERPOOL_PROJECT_ID]/[WORKERPOOL_NAME]".
+    /// This is an experimental field.
+    #[serde(rename="workerPool")]
+    pub worker_pool: Option<String>,
+}
+
+impl Part for BuildOptions {}
+
+
+/// Request to cancel an ongoing build.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [builds cancel projects](struct.ProjectBuildCancelCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelBuildRequest { _never_set: Option<bool> }
+
+impl RequestValue for CancelBuildRequest {}
+
+
+/// Artifacts created by the build pipeline.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Results {
+    /// List of build step outputs, produced by builder images, in the order
+    /// corresponding to build step indices.
+    /// 
+    /// [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders)
+    /// can produce this output by writing to `$BUILDER_OUTPUT/output`.
+    /// Only the first 4KB of data is stored.
+    #[serde(rename="buildStepOutputs")]
+    pub build_step_outputs: Option<Vec<String>>,
+    /// Path to the artifact manifest. Only populated when artifacts are uploaded.
+    #[serde(rename="artifactManifest")]
+    pub artifact_manifest: Option<String>,
+    /// Time to push all non-container artifacts.
+    #[serde(rename="artifactTiming")]
+    pub artifact_timing: Option<TimeSpan>,
+    /// Container images that were built as a part of the build.
+    pub images: Option<Vec<BuiltImage>>,
+    /// List of build step digests, in the order corresponding to build step
+    /// indices.
+    #[serde(rename="buildStepImages")]
+    pub build_step_images: Option<Vec<String>>,
+    /// Number of artifacts uploaded. Only populated when artifacts are uploaded.
+    #[serde(rename="numArtifacts")]
+    pub num_artifacts: Option<String>,
+}
+
+impl Part for Results {}
+
+
+/// The request message for Operations.CancelOperation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancel operations](struct.OperationCancelCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelOperationRequest { _never_set: Option<bool> }
+
+impl RequestValue for CancelOperationRequest {}
 
 
 /// This resource represents a long-running operation that is the result of a
@@ -1247,25 +1335,34 @@ impl Resource for Operation {}
 impl ResponseResult for Operation {}
 
 
-/// Response including listed builds.
+/// GitHubEventsConfig describes the configuration of a trigger that creates a
+/// build whenever a GitHub event is received.
 /// 
-/// # Activities
+/// This message is experimental.
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [builds list projects](struct.ProjectBuildListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListBuildsResponse {
-    /// Token to receive the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Builds will be sorted by `create_time`, descending.
-    pub builds: Option<Vec<Build>>,
+pub struct GitHubEventsConfig {
+    /// Owner of the repository.
+    pub owner: Option<String>,
+    /// Name of the repository.
+    pub name: Option<String>,
+    /// filter to match changes in refs like branches, tags.
+    pub push: Option<PushFilter>,
+    /// The installationID that emmits the GitHub event.
+    #[serde(rename="installationId")]
+    pub installation_id: Option<String>,
+    /// filter to match changes in pull requests.
+    #[serde(rename="pullRequest")]
+    pub pull_request: Option<PullRequestFilter>,
+    /// Output only. Indicates that a build was generated from a check suite
+    /// event.
+    #[serde(rename="checkSuite")]
+    pub check_suite: Option<CheckSuiteFilter>,
 }
 
-impl ResponseResult for ListBuildsResponse {}
+impl Part for GitHubEventsConfig {}
 
 
 
@@ -1464,6 +1561,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectTriggerListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1803,7 +1902,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1819,10 +1918,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1854,7 +1950,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1944,7 +2040,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2102,7 +2198,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2118,10 +2214,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2141,7 +2234,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2240,7 +2333,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2376,7 +2469,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2392,10 +2485,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2415,7 +2505,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2493,7 +2583,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2643,10 +2733,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2666,7 +2753,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2754,7 +2841,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2832,6 +2919,8 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_list("projectId")
+///              .page_token("justo")
+///              .page_size(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -2840,6 +2929,8 @@ pub struct ProjectTriggerListCall<'a, C, A>
 
     hub: &'a CloudBuild<C, A>,
     _project_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2861,9 +2952,15 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.triggers.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
-        for &field in ["alt", "projectId"].iter() {
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2902,10 +2999,7 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2925,7 +3019,7 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2988,6 +3082,20 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._project_id = new_value.to_string();
         self
     }
+    /// Token to provide to skip to a particular spot in the list.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectTriggerListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of results to return in the list.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectTriggerListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -3003,7 +3111,7 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3153,10 +3261,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3176,7 +3281,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3264,7 +3369,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3419,10 +3524,7 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3454,7 +3556,7 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3554,7 +3656,7 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3711,10 +3813,7 @@ impl<'a, C, A> ProjectBuildCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3746,7 +3845,7 @@ impl<'a, C, A> ProjectBuildCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3836,7 +3935,7 @@ impl<'a, C, A> ProjectBuildCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3987,10 +4086,7 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4010,7 +4106,7 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4098,7 +4194,7 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4177,9 +4273,9 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().builds_list("projectId")
-///              .page_token("duo")
-///              .page_size(-32)
-///              .filter("sea")
+///              .page_token("sea")
+///              .page_size(-55)
+///              .filter("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -4262,10 +4358,7 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4285,7 +4378,7 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4384,7 +4477,7 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4539,10 +4632,7 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4574,7 +4664,7 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4674,7 +4764,7 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4855,10 +4945,7 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4890,7 +4977,7 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4990,7 +5077,7 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5145,10 +5232,7 @@ impl<'a, C, A> ProjectTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5180,7 +5264,7 @@ impl<'a, C, A> ProjectTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5270,7 +5354,7 @@ impl<'a, C, A> ProjectTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5427,10 +5511,7 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5462,7 +5543,7 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5562,7 +5643,7 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

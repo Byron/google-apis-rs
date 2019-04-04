@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dns* crate version *1.0.8+20180826*, where *20180826* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *dns* crate version *1.0.8+20190328*, where *20190328* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *dns* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-dns).
@@ -414,28 +414,44 @@ impl<'a, C, A> Dns<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Parameters for DnsKey key generation. Used for generating initial keys for a new ManagedZone and as default when adding a new DnsKey.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DnsKeySpec {
-    /// One of "KEY_SIGNING" or "ZONE_SIGNING". Keys of type KEY_SIGNING have the Secure Entry Point flag set and, when active, will be used to sign only resource record sets of type DNSKEY. Otherwise, the Secure Entry Point flag will be cleared and this key will be used to sign only resource record sets of other types.
+    /// no description provided
     #[serde(rename="keyType")]
     pub key_type: Option<String>,
-    /// Length of the keys in bits.
+    /// no description provided
     #[serde(rename="keyLength")]
     pub key_length: Option<u32>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKeySpec".
     pub kind: Option<String>,
-    /// String mnemonic specifying the DNSSEC algorithm of this key.
+    /// no description provided
     pub algorithm: Option<String>,
 }
 
 impl Part for DnsKeySpec {}
 
 
-/// A unit of data that will be returned by the DNS servers.
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZonePrivateVisibilityConfigNetwork {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePrivateVisibilityConfigNetwork".
+    pub kind: Option<String>,
+    /// no description provided
+    #[serde(rename="networkUrl")]
+    pub network_url: Option<String>,
+}
+
+impl Part for ManagedZonePrivateVisibilityConfigNetwork {}
+
+
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -446,18 +462,18 @@ impl Part for DnsKeySpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceRecordSet {
-    /// As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1).
+    /// no description provided
     pub rrdatas: Option<Vec<String>>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#resourceRecordSet".
     pub kind: Option<String>,
-    /// For example, www.example.com.
+    /// no description provided
     pub name: Option<String>,
-    /// Number of seconds that this ResourceRecordSet can be cached by resolvers.
+    /// no description provided
     pub ttl: Option<i32>,
-    /// The identifier of a supported record type, for example, A, AAAA, MX, TXT, and so on.
+    /// no description provided
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// As defined in RFC 4034 (section 3.2).
+    /// no description provided
     #[serde(rename="signatureRrdatas")]
     pub signature_rrdatas: Option<Vec<String>>,
 }
@@ -465,7 +481,7 @@ pub struct ResourceRecordSet {
 impl Resource for ResourceRecordSet {}
 
 
-/// A zone is a subtree of the DNS namespace under one administrative responsibility. A ManagedZone is a resource that represents a DNS zone hosted by the Cloud DNS service.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -483,28 +499,33 @@ impl Resource for ResourceRecordSet {}
 pub struct ManagedZone {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZone".
     pub kind: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.
+    /// no description provided
     pub description: Option<String>,
-    /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)
+    /// no description provided
     #[serde(rename="nameServers")]
     pub name_servers: Option<Vec<String>>,
-    /// User labels.
+    /// no description provided
     pub labels: Option<HashMap<String, String>>,
-    /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.
+    /// no description provided
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// Unique identifier for the resource; defined by the server (output only)
+    /// no description provided
+    pub visibility: Option<String>,
+    /// no description provided
     pub id: Option<String>,
-    /// The DNS name of this managed zone, for instance "example.com.".
+    /// no description provided
+    #[serde(rename="privateVisibilityConfig")]
+    pub private_visibility_config: Option<ManagedZonePrivateVisibilityConfig>,
+    /// no description provided
     #[serde(rename="dnsName")]
     pub dns_name: Option<String>,
-    /// DNSSEC configuration.
+    /// no description provided
     #[serde(rename="dnssecConfig")]
     pub dnssec_config: Option<ManagedZoneDnsSecConfig>,
-    /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset.
+    /// no description provided
     #[serde(rename="nameServerSet")]
     pub name_server_set: Option<String>,
-    /// User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.
+    /// no description provided
     pub name: Option<String>,
 }
 
@@ -524,16 +545,14 @@ impl ResponseResult for ManagedZone {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZoneOperationsListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The operation resources.
+    /// no description provided
     pub operations: Option<Vec<Operation>>,
 }
 
@@ -546,10 +565,10 @@ impl ResponseResult for ManagedZoneOperationsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationDnsKeyContext {
-    /// The post-operation DnsKey resource.
+    /// no description provided
     #[serde(rename="newValue")]
     pub new_value: Option<DnsKey>,
-    /// The pre-operation DnsKey resource.
+    /// no description provided
     #[serde(rename="oldValue")]
     pub old_value: Option<DnsKey>,
 }
@@ -557,7 +576,7 @@ pub struct OperationDnsKeyContext {
 impl Part for OperationDnsKeyContext {}
 
 
-/// The response to a request to enumerate DnsKeys in a ManagedZone.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -568,14 +587,12 @@ impl Part for OperationDnsKeyContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DnsKeysListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
-    /// The requested resources.
+    /// no description provided
     #[serde(rename="dnsKeys")]
     pub dns_keys: Option<Vec<DnsKey>>,
     /// Type of resource.
@@ -585,7 +602,7 @@ pub struct DnsKeysListResponse {
 impl ResponseResult for DnsKeysListResponse {}
 
 
-/// A project resource. The project is a top level container for resources including Cloud DNS ManagedZones. Projects can be created only in the APIs console.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -596,13 +613,13 @@ impl ResponseResult for DnsKeysListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Project {
-    /// Quotas assigned to this project (output only).
+    /// no description provided
     pub quota: Option<Quota>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#project".
     pub kind: Option<String>,
-    /// User assigned unique identifier for the resource (output only).
+    /// no description provided
     pub id: Option<String>,
-    /// Unique numeric identifier for the resource; defined by the server (output only).
+    /// no description provided
     pub number: Option<String>,
 }
 
@@ -610,7 +627,7 @@ impl Resource for Project {}
 impl ResponseResult for Project {}
 
 
-/// A DNSSEC key pair.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -622,32 +639,32 @@ impl ResponseResult for Project {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DnsKey {
-    /// The key tag is a non-cryptographic hash of the a DNSKEY resource record associated with this DnsKey. The key tag can be used to identify a DNSKEY more quickly (but it is not a unique identifier). In particular, the key tag is used in a parent zone's DS record to point at the DNSKEY in this child ManagedZone. The key tag is a number in the range [0, 65535] and the algorithm to calculate it is specified in RFC4034 Appendix B. Output only.
+    /// no description provided
     #[serde(rename="keyTag")]
     pub key_tag: Option<i32>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKey".
     pub kind: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the resource's function.
+    /// no description provided
     pub description: Option<String>,
-    /// String mnemonic specifying the DNSSEC algorithm of this key. Immutable after creation time.
+    /// no description provided
     pub algorithm: Option<String>,
-    /// Length of the key in bits. Specified at creation time then immutable.
+    /// no description provided
     #[serde(rename="keyLength")]
     pub key_length: Option<u32>,
-    /// The time that this resource was created in the control plane. This is in RFC3339 text format. Output only.
+    /// no description provided
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// Cryptographic hashes of the DNSKEY resource record associated with this DnsKey. These digests are needed to construct a DS record that points at this DNS key. Output only.
+    /// no description provided
     pub digests: Option<Vec<DnsKeyDigest>>,
-    /// Base64 encoded public half of this key. Output only.
+    /// no description provided
     #[serde(rename="publicKey")]
     pub public_key: Option<String>,
-    /// One of "KEY_SIGNING" or "ZONE_SIGNING". Keys of type KEY_SIGNING have the Secure Entry Point flag set and, when active, will be used to sign only resource record sets of type DNSKEY. Otherwise, the Secure Entry Point flag will be cleared and this key will be used to sign only resource record sets of other types. Immutable after creation time.
+    /// no description provided
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Unique identifier for the resource; defined by the server (output only).
+    /// no description provided
     pub id: Option<String>,
-    /// Active keys will be used to sign subsequent changes to the ManagedZone. Inactive keys will still be present as DNSKEY Resource Records for the use of resolvers validating existing signatures.
+    /// no description provided
     #[serde(rename="isActive")]
     pub is_active: Option<bool>,
 }
@@ -667,16 +684,14 @@ impl ResponseResult for DnsKey {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZonesListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The managed zone resources.
+    /// no description provided
     #[serde(rename="managedZones")]
     pub managed_zones: Option<Vec<ManagedZone>>,
 }
@@ -695,16 +710,14 @@ impl ResponseResult for ManagedZonesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceRecordSetsListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The resource record set resources.
+    /// no description provided
     pub rrsets: Option<Vec<ResourceRecordSet>>,
 }
 
@@ -719,12 +732,12 @@ impl ResponseResult for ResourceRecordSetsListResponse {}
 pub struct ManagedZoneDnsSecConfig {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZoneDnsSecConfig".
     pub kind: Option<String>,
-    /// Specifies parameters that will be used for generating initial DnsKeys for this ManagedZone. Output only while state is not OFF.
+    /// no description provided
     #[serde(rename="defaultKeySpecs")]
     pub default_key_specs: Option<Vec<DnsKeySpec>>,
-    /// Specifies whether DNSSEC is enabled, and what mode it is in.
+    /// no description provided
     pub state: Option<String>,
-    /// Specifies the mechanism used to provide authenticated denial-of-existence responses. Output only while state is not OFF.
+    /// no description provided
     #[serde(rename="nonExistence")]
     pub non_existence: Option<String>,
 }
@@ -738,10 +751,10 @@ impl Part for ManagedZoneDnsSecConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationManagedZoneContext {
-    /// The post-operation ManagedZone resource.
+    /// no description provided
     #[serde(rename="newValue")]
     pub new_value: Option<ManagedZone>,
-    /// The pre-operation ManagedZone resource.
+    /// no description provided
     #[serde(rename="oldValue")]
     pub old_value: Option<ManagedZone>,
 }
@@ -749,7 +762,22 @@ pub struct OperationManagedZoneContext {
 impl Part for OperationManagedZoneContext {}
 
 
-/// Limits associated with a Project.
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZonePrivateVisibilityConfig {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePrivateVisibilityConfig".
+    pub kind: Option<String>,
+    /// no description provided
+    pub networks: Option<Vec<ManagedZonePrivateVisibilityConfigNetwork>>,
+}
+
+impl Part for ManagedZonePrivateVisibilityConfig {}
+
+
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -757,30 +785,36 @@ impl Part for OperationManagedZoneContext {}
 pub struct Quota {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#quota".
     pub kind: Option<String>,
-    /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.
-    #[serde(rename="rrsetAdditionsPerChange")]
-    pub rrset_additions_per_change: Option<i32>,
-    /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.
+    /// no description provided
+    #[serde(rename="managedZonesPerNetwork")]
+    pub managed_zones_per_network: Option<i32>,
+    /// no description provided
     #[serde(rename="totalRrdataSizePerChange")]
     pub total_rrdata_size_per_change: Option<i32>,
-    /// Maximum allowed number of ResourceRecords per ResourceRecordSet.
+    /// no description provided
     #[serde(rename="resourceRecordsPerRrset")]
     pub resource_records_per_rrset: Option<i32>,
-    /// Maximum allowed number of DnsKeys per ManagedZone.
+    /// no description provided
     #[serde(rename="dnsKeysPerManagedZone")]
     pub dns_keys_per_managed_zone: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets per zone in the project.
+    /// no description provided
     #[serde(rename="rrsetsPerManagedZone")]
     pub rrsets_per_managed_zone: Option<i32>,
-    /// DNSSEC algorithm and key length types that can be used for DnsKeys.
+    /// no description provided
+    #[serde(rename="rrsetAdditionsPerChange")]
+    pub rrset_additions_per_change: Option<i32>,
+    /// no description provided
     #[serde(rename="whitelistedKeySpecs")]
     pub whitelisted_key_specs: Option<Vec<DnsKeySpec>>,
-    /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.
+    /// no description provided
     #[serde(rename="rrsetDeletionsPerChange")]
     pub rrset_deletions_per_change: Option<i32>,
-    /// Maximum allowed number of managed zones in the project.
+    /// no description provided
     #[serde(rename="managedZones")]
     pub managed_zones: Option<i32>,
+    /// no description provided
+    #[serde(rename="networksPerManagedZone")]
+    pub networks_per_managed_zone: Option<i32>,
 }
 
 impl Part for Quota {}
@@ -792,17 +826,17 @@ impl Part for Quota {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DnsKeyDigest {
-    /// Specifies the algorithm used to calculate this digest.
+    /// no description provided
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The base-16 encoded bytes of this digest. Suitable for use in a DS resource record.
+    /// no description provided
     pub digest: Option<String>,
 }
 
 impl Part for DnsKeyDigest {}
 
 
-/// The response to a request to enumerate Changes to a ResourceRecordSets collection.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -813,29 +847,27 @@ impl Part for DnsKeyDigest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChangesListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The requested changes.
+    /// no description provided
     pub changes: Option<Vec<Change>>,
 }
 
 impl ResponseResult for ChangesListResponse {}
 
 
-/// Elements common to every response.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResponseHeader {
-    /// For mutating operation requests that completed successfully. This is the client_operation_id if the client specified it, otherwise it is generated by the server (output only).
+    /// no description provided
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
 }
@@ -843,7 +875,7 @@ pub struct ResponseHeader {
 impl Part for ResponseHeader {}
 
 
-/// An operation represents a successful mutation performed on a Cloud DNS resource. Operations provide: - An audit log of server resource mutations. - A way to recover/retry API calls in the case where the response is never received by the caller. Use the caller specified client_operation_id.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -856,32 +888,32 @@ impl Part for ResponseHeader {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
-    /// Status of the operation. Can be one of the following: "PENDING" or "DONE" (output only).
+    /// no description provided
     pub status: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#operation".
     pub kind: Option<String>,
-    /// Only populated if the operation targeted a DnsKey (output only).
+    /// no description provided
     #[serde(rename="dnsKeyContext")]
     pub dns_key_context: Option<OperationDnsKeyContext>,
-    /// Only populated if the operation targeted a ManagedZone (output only).
+    /// no description provided
     #[serde(rename="zoneContext")]
     pub zone_context: Option<OperationManagedZoneContext>,
-    /// User who requested the operation, for example: user@example.com. cloud-dns-system for operations automatically done by the system. (output only)
+    /// no description provided
     pub user: Option<String>,
-    /// The time that this operation was started by the server. This is in RFC3339 text format (output only).
+    /// no description provided
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Type of the operation. Operations include insert, update, and delete (output only).
+    /// no description provided
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Unique identifier for the resource. This is the client_operation_id if the client specified it when the mutation was initiated, otherwise, it is generated by the server. The name must be 1-63 characters long and match the regular expression [-a-z0-9]? (output only)
+    /// no description provided
     pub id: Option<String>,
 }
 
 impl ResponseResult for Operation {}
 
 
-/// An atomic update to a collection of ResourceRecordSets.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -894,21 +926,21 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Change {
-    /// Which ResourceRecordSets to remove? Must match existing data exactly.
+    /// no description provided
     pub deletions: Option<Vec<ResourceRecordSet>>,
-    /// Status of the operation (output only).
+    /// no description provided
     pub status: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#change".
     pub kind: Option<String>,
-    /// If the DNS queries for the zone will be served.
+    /// no description provided
     #[serde(rename="isServing")]
     pub is_serving: Option<bool>,
-    /// The time that this operation was started by the server (output only). This is in RFC3339 text format.
+    /// no description provided
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Which ResourceRecordSets to add?
+    /// no description provided
     pub additions: Option<Vec<ResourceRecordSet>>,
-    /// Unique identifier for the resource; defined by the server (output only).
+    /// no description provided
     pub id: Option<String>,
 }
 
@@ -963,13 +995,13 @@ impl<'a, C, A> DnsKeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing DnsKey.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    /// * `dnsKeyId` - The identifier of the requested DnsKey.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
+    /// * `dnsKeyId` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str, dns_key_id: &str) -> DnsKeyGetCall<'a, C, A> {
         DnsKeyGetCall {
             hub: self.hub,
@@ -986,12 +1018,12 @@ impl<'a, C, A> DnsKeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate DnsKeys to a ResourceRecordSet collection.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> DnsKeyListCall<'a, C, A> {
         DnsKeyListCall {
             hub: self.hub,
@@ -1050,12 +1082,12 @@ impl<'a, C, A> ManagedZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate Operations for the given ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> ManagedZoneOperationListCall<'a, C, A> {
         ManagedZoneOperationListCall {
             hub: self.hub,
@@ -1072,13 +1104,13 @@ impl<'a, C, A> ManagedZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Operation.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request.
-    /// * `operation` - Identifies the operation addressed by this request.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
+    /// * `operation` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str, operation: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
         ManagedZoneOperationGetCall {
             hub: self.hub,
@@ -1136,13 +1168,13 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an existing ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn update(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZoneUpdateCall<'a, C, A> {
         ManagedZoneUpdateCall {
             hub: self.hub,
@@ -1158,13 +1190,13 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Apply a partial update to an existing ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn patch(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZonePatchCall<'a, C, A> {
         ManagedZonePatchCall {
             hub: self.hub,
@@ -1180,12 +1212,12 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn create(&self, request: ManagedZone, project: &str) -> ManagedZoneCreateCall<'a, C, A> {
         ManagedZoneCreateCall {
             hub: self.hub,
@@ -1200,12 +1232,12 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a previously created ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn delete(&self, project: &str, managed_zone: &str) -> ManagedZoneDeleteCall<'a, C, A> {
         ManagedZoneDeleteCall {
             hub: self.hub,
@@ -1220,12 +1252,12 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str) -> ManagedZoneGetCall<'a, C, A> {
         ManagedZoneGetCall {
             hub: self.hub,
@@ -1240,11 +1272,11 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate ManagedZones that have been created but not yet deleted.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn list(&self, project: &str) -> ManagedZoneListCall<'a, C, A> {
         ManagedZoneListCall {
             hub: self.hub,
@@ -1302,12 +1334,12 @@ impl<'a, C, A> ResourceRecordSetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate ResourceRecordSets that have been created but not yet deleted.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> ResourceRecordSetListCall<'a, C, A> {
         ResourceRecordSetListCall {
             hub: self.hub,
@@ -1367,13 +1399,13 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Atomically update the ResourceRecordSet collection.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn create(&self, request: Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a, C, A> {
         ChangeCreateCall {
             hub: self.hub,
@@ -1389,12 +1421,12 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate Changes to a ResourceRecordSet collection.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a, C, A> {
         ChangeListCall {
             hub: self.hub,
@@ -1412,13 +1444,13 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Change.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    /// * `changeId` - The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
+    /// * `changeId` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a, C, A> {
         ChangeGetCall {
             hub: self.hub,
@@ -1476,11 +1508,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Project.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn get(&self, project: &str) -> ProjectGetCall<'a, C, A> {
         ProjectGetCall {
             hub: self.hub,
@@ -1501,7 +1533,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Fetch the representation of an existing DnsKey.
+/// 
 ///
 /// A builder for the *get* method supported by a *dnsKey* resource.
 /// It is not used directly, but through a `DnsKeyMethods` instance.
@@ -1613,10 +1645,7 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1636,7 +1665,7 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1689,7 +1718,6 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -1699,7 +1727,6 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -1709,7 +1736,6 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._managed_zone = new_value.to_string();
         self
     }
-    /// The identifier of the requested DnsKey.
     ///
     /// Sets the *dns key id* path property to the given value.
     ///
@@ -1719,14 +1745,12 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._dns_key_id = new_value.to_string();
         self
     }
-    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type will be computed and displayed.
     ///
     /// Sets the *digest type* query property to the given value.
     pub fn digest_type(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
         self._digest_type = Some(new_value.to_string());
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
@@ -1748,7 +1772,7 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1792,7 +1816,7 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Enumerate DnsKeys to a ResourceRecordSet collection.
+/// 
 ///
 /// A builder for the *list* method supported by a *dnsKey* resource.
 /// It is not used directly, but through a `DnsKeyMethods` instance.
@@ -1907,10 +1931,7 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1930,7 +1951,7 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1983,7 +2004,6 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -1993,7 +2013,6 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -2003,21 +2022,18 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DnsKeyListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type will be computed and displayed.
     ///
     /// Sets the *digest type* query property to the given value.
     pub fn digest_type(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
@@ -2039,7 +2055,7 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2083,7 +2099,7 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Enumerate Operations for the given ManagedZone.
+/// 
 ///
 /// A builder for the *list* method supported by a *managedZoneOperation* resource.
 /// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
@@ -2198,10 +2214,7 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2221,7 +2234,7 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2274,7 +2287,6 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -2284,7 +2296,6 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -2294,21 +2305,18 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sorting criterion. The only supported values are START_TIME and ID.
     ///
     /// Sets the *sort by* query property to the given value.
     pub fn sort_by(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
         self._sort_by = Some(new_value.to_string());
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagedZoneOperationListCall<'a, C, A> {
@@ -2330,7 +2338,7 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2374,7 +2382,7 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Fetch the representation of an existing Operation.
+/// 
 ///
 /// A builder for the *get* method supported by a *managedZoneOperation* resource.
 /// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
@@ -2481,10 +2489,7 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2504,7 +2509,7 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2557,7 +2562,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -2567,7 +2571,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -2577,7 +2580,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Identifies the operation addressed by this request.
     ///
     /// Sets the *operation* path property to the given value.
     ///
@@ -2587,7 +2589,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._operation = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
@@ -2609,7 +2610,7 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2653,7 +2654,7 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Update an existing ManagedZone.
+/// 
 ///
 /// A builder for the *update* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -2765,10 +2766,7 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2800,7 +2798,7 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2865,7 +2863,6 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -2875,7 +2872,6 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -2885,7 +2881,6 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a, C, A> {
@@ -2907,7 +2902,7 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2951,7 +2946,7 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Apply a partial update to an existing ManagedZone.
+/// 
 ///
 /// A builder for the *patch* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -3063,10 +3058,7 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3098,7 +3090,7 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3163,7 +3155,6 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3173,7 +3164,6 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -3183,7 +3173,6 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZonePatchCall<'a, C, A> {
@@ -3205,7 +3194,7 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3249,7 +3238,7 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Create a new ManagedZone.
+/// 
 ///
 /// A builder for the *create* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -3359,10 +3348,7 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3394,7 +3380,7 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3459,7 +3445,6 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3469,7 +3454,6 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneCreateCall<'a, C, A> {
@@ -3491,7 +3475,7 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3535,7 +3519,7 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Delete a previously created ManagedZone.
+/// 
 ///
 /// A builder for the *delete* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -3639,10 +3623,7 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3662,7 +3643,7 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3705,7 +3686,6 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3715,7 +3695,6 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -3725,7 +3704,6 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, A> {
@@ -3747,7 +3725,7 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3791,7 +3769,7 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Fetch the representation of an existing ManagedZone.
+/// 
 ///
 /// A builder for the *get* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -3896,10 +3874,7 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3919,7 +3894,7 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3972,7 +3947,6 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3982,7 +3956,6 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -3992,7 +3965,6 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, A> {
@@ -4014,7 +3986,7 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4058,7 +4030,7 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Enumerate ManagedZones that have been created but not yet deleted.
+/// 
 ///
 /// A builder for the *list* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -4171,10 +4143,7 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4194,7 +4163,7 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4247,7 +4216,6 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -4257,21 +4225,18 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._project = new_value.to_string();
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagedZoneListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Restricts the list to return only zones with this domain name.
     ///
     /// Sets the *dns name* query property to the given value.
     pub fn dns_name(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
@@ -4293,7 +4258,7 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4337,7 +4302,7 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Enumerate ResourceRecordSets that have been created but not yet deleted.
+/// 
 ///
 /// A builder for the *list* method supported by a *resourceRecordSet* resource.
 /// It is not used directly, but through a `ResourceRecordSetMethods` instance.
@@ -4457,10 +4422,7 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4480,7 +4442,7 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4533,7 +4495,6 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -4543,7 +4504,6 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -4553,28 +4513,24 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Restricts the list to return only records of this type. If present, the "name" parameter must also be present.
     ///
     /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Restricts the list to return only records with this fully qualified domain name.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ResourceRecordSetListCall<'a, C, A> {
@@ -4596,7 +4552,7 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4640,7 +4596,7 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Atomically update the ResourceRecordSet collection.
+/// 
 ///
 /// A builder for the *create* method supported by a *change* resource.
 /// It is not used directly, but through a `ChangeMethods` instance.
@@ -4752,10 +4708,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4787,7 +4740,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4852,7 +4805,6 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -4862,7 +4814,6 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -4872,7 +4823,6 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
@@ -4894,7 +4844,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4938,7 +4888,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Enumerate Changes to a ResourceRecordSet collection.
+/// 
 ///
 /// A builder for the *list* method supported by a *change* resource.
 /// It is not used directly, but through a `ChangeMethods` instance.
@@ -5058,10 +5008,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5081,7 +5028,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5134,7 +5081,6 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5144,7 +5090,6 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -5154,28 +5099,24 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sorting order direction: 'ascending' or 'descending'.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sorting criterion. The only supported value is change sequence.
     ///
     /// Sets the *sort by* query property to the given value.
     pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_by = Some(new_value.to_string());
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
@@ -5197,7 +5138,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5241,7 +5182,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Fetch the representation of an existing Change.
+/// 
 ///
 /// A builder for the *get* method supported by a *change* resource.
 /// It is not used directly, but through a `ChangeMethods` instance.
@@ -5348,10 +5289,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5371,7 +5309,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5424,7 +5362,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5434,7 +5371,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -5444,7 +5380,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._managed_zone = new_value.to_string();
         self
     }
-    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
     ///
     /// Sets the *change id* path property to the given value.
     ///
@@ -5454,7 +5389,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._change_id = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
@@ -5476,7 +5410,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5520,7 +5454,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Fetch the representation of an existing Project.
+/// 
 ///
 /// A builder for the *get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5623,10 +5557,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5646,7 +5577,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5699,7 +5630,6 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5709,7 +5639,6 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ProjectGetCall<'a, C, A> {
@@ -5731,7 +5660,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *storagetransfer* API can be found at the
-[official documentation site](https://cloud.google.com/storage/transfer).
+[official documentation site](https://cloud.google.com/storage-transfer/docs).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storagetransfer* API at revision *20181008*. The CLI is at version *1.0.8*.
+This documentation was generated from the *storagetransfer* API at revision *20190330*. The CLI is at version *1.0.8*.
 
 ```bash
 storagetransfer1 [options]

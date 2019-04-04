@@ -1,0 +1,39 @@
+site_name: Security Command Center v1.0.8+20190402
+site_url: http://byron.github.io/google-apis-rs/google-securitycenter1-cli
+site_description: A complete library to interact with Security Command Center (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/securitycenter1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['organizations_assets-group.md', 'Organizations', 'Assets Group']
+- ['organizations_assets-list.md', 'Organizations', 'Assets List']
+- ['organizations_assets-run-discovery.md', 'Organizations', 'Assets Run Discovery']
+- ['organizations_assets-update-security-marks.md', 'Organizations', 'Assets Update Security Marks']
+- ['organizations_get-organization-settings.md', 'Organizations', 'Get Organization Settings']
+- ['organizations_operations-cancel.md', 'Organizations', 'Operations Cancel']
+- ['organizations_operations-delete.md', 'Organizations', 'Operations Delete']
+- ['organizations_operations-get.md', 'Organizations', 'Operations Get']
+- ['organizations_operations-list.md', 'Organizations', 'Operations List']
+- ['organizations_sources-create.md', 'Organizations', 'Sources Create']
+- ['organizations_sources-findings-create.md', 'Organizations', 'Sources Findings Create']
+- ['organizations_sources-findings-group.md', 'Organizations', 'Sources Findings Group']
+- ['organizations_sources-findings-list.md', 'Organizations', 'Sources Findings List']
+- ['organizations_sources-findings-patch.md', 'Organizations', 'Sources Findings Patch']
+- ['organizations_sources-findings-set-state.md', 'Organizations', 'Sources Findings Set State']
+- ['organizations_sources-findings-update-security-marks.md', 'Organizations', 'Sources Findings Update Security Marks']
+- ['organizations_sources-get.md', 'Organizations', 'Sources Get']
+- ['organizations_sources-get-iam-policy.md', 'Organizations', 'Sources Get Iam Policy']
+- ['organizations_sources-list.md', 'Organizations', 'Sources List']
+- ['organizations_sources-patch.md', 'Organizations', 'Sources Patch']
+- ['organizations_sources-set-iam-policy.md', 'Organizations', 'Sources Set Iam Policy']
+- ['organizations_sources-test-iam-permissions.md', 'Organizations', 'Sources Test Iam Permissions']
+- ['organizations_update-organization-settings.md', 'Organizations', 'Update Organization Settings']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

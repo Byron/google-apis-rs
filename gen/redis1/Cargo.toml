@@ -4,12 +4,12 @@
 [package]
 
 name = "google-redis1"
-version = "1.0.8+20180928"
+version = "1.0.8+20190327"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Redis (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/redis1"
 homepage = "https://cloud.google.com/memorystore/docs/redis/"
-documentation = "https://docs.rs/google-redis1/1.0.8+20180928"
+documentation = "https://docs.rs/google-redis1/1.0.8+20190327"
 license = "MIT"
 keywords = ["redis", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

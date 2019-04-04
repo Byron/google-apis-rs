@@ -157,9 +157,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-ipv4-cidr-size" => Some(("cluster.nodeIpv4CidrSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.daily-maintenance-window.duration" => Some(("cluster.maintenancePolicy.window.dailyMaintenanceWindow.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.daily-maintenance-window.start-time" => Some(("cluster.maintenancePolicy.window.dailyMaintenanceWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -171,15 +168,19 @@ impl<'n> Engine<'n> {
                     "cluster.addons-config.kubernetes-dashboard.disabled" => Some(("cluster.addonsConfig.kubernetesDashboard.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.horizontal-pod-autoscaling.disabled" => Some(("cluster.addonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.locations" => Some(("cluster.locations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "cluster.legacy-abac.enabled" => Some(("cluster.legacyAbac.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "cluster.resource-labels" => Some(("cluster.resourceLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.enable-kubernetes-alpha" => Some(("cluster.enableKubernetesAlpha", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.logging-service" => Some(("cluster.loggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.network-config.subnetwork" => Some(("cluster.networkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.network" => Some(("cluster.networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.location" => Some(("cluster.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.master-ipv4-cidr-block" => Some(("cluster.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.public-endpoint" => Some(("cluster.privateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.enable-private-nodes" => Some(("cluster.privateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.nodeIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.use-ip-aliases" => Some(("cluster.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -188,6 +189,7 @@ impl<'n> Engine<'n> {
                     "cluster.ip-allocation-policy.services-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.create-subnetwork" => Some(("cluster.ipAllocationPolicy.createSubnetwork", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.nodeIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.ip-allocation-policy.tpu-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.tpuIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.subnetwork-name" => Some(("cluster.ipAllocationPolicy.subnetworkName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.services-secondary-range-name" => Some(("cluster.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -204,18 +206,15 @@ impl<'n> Engine<'n> {
                     "cluster.master-auth.password" => Some(("cluster.masterAuth.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.cluster-ca-certificate" => Some(("cluster.masterAuth.clusterCaCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.expire-time" => Some(("cluster.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.initial-node-count" => Some(("cluster.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.monitoring-service" => Some(("cluster.monitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.create-time" => Some(("cluster.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.master-ipv4-cidr-block" => Some(("cluster.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.public-endpoint" => Some(("cluster.privateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.enable-private-nodes" => Some(("cluster.privateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.enable-tpu" => Some(("cluster.enableTpu", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.current-node-count" => Some(("cluster.currentNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.enable-kubernetes-alpha" => Some(("cluster.enableKubernetesAlpha", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.legacy-abac.enabled" => Some(("cluster.legacyAbac.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.initial-cluster-version" => Some(("cluster.initialClusterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.machine-type" => Some(("cluster.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.tags" => Some(("cluster.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -226,15 +225,19 @@ impl<'n> Engine<'n> {
                     "cluster.node-config.disk-type" => Some(("cluster.nodeConfig.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.disk-size-gb" => Some(("cluster.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.min-cpu-platform" => Some(("cluster.nodeConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.node-config.local-ssd-count" => Some(("cluster.nodeConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "cluster.node-config.image-type" => Some(("cluster.nodeConfig.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.metadata" => Some(("cluster.nodeConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.node-config.image-type" => Some(("cluster.nodeConfig.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.local-ssd-count" => Some(("cluster.nodeConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.cluster-ipv4-cidr" => Some(("cluster.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.subnetwork" => Some(("cluster.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.resource-labels" => Some(("cluster.resourceLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.self-link" => Some(("cluster.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.tpu-ipv4-cidr-block" => Some(("cluster.tpuIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-private-endpoint", "enable-private-nodes", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "use-ip-aliases", "username", "window", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-private-endpoint", "enable-private-nodes", "enable-tpu", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "tpu-ipv4-cidr-block", "use-ip-aliases", "username", "window", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -418,6 +421,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_clusters_get_jwks(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_clusters_get_jwks(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_clusters_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_clusters_list(opt.value_of("parent").unwrap_or(""));
@@ -500,11 +555,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.status" => Some(("nodePool.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "node-pool.self-link" => Some(("nodePool.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.management.auto-repair" => Some(("nodePool.management.autoRepair", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.management.upgrade-options.description" => Some(("nodePool.management.upgradeOptions.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.management.upgrade-options.auto-upgrade-start-time" => Some(("nodePool.management.upgradeOptions.autoUpgradeStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -516,6 +571,7 @@ impl<'n> Engine<'n> {
                     "node-pool.autoscaling.max-node-count" => Some(("nodePool.autoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.version" => Some(("nodePool.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.initial-node-count" => Some(("nodePool.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.status-message" => Some(("nodePool.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.machine-type" => Some(("nodePool.config.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.tags" => Some(("nodePool.config.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.config.preemptible" => Some(("nodePool.config.preemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -525,11 +581,10 @@ impl<'n> Engine<'n> {
                     "node-pool.config.disk-type" => Some(("nodePool.config.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.disk-size-gb" => Some(("nodePool.config.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.min-cpu-platform" => Some(("nodePool.config.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "node-pool.config.image-type" => Some(("nodePool.config.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.metadata" => Some(("nodePool.config.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "node-pool.status-message" => Some(("nodePool.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.image-type" => Some(("nodePool.config.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.self-link" => Some(("nodePool.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoscaling", "cluster-id", "config", "description", "disk-size-gb", "disk-type", "enabled", "image-type", "initial-node-count", "instance-group-urls", "labels", "local-ssd-count", "machine-type", "management", "max-node-count", "metadata", "min-cpu-platform", "min-node-count", "name", "node-pool", "oauth-scopes", "parent", "preemptible", "project-id", "self-link", "service-account", "status", "status-message", "tags", "upgrade-options", "version", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1353,11 +1408,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "enabled", "name", "project-id", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1896,10 +1951,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-policy.enabled" => Some(("networkPolicy.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-policy.provider" => Some(("networkPolicy.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "enabled", "name", "network-policy", "project-id", "provider", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2165,6 +2220,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-id" => Some(("update.desiredNodePoolId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.http-load-balancing.disabled" => Some(("update.desiredAddonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2174,13 +2231,11 @@ impl<'n> Engine<'n> {
                     "update.desired-master-version" => Some(("update.desiredMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-locations" => Some(("update.desiredLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-node-version" => Some(("update.desiredNodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-image-type" => Some(("update.desiredImageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.min-node-count" => Some(("update.desiredNodePoolAutoscaling.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.enabled" => Some(("update.desiredNodePoolAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.max-node-count" => Some(("update.desiredNodePoolAutoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update.desired-image-type" => Some(("update.desiredImageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "desired-addons-config", "desired-image-type", "desired-locations", "desired-master-authorized-networks-config", "desired-master-version", "desired-monitoring-service", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-version", "disabled", "enabled", "horizontal-pod-autoscaling", "http-load-balancing", "kubernetes-dashboard", "max-node-count", "min-node-count", "name", "network-policy-config", "project-id", "update", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2282,6 +2337,58 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::UpdateMasterRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_clusters_update_master(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_clusters_well_known_get_openid_configuration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_clusters_well_known_get_openid_configuration(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2802,9 +2909,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-ipv4-cidr-size" => Some(("cluster.nodeIpv4CidrSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.daily-maintenance-window.duration" => Some(("cluster.maintenancePolicy.window.dailyMaintenanceWindow.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.maintenance-policy.window.daily-maintenance-window.start-time" => Some(("cluster.maintenancePolicy.window.dailyMaintenanceWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2816,15 +2920,19 @@ impl<'n> Engine<'n> {
                     "cluster.addons-config.kubernetes-dashboard.disabled" => Some(("cluster.addonsConfig.kubernetesDashboard.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.addons-config.horizontal-pod-autoscaling.disabled" => Some(("cluster.addonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.locations" => Some(("cluster.locations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "cluster.legacy-abac.enabled" => Some(("cluster.legacyAbac.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "cluster.resource-labels" => Some(("cluster.resourceLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.enable-kubernetes-alpha" => Some(("cluster.enableKubernetesAlpha", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.logging-service" => Some(("cluster.loggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.network-config.subnetwork" => Some(("cluster.networkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.network" => Some(("cluster.networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.location" => Some(("cluster.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.master-ipv4-cidr-block" => Some(("cluster.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.public-endpoint" => Some(("cluster.privateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.private-cluster-config.enable-private-nodes" => Some(("cluster.privateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.nodeIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.use-ip-aliases" => Some(("cluster.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2833,6 +2941,7 @@ impl<'n> Engine<'n> {
                     "cluster.ip-allocation-policy.services-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.create-subnetwork" => Some(("cluster.ipAllocationPolicy.createSubnetwork", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.node-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.nodeIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.ip-allocation-policy.tpu-ipv4-cidr-block" => Some(("cluster.ipAllocationPolicy.tpuIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.cluster-ipv4-cidr" => Some(("cluster.ipAllocationPolicy.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.subnetwork-name" => Some(("cluster.ipAllocationPolicy.subnetworkName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.ip-allocation-policy.services-secondary-range-name" => Some(("cluster.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2849,18 +2958,15 @@ impl<'n> Engine<'n> {
                     "cluster.master-auth.password" => Some(("cluster.masterAuth.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.cluster-ca-certificate" => Some(("cluster.masterAuth.clusterCaCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.expire-time" => Some(("cluster.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.initial-node-count" => Some(("cluster.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.monitoring-service" => Some(("cluster.monitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.create-time" => Some(("cluster.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.master-ipv4-cidr-block" => Some(("cluster.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.public-endpoint" => Some(("cluster.privateClusterConfig.publicEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.private-cluster-config.enable-private-nodes" => Some(("cluster.privateClusterConfig.enablePrivateNodes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.enable-tpu" => Some(("cluster.enableTpu", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.current-node-count" => Some(("cluster.currentNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.enable-kubernetes-alpha" => Some(("cluster.enableKubernetesAlpha", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.legacy-abac.enabled" => Some(("cluster.legacyAbac.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.initial-cluster-version" => Some(("cluster.initialClusterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.machine-type" => Some(("cluster.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.tags" => Some(("cluster.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2871,15 +2977,19 @@ impl<'n> Engine<'n> {
                     "cluster.node-config.disk-type" => Some(("cluster.nodeConfig.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.disk-size-gb" => Some(("cluster.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-config.min-cpu-platform" => Some(("cluster.nodeConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.node-config.local-ssd-count" => Some(("cluster.nodeConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "cluster.node-config.image-type" => Some(("cluster.nodeConfig.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.metadata" => Some(("cluster.nodeConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cluster.node-config.image-type" => Some(("cluster.nodeConfig.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.local-ssd-count" => Some(("cluster.nodeConfig.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.cluster-ipv4-cidr" => Some(("cluster.clusterIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.subnetwork" => Some(("cluster.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.resource-labels" => Some(("cluster.resourceLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "cluster.self-link" => Some(("cluster.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.tpu-ipv4-cidr-block" => Some(("cluster.tpuIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-private-endpoint", "enable-private-nodes", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "use-ip-aliases", "username", "window", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-private-endpoint", "enable-private-nodes", "enable-tpu", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "tpu-ipv4-cidr-block", "use-ip-aliases", "username", "window", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3074,11 +3184,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "enabled", "name", "project-id", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3667,11 +3777,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.status" => Some(("nodePool.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "node-pool.self-link" => Some(("nodePool.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.management.auto-repair" => Some(("nodePool.management.autoRepair", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.management.upgrade-options.description" => Some(("nodePool.management.upgradeOptions.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.management.upgrade-options.auto-upgrade-start-time" => Some(("nodePool.management.upgradeOptions.autoUpgradeStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3683,6 +3793,7 @@ impl<'n> Engine<'n> {
                     "node-pool.autoscaling.max-node-count" => Some(("nodePool.autoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.version" => Some(("nodePool.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.initial-node-count" => Some(("nodePool.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.status-message" => Some(("nodePool.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.machine-type" => Some(("nodePool.config.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.tags" => Some(("nodePool.config.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "node-pool.config.preemptible" => Some(("nodePool.config.preemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3692,11 +3803,10 @@ impl<'n> Engine<'n> {
                     "node-pool.config.disk-type" => Some(("nodePool.config.diskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.disk-size-gb" => Some(("nodePool.config.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.config.min-cpu-platform" => Some(("nodePool.config.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "node-pool.config.image-type" => Some(("nodePool.config.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.metadata" => Some(("nodePool.config.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "node-pool.status-message" => Some(("nodePool.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.image-type" => Some(("nodePool.config.imageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.self-link" => Some(("nodePool.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoscaling", "cluster-id", "config", "description", "disk-size-gb", "disk-type", "enabled", "image-type", "initial-node-count", "instance-group-urls", "labels", "local-ssd-count", "machine-type", "management", "max-node-count", "metadata", "min-cpu-platform", "min-node-count", "name", "node-pool", "oauth-scopes", "parent", "preemptible", "project-id", "self-link", "service-account", "status", "status-message", "tags", "upgrade-options", "version", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4589,10 +4699,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-policy.enabled" => Some(("networkPolicy.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-policy.provider" => Some(("networkPolicy.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "enabled", "name", "network-policy", "project-id", "provider", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4768,6 +4878,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-id" => Some(("update.desiredNodePoolId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.http-load-balancing.disabled" => Some(("update.desiredAddonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4777,13 +4889,11 @@ impl<'n> Engine<'n> {
                     "update.desired-master-version" => Some(("update.desiredMasterVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-locations" => Some(("update.desiredLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-node-version" => Some(("update.desiredNodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-image-type" => Some(("update.desiredImageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.min-node-count" => Some(("update.desiredNodePoolAutoscaling.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.enabled" => Some(("update.desiredNodePoolAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.max-node-count" => Some(("update.desiredNodePoolAutoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update.desired-image-type" => Some(("update.desiredImageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "desired-addons-config", "desired-image-type", "desired-locations", "desired-master-authorized-networks-config", "desired-master-version", "desired-monitoring-service", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-version", "disabled", "enabled", "horizontal-pod-autoscaling", "http-load-balancing", "kubernetes-dashboard", "max-node-count", "min-node-count", "name", "network-policy-config", "project-id", "update", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -5120,6 +5230,9 @@ impl<'n> Engine<'n> {
                     ("locations-clusters-get", Some(opt)) => {
                         call_result = self._projects_locations_clusters_get(opt, dry_run, &mut err);
                     },
+                    ("locations-clusters-get-jwks", Some(opt)) => {
+                        call_result = self._projects_locations_clusters_get_jwks(opt, dry_run, &mut err);
+                    },
                     ("locations-clusters-list", Some(opt)) => {
                         call_result = self._projects_locations_clusters_list(opt, dry_run, &mut err);
                     },
@@ -5185,6 +5298,9 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-clusters-update-master", Some(opt)) => {
                         call_result = self._projects_locations_clusters_update_master(opt, dry_run, &mut err);
+                    },
+                    ("locations-clusters-well-known-get-openid-configuration", Some(opt)) => {
+                        call_result = self._projects_locations_clusters_well_known_get_openid_configuration(opt, dry_run, &mut err);
                     },
                     ("locations-get-server-config", Some(opt)) => {
                         call_result = self._projects_locations_get_server_config(opt, dry_run, &mut err);
@@ -5379,7 +5495,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-clusters-complete-ip-rotation', 'locations-clusters-create', 'locations-clusters-delete', 'locations-clusters-get', 'locations-clusters-list', 'locations-clusters-node-pools-create', 'locations-clusters-node-pools-delete', 'locations-clusters-node-pools-get', 'locations-clusters-node-pools-list', 'locations-clusters-node-pools-rollback', 'locations-clusters-node-pools-set-autoscaling', 'locations-clusters-node-pools-set-management', 'locations-clusters-node-pools-set-size', 'locations-clusters-node-pools-update', 'locations-clusters-set-addons', 'locations-clusters-set-legacy-abac', 'locations-clusters-set-locations', 'locations-clusters-set-logging', 'locations-clusters-set-maintenance-policy', 'locations-clusters-set-master-auth', 'locations-clusters-set-monitoring', 'locations-clusters-set-network-policy', 'locations-clusters-set-resource-labels', 'locations-clusters-start-ip-rotation', 'locations-clusters-update', 'locations-clusters-update-master', 'locations-get-server-config', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'zones-clusters-addons', 'zones-clusters-complete-ip-rotation', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-legacy-abac', 'zones-clusters-list', 'zones-clusters-locations', 'zones-clusters-logging', 'zones-clusters-master', 'zones-clusters-monitoring', 'zones-clusters-node-pools-autoscaling', 'zones-clusters-node-pools-create', 'zones-clusters-node-pools-delete', 'zones-clusters-node-pools-get', 'zones-clusters-node-pools-list', 'zones-clusters-node-pools-rollback', 'zones-clusters-node-pools-set-management', 'zones-clusters-node-pools-set-size', 'zones-clusters-node-pools-update', 'zones-clusters-resource-labels', 'zones-clusters-set-maintenance-policy', 'zones-clusters-set-master-auth', 'zones-clusters-set-network-policy', 'zones-clusters-start-ip-rotation', 'zones-clusters-update', 'zones-get-serverconfig', 'zones-operations-cancel', 'zones-operations-get' and 'zones-operations-list'", vec![
+        ("projects", "methods: 'locations-clusters-complete-ip-rotation', 'locations-clusters-create', 'locations-clusters-delete', 'locations-clusters-get', 'locations-clusters-get-jwks', 'locations-clusters-list', 'locations-clusters-node-pools-create', 'locations-clusters-node-pools-delete', 'locations-clusters-node-pools-get', 'locations-clusters-node-pools-list', 'locations-clusters-node-pools-rollback', 'locations-clusters-node-pools-set-autoscaling', 'locations-clusters-node-pools-set-management', 'locations-clusters-node-pools-set-size', 'locations-clusters-node-pools-update', 'locations-clusters-set-addons', 'locations-clusters-set-legacy-abac', 'locations-clusters-set-locations', 'locations-clusters-set-logging', 'locations-clusters-set-maintenance-policy', 'locations-clusters-set-master-auth', 'locations-clusters-set-monitoring', 'locations-clusters-set-network-policy', 'locations-clusters-set-resource-labels', 'locations-clusters-start-ip-rotation', 'locations-clusters-update', 'locations-clusters-update-master', 'locations-clusters-well-known-get-openid-configuration', 'locations-get-server-config', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'zones-clusters-addons', 'zones-clusters-complete-ip-rotation', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-legacy-abac', 'zones-clusters-list', 'zones-clusters-locations', 'zones-clusters-logging', 'zones-clusters-master', 'zones-clusters-monitoring', 'zones-clusters-node-pools-autoscaling', 'zones-clusters-node-pools-create', 'zones-clusters-node-pools-delete', 'zones-clusters-node-pools-get', 'zones-clusters-node-pools-list', 'zones-clusters-node-pools-rollback', 'zones-clusters-node-pools-set-management', 'zones-clusters-node-pools-set-size', 'zones-clusters-node-pools-update', 'zones-clusters-resource-labels', 'zones-clusters-set-maintenance-policy', 'zones-clusters-set-master-auth', 'zones-clusters-set-network-policy', 'zones-clusters-start-ip-rotation', 'zones-clusters-update', 'zones-get-serverconfig', 'zones-operations-cancel', 'zones-operations-get' and 'zones-operations-list'", vec![
             ("locations-clusters-complete-ip-rotation",
                     Some(r##"Completes master IP rotation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-complete-ip-rotation",
@@ -5489,6 +5605,32 @@ fn main() {
                      None,
                      Some(r##"The name (project, location, cluster) of the cluster to retrieve.
         Specified in the format 'projects/*/locations/*/clusters/*'."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-clusters-get-jwks",
+                    Some(r##"GetJSONWebKeys gets the public component of the cluster signing keys in
+        JSON Web Key format.
+        This API is not yet intended for general use, and is not available for all
+        clusters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-get-jwks",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The cluster (project, location, cluster id) to get keys for. Specified in
+        the format 'projects/*/locations/*/clusters/*'."##),
                      Some(true),
                      Some(false)),
         
@@ -6132,14 +6274,41 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-clusters-well-known-get-openid-configuration",
+                    Some(r##"GetOpenIDConfig gets the OIDC discovery document for the cluster.
+        See the OpenID Connect Discovery 1.0 specification for details.
+        https://openid.net/specs/openid-connect-discovery-1_0.html
+        This API is not yet intended for general use, and is not available for all
+        clusters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-well-known-get-openid-configuration",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The cluster (project, location, cluster id) to get the discovery document
+        for. Specified in the format 'projects/*/locations/*/clusters/*'."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-get-server-config",
                     Some(r##"Returns configuration info about the Kubernetes Engine service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-get-server-config",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name (project and location) of the server config to get
-        Specified in the format 'projects/*/locations/*'."##),
+                     Some(r##"The name (project and location) of the server config to get,
+        specified in the format 'projects/*/locations/*'."##),
                      Some(true),
                      Some(false)),
         
@@ -7602,8 +7771,8 @@ fn main() {
     
     let mut app = App::new("container1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180917")
-           .about("The Google Kubernetes Engine API is used for building and managing container based applications, powered by the open source Kubernetes technology.")
+           .version("1.0.8+20190316")
+           .about("Builds and manages container-based applications, powered by the open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

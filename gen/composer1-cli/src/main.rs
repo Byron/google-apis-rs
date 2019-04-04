@@ -70,14 +70,15 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.dag-gcs-prefix" => Some(("config.dagGcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.software-config.python-version" => Some(("config.softwareConfig.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.software-config.airflow-config-overrides" => Some(("config.softwareConfig.airflowConfigOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.airflow-uri" => Some(("config.airflowUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gke-cluster" => Some(("config.gkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.machine-type" => Some(("config.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -90,9 +91,9 @@ impl<'n> Engine<'n> {
                     "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-count" => Some(("config.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "env-variables", "gke-cluster", "image-version", "labels", "location", "machine-type", "name", "network", "node-config", "node-count", "oauth-scopes", "pypi-packages", "service-account", "software-config", "state", "subnetwork", "tags", "update-time", "uuid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "env-variables", "gke-cluster", "image-version", "labels", "location", "machine-type", "name", "network", "node-config", "node-count", "oauth-scopes", "pypi-packages", "python-version", "service-account", "software-config", "state", "subnetwork", "tags", "update-time", "uuid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -339,14 +340,15 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.dag-gcs-prefix" => Some(("config.dagGcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.software-config.python-version" => Some(("config.softwareConfig.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.software-config.airflow-config-overrides" => Some(("config.softwareConfig.airflowConfigOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.airflow-uri" => Some(("config.airflowUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gke-cluster" => Some(("config.gkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.machine-type" => Some(("config.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -359,9 +361,9 @@ impl<'n> Engine<'n> {
                     "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-count" => Some(("config.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "env-variables", "gke-cluster", "image-version", "labels", "location", "machine-type", "name", "network", "node-config", "node-count", "oauth-scopes", "pypi-packages", "service-account", "software-config", "state", "subnetwork", "tags", "update-time", "uuid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "env-variables", "gke-cluster", "image-version", "labels", "location", "machine-type", "name", "network", "node-config", "node-count", "oauth-scopes", "pypi-packages", "python-version", "service-account", "software-config", "state", "subnetwork", "tags", "update-time", "uuid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -392,6 +394,65 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_image_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_image_versions_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -613,6 +674,9 @@ impl<'n> Engine<'n> {
                     ("locations-environments-patch", Some(opt)) => {
                         call_result = self._projects_locations_environments_patch(opt, dry_run, &mut err);
                     },
+                    ("locations-image-versions-list", Some(opt)) => {
+                        call_result = self._projects_locations_image_versions_list(opt, dry_run, &mut err);
+                    },
                     ("locations-operations-delete", Some(opt)) => {
                         call_result = self._projects_locations_operations_delete(opt, dry_run, &mut err);
                     },
@@ -713,7 +777,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-environments-create', 'locations-environments-delete', 'locations-environments-get', 'locations-environments-list', 'locations-environments-patch', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-environments-create', 'locations-environments-delete', 'locations-environments-get', 'locations-environments-list', 'locations-environments-patch', 'locations-image-versions-list', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
             ("locations-environments-create",
                     Some(r##"Create a new environment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-create",
@@ -840,6 +904,29 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-image-versions-list",
+                    Some(r##"List ImageVersions for provided location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-image-versions-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"List ImageVersions in the given project and location, in the form:
+        "projects/{projectId}/locations/{locationId}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-operations-delete",
                     Some(r##"Deletes a long-running operation. This method indicates that the client is
         no longer interested in the operation result. It does not cancel the
@@ -926,7 +1013,7 @@ fn main() {
     
     let mut app = App::new("composer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181001")
+           .version("1.0.8+20190323")
            .about("Manages Apache Airflow environments on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_composer1_cli")
            .arg(Arg::with_name("url")
