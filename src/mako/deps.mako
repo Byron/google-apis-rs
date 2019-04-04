@@ -194,9 +194,10 @@ help${agsuffix}:
 	url = info['discoveryRestUrl'].replace("$", "$$")
 	json_api_targets.append(fake_target)
 %>\
-${fake_target}:
+${fake_target}: $(PYTHON_BIN)
 	@mkdir -p ${target_dir}
 	@-curl --silent --show-error --fail --retry 3 -o '${target}' '${url}'
+	$(PYTHON) $(SORT_JSON_FILE) --skip-missing-file '${target}'
 % endfor
 
 update-json: ${' '.join(json_api_targets)}
