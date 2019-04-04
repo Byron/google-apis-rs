@@ -14,6 +14,7 @@ CODECOV := $(PYTHON) -m codecov
 
 MAKO_RENDER := etc/bin/mako-render
 API_VERSION_GEN := etc/bin/api_version_to_yaml.py
+SORT_JSON_FILE := etc/bin/sort_json_file.py
 TPL := $(PYTHON) $(MAKO_RENDER)
 MKDOCS := $(shell pwd)/$(VENV_DIR)/bin/mkdocs
 
