@@ -8,6 +8,7 @@ api:
     acceleratedmobilepageurl:
     - v1
     accesscontextmanager:
+    - v1
     - v1beta
     adexchangebuyer:
     - v1.3
@@ -56,6 +57,8 @@ api:
     - v2
     bigquerydatatransfer:
     - v1
+    bigtableadmin:
+    - v2
     binaryauthorization:
     - v1beta1
     blogger:
@@ -71,6 +74,7 @@ api:
     classroom:
     - v1
     cloudasset:
+    - v1
     - v1beta1
     cloudbilling:
     - v1
@@ -82,6 +86,8 @@ api:
     - v1beta1
     cloudfunctions:
     - v1
+    cloudidentity:
+    - v1
     cloudiot:
     - v1
     cloudkms:
@@ -91,17 +97,24 @@ api:
     - v2
     cloudmonitoring:
     - v2beta2
+    cloudprivatecatalog:
+    - v1beta1
+    cloudprivatecatalogproducer:
+    - v1beta1
     cloudprofiler:
     - v2
     cloudresourcemanager:
     - v1
     - v1beta1
     - v2
+    cloudscheduler:
+    - v1beta1
     cloudsearch:
     - v1
     cloudshell:
     - v1
     cloudtasks:
+    - v2
     - v2beta2
     - v2beta3
     cloudtrace:
@@ -117,6 +130,8 @@ api:
     - v2
     container:
     - v1
+    containeranalysis:
+    - v1beta1
     content:
     - v2
     - v2sandbox
@@ -138,6 +153,7 @@ api:
     - v2.8
     - v3.0
     - v3.2
+    - v3.3
     dialogflow:
     - v2
     - v2beta1
@@ -150,6 +166,8 @@ api:
     - v2beta1
     dns:
     - v1
+    docs:
+    - v1
     doubleclickbidmanager:
     - v1
     doubleclicksearch:
@@ -157,7 +175,12 @@ api:
     drive:
     - v2
     - v3
+    driveactivity:
+    - v2
+    factchecktools:
+    - v1alpha1
     file:
+    - v1
     - v1beta1
     firebasedynamiclinks:
     - v1
@@ -192,11 +215,14 @@ api:
     - v1
     groupssettings:
     - v1
+    healthcare:
+    - v1beta1
     iam:
     - v1
     iamcredentials:
     - v1
     iap:
+    - v1
     - v1beta1
     identitytoolkit:
     - v3
@@ -209,6 +235,8 @@ api:
     language:
     - v1
     - v1beta1
+    libraryagent:
+    - v1
     licensing:
     - v1
     logging:
@@ -234,6 +262,7 @@ api:
     pagespeedonline:
     - v2
     - v4
+    - v5
     partners:
     - v2
     people:
@@ -261,6 +290,8 @@ api:
     - v1
     redis:
     - v1
+    remotebuildexecution:
+    - v2
     replicapool:
     - v1beta2
     replicapoolupdater:
@@ -269,6 +300,8 @@ api:
     - v1sandbox
     resourceviews:
     - v1beta2
+    run:
+    - v1
     runtimeconfig:
     - v1
     - v1beta1
@@ -277,6 +310,8 @@ api:
     script:
     - v1
     searchconsole:
+    - v1
+    securitycenter:
     - v1
     servicebroker:
     - v1
@@ -287,6 +322,7 @@ api:
     servicemanagement:
     - v1
     servicenetworking:
+    - v1
     - v1beta
     serviceregistry:
     - alpha
@@ -350,6 +386,8 @@ api:
     - v1
     webmasters:
     - v3
+    websecurityscanner:
+    - v1beta
     youtube:
     - v3
     youtubeanalytics:
