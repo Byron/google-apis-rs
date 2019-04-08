@@ -25,7 +25,7 @@ DO NOT EDIT !
 This file was generated automatically by '${self.uri}'
 DO NOT EDIT !
 -->
-<html>
+<html lang="en">
 <head>
   <link rel="stylesheet" 
     href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
