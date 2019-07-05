@@ -352,8 +352,6 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
                 return wrap_type("%s<String, %s>" % (rust_type, nested_type(t)))
             else:
                 return wrap_type(nested_type(t))
-        elif t['type'] == 'string' and 'Count' in pn:
-            rust_type = 'i64'
         elif rust_type == USE_FORMAT:
             rust_type = TYPE_MAP[t['format']]
 

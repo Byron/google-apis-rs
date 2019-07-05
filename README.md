@@ -99,9 +99,9 @@ Before anything else happens, be sure we publish the latest APIs to cargo.
 ```bash
 # We want as many publishes to work as possible ... -k keeps going on error.
 # sometimes uploads fail spuriously, and just need to be retried.
-$ make publish-api -k
+$ make publish-api publish-cli -k
 # another attempt to do this should not do actual work
-$ make publish-api
+$ make publish-api publish-cli
 # all clear ? Please proceed ... .
 ```
 
