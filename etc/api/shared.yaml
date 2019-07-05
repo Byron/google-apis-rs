@@ -40,6 +40,8 @@ api:
     # The following do not have any sub-commands, and we don't currently support that. args_data array turns out empty in CLI
     - websecurityscanner
     - youtubeanalytics
+    # returned by google APIs, but can't be fetched
+    - osconfig
   manually_added:
     - name: photoslibrary
       version: v1
