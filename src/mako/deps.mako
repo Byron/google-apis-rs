@@ -84,17 +84,20 @@
 	api_json = util.api_json_path(directories.api_base, an, version)
 	api_meta_dir = os.path.dirname(api_json)
 	print('Loading JSON: {}'.format(api_json))
-	with open(api_json, 'r') as fh:
-		crate_version = util.crate_version(cargo.build_version + make.aggregated_target_suffix, json.load(fh).get('revision', '00000000'))
-		api_crate_publish_file = api_meta_dir + '/crates/' + crate_version
-	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.yaml'
-	type_specific_cfg = gen_type_cfg_path(make.id)
-	api_json_inputs = api_json + ' $(API_SHARED_INFO) ' + type_specific_cfg
-	if os.path.isfile(api_json_overrides):
-		api_json_inputs += ' ' + api_json_overrides
-	api_info.append((api_target, api_clean, api_cargo, api_doc, api_crate_publish_file, gen_root))
+	try:
+		with open(api_json, 'r') as fh:
+			crate_version = util.crate_version(cargo.build_version + make.aggregated_target_suffix, json.load(fh).get('revision', '00000000'))
+			api_crate_publish_file = api_meta_dir + '/crates/' + crate_version
+			api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.yaml'
+			type_specific_cfg = gen_type_cfg_path(make.id)
+			api_json_inputs = api_json + ' $(API_SHARED_INFO) ' + type_specific_cfg
+			if os.path.isfile(api_json_overrides):
+				api_json_inputs += ' ' + api_json_overrides
+			api_info.append((api_target, api_clean, api_cargo, api_doc, api_crate_publish_file, gen_root))
 
-	space_join = lambda i: ' '.join(a[i] for a in api_info)
+			space_join = lambda i: ' '.join(a[i] for a in api_info)
+	except:
+		print('Could not open JSON file at {}'.format(api_json))
 %>\
 ${api_common}: $(RUST_SRC)/${make.id}/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
 	@ echo "// COPY OF '$<'"  > $@
