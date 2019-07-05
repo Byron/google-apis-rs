@@ -6,7 +6,7 @@
                       rust_copy_value_s, organize_params, REQUEST_VALUE_PROPERTY_NAME,
                       build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params, 
                       struct_type_bounds_s, METHODS_RESOURCE, SPACES_PER_TAB, prefix_all_but_first_with,
-                      METHODS_BUILDER_MARKER_TRAIT, remove_empty_lines, method_default_scope)
+                      METHODS_BUILDER_MARKER_TRAIT, remove_empty_lines, method_default_scope, rust_doc_sanitize)
 %>\
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -80,7 +80,7 @@ impl${rb_params} ${ThisType} {
     % if 'description' in m:
     /// Create a builder to help you perform the following task:
     ///
-    ${m.description | rust_doc_comment, indent_all_but_first_by(1)}
+    ${m.description | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     % if required_props:
     /// 

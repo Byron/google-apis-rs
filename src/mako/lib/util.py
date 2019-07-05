@@ -3,10 +3,12 @@ import os
 from random import (randint, random, choice, seed)
 import collections
 from copy import deepcopy
+import subprocess
 
 seed(1337)
 
 re_linestart = re.compile('^', flags=re.MULTILINE)
+re_spaces_after_newline = re.compile('^ {4}', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
 re_desc_parts = re.compile("((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.", flags=re.IGNORECASE|re.MULTILINE)
 
@@ -124,6 +126,22 @@ def rust_module_doc_comment(s):
 # rust doc comment filter
 def rust_doc_comment(s):
     return re_linestart.sub('/// ', s)
+
+# returns true if there is an indication for something that is interpreted as doc comment by rustdoc
+def has_markdown_codeblock_with_indentation(s):
+    return re_spaces_after_newline.search(s) != None
+
+def preprocess(s):
+    p = subprocess.Popen([os.environ['PREPROC']], close_fds=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    res = p.communicate(s)
+    return res[0]
+
+# runs the preprocessor in case there is evidence for code blocks using indentation
+def rust_doc_sanitize(s):
+    if has_markdown_codeblock_with_indentation(s):
+        return preprocess(s)
+    else:
+        return s
 
 # rust comment filter
 def rust_comment(s):

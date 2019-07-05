@@ -515,32 +515,36 @@ impl Part for Editors {}
 /// be less than HistogramRule.end. For example, a pivot table showing
 /// average purchase amount by age that has 50+ rows:
 /// 
-///     +-----+-------------------+
-///     | Age | AVERAGE of Amount |
-///     +-----+-------------------+
-///     | 16  |            $27.13 |
-///     | 17  |             $5.24 |
-///     | 18  |            $20.15 |
-///     ...
-///     +-----+-------------------+
+/// ````text
+/// +-----+-------------------+
+/// | Age | AVERAGE of Amount |
+/// +-----+-------------------+
+/// | 16  |            $27.13 |
+/// | 17  |             $5.24 |
+/// | 18  |            $20.15 |
+/// ...
+/// +-----+-------------------+
+/// ````
+/// 
 /// could be turned into a pivot table that looks like the one below by
 /// applying a histogram group rule with a HistogramRule.start of 25,
 /// an HistogramRule.interval of 20, and an HistogramRule.end
 /// of 65.
 /// 
-///     +-------------+-------------------+
-///     | Grouped Age | AVERAGE of Amount |
-///     +-------------+-------------------+
-///     | < 25        |            $19.34 |
-///     | 25-45       |            $31.43 |
-///     | 45-65       |            $35.87 |
-///     | > 65        |            $27.55 |
-///     +-------------+-------------------+
-///     | Grand Total |            $29.12 |
-///     +-------------+-------------------+
+/// ````text
+/// +-------------+-------------------+
+/// | Grouped Age | AVERAGE of Amount |
+/// +-------------+-------------------+
+/// | < 25        |            $19.34 |
+/// | 25-45       |            $31.43 |
+/// | 45-65       |            $35.87 |
+/// | > 65        |            $27.55 |
+/// +-------------+-------------------+
+/// | Grand Total |            $29.12 |
+/// +-------------+-------------------+
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HistogramRule {
     /// The minimum value at which items are placed into buckets
@@ -833,31 +837,35 @@ impl Part for BasicChartSpec {}
 /// buckets with names of your choosing. For example, a pivot table that
 /// aggregates population by state:
 /// 
-///     +-------+-------------------+
-///     | State | SUM of Population |
-///     +-------+-------------------+
-///     | AK    |               0.7 |
-///     | AL    |               4.8 |
-///     | AR    |               2.9 |
-///     ...
-///     +-------+-------------------+
+/// ````text
+/// +-------+-------------------+
+/// | State | SUM of Population |
+/// +-------+-------------------+
+/// | AK    |               0.7 |
+/// | AL    |               4.8 |
+/// | AR    |               2.9 |
+/// ...
+/// +-------+-------------------+
+/// ````
+/// 
 /// could be turned into a pivot table that aggregates population by time zone
 /// by providing a list of groups (for example, groupName = 'Central',
 /// items = ['AL', 'AR', 'IA', ...]) to a manual group rule.
 /// Note that a similar effect could be achieved by adding a time zone column
 /// to the source data and adjusting the pivot table.
 /// 
-///     +-----------+-------------------+
-///     | Time Zone | SUM of Population |
-///     +-----------+-------------------+
-///     | Central   |             106.3 |
-///     | Eastern   |             151.9 |
-///     | Mountain  |              17.4 |
-///     ...
-///     +-----------+-------------------+
+/// ````text
+/// +-----------+-------------------+
+/// | Time Zone | SUM of Population |
+/// +-----------+-------------------+
+/// | Central   |             106.3 |
+/// | Eastern   |             151.9 |
+/// | Mountain  |              17.4 |
+/// ...
+/// +-----------+-------------------+
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManualRule {
     /// The list of group names and the corresponding items from the source data
@@ -2061,22 +2069,15 @@ impl Part for BooleanCondition {}
 /// 
 /// For example, if `"Sheet1"` is sheet ID 0, then:
 /// 
-///   `Sheet1!A1:A1 == sheet_id: 0,
-///                   start_row_index: 0, end_row_index: 1,
-///                   start_column_index: 0, end_column_index: 1`
+/// `Sheet1!A1:A1 == sheet_id: 0, start_row_index: 0, end_row_index: 1, start_column_index: 0, end_column_index: 1`
 /// 
-///   `Sheet1!A3:B4 == sheet_id: 0,
-///                   start_row_index: 2, end_row_index: 4,
-///                   start_column_index: 0, end_column_index: 2`
+/// `Sheet1!A3:B4 == sheet_id: 0, start_row_index: 2, end_row_index: 4, start_column_index: 0, end_column_index: 2`
 /// 
-///   `Sheet1!A:B == sheet_id: 0,
-///                 start_column_index: 0, end_column_index: 2`
+/// `Sheet1!A:B == sheet_id: 0, start_column_index: 0, end_column_index: 2`
 /// 
-///   `Sheet1!A5:B == sheet_id: 0,
-///                  start_row_index: 4,
-///                  start_column_index: 0, end_column_index: 2`
+/// `Sheet1!A5:B == sheet_id: 0, start_row_index: 4, start_column_index: 0, end_column_index: 2`
 /// 
-///   `Sheet1 == sheet_id:0`
+/// `Sheet1 == sheet_id:0`
 /// 
 /// The start index must always be less than or equal to the end index.
 /// If the start index equals the end index, then the range is empty.
@@ -2084,7 +2085,6 @@ impl Part for BooleanCondition {}
 /// UI as `#REF!`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GridRange {
     /// The end row (exclusive) of the range, or not set if unbounded.
@@ -3337,28 +3337,32 @@ impl Part for AddProtectedRangeResponse {}
 /// buckets based on selected parts of their date or time values. For example,
 /// consider a pivot table showing sales transactions by date:
 /// 
-///     +----------+--------------+
-///     | Date     | SUM of Sales |
-///     +----------+--------------+
-///     | 1/1/2017 |      $621.14 |
-///     | 2/3/2017 |      $708.84 |
-///     | 5/8/2017 |      $326.84 |
-///     ...
-///     +----------+--------------+
+/// ````text
+/// +----------+--------------+
+/// | Date     | SUM of Sales |
+/// +----------+--------------+
+/// | 1/1/2017 |      $621.14 |
+/// | 2/3/2017 |      $708.84 |
+/// | 5/8/2017 |      $326.84 |
+/// ...
+/// +----------+--------------+
+/// ````
+/// 
 /// Applying a date-time group rule with a DateTimeRuleType of YEAR_MONTH
 /// results in the following pivot table.
 /// 
-///     +--------------+--------------+
-///     | Grouped Date | SUM of Sales |
-///     +--------------+--------------+
-///     | 2017-Jan     |   $53,731.78 |
-///     | 2017-Feb     |   $83,475.32 |
-///     | 2017-Mar     |   $94,385.05 |
-///     ...
-///     +--------------+--------------+
+/// ````text
+/// +--------------+--------------+
+/// | Grouped Date | SUM of Sales |
+/// +--------------+--------------+
+/// | 2017-Jan     |   $53,731.78 |
+/// | 2017-Feb     |   $83,475.32 |
+/// | 2017-Mar     |   $94,385.05 |
+/// ...
+/// +--------------+--------------+
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DateTimeRule {
     /// The type of date-time grouping to apply.
@@ -3635,14 +3639,15 @@ pub struct TextRotation {
     /// characters is unchanged.
     /// For example:
     /// 
-    ///     | V |
-    ///     | e |
-    ///     | r |
-    ///     | t |
-    ///     | i |
-    ///     | c |
-    ///     | a |
-    ///     | l |
+    /// ````text
+    /// | V |
+    /// | e |
+    /// | r |
+    /// | t |
+    /// | i |
+    /// | c |
+    /// | a |
+    /// | l |````
     pub vertical: Option<bool>,
 }
 
@@ -3965,13 +3970,14 @@ pub struct ChartSourceRange {
     /// 
     /// For example, these are valid configurations:
     /// 
-    ///     domain sources: A1:A5
-    ///     series1 sources: B1:B5
-    ///     series2 sources: D6:D10
+    /// ````text
+    /// domain sources: A1:A5
+    /// series1 sources: B1:B5
+    /// series2 sources: D6:D10
     /// 
-    ///     domain sources: A1:A5, C10:C12
-    ///     series1 sources: B1:B5, D10:D12
-    ///     series2 sources: C1:C5, E10:E12
+    /// domain sources: A1:A5, C10:C12
+    /// series1 sources: B1:B5, D10:D12
+    /// series2 sources: C1:C5, E10:E12````
     pub sources: Option<Vec<GridRange>>,
 }
 
@@ -4986,113 +4992,118 @@ impl Part for AddBandingResponse {}
 /// 
 /// Example (Java):
 /// 
-///      import com.google.type.Color;
+/// ````text
+///  import com.google.type.Color;
 /// 
-///      // ...
-///      public static java.awt.Color fromProto(Color protocolor) {
-///        float alpha = protocolor.hasAlpha()
-///            ? protocolor.getAlpha().getValue()
-///            : 1.0;
+///  // ...
+///  public static java.awt.Color fromProto(Color protocolor) {
+///    float alpha = protocolor.hasAlpha()
+///        ? protocolor.getAlpha().getValue()
+///        : 1.0;
 /// 
-///        return new java.awt.Color(
-///            protocolor.getRed(),
-///            protocolor.getGreen(),
-///            protocolor.getBlue(),
-///            alpha);
-///      }
+///    return new java.awt.Color(
+///        protocolor.getRed(),
+///        protocolor.getGreen(),
+///        protocolor.getBlue(),
+///        alpha);
+///  }
 /// 
-///      public static Color toProto(java.awt.Color color) {
-///        float red = (float) color.getRed();
-///        float green = (float) color.getGreen();
-///        float blue = (float) color.getBlue();
-///        float denominator = 255.0;
-///        Color.Builder resultBuilder =
-///            Color
-///                .newBuilder()
-///                .setRed(red / denominator)
-///                .setGreen(green / denominator)
-///                .setBlue(blue / denominator);
-///        int alpha = color.getAlpha();
-///        if (alpha != 255) {
-///          result.setAlpha(
-///              FloatValue
-///                  .newBuilder()
-///                  .setValue(((float) alpha) / denominator)
-///                  .build());
-///        }
-///        return resultBuilder.build();
-///      }
-///      // ...
+///  public static Color toProto(java.awt.Color color) {
+///    float red = (float) color.getRed();
+///    float green = (float) color.getGreen();
+///    float blue = (float) color.getBlue();
+///    float denominator = 255.0;
+///    Color.Builder resultBuilder =
+///        Color
+///            .newBuilder()
+///            .setRed(red / denominator)
+///            .setGreen(green / denominator)
+///            .setBlue(blue / denominator);
+///    int alpha = color.getAlpha();
+///    if (alpha != 255) {
+///      result.setAlpha(
+///          FloatValue
+///              .newBuilder()
+///              .setValue(((float) alpha) / denominator)
+///              .build());
+///    }
+///    return resultBuilder.build();
+///  }
+///  // ...
+/// ````
 /// 
 /// Example (iOS / Obj-C):
 /// 
-///      // ...
-///      static UIColor* fromProto(Color* protocolor) {
-///         float red = [protocolor red];
-///         float green = [protocolor green];
-///         float blue = [protocolor blue];
-///         FloatValue* alpha_wrapper = [protocolor alpha];
-///         float alpha = 1.0;
-///         if (alpha_wrapper != nil) {
-///           alpha = [alpha_wrapper value];
-///         }
-///         return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
-///      }
-/// 
-///      static Color* toProto(UIColor* color) {
-///          CGFloat red, green, blue, alpha;
-///          if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
-///            return nil;
-///          }
-///          Color* result = [[Color alloc] init];
-///          [result setRed:red];
-///          [result setGreen:green];
-///          [result setBlue:blue];
-///          if (alpha <= 0.9999) {
-///            [result setAlpha:floatWrapperWithValue(alpha)];
-///          }
-///          [result autorelease];
-///          return result;
+/// ````text
+///  // ...
+///  static UIColor* fromProto(Color* protocolor) {
+///     float red = [protocolor red];
+///     float green = [protocolor green];
+///     float blue = [protocolor blue];
+///     FloatValue* alpha_wrapper = [protocolor alpha];
+///     float alpha = 1.0;
+///     if (alpha_wrapper != nil) {
+///       alpha = [alpha_wrapper value];
 ///     }
-///     // ...
+///     return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+///  }
 /// 
-///  Example (JavaScript):
+///  static Color* toProto(UIColor* color) {
+///      CGFloat red, green, blue, alpha;
+///      if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
+///        return nil;
+///      }
+///      Color* result = [[Color alloc] init];
+///      [result setRed:red];
+///      [result setGreen:green];
+///      [result setBlue:blue];
+///      if (alpha <= 0.9999) {
+///        [result setAlpha:floatWrapperWithValue(alpha)];
+///      }
+///      [result autorelease];
+///      return result;
+/// }
+/// // ...
+/// ````
 /// 
-///     // ...
+/// Example (JavaScript):
 /// 
-///     var protoToCssColor = function(rgb_color) {
-///        var redFrac = rgb_color.red || 0.0;
-///        var greenFrac = rgb_color.green || 0.0;
-///        var blueFrac = rgb_color.blue || 0.0;
-///        var red = Math.floor(redFrac * 255);
-///        var green = Math.floor(greenFrac * 255);
-///        var blue = Math.floor(blueFrac * 255);
+/// ````text
+/// // ...
 /// 
-///        if (!('alpha' in rgb_color)) {
-///           return rgbToCssColor_(red, green, blue);
-///        }
+/// var protoToCssColor = function(rgb_color) {
+///    var redFrac = rgb_color.red || 0.0;
+///    var greenFrac = rgb_color.green || 0.0;
+///    var blueFrac = rgb_color.blue || 0.0;
+///    var red = Math.floor(redFrac * 255);
+///    var green = Math.floor(greenFrac * 255);
+///    var blue = Math.floor(blueFrac * 255);
 /// 
-///        var alphaFrac = rgb_color.alpha.value || 0.0;
-///        var rgbParams = [red, green, blue].join(',');
-///        return ['rgba(', rgbParams, ',', alphaFrac, ')'].join('');
-///     };
+///    if (!('alpha' in rgb_color)) {
+///       return rgbToCssColor_(red, green, blue);
+///    }
 /// 
-///     var rgbToCssColor_ = function(red, green, blue) {
-///       var rgbNumber = new Number((red << 16) | (green << 8) | blue);
-///       var hexString = rgbNumber.toString(16);
-///       var missingZeros = 6 - hexString.length;
-///       var resultBuilder = ['#'];
-///       for (var i = 0; i < missingZeros; i++) {
-///          resultBuilder.push('0');
-///       }
-///       resultBuilder.push(hexString);
-///       return resultBuilder.join('');
-///     };
+///    var alphaFrac = rgb_color.alpha.value || 0.0;
+///    var rgbParams = [red, green, blue].join(',');
+///    return ['rgba(', rgbParams, ',', alphaFrac, ')'].join('');
+/// };
 /// 
-///     // ...
+/// var rgbToCssColor_ = function(red, green, blue) {
+///   var rgbNumber = new Number((red << 16) | (green << 8) | blue);
+///   var hexString = rgbNumber.toString(16);
+///   var missingZeros = 6 - hexString.length;
+///   var resultBuilder = ['#'];
+///   for (var i = 0; i < missingZeros; i++) {
+///      resultBuilder.push('0');
+///   }
+///   resultBuilder.push(hexString);
+///   return resultBuilder.join('');
+/// };
+/// 
+/// // ...
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Color {
     /// The amount of blue in the color as a value in the interval [0, 1].
@@ -5286,16 +5297,17 @@ pub struct PivotGroup {
     /// pivot table, please delete the existing pivot table and then create a new
     /// pivot table with same parameters.
     /// 
-    ///     +--------------+---------+-------+
-    ///     | SUM of Units | Product |       |
-    ///     | Region       | Pen     | Paper |
-    ///     +--------------+---------+-------+
-    ///     | New York     |     345 |    98 |
-    ///     | Oregon       |     234 |   123 |
-    ///     | Tennessee    |     531 |   415 |
-    ///     +--------------+---------+-------+
-    ///     | Grand Total  |    1110 |   636 |
-    ///     +--------------+---------+-------+
+    /// ````text
+    /// +--------------+---------+-------+
+    /// | SUM of Units | Product |       |
+    /// | Region       | Pen     | Paper |
+    /// +--------------+---------+-------+
+    /// | New York     |     345 |    98 |
+    /// | Oregon       |     234 |   123 |
+    /// | Tennessee    |     531 |   415 |
+    /// +--------------+---------+-------+
+    /// | Grand Total  |    1110 |   636 |
+    /// +--------------+---------+-------+````
     pub label: Option<String>,
     /// Metadata about values in the grouping.
     #[serde(rename="valueMetadata")]
@@ -5316,13 +5328,14 @@ pub struct PivotGroup {
     /// it is redundant with previous rows. Setting repeat_headings to true
     /// would cause "Q1" to be repeated for "Feb" and "Mar".
     /// 
-    ///     +--------------+
-    ///     | Q1     | Jan |
-    ///     |        | Feb |
-    ///     |        | Mar |
-    ///     +--------+-----+
-    ///     | Q1 Total     |
-    ///     +--------------+
+    /// ````text
+    /// +--------------+
+    /// | Q1     | Jan |
+    /// |        | Feb |
+    /// |        | Mar |
+    /// +--------+-----+
+    /// | Q1 Total     |
+    /// +--------------+````
     #[serde(rename="repeatHeadings")]
     pub repeat_headings: Option<bool>,
     /// The group rule to apply to this row/column group.

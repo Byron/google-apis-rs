@@ -509,14 +509,15 @@ pub struct Paragraph {
     /// is represented as around the top-left corner as defined when the text is
     /// read in the 'natural' orientation.
     /// For example:
-    ///   * when the text is horizontal it might look like:
-    ///      0----1
-    ///      |    |
-    ///      3----2
-    ///   * when it's rotated 180 degrees around the top-left corner it becomes:
-    ///      2----3
-    ///      |    |
-    ///      1----0
+    /// 
+    /// * when the text is horizontal it might look like:
+    ///   0----1
+    ///   |    |
+    ///   3----2
+    /// * when it's rotated 180 degrees around the top-left corner it becomes:
+    ///   2----3
+    ///   |    |
+    ///   1----0
     ///   and the vertex order will still be (0, 1, 2, 3).
     #[serde(rename="boundingBox")]
     pub bounding_box: Option<BoundingPoly>,
@@ -569,14 +570,13 @@ impl Part for WebLabel {}
 
 /// TextAnnotation contains a structured representation of OCR extracted text.
 /// The hierarchy of an OCR extracted text structure is like this:
-///     TextAnnotation -> Page -> Block -> Paragraph -> Word -> Symbol
+/// TextAnnotation -> Page -> Block -> Paragraph -> Word -> Symbol
 /// Each structural component, starting from Page, may further have their own
 /// properties. Properties describe detected languages, breaks etc.. Please refer
 /// to the TextAnnotation.TextProperty message definition below for more
 /// detail.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TextAnnotation {
     /// UTF-8 text detected on the pages.
@@ -840,17 +840,21 @@ pub struct Block {
     /// For example:
     /// 
     /// * when the text is horizontal it might look like:
-    /// 
-    ///         0----1
-    ///         |    |
-    ///         3----2
+    ///   
+    ///   ````text
+    ///     0----1
+    ///     |    |
+    ///     3----2
+    ///   ````
     /// 
     /// * when it's rotated 180 degrees around the top-left corner it becomes:
-    /// 
-    ///         2----3
-    ///         |    |
-    ///         1----0
-    /// 
+    ///   
+    ///   ````text
+    ///     2----3
+    ///     |    |
+    ///     1----0
+    ///   ````
+    ///   
     ///   and the vertex order will still be (0, 1, 2, 3).
     #[serde(rename="boundingBox")]
     pub bounding_box: Option<BoundingPoly>,
@@ -1469,14 +1473,14 @@ pub struct ImportProductSetsGcsSource {
     /// The format of the input csv file should be one image per line.
     /// In each line, there are 8 columns.
     /// 
-    /// 1.  image-uri
-    /// 2.  image-id
-    /// 3.  product-set-id
-    /// 4.  product-id
-    /// 5.  product-category
-    /// 6.  product-display-name
-    /// 7.  labels
-    /// 8.  bounding-poly
+    /// 1. image-uri
+    /// 1. image-id
+    /// 1. product-set-id
+    /// 1. product-id
+    /// 1. product-category
+    /// 1. product-display-name
+    /// 1. labels
+    /// 1. bounding-poly
     /// 
     /// The `image-uri`, `product-set-id`, `product-id`, and `product-category`
     /// columns are required. All other columns are optional.
@@ -1504,7 +1508,9 @@ pub struct ImportProductSetsGcsSource {
     /// The `labels` column (optional) is a line containing a list of
     /// comma-separated key-value pairs, in the following format:
     /// 
-    ///     "key_1=value_1,key_2=value_2,...,key_n=value_n"
+    /// ````text
+    /// "key_1=value_1,key_2=value_2,...,key_n=value_n"
+    /// ````
     /// 
     /// The `bounding-poly` column (optional) identifies one region of
     /// interest from the image in the same manner as `CreateReferenceImage`. If
@@ -1831,14 +1837,15 @@ pub struct Word {
     /// is represented as around the top-left corner as defined when the text is
     /// read in the 'natural' orientation.
     /// For example:
-    ///   * when the text is horizontal it might look like:
-    ///      0----1
-    ///      |    |
-    ///      3----2
-    ///   * when it's rotated 180 degrees around the top-left corner it becomes:
-    ///      2----3
-    ///      |    |
-    ///      1----0
+    /// 
+    /// * when the text is horizontal it might look like:
+    ///   0----1
+    ///   |    |
+    ///   3----2
+    /// * when it's rotated 180 degrees around the top-left corner it becomes:
+    ///   2----3
+    ///   |    |
+    ///   1----0
     ///   and the vertex order will still be (0, 1, 2, 3).
     #[serde(rename="boundingBox")]
     pub bounding_box: Option<BoundingPoly>,
@@ -1880,9 +1887,11 @@ impl ResponseResult for ListProductsResponse {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -1898,7 +1907,6 @@ impl ResponseResult for ListProductsResponse {}
 /// * [locations products reference images delete projects](struct.ProjectLocationProductReferenceImageDeleteCall.html) (response)
 /// * [locations product sets add product projects](struct.ProjectLocationProductSetAddProductCall.html) (response)
 /// * [locations product sets remove product projects](struct.ProjectLocationProductSetRemoveProductCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1935,14 +1943,15 @@ pub struct Symbol {
     /// is represented as around the top-left corner as defined when the text is
     /// read in the 'natural' orientation.
     /// For example:
-    ///   * when the text is horizontal it might look like:
-    ///      0----1
-    ///      |    |
-    ///      3----2
-    ///   * when it's rotated 180 degrees around the top-left corner it becomes:
-    ///      2----3
-    ///      |    |
-    ///      1----0
+    /// 
+    /// * when the text is horizontal it might look like:
+    ///   0----1
+    ///   |    |
+    ///   3----2
+    /// * when it's rotated 180 degrees around the top-left corner it becomes:
+    ///   2----3
+    ///   |    |
+    ///   1----0
     ///   and the vertice order will still be (0, 1, 2, 3).
     #[serde(rename="boundingBox")]
     pub bounding_box: Option<BoundingPoly>,
@@ -2227,113 +2236,118 @@ impl Part for Page {}
 /// 
 /// Example (Java):
 /// 
-///      import com.google.type.Color;
+/// ````text
+///  import com.google.type.Color;
 /// 
-///      // ...
-///      public static java.awt.Color fromProto(Color protocolor) {
-///        float alpha = protocolor.hasAlpha()
-///            ? protocolor.getAlpha().getValue()
-///            : 1.0;
+///  // ...
+///  public static java.awt.Color fromProto(Color protocolor) {
+///    float alpha = protocolor.hasAlpha()
+///        ? protocolor.getAlpha().getValue()
+///        : 1.0;
 /// 
-///        return new java.awt.Color(
-///            protocolor.getRed(),
-///            protocolor.getGreen(),
-///            protocolor.getBlue(),
-///            alpha);
-///      }
+///    return new java.awt.Color(
+///        protocolor.getRed(),
+///        protocolor.getGreen(),
+///        protocolor.getBlue(),
+///        alpha);
+///  }
 /// 
-///      public static Color toProto(java.awt.Color color) {
-///        float red = (float) color.getRed();
-///        float green = (float) color.getGreen();
-///        float blue = (float) color.getBlue();
-///        float denominator = 255.0;
-///        Color.Builder resultBuilder =
-///            Color
-///                .newBuilder()
-///                .setRed(red / denominator)
-///                .setGreen(green / denominator)
-///                .setBlue(blue / denominator);
-///        int alpha = color.getAlpha();
-///        if (alpha != 255) {
-///          result.setAlpha(
-///              FloatValue
-///                  .newBuilder()
-///                  .setValue(((float) alpha) / denominator)
-///                  .build());
-///        }
-///        return resultBuilder.build();
-///      }
-///      // ...
+///  public static Color toProto(java.awt.Color color) {
+///    float red = (float) color.getRed();
+///    float green = (float) color.getGreen();
+///    float blue = (float) color.getBlue();
+///    float denominator = 255.0;
+///    Color.Builder resultBuilder =
+///        Color
+///            .newBuilder()
+///            .setRed(red / denominator)
+///            .setGreen(green / denominator)
+///            .setBlue(blue / denominator);
+///    int alpha = color.getAlpha();
+///    if (alpha != 255) {
+///      result.setAlpha(
+///          FloatValue
+///              .newBuilder()
+///              .setValue(((float) alpha) / denominator)
+///              .build());
+///    }
+///    return resultBuilder.build();
+///  }
+///  // ...
+/// ````
 /// 
 /// Example (iOS / Obj-C):
 /// 
-///      // ...
-///      static UIColor* fromProto(Color* protocolor) {
-///         float red = [protocolor red];
-///         float green = [protocolor green];
-///         float blue = [protocolor blue];
-///         FloatValue* alpha_wrapper = [protocolor alpha];
-///         float alpha = 1.0;
-///         if (alpha_wrapper != nil) {
-///           alpha = [alpha_wrapper value];
-///         }
-///         return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
-///      }
-/// 
-///      static Color* toProto(UIColor* color) {
-///          CGFloat red, green, blue, alpha;
-///          if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
-///            return nil;
-///          }
-///          Color* result = [[Color alloc] init];
-///          [result setRed:red];
-///          [result setGreen:green];
-///          [result setBlue:blue];
-///          if (alpha <= 0.9999) {
-///            [result setAlpha:floatWrapperWithValue(alpha)];
-///          }
-///          [result autorelease];
-///          return result;
+/// ````text
+///  // ...
+///  static UIColor* fromProto(Color* protocolor) {
+///     float red = [protocolor red];
+///     float green = [protocolor green];
+///     float blue = [protocolor blue];
+///     FloatValue* alpha_wrapper = [protocolor alpha];
+///     float alpha = 1.0;
+///     if (alpha_wrapper != nil) {
+///       alpha = [alpha_wrapper value];
 ///     }
-///     // ...
+///     return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+///  }
 /// 
-///  Example (JavaScript):
+///  static Color* toProto(UIColor* color) {
+///      CGFloat red, green, blue, alpha;
+///      if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) {
+///        return nil;
+///      }
+///      Color* result = [[Color alloc] init];
+///      [result setRed:red];
+///      [result setGreen:green];
+///      [result setBlue:blue];
+///      if (alpha <= 0.9999) {
+///        [result setAlpha:floatWrapperWithValue(alpha)];
+///      }
+///      [result autorelease];
+///      return result;
+/// }
+/// // ...
+/// ````
 /// 
-///     // ...
+/// Example (JavaScript):
 /// 
-///     var protoToCssColor = function(rgb_color) {
-///        var redFrac = rgb_color.red || 0.0;
-///        var greenFrac = rgb_color.green || 0.0;
-///        var blueFrac = rgb_color.blue || 0.0;
-///        var red = Math.floor(redFrac * 255);
-///        var green = Math.floor(greenFrac * 255);
-///        var blue = Math.floor(blueFrac * 255);
+/// ````text
+/// // ...
 /// 
-///        if (!('alpha' in rgb_color)) {
-///           return rgbToCssColor_(red, green, blue);
-///        }
+/// var protoToCssColor = function(rgb_color) {
+///    var redFrac = rgb_color.red || 0.0;
+///    var greenFrac = rgb_color.green || 0.0;
+///    var blueFrac = rgb_color.blue || 0.0;
+///    var red = Math.floor(redFrac * 255);
+///    var green = Math.floor(greenFrac * 255);
+///    var blue = Math.floor(blueFrac * 255);
 /// 
-///        var alphaFrac = rgb_color.alpha.value || 0.0;
-///        var rgbParams = [red, green, blue].join(',');
-///        return ['rgba(', rgbParams, ',', alphaFrac, ')'].join('');
-///     };
+///    if (!('alpha' in rgb_color)) {
+///       return rgbToCssColor_(red, green, blue);
+///    }
 /// 
-///     var rgbToCssColor_ = function(red, green, blue) {
-///       var rgbNumber = new Number((red << 16) | (green << 8) | blue);
-///       var hexString = rgbNumber.toString(16);
-///       var missingZeros = 6 - hexString.length;
-///       var resultBuilder = ['#'];
-///       for (var i = 0; i < missingZeros; i++) {
-///          resultBuilder.push('0');
-///       }
-///       resultBuilder.push(hexString);
-///       return resultBuilder.join('');
-///     };
+///    var alphaFrac = rgb_color.alpha.value || 0.0;
+///    var rgbParams = [red, green, blue].join(',');
+///    return ['rgba(', rgbParams, ',', alphaFrac, ')'].join('');
+/// };
 /// 
-///     // ...
+/// var rgbToCssColor_ = function(red, green, blue) {
+///   var rgbNumber = new Number((red << 16) | (green << 8) | blue);
+///   var hexString = rgbNumber.toString(16);
+///   var missingZeros = 6 - hexString.length;
+///   var resultBuilder = ['#'];
+///   for (var i = 0; i < missingZeros; i++) {
+///      resultBuilder.push('0');
+///   }
+///   resultBuilder.push(hexString);
+///   return resultBuilder.join('');
+/// };
+/// 
+/// // ...
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Color {
     /// The amount of blue in the color as a value in the interval [0, 1].

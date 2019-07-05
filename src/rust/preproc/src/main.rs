@@ -13,7 +13,6 @@ fn main() {
     };
 
     let mut output = String::with_capacity(2048);
-
     cmark(
         Parser::new_ext(&md, pulldown_cmark::Options::all()).map(|e| {
             use pulldown_cmark::Event::*;
@@ -21,7 +20,7 @@ fn main() {
                 Start(ref tag) => {
                     use pulldown_cmark::Tag::*;
                     match tag {
-                        CodeBlock(code) => Start(CodeBlock(format!("ignore{}", code).into())),
+                        CodeBlock(code) => Start(CodeBlock(format!("text{}", code).into())),
                         _ => e,
                     }
                 }

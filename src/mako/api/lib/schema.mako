@@ -2,7 +2,8 @@
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
-                      PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals)
+                      PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals,
+                      rust_doc_sanitize)
 %>\
 ## Build a schema which must be an object
 ###################################################################################################################
@@ -12,7 +13,7 @@
 % if properties:
 ${struct} {
 % for pn, p in properties.iteritems():
-    ${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
+    ${p.get('description', 'no description provided') | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
     % if pn != mangle_ident(pn):
     #[serde(rename="${pn}")]
     % endif
@@ -28,7 +29,7 @@ ${struct}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=a
 %>\
 pub enum ${et} {
 % for p in s.variant.map:
-    ${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
+    ${p.get('description', 'no description provided') | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
     % if variant_type(p) != p.type_value:
     #[serde(rename="${p.type_value}")]
     % endif
@@ -72,7 +73,7 @@ ${struct} { _never_set: Option<bool> }
 
     s_type = unique_type_name(s.id)
 %>\
-<%block filter="rust_doc_comment">\
+<%block filter="rust_doc_sanitize, rust_doc_comment">\
 ${doc(s, c)}\
 </%block>
 #[derive(${', '.join(traits)})]

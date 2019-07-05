@@ -731,9 +731,11 @@ impl Part for KeyValue {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -743,7 +745,6 @@ impl Part for KeyValue {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [messages delete spaces](struct.SpaceMessageDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -864,12 +865,14 @@ impl ResponseResult for ListMembershipsResponse {}
 /// Annotations associated with the plain-text body of the message.
 /// 
 /// Example plain-text message body:
-/// ```
+/// 
+/// ````text
 /// Hello @FooBot how are you!"
-/// ```
+/// ````
 /// 
 /// The corresponding annotations metadata:
-/// ```
+/// 
+/// ````text
 /// "annotations":[{
 ///   "type":"USER_MENTION",
 ///   "startIndex":6,
@@ -884,10 +887,9 @@ impl ResponseResult for ListMembershipsResponse {}
 ///     "type":"MENTION"
 ///    }
 /// }]
-/// ```
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotation {
     /// The metadata of user mention.

@@ -7,7 +7,7 @@
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
                       upload_action_fn, unique_type_name, schema_doc_format, METHODS_BUILDER_MARKER_TRAIT,
-                      to_extern_crate_name)  
+                      to_extern_crate_name, rust_doc_sanitize)  
 
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
@@ -341,7 +341,7 @@ You can read the full text at the repository's [license file][repo-license].
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
 % for url, scope in auth.oauth2.scopes.items():
-    ${scope.description | rust_doc_comment}
+    ${scope.description | rust_doc_sanitize, rust_doc_comment}
     ${scope_url_to_variant(name, url, fully_qualified=False)},
     % if not loop.last:
 

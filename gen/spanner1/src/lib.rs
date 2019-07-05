@@ -502,14 +502,18 @@ impl ResponseResult for Instance {}
 /// 
 /// For example, consider the following table definition:
 /// 
-///     CREATE TABLE UserEvents (
-///       UserName STRING(MAX),
-///       EventDate STRING(10)
-///     ) PRIMARY KEY(UserName, EventDate);
+/// ````text
+/// CREATE TABLE UserEvents (
+///   UserName STRING(MAX),
+///   EventDate STRING(10)
+/// ) PRIMARY KEY(UserName, EventDate);
+/// ````
 /// 
 /// The following keys name rows in this table:
 /// 
-///     "Bob", "2014-09-23"
+/// ````text
+/// "Bob", "2014-09-23"
+/// ````
 /// 
 /// Since the `UserEvents` table's `PRIMARY KEY` clause names two
 /// columns, each `UserEvents` key has two elements; the first is the
@@ -520,8 +524,10 @@ impl ResponseResult for Instance {}
 /// sort order. For example, the following range returns all events for
 /// user `"Bob"` that occurred in the year 2015:
 /// 
-///     "start_closed": ["Bob", "2015-01-01"]
-///     "end_closed": ["Bob", "2015-12-31"]
+/// ````text
+/// "start_closed": ["Bob", "2015-01-01"]
+/// "end_closed": ["Bob", "2015-12-31"]
+/// ````
 /// 
 /// Start and end keys can omit trailing key components. This affects the
 /// inclusion and exclusion of rows that exactly match the provided key
@@ -532,54 +538,69 @@ impl ResponseResult for Instance {}
 /// For example, the following range includes all events for `"Bob"` that
 /// occurred during and after the year 2000:
 /// 
-///     "start_closed": ["Bob", "2000-01-01"]
-///     "end_closed": ["Bob"]
+/// ````text
+/// "start_closed": ["Bob", "2000-01-01"]
+/// "end_closed": ["Bob"]
+/// ````
 /// 
 /// The next example retrieves all events for `"Bob"`:
 /// 
-///     "start_closed": ["Bob"]
-///     "end_closed": ["Bob"]
+/// ````text
+/// "start_closed": ["Bob"]
+/// "end_closed": ["Bob"]
+/// ````
 /// 
 /// To retrieve events before the year 2000:
 /// 
-///     "start_closed": ["Bob"]
-///     "end_open": ["Bob", "2000-01-01"]
+/// ````text
+/// "start_closed": ["Bob"]
+/// "end_open": ["Bob", "2000-01-01"]
+/// ````
 /// 
 /// The following range includes all rows in the table:
 /// 
-///     "start_closed": []
-///     "end_closed": []
+/// ````text
+/// "start_closed": []
+/// "end_closed": []
+/// ````
 /// 
 /// This range returns all users whose `UserName` begins with any
 /// character from A to C:
 /// 
-///     "start_closed": ["A"]
-///     "end_open": ["D"]
+/// ````text
+/// "start_closed": ["A"]
+/// "end_open": ["D"]
+/// ````
 /// 
 /// This range returns all users whose `UserName` begins with B:
 /// 
-///     "start_closed": ["B"]
-///     "end_open": ["C"]
+/// ````text
+/// "start_closed": ["B"]
+/// "end_open": ["C"]
+/// ````
 /// 
 /// Key ranges honor column sort order. For example, suppose a table is
 /// defined as follows:
 /// 
-///     CREATE TABLE DescendingSortedTable {
-///       Key INT64,
-///       ...
-///     ) PRIMARY KEY(Key DESC);
+/// ````text
+/// CREATE TABLE DescendingSortedTable {
+///   Key INT64,
+///   ...
+/// ) PRIMARY KEY(Key DESC);
+/// ````
 /// 
 /// The following range retrieves all rows with key values between 1
 /// and 100 inclusive:
 /// 
-///     "start_closed": ["100"]
-///     "end_closed": ["1"]
+/// ````text
+/// "start_closed": ["100"]
+/// "end_closed": ["1"]
+/// ````
 /// 
 /// Note that 100 is passed as the start, and 1 is passed as the end,
 /// because `Key` is a descending column in the schema.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct KeyRange {
     /// If the end is open, then the range excludes rows whose first
@@ -699,9 +720,11 @@ impl Part for ReplicaInfo {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -718,7 +741,6 @@ impl Part for ReplicaInfo {}
 /// * [instances operations cancel projects](struct.ProjectInstanceOperationCancelCall.html) (response)
 /// * [instances databases sessions rollback projects](struct.ProjectInstanceDatabaseSessionRollbackCall.html) (response)
 /// * [instances databases sessions delete projects](struct.ProjectInstanceDatabaseSessionDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -859,9 +881,9 @@ impl ResponseResult for Database {}
 /// Clients can determine whether all DML statements have run successfully, or if
 /// a statement failed, using one of the following approaches:
 /// 
-///   1. Check if `'status'` field is `OkStatus`.
-///   2. Check if `result_sets_size()` equals the number of statements in
-///      ExecuteBatchDmlRequest.
+/// 1. Check if `'status'` field is `OkStatus`.
+/// 1. Check if `result_sets_size()` equals the number of statements in
+///    ExecuteBatchDmlRequest.
 /// 
 /// Example 1: A request with 5 DML statements, all executed successfully.
 /// 
@@ -881,7 +903,6 @@ impl ResponseResult for Database {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances databases sessions execute batch dml projects](struct.ProjectInstanceDatabaseSessionExecuteBatchDmlCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecuteBatchDmlResponse {
     /// If all DML statements are executed successfully, status will be OK.
@@ -1639,11 +1660,12 @@ pub struct ResultSetStats {
     /// the query is profiled. For example, a query could return the statistics as
     /// follows:
     /// 
-    ///     {
-    ///       "rows_returned": "3",
-    ///       "elapsed_time": "1.22 secs",
-    ///       "cpu_time": "1.19 secs"
-    ///     }
+    /// ````text
+    /// {
+    ///   "rows_returned": "3",
+    ///   "elapsed_time": "1.22 secs",
+    ///   "cpu_time": "1.19 secs"
+    /// }````
     #[serde(rename="queryStats")]
     pub query_stats: Option<HashMap<String, String>>,
 }
@@ -1673,7 +1695,6 @@ impl ResponseResult for CommitResponse {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -1681,37 +1702,40 @@ impl ResponseResult for CommitResponse {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -1725,7 +1749,6 @@ impl ResponseResult for CommitResponse {}
 /// * [instances databases set iam policy projects](struct.ProjectInstanceDatabaseSetIamPolicyCall.html) (response)
 /// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (response)
 /// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Associates a list of `members` to a `role`.
@@ -1920,10 +1943,11 @@ pub struct PlanNode {
     /// For example, a Parameter Reference node could have the following
     /// information in its metadata:
     /// 
-    ///     {
-    ///       "parameter_reference": "param1",
-    ///       "parameter_type": "array"
-    ///     }
+    /// ````text
+    /// {
+    ///   "parameter_reference": "param1",
+    ///   "parameter_type": "array"
+    /// }````
     pub metadata: Option<HashMap<String, String>>,
 }
 
@@ -1931,7 +1955,6 @@ impl Part for PlanNode {}
 
 
 /// # Transactions
-/// 
 /// 
 /// Each session can have at most one active transaction at a time. After the
 /// active transaction is completed, the session can immediately be
@@ -1942,24 +1965,24 @@ impl Part for PlanNode {}
 /// 
 /// Cloud Spanner supports three transaction modes:
 /// 
-///   1. Locking read-write. This type of transaction is the only way
-///      to write data into Cloud Spanner. These transactions rely on
-///      pessimistic locking and, if necessary, two-phase commit.
-///      Locking read-write transactions may abort, requiring the
-///      application to retry.
+/// 1. Locking read-write. This type of transaction is the only way
+///    to write data into Cloud Spanner. These transactions rely on
+///    pessimistic locking and, if necessary, two-phase commit.
+///    Locking read-write transactions may abort, requiring the
+///    application to retry.
 /// 
-///   2. Snapshot read-only. This transaction type provides guaranteed
-///      consistency across several reads, but does not allow
-///      writes. Snapshot read-only transactions can be configured to
-///      read at timestamps in the past. Snapshot read-only
-///      transactions do not need to be committed.
+/// 1. Snapshot read-only. This transaction type provides guaranteed
+///    consistency across several reads, but does not allow
+///    writes. Snapshot read-only transactions can be configured to
+///    read at timestamps in the past. Snapshot read-only
+///    transactions do not need to be committed.
 /// 
-///   3. Partitioned DML. This type of transaction is used to execute
-///      a single Partitioned DML statement. Partitioned DML partitions
-///      the key space and runs the DML statement over each partition
-///      in parallel using separate, internal transactions that commit
-///      independently. Partitioned DML transactions do not need to be
-///      committed.
+/// 1. Partitioned DML. This type of transaction is used to execute
+///    a single Partitioned DML statement. Partitioned DML partitions
+///    the key space and runs the DML statement over each partition
+///    in parallel using separate, internal transactions that commit
+///    independently. Partitioned DML transactions do not need to be
+///    committed.
 /// 
 /// For transactions that only read, snapshot read-only transactions
 /// provide simpler semantics and are almost always faster. In
@@ -2062,9 +2085,9 @@ impl Part for PlanNode {}
 /// 
 /// The types of timestamp bound are:
 /// 
-///   - Strong (the default).
-///   - Bounded staleness.
-///   - Exact staleness.
+/// * Strong (the default).
+/// * Bounded staleness.
+/// * Exact staleness.
 /// 
 /// If the Cloud Spanner database to be read is geographically distributed,
 /// stale read-only transactions can execute more quickly than strong
@@ -2171,45 +2194,44 @@ impl Part for PlanNode {}
 /// That said, Partitioned DML is not a drop-in replacement for standard DML used
 /// in ReadWrite transactions.
 /// 
-///  - The DML statement must be fully-partitionable. Specifically, the statement
-///    must be expressible as the union of many statements which each access only
-///    a single row of the table.
+/// * The DML statement must be fully-partitionable. Specifically, the statement
+///   must be expressible as the union of many statements which each access only
+///   a single row of the table.
 /// 
-///  - The statement is not applied atomically to all rows of the table. Rather,
-///    the statement is applied atomically to partitions of the table, in
-///    independent transactions. Secondary index rows are updated atomically
-///    with the base table rows.
+/// * The statement is not applied atomically to all rows of the table. Rather,
+///   the statement is applied atomically to partitions of the table, in
+///   independent transactions. Secondary index rows are updated atomically
+///   with the base table rows.
 /// 
-///  - Partitioned DML does not guarantee exactly-once execution semantics
-///    against a partition. The statement will be applied at least once to each
-///    partition. It is strongly recommended that the DML statement should be
-///    idempotent to avoid unexpected results. For instance, it is potentially
-///    dangerous to run a statement such as
-///    `UPDATE table SET column = column + 1` as it could be run multiple times
-///    against some rows.
+/// * Partitioned DML does not guarantee exactly-once execution semantics
+///   against a partition. The statement will be applied at least once to each
+///   partition. It is strongly recommended that the DML statement should be
+///   idempotent to avoid unexpected results. For instance, it is potentially
+///   dangerous to run a statement such as
+///   `UPDATE table SET column = column + 1` as it could be run multiple times
+///   against some rows.
 /// 
-///  - The partitions are committed automatically - there is no support for
-///    Commit or Rollback. If the call returns an error, or if the client issuing
-///    the ExecuteSql call dies, it is possible that some rows had the statement
-///    executed on them successfully. It is also possible that statement was
-///    never executed against other rows.
+/// * The partitions are committed automatically - there is no support for
+///   Commit or Rollback. If the call returns an error, or if the client issuing
+///   the ExecuteSql call dies, it is possible that some rows had the statement
+///   executed on them successfully. It is also possible that statement was
+///   never executed against other rows.
 /// 
-///  - Partitioned DML transactions may only contain the execution of a single
-///    DML statement via ExecuteSql or ExecuteStreamingSql.
+/// * Partitioned DML transactions may only contain the execution of a single
+///   DML statement via ExecuteSql or ExecuteStreamingSql.
 /// 
-///  - If any error is encountered during the execution of the partitioned DML
-///    operation (for instance, a UNIQUE INDEX violation, division by zero, or a
-///    value that cannot be stored due to schema constraints), then the
-///    operation is stopped at that point and an error is returned. It is
-///    possible that at this point, some partitions have been committed (or even
-///    committed multiple times), and other partitions have not been run at all.
+/// * If any error is encountered during the execution of the partitioned DML
+///   operation (for instance, a UNIQUE INDEX violation, division by zero, or a
+///   value that cannot be stored due to schema constraints), then the
+///   operation is stopped at that point and an error is returned. It is
+///   possible that at this point, some partitions have been committed (or even
+///   committed multiple times), and other partitions have not been run at all.
 /// 
 /// Given the above, Partitioned DML is good fit for large, database-wide,
 /// operations that are idempotent, such as deleting old rows from a very large
 /// table.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransactionOptions {
     /// Transaction may write.
@@ -2293,12 +2315,13 @@ impl RequestValue for TestIamPermissionsRequest {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
     /// An optional description of the expression. This is a longer text which
@@ -2380,60 +2403,64 @@ pub struct PartialResultSet {
     /// field. Two or more chunked values can be merged to form a
     /// complete value as follows:
     /// 
-    ///   * `bool/number/null`: cannot be chunked
-    ///   * `string`: concatenate the strings
-    ///   * `list`: concatenate the lists. If the last element in a list is a
-    ///     `string`, `list`, or `object`, merge it with the first element in
-    ///     the next list by applying these rules recursively.
-    ///   * `object`: concatenate the (field name, field value) pairs. If a
-    ///     field name is duplicated, then apply these rules recursively
-    ///     to merge the field values.
+    /// * `bool/number/null`: cannot be chunked
+    /// * `string`: concatenate the strings
+    /// * `list`: concatenate the lists. If the last element in a list is a
+    ///   `string`, `list`, or `object`, merge it with the first element in
+    ///   the next list by applying these rules recursively.
+    /// * `object`: concatenate the (field name, field value) pairs. If a
+    ///   field name is duplicated, then apply these rules recursively
+    ///   to merge the field values.
     /// 
     /// Some examples of merging:
     /// 
-    ///     # Strings are concatenated.
-    ///     "foo", "bar" => "foobar"
+    /// ````text
+    /// # Strings are concatenated.
+    /// "foo", "bar" => "foobar"
     /// 
-    ///     # Lists of non-strings are concatenated.
-    ///     [2, 3], [4] => [2, 3, 4]
+    /// # Lists of non-strings are concatenated.
+    /// [2, 3], [4] => [2, 3, 4]
     /// 
-    ///     # Lists are concatenated, but the last and first elements are merged
-    ///     # because they are strings.
-    ///     ["a", "b"], ["c", "d"] => ["a", "bc", "d"]
+    /// # Lists are concatenated, but the last and first elements are merged
+    /// # because they are strings.
+    /// ["a", "b"], ["c", "d"] => ["a", "bc", "d"]
     /// 
-    ///     # Lists are concatenated, but the last and first elements are merged
-    ///     # because they are lists. Recursively, the last and first elements
-    ///     # of the inner lists are merged because they are strings.
-    ///     ["a", ["b", "c"]], [["d"], "e"] => ["a", ["b", "cd"], "e"]
+    /// # Lists are concatenated, but the last and first elements are merged
+    /// # because they are lists. Recursively, the last and first elements
+    /// # of the inner lists are merged because they are strings.
+    /// ["a", ["b", "c"]], [["d"], "e"] => ["a", ["b", "cd"], "e"]
     /// 
-    ///     # Non-overlapping object fields are combined.
-    ///     {"a": "1"}, {"b": "2"} => {"a": "1", "b": 2"}
+    /// # Non-overlapping object fields are combined.
+    /// {"a": "1"}, {"b": "2"} => {"a": "1", "b": 2"}
     /// 
-    ///     # Overlapping object fields are merged.
-    ///     {"a": "1"}, {"a": "2"} => {"a": "12"}
+    /// # Overlapping object fields are merged.
+    /// {"a": "1"}, {"a": "2"} => {"a": "12"}
     /// 
-    ///     # Examples of merging objects containing lists of strings.
-    ///     {"a": ["1"]}, {"a": ["2"]} => {"a": ["12"]}
+    /// # Examples of merging objects containing lists of strings.
+    /// {"a": ["1"]}, {"a": ["2"]} => {"a": ["12"]}
+    /// ````
     /// 
     /// For a more complete example, suppose a streaming SQL query is
     /// yielding a result set whose rows contain a single string
     /// field. The following `PartialResultSet`s might be yielded:
     /// 
-    ///     {
-    ///       "metadata": { ... }
-    ///       "values": ["Hello", "W"]
-    ///       "chunked_value": true
-    ///       "resume_token": "Af65..."
-    ///     }
-    ///     {
-    ///       "values": ["orl"]
-    ///       "chunked_value": true
-    ///       "resume_token": "Bqp2..."
-    ///     }
-    ///     {
-    ///       "values": ["d"]
-    ///       "resume_token": "Zx1B..."
-    ///     }
+    /// ````text
+    /// {
+    ///   "metadata": { ... }
+    ///   "values": ["Hello", "W"]
+    ///   "chunked_value": true
+    ///   "resume_token": "Af65..."
+    /// }
+    /// {
+    ///   "values": ["orl"]
+    ///   "chunked_value": true
+    ///   "resume_token": "Bqp2..."
+    /// }
+    /// {
+    ///   "values": ["d"]
+    ///   "resume_token": "Zx1B..."
+    /// }
+    /// ````
     /// 
     /// This sequence of `PartialResultSet`s encodes two rows, one
     /// containing the field value `"Hello"`, and a second containing the
@@ -2701,13 +2728,13 @@ impl RequestValue for BeginTransactionRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultSetMetadata {
     /// Indicates the field names and types for the rows in the result
-    /// set.  For example, a SQL query like `"SELECT UserId, UserName FROM
-    /// Users"` could return a `row_type` value like:
+    /// set.  For example, a SQL query like `"SELECT UserId, UserName FROM Users"` could return a `row_type` value like:
     /// 
-    ///     "fields": [
-    ///       { "name": "UserId", "type": { "code": "INT64" } },
-    ///       { "name": "UserName", "type": { "code": "STRING" } },
-    ///     ]
+    /// ````text
+    /// "fields": [
+    ///   { "name": "UserId", "type": { "code": "INT64" } },
+    ///   { "name": "UserName", "type": { "code": "STRING" } },
+    /// ]````
     #[serde(rename="rowType")]
     pub row_type: Option<StructType>,
     /// If the read or SQL query began a transaction as a side-effect, the
@@ -3290,27 +3317,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Immediately upon completion of this request:
     /// 
-    ///   * For resource types for which a decrease in the instance's allocation
-    ///     has been requested, billing is based on the newly-requested level.
+    /// * For resource types for which a decrease in the instance's allocation
+    ///   has been requested, billing is based on the newly-requested level.
     /// 
     /// Until completion of the returned operation:
     /// 
-    ///   * Cancelling the operation sets its metadata's
-    ///     cancel_time, and begins
-    ///     restoring resources to their pre-request values. The operation
-    ///     is guaranteed to succeed at undoing all resource changes,
-    ///     after which point it terminates with a `CANCELLED` status.
-    ///   * All other attempts to modify the instance are rejected.
-    ///   * Reading the instance via the API continues to give the pre-request
-    ///     resource levels.
+    /// * Cancelling the operation sets its metadata's
+    ///   cancel_time, and begins
+    ///   restoring resources to their pre-request values. The operation
+    ///   is guaranteed to succeed at undoing all resource changes,
+    ///   after which point it terminates with a `CANCELLED` status.
+    /// * All other attempts to modify the instance are rejected.
+    /// * Reading the instance via the API continues to give the pre-request
+    ///   resource levels.
     /// 
     /// Upon completion of the returned operation:
     /// 
-    ///   * Billing begins for all successfully-allocated resources (some types
-    ///     may have lower than the requested levels).
-    ///   * All newly-reserved resources are available for serving the instance's
-    ///     tables.
-    ///   * The instance's new resource levels are readable via the API.
+    /// * Billing begins for all successfully-allocated resources (some types
+    ///   may have lower than the requested levels).
+    /// * All newly-reserved resources are available for serving the instance's
+    ///   tables.
+    /// * The instance's new resource levels are readable via the API.
     /// 
     /// The returned long-running operation will
     /// have a name of the format `<instance_name>/operations/<operation_id>` and
@@ -3681,23 +3708,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Immediately upon completion of this request:
     /// 
-    ///   * The instance is readable via the API, with all requested attributes
-    ///     but no allocated resources. Its state is `CREATING`.
+    /// * The instance is readable via the API, with all requested attributes
+    ///   but no allocated resources. Its state is `CREATING`.
     /// 
     /// Until completion of the returned operation:
     /// 
-    ///   * Cancelling the operation renders the instance immediately unreadable
-    ///     via the API.
-    ///   * The instance can be deleted.
-    ///   * All other attempts to modify the instance are rejected.
+    /// * Cancelling the operation renders the instance immediately unreadable
+    ///   via the API.
+    /// * The instance can be deleted.
+    /// * All other attempts to modify the instance are rejected.
     /// 
     /// Upon completion of the returned operation:
     /// 
-    ///   * Billing for all successfully-allocated resources begins (some types
-    ///     may have lower than the requested levels).
-    ///   * Databases can be created in the instance.
-    ///   * The instance's allocated resource levels are readable via the API.
-    ///   * The instance's state becomes `READY`.
+    /// * Billing for all successfully-allocated resources begins (some types
+    ///   may have lower than the requested levels).
+    /// * Databases can be created in the instance.
+    /// * The instance's allocated resource levels are readable via the API.
+    /// * The instance's state becomes `READY`.
     /// 
     /// The returned long-running operation will
     /// have a name of the format `<instance_name>/operations/<operation_id>` and
@@ -3786,13 +3813,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Immediately upon completion of the request:
     /// 
-    ///   * Billing ceases for all of the instance's reserved resources.
+    /// * Billing ceases for all of the instance's reserved resources.
     /// 
     /// Soon afterward:
     /// 
-    ///   * The instance and *all of its databases* immediately and
-    ///     irrevocably disappear from the API. All data in the databases
-    ///     is permanently deleted.
+    /// * The instance and *all of its databases* immediately and
+    ///   irrevocably disappear from the API. All data in the databases
+    ///   is permanently deleted.
     /// 
     /// # Arguments
     ///
@@ -7973,22 +8000,22 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// An expression for filtering the results of the request. Filter rules are
     /// case insensitive. The fields eligible for filtering are:
     /// 
-    ///   * `name`
-    ///   * `display_name`
-    ///   * `labels.key` where key is the name of a label
+    /// * `name`
+    /// * `display_name`
+    /// * `labels.key` where key is the name of a label
     /// 
     /// Some examples of using filters are:
     /// 
-    ///   * `name:*` --> The instance has a name.
-    ///   * `name:Howl` --> The instance's name contains the string "howl".
-    ///   * `name:HOWL` --> Equivalent to above.
-    ///   * `NAME:howl` --> Equivalent to above.
-    ///   * `labels.env:*` --> The instance has the label "env".
-    ///   * `labels.env:dev` --> The instance has the label "env" and the value of
-    ///                        the label contains the string "dev".
-    ///   * `name:howl labels.env:dev` --> The instance's name contains "howl" and
-    ///                                  it has the label "env" with its value
-    ///                                  containing "dev".
+    /// * `name:*` --> The instance has a name.
+    /// * `name:Howl` --> The instance's name contains the string "howl".
+    /// * `name:HOWL` --> Equivalent to above.
+    /// * `NAME:howl` --> Equivalent to above.
+    /// * `labels.env:*` --> The instance has the label "env".
+    /// * `labels.env:dev` --> The instance has the label "env" and the value of
+    ///   the label contains the string "dev".
+    /// * `name:howl labels.env:dev` --> The instance's name contains "howl" and
+    ///   it has the label "env" with its value
+    ///   containing "dev".
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectInstanceListCall<'a, C, A> {
@@ -9218,27 +9245,27 @@ impl<'a, C, A> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A> where C: Borrow
 /// 
 /// Immediately upon completion of this request:
 /// 
-///   * For resource types for which a decrease in the instance's allocation
-///     has been requested, billing is based on the newly-requested level.
+/// * For resource types for which a decrease in the instance's allocation
+///   has been requested, billing is based on the newly-requested level.
 /// 
 /// Until completion of the returned operation:
 /// 
-///   * Cancelling the operation sets its metadata's
-///     cancel_time, and begins
-///     restoring resources to their pre-request values. The operation
-///     is guaranteed to succeed at undoing all resource changes,
-///     after which point it terminates with a `CANCELLED` status.
-///   * All other attempts to modify the instance are rejected.
-///   * Reading the instance via the API continues to give the pre-request
-///     resource levels.
+/// * Cancelling the operation sets its metadata's
+///   cancel_time, and begins
+///   restoring resources to their pre-request values. The operation
+///   is guaranteed to succeed at undoing all resource changes,
+///   after which point it terminates with a `CANCELLED` status.
+/// * All other attempts to modify the instance are rejected.
+/// * Reading the instance via the API continues to give the pre-request
+///   resource levels.
 /// 
 /// Upon completion of the returned operation:
 /// 
-///   * Billing begins for all successfully-allocated resources (some types
-///     may have lower than the requested levels).
-///   * All newly-reserved resources are available for serving the instance's
-///     tables.
-///   * The instance's new resource levels are readable via the API.
+/// * Billing begins for all successfully-allocated resources (some types
+///   may have lower than the requested levels).
+/// * All newly-reserved resources are available for serving the instance's
+///   tables.
+/// * The instance's new resource levels are readable via the API.
 /// 
 /// The returned long-running operation will
 /// have a name of the format `<instance_name>/operations/<operation_id>` and
@@ -13006,13 +13033,13 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     /// An expression for filtering the results of the request. Filter rules are
     /// case insensitive. The fields eligible for filtering are:
     /// 
-    ///   * `labels.key` where key is the name of a label
+    /// * `labels.key` where key is the name of a label
     /// 
     /// Some examples of using filters are:
     /// 
-    ///   * `labels.env:*` --> The session has the label "env".
-    ///   * `labels.env:dev` --> The session has the label "env" and the value of
-    ///                        the label contains the string "dev".
+    /// * `labels.env:*` --> The session has the label "env".
+    /// * `labels.env:dev` --> The session has the label "env" and the value of
+    ///   the label contains the string "dev".
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
@@ -13384,23 +13411,23 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationListCall<'a, C, A> where C: Borro
 /// 
 /// Immediately upon completion of this request:
 /// 
-///   * The instance is readable via the API, with all requested attributes
-///     but no allocated resources. Its state is `CREATING`.
+/// * The instance is readable via the API, with all requested attributes
+///   but no allocated resources. Its state is `CREATING`.
 /// 
 /// Until completion of the returned operation:
 /// 
-///   * Cancelling the operation renders the instance immediately unreadable
-///     via the API.
-///   * The instance can be deleted.
-///   * All other attempts to modify the instance are rejected.
+/// * Cancelling the operation renders the instance immediately unreadable
+///   via the API.
+/// * The instance can be deleted.
+/// * All other attempts to modify the instance are rejected.
 /// 
 /// Upon completion of the returned operation:
 /// 
-///   * Billing for all successfully-allocated resources begins (some types
-///     may have lower than the requested levels).
-///   * Databases can be created in the instance.
-///   * The instance's allocated resource levels are readable via the API.
-///   * The instance's state becomes `READY`.
+/// * Billing for all successfully-allocated resources begins (some types
+///   may have lower than the requested levels).
+/// * Databases can be created in the instance.
+/// * The instance's allocated resource levels are readable via the API.
+/// * The instance's state becomes `READY`.
 /// 
 /// The returned long-running operation will
 /// have a name of the format `<instance_name>/operations/<operation_id>` and
@@ -14442,13 +14469,13 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
 /// 
 /// Immediately upon completion of the request:
 /// 
-///   * Billing ceases for all of the instance's reserved resources.
+/// * Billing ceases for all of the instance's reserved resources.
 /// 
 /// Soon afterward:
 /// 
-///   * The instance and *all of its databases* immediately and
-///     irrevocably disappear from the API. All data in the databases
-///     is permanently deleted.
+/// * The instance and *all of its databases* immediately and
+///   irrevocably disappear from the API. All data in the databases
+///   is permanently deleted.
 ///
 /// A builder for the *instances.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

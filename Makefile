@@ -20,6 +20,8 @@ MKDOCS := $(shell pwd)/$(VENV_DIR)/bin/mkdocs
 
 MAKO_SRC = src/mako
 RUST_SRC = src/rust
+PREPROC_DIR = $(RUST_SRC)/preproc
+PREPROC = target/release/preproc
 API_DEPS_TPL = $(MAKO_SRC)/deps.mako
 API_DEPS = .api.deps
 CLI_DEPS = .cli.deps
@@ -36,8 +38,8 @@ endif
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
 MAKO_LIB_DIR = $(MAKO_SRC)/lib
 MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
-MAKO = export PYTHONPATH=$(MAKO_LIB_DIR):$(PYTHONPATH); $(TPL) --template-dir '.'
-MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER)
+MAKO = PREPROC=$(PREPROC) PYTHONPATH=$(MAKO_LIB_DIR):$(PYTHONPATH) $(TPL) --template-dir '.'
+MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER) $(PREPROC)
 
 help:
 	$(info using template engine: '$(MAKO_RENDER)')
@@ -57,6 +59,9 @@ help:
 	$(info test-gen       -   run unit tests for python code, including coverage)
 	$(info test           -   run all tests)
 	$(info help           -   print this help)
+
+$(PREPROC): $(PREPROC_DIR)/src/main.rs
+	cd "$(PREPROC_DIR)" && cargo build --release 
 
 $(VENV_BIN):
 	wget -nv https://pypi.python.org/packages/source/v/virtualenv/virtualenv-$(VIRTUALENV_VERSION).tar.gz -O virtualenv-$(VIRTUALENV_VERSION).tar.gz
