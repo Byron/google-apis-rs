@@ -25,14 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Vision* API at revision *20190314*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Vision* API at revision *20190628*. The CLI is at version *1.0.9*.
 
 ```bash
 vision1 [options]
         files
+                annotate (-r <kv>)... [-p <v>]... [-o <out>]
                 async-batch-annotate (-r <kv>)... [-p <v>]... [-o <out>]
         images
                 annotate (-r <kv>)... [-p <v>]... [-o <out>]
+                async-batch-annotate (-r <kv>)... [-p <v>]... [-o <out>]
         locations
                 operations-get <name> [-p <v>]... [-o <out>]
         operations
@@ -41,6 +43,7 @@ vision1 [options]
                 get <name> [-p <v>]... [-o <out>]
                 list <name> [-p <v>]... [-o <out>]
         projects
+                locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-product-sets-add-product <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-product-sets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-product-sets-delete <name> [-p <v>]... [-o <out>]
@@ -59,6 +62,7 @@ vision1 [options]
                 locations-products-reference-images-delete <name> [-p <v>]... [-o <out>]
                 locations-products-reference-images-get <name> [-p <v>]... [-o <out>]
                 locations-products-reference-images-list <parent> [-p <v>]... [-o <out>]
+                operations-get <name> [-p <v>]... [-o <out>]
   vision1 --help
 
 Configuration:

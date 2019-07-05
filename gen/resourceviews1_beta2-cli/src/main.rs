@@ -1323,7 +1323,7 @@ fn main() {
     
     let mut app = App::new("resourceviews1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20160512")
+           .version("1.0.9+20160512")
            .about("The Resource View API allows users to create and manage logical sets of Google Compute Engine instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_resourceviews1_beta2_cli")
            .arg(Arg::with_name("url")

@@ -143,6 +143,176 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _albums_batch_add_media_items(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "media-item-ids" => Some(("mediaItemIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["media-item-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchAddMediaItemsToAlbumRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.albums().batch_add_media_items(request, opt.value_of("album-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _albums_batch_remove_media_items(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "media-item-ids" => Some(("mediaItemIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["media-item-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchRemoveMediaItemsFromAlbumRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.albums().batch_remove_media_items(request, opt.value_of("album-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _albums_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -808,9 +978,10 @@ impl<'n> Engine<'n> {
                     "filters.include-archived-media" => Some(("filters.includeArchivedMedia", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "filters.exclude-non-app-created-data" => Some(("filters.excludeNonAppCreatedData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "filters.media-type-filter.media-types" => Some(("filters.mediaTypeFilter.mediaTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "filters.feature-filter.included-features" => Some(("filters.featureFilter.includedFeatures", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["album-id", "content-filter", "exclude-non-app-created-data", "excluded-content-categories", "filters", "include-archived-media", "included-content-categories", "media-type-filter", "media-types", "page-size", "page-token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["album-id", "content-filter", "exclude-non-app-created-data", "excluded-content-categories", "feature-filter", "filters", "include-archived-media", "included-content-categories", "included-features", "media-type-filter", "media-types", "page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1164,6 +1335,12 @@ impl<'n> Engine<'n> {
                     ("add-enrichment", Some(opt)) => {
                         call_result = self._albums_add_enrichment(opt, dry_run, &mut err);
                     },
+                    ("batch-add-media-items", Some(opt)) => {
+                        call_result = self._albums_batch_add_media_items(opt, dry_run, &mut err);
+                    },
+                    ("batch-remove-media-items", Some(opt)) => {
+                        call_result = self._albums_batch_remove_media_items(opt, dry_run, &mut err);
+                    },
                     ("create", Some(opt)) => {
                         call_result = self._albums_create(opt, dry_run, &mut err);
                     },
@@ -1313,7 +1490,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("albums", "methods: 'add-enrichment', 'create', 'get', 'list', 'share' and 'unshare'", vec![
+        ("albums", "methods: 'add-enrichment', 'batch-add-media-items', 'batch-remove-media-items', 'create', 'get', 'list', 'share' and 'unshare'", vec![
             ("add-enrichment",
                     Some(r##"Adds an enrichment at a specified position in a defined album."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_add-enrichment",
@@ -1321,6 +1498,87 @@ fn main() {
                     (Some(r##"album-id"##),
                      None,
                      Some(r##"Identifier of the album where the enrichment is to be added."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("batch-add-media-items",
+                    Some(r##"Adds one or more media items in a user's Google Photos library to
+        an album. The media items and albums must have been created by the
+        developer via the API.
+        
+        Media items are added to the end of the album. If multiple media items are
+        given, they are added in the order specified in this call.
+        
+        Each album can contain up to 20,000 media items.
+        
+        Only media items that are in the user's library can be added to an
+        album. For albums that are shared, the album must either be owned by the
+        user or the user must have joined the album as a collaborator.
+        
+        Partial success is not supported. The entire request will fail if an
+        invalid media item or album is specified."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_batch-add-media-items",
+                  vec![
+                    (Some(r##"album-id"##),
+                     None,
+                     Some(r##"Identifier of the Album that the
+        media items are added to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("batch-remove-media-items",
+                    Some(r##"Removes one or more media items from a specified album. The media items and
+        the album must have been created by the developer via the API.
+        
+        For albums that are shared, this action is only supported for media items
+        that were added to the album by this user, or for all media items if the
+        album was created by this user.
+        
+        Partial success is not supported. The entire request will fail and no
+        action will be performed on the album if an invalid media item or album is
+        specified."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_batch-remove-media-items",
+                  vec![
+                    (Some(r##"album-id"##),
+                     None,
+                     Some(r##"Identifier of the Album that the media
+        items are to be removed from."##),
                      Some(true),
                      Some(false)),
         
@@ -1481,8 +1739,9 @@ fn main() {
         <a href="/photos/library/guides/upload-media">Uploading media</a>.
         
         This call adds the media item to the library. If an album `id` is
-        specified, the call adds the media item to the album too. By default, the
-        media item will be added to the end of the library or album.
+        specified, the call adds the media item to the album too. Each album can
+        contain up to 20,000 media items. By default, the media item will be added
+        to the end of the library or album.
         
         If an album `id` and position are both defined, the media item is
         added to the album at the specified position.
@@ -1688,7 +1947,7 @@ fn main() {
     
     let mut app = App::new("photoslibrary1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190402")
+           .version("1.0.9+20190702")
            .about("Manage photos, videos, and albums in Google Photos
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli")

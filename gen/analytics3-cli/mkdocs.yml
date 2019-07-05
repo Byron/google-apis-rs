@@ -1,4 +1,4 @@
-site_name: analytics v1.0.8+20180730
+site_name: analytics v1.0.9+20190604
 site_url: http://byron.github.io/google-apis-rs/google-analytics3-cli
 site_description: A complete library to interact with analytics (protocol v3)
 
@@ -100,5 +100,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

@@ -1,4 +1,4 @@
-site_name: iam v1.0.8+20190321
+site_name: iam v1.0.9+20190627
 site_url: http://byron.github.io/google-apis-rs/google-iam1-cli
 site_description: A complete library to interact with iam (protocol v1)
 
@@ -48,5 +48,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

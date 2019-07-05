@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Binary Authorization* crate version *1.0.8+20190322*, where *20190322* is the exact revision of the *binaryauthorization:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Binary Authorization* crate version *1.0.9+20190628*, where *20190628* is the exact revision of the *binaryauthorization:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Binary Authorization* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/binary-authorization/).
@@ -220,9 +220,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -334,7 +332,7 @@ impl<'a, C, A> BinaryAuthorization<C, A>
         BinaryAuthorization {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://binaryauthorization.googleapis.com/".to_string(),
             _root_url: "https://binaryauthorization.googleapis.com/".to_string(),
         }
@@ -345,7 +343,7 @@ impl<'a, C, A> BinaryAuthorization<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -514,7 +512,7 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -1027,6 +1025,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectPolicyGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1054,6 +1053,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// A policy specifies the attestors that must attest to
+    /// a container image, before the project is allowed to deploy that
+    /// image. There is at most one policy per project. All image admission
+    /// requests are permitted if a project has no policy.
+    /// 
     /// Gets the policy for this project. Returns a default
     /// policy if the project does not have one.
     /// 
@@ -1085,6 +1089,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectAttestorGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2379,6 +2384,7 @@ impl<'a, C, A> ProjectAttestorTestIamPermissionCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().policy_get_iam_policy("resource")
+///              .options_requested_policy_version(-81)
 ///              .doit();
 /// # }
 /// ```
@@ -2387,6 +2393,7 @@ pub struct ProjectPolicyGetIamPolicyCall<'a, C, A>
 
     hub: &'a BinaryAuthorization<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2409,9 +2416,12 @@ impl<'a, C, A> ProjectPolicyGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "binaryauthorization.projects.policy.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2535,6 +2545,16 @@ impl<'a, C, A> ProjectPolicyGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper:
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectPolicyGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectPolicyGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2850,6 +2870,11 @@ impl<'a, C, A> ProjectAttestorGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
+/// A policy specifies the attestors that must attest to
+/// a container image, before the project is allowed to deploy that
+/// image. There is at most one policy per project. All image admission
+/// requests are permitted if a project has no policy.
+/// 
 /// Gets the policy for this project. Returns a default
 /// policy if the project does not have one.
 ///
@@ -3130,6 +3155,7 @@ impl<'a, C, A> ProjectGetPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().attestors_get_iam_policy("resource")
+///              .options_requested_policy_version(-19)
 ///              .doit();
 /// # }
 /// ```
@@ -3138,6 +3164,7 @@ pub struct ProjectAttestorGetIamPolicyCall<'a, C, A>
 
     hub: &'a BinaryAuthorization<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3160,9 +3187,12 @@ impl<'a, C, A> ProjectAttestorGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "binaryauthorization.projects.attestors.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3286,6 +3316,16 @@ impl<'a, C, A> ProjectAttestorGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectAttestorGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectAttestorGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

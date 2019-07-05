@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Docs* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *docs:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Docs* crate version *1.0.9+20190627*, where *20190627* is the exact revision of the *docs:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Docs* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/docs/).
@@ -214,9 +214,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -339,7 +337,7 @@ impl<'a, C, A> Docs<C, A>
         Docs {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://docs.googleapis.com/".to_string(),
             _root_url: "https://docs.googleapis.com/".to_string(),
         }
@@ -350,7 +348,7 @@ impl<'a, C, A> Docs<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -378,33 +376,6 @@ impl<'a, C, A> Docs<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A mask that indicates which of the fields on the base CropProperties have been changed in this suggestion.
-/// For any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CropPropertiesSuggestionState {
-    /// Indicates if there was a suggested change to offset_bottom.
-    #[serde(rename="offsetBottomSuggested")]
-    pub offset_bottom_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to offset_left.
-    #[serde(rename="offsetLeftSuggested")]
-    pub offset_left_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to offset_right.
-    #[serde(rename="offsetRightSuggested")]
-    pub offset_right_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to angle.
-    #[serde(rename="angleSuggested")]
-    pub angle_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to offset_top.
-    #[serde(rename="offsetTopSuggested")]
-    pub offset_top_suggested: Option<bool>,
-}
-
-impl Part for CropPropertiesSuggestionState {}
-
-
 /// A mask that indicates which of the fields on the base
 /// EmbeddedDrawingProperties
 /// have been changed in this suggestion. For any field set to true, there is a
@@ -416,65 +387,6 @@ impl Part for CropPropertiesSuggestionState {}
 pub struct EmbeddedDrawingPropertiesSuggestionState { _never_set: Option<bool> }
 
 impl Part for EmbeddedDrawingPropertiesSuggestionState {}
-
-
-/// A single update to apply to a document.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Request {
-    /// Inserts text at the specified location.
-    #[serde(rename="insertText")]
-    pub insert_text: Option<InsertTextRequest>,
-    /// Creates bullets for paragraphs.
-    #[serde(rename="createParagraphBullets")]
-    pub create_paragraph_bullets: Option<CreateParagraphBulletsRequest>,
-    /// Updates the paragraph style at the specified range.
-    #[serde(rename="updateParagraphStyle")]
-    pub update_paragraph_style: Option<UpdateParagraphStyleRequest>,
-    /// Replaces all instances of the specified text.
-    #[serde(rename="replaceAllText")]
-    pub replace_all_text: Option<ReplaceAllTextRequest>,
-    /// Deletes a row from a table.
-    #[serde(rename="deleteTableRow")]
-    pub delete_table_row: Option<DeleteTableRowRequest>,
-    /// Inserts a page break at the specified location.
-    #[serde(rename="insertPageBreak")]
-    pub insert_page_break: Option<InsertPageBreakRequest>,
-    /// Creates a named range.
-    #[serde(rename="createNamedRange")]
-    pub create_named_range: Option<CreateNamedRangeRequest>,
-    /// Deletes content from the document.
-    #[serde(rename="deleteContentRange")]
-    pub delete_content_range: Option<DeleteContentRangeRequest>,
-    /// Deletes bullets from paragraphs.
-    #[serde(rename="deleteParagraphBullets")]
-    pub delete_paragraph_bullets: Option<DeleteParagraphBulletsRequest>,
-    /// Deletes a named range.
-    #[serde(rename="deleteNamedRange")]
-    pub delete_named_range: Option<DeleteNamedRangeRequest>,
-    /// Inserts a table at the specified location.
-    #[serde(rename="insertTable")]
-    pub insert_table: Option<InsertTableRequest>,
-    /// Inserts an empty row into a table.
-    #[serde(rename="insertTableRow")]
-    pub insert_table_row: Option<InsertTableRowRequest>,
-    /// Updates the text style at the specified range.
-    #[serde(rename="updateTextStyle")]
-    pub update_text_style: Option<UpdateTextStyleRequest>,
-    /// Deletes a positioned object from the document.
-    #[serde(rename="deletePositionedObject")]
-    pub delete_positioned_object: Option<DeletePositionedObjectRequest>,
-    /// Deletes a column from a table.
-    #[serde(rename="deleteTableColumn")]
-    pub delete_table_column: Option<DeleteTableColumnRequest>,
-    /// Inserts an inline image at the specified location.
-    #[serde(rename="insertInlineImage")]
-    pub insert_inline_image: Option<InsertInlineImageRequest>,
-}
-
-impl Part for Request {}
 
 
 /// Deletes content from the document.
@@ -533,44 +445,6 @@ pub struct EmbeddedObjectBorder {
 impl Part for EmbeddedObjectBorder {}
 
 
-/// Represents a font family and weight of text.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WeightedFontFamily {
-    /// The font family of the text.
-    /// 
-    /// The font family can be any font from the Font menu in Docs or from
-    /// [Google Fonts] (https://fonts.google.com/). If the font name is
-    /// unrecognized, the text is rendered in `Arial`.
-    #[serde(rename="fontFamily")]
-    pub font_family: Option<String>,
-    /// The weight of the font. This field can have any value that is a multiple of
-    /// `100` between `100` and `900`, inclusive. This range corresponds to the
-    /// numerical values described in the CSS 2.1 Specification,
-    /// [section 15.6](https://www.w3.org/TR/CSS21/fonts.html#font-boldness), with
-    /// non-numerical values disallowed.
-    /// 
-    /// The default value is `400` ("normal").
-    /// 
-    /// The font weight makes up just one component of the rendered font weight.
-    /// The rendered weight is determined by a combination of the `weight` and the
-    /// text style's resolved `bold` value, after accounting for inheritance:
-    /// 
-    /// * If the text is bold and the weight is less than `400`, the rendered
-    ///   weight is 400.
-    /// * If the text is bold and the weight is greater than or equal to `400` but
-    ///   is less than `700`, the rendered weight is `700`.
-    /// * If the weight is greater than or equal to `700`, the rendered weight is
-    ///   equal to the weight.
-    /// * If the text is not bold, the rendered weight is equal to the weight.
-    pub weight: Option<i32>,
-}
-
-impl Part for WeightedFontFamily {}
-
-
 /// A ParagraphElement representing a
 /// column break. A column break makes the subsequent text start at the top of
 /// the next column.
@@ -604,30 +478,6 @@ pub struct ColumnBreak {
 impl Part for ColumnBreak {}
 
 
-/// A mask that indicates which of the fields on the base EmbeddedObjectBorder have been changed in this
-/// suggestion. For any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EmbeddedObjectBorderSuggestionState {
-    /// Indicates if there was a suggested change to color.
-    #[serde(rename="colorSuggested")]
-    pub color_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to dash_style.
-    #[serde(rename="dashStyleSuggested")]
-    pub dash_style_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to width.
-    #[serde(rename="widthSuggested")]
-    pub width_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to property_state.
-    #[serde(rename="propertyStateSuggested")]
-    pub property_state_suggested: Option<bool>,
-}
-
-impl Part for EmbeddedObjectBorderSuggestionState {}
-
-
 /// Replaces all instances of text matching a criteria with replace text.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -643,29 +493,6 @@ pub struct ReplaceAllTextRequest {
 }
 
 impl Part for ReplaceAllTextRequest {}
-
-
-/// A StructuralElement representing
-/// a table of contents.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableOfContents {
-    /// The content of the table of contents.
-    pub content: Option<Vec<StructuralElement>>,
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this content.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The suggested insertion IDs. A TableOfContents may have multiple insertion IDs if it
-    /// is a nested suggested change. If empty, then this is not a suggested
-    /// insertion.
-    #[serde(rename="suggestedInsertionIds")]
-    pub suggested_insertion_ids: Option<Vec<String>>,
-}
-
-impl Part for TableOfContents {}
 
 
 /// The crop properties of an image.
@@ -711,52 +538,6 @@ pub struct CropProperties {
 impl Part for CropProperties {}
 
 
-/// Inserts an InlineObject containing an
-/// image at the given location.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InsertInlineImageRequest {
-    /// The size that the image should appear as in the document. This property is
-    /// optional and the final size of the image in the document is determined by
-    /// the following rules:
-    ///  * If neither width nor height is specified, then a default size of the
-    ///  image is calculated based on its resolution.
-    ///  * If one dimension is specified then the other dimension is calculated to
-    ///  preserve the aspect ratio of the image.
-    ///  * If both width and height are specified, the image is scaled to fit
-    ///  within the provided dimensions while maintaining its aspect ratio.
-    #[serde(rename="objectSize")]
-    pub object_size: Option<Size>,
-    /// Inserts the text at the end of a header, footer or the document body.
-    /// 
-    /// Inline images cannot be inserted inside a footnote.
-    #[serde(rename="endOfSegmentLocation")]
-    pub end_of_segment_location: Option<EndOfSegmentLocation>,
-    /// Inserts the image at a specific index in the document.
-    /// 
-    /// The image must be inserted inside the bounds of an existing
-    /// Paragraph. For instance, it cannot be
-    /// inserted at a table's start index (i.e. between the table and its
-    /// preceding paragraph).
-    /// 
-    /// Inline images cannot be inserted inside a footnote or equation.
-    pub location: Option<Location>,
-    /// The image URI.
-    /// 
-    /// The image is fetched once at insertion time and a copy is stored for
-    /// display inside the document. Images must be less than 50MB in size, cannot
-    /// exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format.
-    /// 
-    /// The provided URI can be at most 2 kB in length. The URI itself is saved
-    /// with the image, and exposed via the ImageProperties.content_uri field.
-    pub uri: Option<String>,
-}
-
-impl Part for InsertInlineImageRequest {}
-
-
 /// A Google Docs document.
 /// 
 /// # Activities
@@ -770,43 +551,44 @@ impl Part for InsertInlineImageRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Document {
-    /// The main body of the document.
+    /// Output only. The main body of the document.
     pub body: Option<Body>,
-    /// The style of the document.
+    /// Output only. The style of the document.
     #[serde(rename="documentStyle")]
     pub document_style: Option<DocumentStyle>,
-    /// The suggested changes to the style of the document, keyed by suggestion ID.
+    /// Output only. The suggested changes to the style of the document, keyed by
+    /// suggestion ID.
     #[serde(rename="suggestedDocumentStyleChanges")]
     pub suggested_document_style_changes: Option<HashMap<String, SuggestedDocumentStyle>>,
-    /// The suggested changes to the named styles of the document, keyed by
-    /// suggestion ID.
+    /// Output only. The suggested changes to the named styles of the document,
+    /// keyed by suggestion ID.
     #[serde(rename="suggestedNamedStylesChanges")]
     pub suggested_named_styles_changes: Option<HashMap<String, SuggestedNamedStyles>>,
-    /// The lists in the document, keyed by list ID.
+    /// Output only. The lists in the document, keyed by list ID.
     pub lists: Option<HashMap<String, List>>,
-    /// The footers in the document, keyed by footer ID.
+    /// Output only. The footers in the document, keyed by footer ID.
     pub footers: Option<HashMap<String, Footer>>,
-    /// The suggestions view mode applied to the document.
+    /// Output only. The suggestions view mode applied to the document.
     /// 
     /// Note: When editing a document, changes must be based on a document with
     /// SUGGESTIONS_INLINE.
     #[serde(rename="suggestionsViewMode")]
     pub suggestions_view_mode: Option<String>,
-    /// The positioned objects in the document, keyed by object ID.
+    /// Output only. The positioned objects in the document, keyed by object ID.
     #[serde(rename="positionedObjects")]
     pub positioned_objects: Option<HashMap<String, PositionedObject>>,
-    /// The named ranges in the document, keyed by name.
+    /// Output only. The named ranges in the document, keyed by name.
     #[serde(rename="namedRanges")]
     pub named_ranges: Option<HashMap<String, NamedRanges>>,
-    /// The ID of the document.
+    /// Output only. The ID of the document.
     #[serde(rename="documentId")]
     pub document_id: Option<String>,
     /// The title of the document.
     pub title: Option<String>,
-    /// The revision ID of the document. Can be used in update requests to specify
-    /// which revision of a document to apply updates to and how the request should
-    /// behave if the document has been edited since that revision. Only populated
-    /// if the user has edit access to the document.
+    /// Output only. The revision ID of the document. Can be used in update
+    /// requests to specify which revision of a document to apply updates to and
+    /// how the request should behave if the document has been edited since that
+    /// revision. Only populated if the user has edit access to the document.
     /// 
     /// The format of the revision ID may change over time, so it should be treated
     /// opaquely. A returned revision ID is only guaranteed to be valid for 24
@@ -817,14 +599,14 @@ pub struct Document {
     /// internal factors such as ID format changes.
     #[serde(rename="revisionId")]
     pub revision_id: Option<String>,
-    /// The headers in the document, keyed by header ID.
+    /// Output only. The headers in the document, keyed by header ID.
     pub headers: Option<HashMap<String, Header>>,
-    /// The footnotes in the document, keyed by footnote ID.
+    /// Output only. The footnotes in the document, keyed by footnote ID.
     pub footnotes: Option<HashMap<String, Footnote>>,
-    /// The inline objects in the document, keyed by object ID.
+    /// Output only. The inline objects in the document, keyed by object ID.
     #[serde(rename="inlineObjects")]
     pub inline_objects: Option<HashMap<String, InlineObject>>,
-    /// The named styles of the document.
+    /// Output only. The named styles of the document.
     #[serde(rename="namedStyles")]
     pub named_styles: Option<NamedStyles>,
 }
@@ -895,54 +677,6 @@ pub struct FootnoteReference {
 impl Part for FootnoteReference {}
 
 
-/// A mask that indicates which of the fields on the base TableCellStyle have been changed in this suggestion.
-/// For any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableCellStyleSuggestionState {
-    /// Indicates if there was a suggested change to border_bottom.
-    #[serde(rename="borderBottomSuggested")]
-    pub border_bottom_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_right.
-    #[serde(rename="borderRightSuggested")]
-    pub border_right_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to padding_bottom.
-    #[serde(rename="paddingBottomSuggested")]
-    pub padding_bottom_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to content_alignment.
-    #[serde(rename="contentAlignmentSuggested")]
-    pub content_alignment_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to padding_left.
-    #[serde(rename="paddingLeftSuggested")]
-    pub padding_left_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_left.
-    #[serde(rename="borderLeftSuggested")]
-    pub border_left_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_top.
-    #[serde(rename="borderTopSuggested")]
-    pub border_top_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to column_span.
-    #[serde(rename="columnSpanSuggested")]
-    pub column_span_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to padding_right.
-    #[serde(rename="paddingRightSuggested")]
-    pub padding_right_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to background_color.
-    #[serde(rename="backgroundColorSuggested")]
-    pub background_color_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to row_span.
-    #[serde(rename="rowSpanSuggested")]
-    pub row_span_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to padding_top.
-    #[serde(rename="paddingTopSuggested")]
-    pub padding_top_suggested: Option<bool>,
-}
-
-impl Part for TableCellStyleSuggestionState {}
-
-
 /// The document body.
 /// 
 /// The body typically contains the full document contents except for
@@ -981,88 +715,6 @@ pub struct BatchUpdateDocumentRequest {
 }
 
 impl RequestValue for BatchUpdateDocumentRequest {}
-
-
-/// A single response from an update.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Response {
-    /// The result of creating a named range.
-    #[serde(rename="createNamedRange")]
-    pub create_named_range: Option<CreateNamedRangeResponse>,
-    /// The result of inserting an inline Google Sheets chart.
-    #[serde(rename="insertInlineSheetsChart")]
-    pub insert_inline_sheets_chart: Option<InsertInlineSheetsChartResponse>,
-    /// The result of replacing text.
-    #[serde(rename="replaceAllText")]
-    pub replace_all_text: Option<ReplaceAllTextResponse>,
-    /// The result of inserting an inline image.
-    #[serde(rename="insertInlineImage")]
-    pub insert_inline_image: Option<InsertInlineImageResponse>,
-}
-
-impl Part for Response {}
-
-
-/// A mask that indicates which of the fields on the base DocumentStyle have been changed in this suggestion.
-/// For any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DocumentStyleSuggestionState {
-    /// Indicates if there was a suggested change to margin_bottom.
-    #[serde(rename="marginBottomSuggested")]
-    pub margin_bottom_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to even_page_header_id.
-    #[serde(rename="evenPageHeaderIdSuggested")]
-    pub even_page_header_id_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to first_page_header_id.
-    #[serde(rename="firstPageHeaderIdSuggested")]
-    pub first_page_header_id_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to margin_right.
-    #[serde(rename="marginRightSuggested")]
-    pub margin_right_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to page_number_start.
-    #[serde(rename="pageNumberStartSuggested")]
-    pub page_number_start_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to default_header_id.
-    #[serde(rename="defaultHeaderIdSuggested")]
-    pub default_header_id_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to default_footer_id.
-    #[serde(rename="defaultFooterIdSuggested")]
-    pub default_footer_id_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to margin_left.
-    #[serde(rename="marginLeftSuggested")]
-    pub margin_left_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to margin_top.
-    #[serde(rename="marginTopSuggested")]
-    pub margin_top_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to first_page_footer_id.
-    #[serde(rename="firstPageFooterIdSuggested")]
-    pub first_page_footer_id_suggested: Option<bool>,
-    /// A mask that indicates which of the fields in size have been changed in this
-    /// suggestion.
-    #[serde(rename="pageSizeSuggestionState")]
-    pub page_size_suggestion_state: Option<SizeSuggestionState>,
-    /// Indicates if there was a suggested change to use_first_page_header_footer.
-    #[serde(rename="useFirstPageHeaderFooterSuggested")]
-    pub use_first_page_header_footer_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to even_page_footer_id.
-    #[serde(rename="evenPageFooterIdSuggested")]
-    pub even_page_footer_id_suggested: Option<bool>,
-    /// A mask that indicates which of the fields in background have been changed in this
-    /// suggestion.
-    #[serde(rename="backgroundSuggestionState")]
-    pub background_suggestion_state: Option<BackgroundSuggestionState>,
-    /// Indicates if there was a suggested change to use_even_page_header_footer.
-    #[serde(rename="useEvenPageHeaderFooterSuggested")]
-    pub use_even_page_header_footer_suggested: Option<bool>,
-}
-
-impl Part for DocumentStyleSuggestionState {}
 
 
 /// A mask that indicates which of the fields on the base SheetsChartReference have been changed in this
@@ -1117,98 +769,6 @@ pub struct ParagraphBorder {
 }
 
 impl Part for ParagraphBorder {}
-
-
-/// The result of inserting an embedded Google Sheets chart.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InsertInlineSheetsChartResponse {
-    /// The object ID of the inserted chart.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
-}
-
-impl Part for InsertInlineSheetsChartResponse {}
-
-
-/// The positioning of a PositionedObject. The positioned object is positioned
-/// relative to the beginning of the Paragraph
-/// it is tethered to.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PositionedObjectPositioning {
-    /// The offset of the left edge of the positioned object relative to the
-    /// beginning of the Paragraph it is tethered
-    /// to. The exact positioning of the object can depend on other content in the
-    /// document and the document's styling.
-    #[serde(rename="leftOffset")]
-    pub left_offset: Option<Dimension>,
-    /// The offset of the top edge of the positioned object relative to the
-    /// beginning of the Paragraph it is tethered
-    /// to. The exact positioning of the object can depend on other content in the
-    /// document and the document's styling.
-    #[serde(rename="topOffset")]
-    pub top_offset: Option<Dimension>,
-    /// The layout of this positioned object.
-    pub layout: Option<String>,
-}
-
-impl Part for PositionedObjectPositioning {}
-
-
-/// The style of a TableCell.
-/// 
-/// Inherited table cell styles are represented as unset fields in this message.
-/// A table cell style can inherit from the table's style.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableCellStyle {
-    /// The bottom padding of the cell.
-    #[serde(rename="paddingBottom")]
-    pub padding_bottom: Option<Dimension>,
-    /// The bottom border of the cell.
-    #[serde(rename="borderBottom")]
-    pub border_bottom: Option<TableCellBorder>,
-    /// The top padding of the cell.
-    #[serde(rename="paddingTop")]
-    pub padding_top: Option<Dimension>,
-    /// The row span of the cell. This property is read-only.
-    #[serde(rename="rowSpan")]
-    pub row_span: Option<i32>,
-    /// The column span of the cell. This property is read-only.
-    #[serde(rename="columnSpan")]
-    pub column_span: Option<i32>,
-    /// The background color of the cell.
-    #[serde(rename="backgroundColor")]
-    pub background_color: Option<OptionalColor>,
-    /// The right border of the cell.
-    #[serde(rename="borderRight")]
-    pub border_right: Option<TableCellBorder>,
-    /// The left padding of the cell.
-    #[serde(rename="paddingLeft")]
-    pub padding_left: Option<Dimension>,
-    /// The top border of the cell.
-    #[serde(rename="borderTop")]
-    pub border_top: Option<TableCellBorder>,
-    /// The right padding of the cell.
-    #[serde(rename="paddingRight")]
-    pub padding_right: Option<Dimension>,
-    /// The left border of the cell.
-    #[serde(rename="borderLeft")]
-    pub border_left: Option<TableCellBorder>,
-    /// The alignment of the content in the table cell. The default alignment
-    /// matches the alignment for newly created table cells in the Docs editor.
-    #[serde(rename="contentAlignment")]
-    pub content_alignment: Option<String>,
-}
-
-impl Part for TableCellStyle {}
 
 
 /// A ParagraphElement representing a
@@ -1306,47 +866,6 @@ pub struct StructuralElement {
 impl Part for StructuralElement {}
 
 
-/// Inserts an empty row into a table.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InsertTableRowRequest {
-    /// The reference table cell location from which rows will be inserted.
-    /// 
-    /// A new row will be inserted above (or below) the row where the reference
-    /// cell is. If the reference cell is a merged cell, a new row will be
-    /// inserted above (or below) the merged cell.
-    #[serde(rename="tableCellLocation")]
-    pub table_cell_location: Option<TableCellLocation>,
-    /// Whether to insert new row below the reference cell location.
-    /// 
-    /// - `True`: insert below the cell.
-    /// - `False`: insert above the cell.
-    #[serde(rename="insertBelow")]
-    pub insert_below: Option<bool>,
-}
-
-impl Part for InsertTableRowRequest {}
-
-
-/// A collection of all the NamedRanges in the
-/// document that share a given name.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NamedRanges {
-    /// The NamedRanges that share the same name.
-    #[serde(rename="namedRanges")]
-    pub named_ranges: Option<Vec<NamedRange>>,
-    /// The name that all the named ranges share.
-    pub name: Option<String>,
-}
-
-impl Part for NamedRanges {}
-
-
 /// A suggested change to a TableCellStyle.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1367,38 +886,6 @@ pub struct SuggestedTableCellStyle {
 impl Part for SuggestedTableCellStyle {}
 
 
-/// A ParagraphElement representing a
-/// page break. A page break makes the subsequent text start at the top of the
-/// next page.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PageBreak {
-    /// The text style of this PageBreak.
-    /// 
-    /// Similar to text content, like text runs and footnote references, the text
-    /// style of a page break can affect content layout as well as the styling of
-    /// text inserted adjacent to it.
-    #[serde(rename="textStyle")]
-    pub text_style: Option<TextStyle>,
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this content.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The suggested text style changes to this PageBreak, keyed by suggestion ID.
-    #[serde(rename="suggestedTextStyleChanges")]
-    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
-    /// The suggested insertion IDs. A PageBreak
-    /// may have multiple insertion IDs if it is a nested suggested change. If
-    /// empty, then this is not a suggested insertion.
-    #[serde(rename="suggestedInsertionIds")]
-    pub suggested_insertion_ids: Option<Vec<String>>,
-}
-
-impl Part for PageBreak {}
-
-
 /// A mask that indicates which of the fields on the base ListProperties have been changed in this suggestion.
 /// For any field set to true, there is a new suggested value.
 /// 
@@ -1417,198 +904,6 @@ pub struct ListPropertiesSuggestionState {
 }
 
 impl Part for ListPropertiesSuggestionState {}
-
-
-/// A StructuralElement representing a
-/// section break. A section is a range of content which has the same
-/// SectionStyle. A section break represents
-/// the start of a new section, and the section style applies to the section
-/// after the section break.
-/// 
-/// The document body always begins with a section break.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SectionBreak {
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this content.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The style of the section after this section break.
-    #[serde(rename="sectionStyle")]
-    pub section_style: Option<SectionStyle>,
-    /// The suggested insertion IDs. A SectionBreak may have multiple insertion IDs if it is
-    /// a nested suggested change. If empty, then this is not a suggested
-    /// insertion.
-    #[serde(rename="suggestedInsertionIds")]
-    pub suggested_insertion_ids: Option<Vec<String>>,
-}
-
-impl Part for SectionBreak {}
-
-
-/// Represents the background of a document.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Background {
-    /// The background color.
-    pub color: Option<OptionalColor>,
-}
-
-impl Part for Background {}
-
-
-/// Describes the bullet of a paragraph.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Bullet {
-    /// The nesting level of this paragraph in the list.
-    #[serde(rename="nestingLevel")]
-    pub nesting_level: Option<i32>,
-    /// The ID of the list this paragraph belongs to.
-    #[serde(rename="listId")]
-    pub list_id: Option<String>,
-    /// The paragraph specific text style applied to this bullet.
-    #[serde(rename="textStyle")]
-    pub text_style: Option<TextStyle>,
-}
-
-impl Part for Bullet {}
-
-
-/// A document footer.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Footer {
-    /// The contents of the footer.
-    /// 
-    /// The indexes for a footer's content begin at zero.
-    pub content: Option<Vec<StructuralElement>>,
-    /// The ID of the footer.
-    #[serde(rename="footerId")]
-    pub footer_id: Option<String>,
-}
-
-impl Part for Footer {}
-
-
-/// Deletes a NamedRange.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteNamedRangeRequest {
-    /// The ID of the named range to delete.
-    #[serde(rename="namedRangeId")]
-    pub named_range_id: Option<String>,
-    /// The name of the range(s) to delete. All named ranges with the given
-    /// name will be deleted.
-    pub name: Option<String>,
-}
-
-impl Part for DeleteNamedRangeRequest {}
-
-
-/// An object that appears inline with text. An InlineObject contains
-/// an EmbeddedObject such as an image.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InlineObject {
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this content.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The properties of this inline object.
-    #[serde(rename="inlineObjectProperties")]
-    pub inline_object_properties: Option<InlineObjectProperties>,
-    /// The suggested changes to the inline object properties, keyed by suggestion
-    /// ID.
-    #[serde(rename="suggestedInlineObjectPropertiesChanges")]
-    pub suggested_inline_object_properties_changes: Option<HashMap<String, SuggestedInlineObjectProperties>>,
-    /// The ID of this inline object.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
-    /// The suggested insertion ID. If empty, then this is not a suggested
-    /// insertion.
-    #[serde(rename="suggestedInsertionId")]
-    pub suggested_insertion_id: Option<String>,
-}
-
-impl Part for InlineObject {}
-
-
-/// A mask that indicates which of the fields on the base NestingLevel have been changed in this suggestion. For
-/// any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NestingLevelSuggestionState {
-    /// A mask that indicates which of the fields in text style have been changed in this
-    /// suggestion.
-    #[serde(rename="textStyleSuggestionState")]
-    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
-    /// Indicates if there was a suggested change to
-    /// glyph_format.
-    #[serde(rename="glyphFormatSuggested")]
-    pub glyph_format_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to
-    /// indent_start.
-    #[serde(rename="indentStartSuggested")]
-    pub indent_start_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to
-    /// start_number.
-    #[serde(rename="startNumberSuggested")]
-    pub start_number_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to
-    /// glyph_type.
-    #[serde(rename="glyphTypeSuggested")]
-    pub glyph_type_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to
-    /// indent_first_line.
-    #[serde(rename="indentFirstLineSuggested")]
-    pub indent_first_line_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to
-    /// glyph_symbol.
-    #[serde(rename="glyphSymbolSuggested")]
-    pub glyph_symbol_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to
-    /// bullet_alignment.
-    #[serde(rename="bulletAlignmentSuggested")]
-    pub bullet_alignment_suggested: Option<bool>,
-}
-
-impl Part for NestingLevelSuggestionState {}
-
-
-/// A suggested change to a
-/// ParagraphStyle.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SuggestedParagraphStyle {
-    /// A mask that indicates which of the fields on the base ParagraphStyle have been changed in this suggestion.
-    #[serde(rename="paragraphStyleSuggestionState")]
-    pub paragraph_style_suggestion_state: Option<ParagraphStyleSuggestionState>,
-    /// A ParagraphStyle that only includes
-    /// the changes made in this suggestion. This can be used along with the
-    /// paragraph_suggestion_state
-    /// to see which fields have changed and their new values.
-    #[serde(rename="paragraphStyle")]
-    pub paragraph_style: Option<ParagraphStyle>,
-}
-
-impl Part for SuggestedParagraphStyle {}
 
 
 /// A StructuralElement representing a
@@ -1646,42 +941,28 @@ pub struct Paragraph {
 impl Part for Paragraph {}
 
 
-/// A named style. Paragraphs in the document can inherit their
-/// TextStyle and
-/// ParagraphStyle from this named style
-/// when they have the same named style type.
+/// Inserts an empty column into a table.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NamedStyle {
-    /// The text style of this named style.
-    #[serde(rename="textStyle")]
-    pub text_style: Option<TextStyle>,
-    /// The type of this named style.
-    #[serde(rename="namedStyleType")]
-    pub named_style_type: Option<String>,
-    /// The paragraph style of this named style.
-    #[serde(rename="paragraphStyle")]
-    pub paragraph_style: Option<ParagraphStyle>,
+pub struct InsertTableColumnRequest {
+    /// Whether to insert new column to the right of the reference cell location.
+    /// 
+    /// - `True`: insert to the right.
+    /// - `False`: insert to the left.
+    #[serde(rename="insertRight")]
+    pub insert_right: Option<bool>,
+    /// The reference table cell location from which columns will be inserted.
+    /// 
+    /// A new column will be inserted to the left (or right) of the column where
+    /// the reference cell is. If the reference cell is a merged cell, a new
+    /// column will be inserted to the left (or right) of the merged cell.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
 }
 
-impl Part for NamedStyle {}
-
-
-/// A mask that indicates which of the fields on the base TableRowStyle have been changed in this suggestion.
-/// For any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableRowStyleSuggestionState {
-    /// Indicates if there was a suggested change to min_row_height.
-    #[serde(rename="minRowHeightSuggested")]
-    pub min_row_height_suggested: Option<bool>,
-}
-
-impl Part for TableRowStyleSuggestionState {}
+impl Part for InsertTableColumnRequest {}
 
 
 /// A reference to the external linked source content.
@@ -1696,60 +977,6 @@ pub struct LinkedContentReference {
 }
 
 impl Part for LinkedContentReference {}
-
-
-/// Location of a single cell within a table.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableCellLocation {
-    /// The zero-based row index. For example, the second row in the table has a
-    /// row index of 1.
-    #[serde(rename="rowIndex")]
-    pub row_index: Option<i32>,
-    /// The zero-based column index. For example, the second column in the table
-    /// has a column index of 1.
-    #[serde(rename="columnIndex")]
-    pub column_index: Option<i32>,
-    /// The location where the table starts in the document.
-    #[serde(rename="tableStartLocation")]
-    pub table_start_location: Option<Location>,
-}
-
-impl Part for TableCellLocation {}
-
-
-/// A collection of Ranges with the same named range
-/// ID.
-/// 
-/// Named ranges allow developers to associate parts of a document with an
-/// arbitrary user-defined label so their contents can be programmatically read
-/// or edited at a later time. A document can contain multiple named ranges with
-/// the same name, but every named range has a unique ID.
-/// 
-/// A named range is created with a single Range,
-/// and content inserted inside a named range generally expands that range.
-/// However, certain document changes can cause the range to be split into
-/// multiple ranges.
-/// 
-/// Named ranges are not private. All applications and collaborators that have
-/// access to the document can see its named ranges.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NamedRange {
-    /// The ranges that belong to this named range.
-    pub ranges: Option<Vec<Range>>,
-    /// The ID of the named range.
-    #[serde(rename="namedRangeId")]
-    pub named_range_id: Option<String>,
-    /// The name of the named range.
-    pub name: Option<String>,
-}
-
-impl Part for NamedRange {}
 
 
 /// The named styles. Paragraphs in the document can inherit their
@@ -1894,24 +1121,6 @@ pub struct ReplaceAllTextResponse {
 impl Part for ReplaceAllTextResponse {}
 
 
-/// A document footnote.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Footnote {
-    /// The contents of the footnote.
-    /// 
-    /// The indexes for a footnote's content begin at zero.
-    pub content: Option<Vec<StructuralElement>>,
-    /// The ID of the footnote.
-    #[serde(rename="footnoteId")]
-    pub footnote_id: Option<String>,
-}
-
-impl Part for Footnote {}
-
-
 /// Inserts a table at the specified location.
 /// 
 /// A newline character will be inserted before the inserted table.
@@ -1947,91 +1156,6 @@ pub struct InsertTableRequest {
 impl Part for InsertTableRequest {}
 
 
-/// A solid color.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Color {
-    /// The RGB color value.
-    #[serde(rename="rgbColor")]
-    pub rgb_color: Option<RgbColor>,
-}
-
-impl Part for Color {}
-
-
-/// The style of the document.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DocumentStyle {
-    /// The ID of the default footer. If not set, there is no default footer.
-    #[serde(rename="defaultFooterId")]
-    pub default_footer_id: Option<String>,
-    /// The ID of the footer used only for even pages. The value of
-    /// use_even_page_header_footer determines
-    /// whether to use the default_footer_id or this value for the
-    /// footer on even pages. If not set, there is no even page footer.
-    #[serde(rename="evenPageFooterId")]
-    pub even_page_footer_id: Option<String>,
-    /// The ID of the footer used only for the first page. If not set then
-    /// a unique footer for the first page does not exist. The value of
-    /// use_first_page_header_footer determines
-    /// whether to use the default_footer_id or this value for the
-    /// footer on the first page. If not set, there is no first page footer.
-    #[serde(rename="firstPageFooterId")]
-    pub first_page_footer_id: Option<String>,
-    /// The size of a page in the document.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<Size>,
-    /// The ID of the default header. If not set, there is no default header.
-    #[serde(rename="defaultHeaderId")]
-    pub default_header_id: Option<String>,
-    /// The bottom page margin.
-    #[serde(rename="marginBottom")]
-    pub margin_bottom: Option<Dimension>,
-    /// The ID of the header used only for the first page. If not set then
-    /// a unique header for the first page does not exist.
-    /// The value of use_first_page_header_footer determines
-    /// whether to use the default_header_id or this value for the
-    /// header on the first page. If not set, there is no first page header.
-    #[serde(rename="firstPageHeaderId")]
-    pub first_page_header_id: Option<String>,
-    /// The ID of the header used only for even pages. The value of
-    /// use_even_page_header_footer determines
-    /// whether to use the default_header_id or this value for the
-    /// header on even pages. If not set, there is no even page header.
-    #[serde(rename="evenPageHeaderId")]
-    pub even_page_header_id: Option<String>,
-    /// Indicates whether to use the first page header / footer IDs for the first
-    /// page.
-    #[serde(rename="useFirstPageHeaderFooter")]
-    pub use_first_page_header_footer: Option<bool>,
-    /// The left page margin.
-    #[serde(rename="marginLeft")]
-    pub margin_left: Option<Dimension>,
-    /// Indicates whether to use the even page header / footer IDs for the even
-    /// pages.
-    #[serde(rename="useEvenPageHeaderFooter")]
-    pub use_even_page_header_footer: Option<bool>,
-    /// The background of the document.
-    pub background: Option<Background>,
-    /// The right page margin.
-    #[serde(rename="marginRight")]
-    pub margin_right: Option<Dimension>,
-    /// The page number from which to start counting the number of pages.
-    #[serde(rename="pageNumberStart")]
-    pub page_number_start: Option<i32>,
-    /// The top page margin.
-    #[serde(rename="marginTop")]
-    pub margin_top: Option<Dimension>,
-}
-
-impl Part for DocumentStyle {}
-
-
 /// A ParagraphElement representing a
 /// spot in the text that is dynamically replaced with content that can change
 /// over time, like a page number.
@@ -2061,166 +1185,6 @@ pub struct AutoText {
 }
 
 impl Part for AutoText {}
-
-
-/// Properties of a PositionedObject.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PositionedObjectProperties {
-    /// The positioning of this positioned object relative to the newline of the
-    /// Paragraph that references this positioned
-    /// object.
-    pub positioning: Option<PositionedObjectPositioning>,
-    /// The embedded object of this positioned object.
-    #[serde(rename="embeddedObject")]
-    pub embedded_object: Option<EmbeddedObject>,
-}
-
-impl Part for PositionedObjectProperties {}
-
-
-/// Styles that apply to a whole paragraph.
-/// 
-/// Inherited paragraph styles are represented as unset fields in this message.
-/// A paragraph style's parent depends on where the paragraph style is defined:
-/// 
-///   * The ParagraphStyle on a Paragraph
-///     inherits from the paragraph's corresponding named style type.
-///   * The ParagraphStyle on a named style
-///     inherits from the normal text named style.
-///   * The ParagraphStyle of the normal text named style inherits
-///     from the default paragraph style in the Docs editor.
-///   * The ParagraphStyle on a Paragraph
-///     element that is contained in a table may inherit its paragraph style from
-///     the table style.
-/// 
-/// If the paragraph style does not inherit from a parent, unsetting fields will
-/// revert the style to a value matching the defaults in the Docs editor.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ParagraphStyle {
-    /// The spacing mode for the paragraph.
-    #[serde(rename="spacingMode")]
-    pub spacing_mode: Option<String>,
-    /// The text direction of this paragraph. If unset, the value defaults to
-    /// LEFT_TO_RIGHT since
-    /// paragraph direction is not inherited.
-    pub direction: Option<String>,
-    /// Whether at least a part of this paragraph should be laid out on the same
-    /// page or column as the next paragraph if possible. If unset, the value is
-    /// inherited from the parent.
-    #[serde(rename="keepWithNext")]
-    pub keep_with_next: Option<bool>,
-    /// The amount of space between lines, as a percentage of normal, where normal
-    /// is represented as 100.0. If unset, the value is inherited from the parent.
-    #[serde(rename="lineSpacing")]
-    pub line_spacing: Option<f32>,
-    /// The amount of indentation for the paragraph on the side that corresponds to
-    /// the start of the text, based on the current paragraph direction. If unset,
-    /// the value is inherited from the parent.
-    #[serde(rename="indentStart")]
-    pub indent_start: Option<Dimension>,
-    /// The border at the bottom of this paragraph. If unset, the value is
-    /// inherited from the parent.
-    /// 
-    /// The bottom border is rendered when the paragraph below has different border
-    /// and indent properties.
-    /// 
-    /// Paragraph borders cannot be partially updated. When making
-    /// changes to a paragraph border the new border must be specified in
-    /// its entirety.
-    #[serde(rename="borderBottom")]
-    pub border_bottom: Option<ParagraphBorder>,
-    /// The border to the right of this paragraph. If unset, the value is inherited
-    /// from the parent.
-    /// 
-    /// Paragraph borders cannot be partially updated. When making
-    /// changes to a paragraph border the new border must be specified in
-    /// its entirety.
-    #[serde(rename="borderRight")]
-    pub border_right: Option<ParagraphBorder>,
-    /// The border to the left of this paragraph. If unset, the value is inherited
-    /// from the parent.
-    /// 
-    /// Paragraph borders cannot be partially updated. When making
-    /// changes to a paragraph border the new border must be specified in
-    /// its entirety.
-    #[serde(rename="borderLeft")]
-    pub border_left: Option<ParagraphBorder>,
-    /// The heading ID of the paragraph. If empty, then this paragraph is not a
-    /// heading. This property is read-only.
-    #[serde(rename="headingId")]
-    pub heading_id: Option<String>,
-    /// The shading of the paragraph. If unset, the value is inherited from the
-    /// parent.
-    pub shading: Option<Shading>,
-    /// The border at the top of this paragraph. If unset, the value is inherited
-    /// from the parent.
-    /// 
-    /// The top border is rendered when the paragraph above has different border
-    /// and indent properties.
-    /// 
-    /// Paragraph borders cannot be partially updated. When making
-    /// changes to a paragraph border the new border must be specified in
-    /// its entirety.
-    #[serde(rename="borderTop")]
-    pub border_top: Option<ParagraphBorder>,
-    /// A list of the tab stops for this paragraph. The list of tab stops is not
-    /// inherited. This property is read-only.
-    #[serde(rename="tabStops")]
-    pub tab_stops: Option<Vec<TabStop>>,
-    /// The amount of indentation for the first line of the paragraph. If unset,
-    /// the value is inherited from the parent.
-    #[serde(rename="indentFirstLine")]
-    pub indent_first_line: Option<Dimension>,
-    /// The text alignment for this paragraph.
-    pub alignment: Option<String>,
-    /// The amount of extra space below the paragraph. If unset, the value is
-    /// inherited from the parent.
-    #[serde(rename="spaceBelow")]
-    pub space_below: Option<Dimension>,
-    /// Whether to avoid widows and orphans for the paragraph. If unset, the value
-    /// is inherited from the parent.
-    #[serde(rename="avoidWidowAndOrphan")]
-    pub avoid_widow_and_orphan: Option<bool>,
-    /// The border between this paragraph and the next and previous paragraphs.
-    /// If unset, the value is inherited from the parent.
-    /// 
-    /// The between border is rendered when the adjacent paragraph has the same
-    /// border and indent properties.
-    /// 
-    /// Paragraph borders cannot be partially updated. When making
-    /// changes to a paragraph border the new border must be specified in
-    /// its entirety.
-    #[serde(rename="borderBetween")]
-    pub border_between: Option<ParagraphBorder>,
-    /// The amount of extra space above the paragraph. If unset, the value is
-    /// inherited from the parent.
-    #[serde(rename="spaceAbove")]
-    pub space_above: Option<Dimension>,
-    /// The amount of indentation for the paragraph on the side that corresponds to
-    /// the end of the text, based on the current paragraph direction. If unset,
-    /// the value is inherited from the parent.
-    #[serde(rename="indentEnd")]
-    pub indent_end: Option<Dimension>,
-    /// The named style type of the paragraph.
-    /// 
-    /// Since updating the named style type affects other properties within
-    /// ParagraphStyle, the named style type is applied before the other properties
-    /// are updated.
-    #[serde(rename="namedStyleType")]
-    pub named_style_type: Option<String>,
-    /// Whether all lines of the paragraph should be laid out on the same page or
-    /// column if possible. If unset, the value is inherited from the parent.
-    #[serde(rename="keepLinesTogether")]
-    pub keep_lines_together: Option<bool>,
-}
-
-impl Part for ParagraphStyle {}
 
 
 /// A ParagraphElement that contains
@@ -2257,37 +1221,6 @@ pub struct InlineObjectElement {
 }
 
 impl Part for InlineObjectElement {}
-
-
-/// A mask that indicates which of the fields on the base Background have been changed in this suggestion.
-/// For any field set to true, the Backgound has a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BackgroundSuggestionState {
-    /// Indicates whether the current background color has been modified in this
-    /// suggestion.
-    #[serde(rename="backgroundColorSuggested")]
-    pub background_color_suggested: Option<bool>,
-}
-
-impl Part for BackgroundSuggestionState {}
-
-
-/// A mask that indicates which of the fields on the base Shading have been changed in this
-/// suggested change. For any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ShadingSuggestionState {
-    /// Indicates if there was a suggested change to the Shading.
-    #[serde(rename="backgroundColorSuggested")]
-    pub background_color_suggested: Option<bool>,
-}
-
-impl Part for ShadingSuggestionState {}
 
 
 /// Inserts text at the specified location.
@@ -2454,99 +1387,6 @@ pub struct SizeSuggestionState {
 impl Part for SizeSuggestionState {}
 
 
-/// Creates a NamedRange referencing the given
-/// range.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateNamedRangeRequest {
-    /// The range to apply the name to.
-    pub range: Option<Range>,
-    /// The name of the NamedRange. Names do not need to be unique.
-    /// 
-    /// Names must be at least 1 character and no more than 256 characters,
-    /// measured in UTF-16 code units.
-    pub name: Option<String>,
-}
-
-impl Part for CreateNamedRangeRequest {}
-
-
-/// A collection of object IDs.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ObjectReferences {
-    /// The object IDs.
-    #[serde(rename="objectIds")]
-    pub object_ids: Option<Vec<String>>,
-}
-
-impl Part for ObjectReferences {}
-
-
-/// Properties of an InlineObject.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InlineObjectProperties {
-    /// The embedded object of this inline object.
-    #[serde(rename="embeddedObject")]
-    pub embedded_object: Option<EmbeddedObject>,
-}
-
-impl Part for InlineObjectProperties {}
-
-
-/// Inserts a page break followed by a newline at the specified location.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InsertPageBreakRequest {
-    /// Inserts the page break at the end of the document body.
-    /// 
-    /// Page breaks cannot be inserted inside a footnote, header or footer.
-    /// Since page breaks can only be inserted inside the body, the segment ID field must be
-    /// empty.
-    #[serde(rename="endOfSegmentLocation")]
-    pub end_of_segment_location: Option<EndOfSegmentLocation>,
-    /// Inserts the page break at a specific index in the document.
-    /// 
-    /// The page break must be inserted inside the bounds of an existing
-    /// Paragraph. For instance, it cannot be
-    /// inserted at a table's start index (i.e. between the table and its
-    /// preceding paragraph).
-    /// 
-    /// Page breaks cannot be inserted inside a table, equation, footnote, header
-    /// or footer. Since page breaks can only be inserted inside the body, the
-    /// segment ID field must be
-    /// empty.
-    pub location: Option<Location>,
-}
-
-impl Part for InsertPageBreakRequest {}
-
-
-/// Properties that apply to a section's column.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SectionColumnProperties {
-    /// The width of the column.
-    pub width: Option<Dimension>,
-    /// The padding at the end of the column.
-    #[serde(rename="paddingEnd")]
-    pub padding_end: Option<Dimension>,
-}
-
-impl Part for SectionColumnProperties {}
-
-
 /// A particular location in the document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2565,25 +1405,6 @@ pub struct Location {
 }
 
 impl Part for Location {}
-
-
-/// A criteria that matches a specific string of text in the document.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubstringMatchCriteria {
-    /// The text to search for in the document.
-    pub text: Option<String>,
-    /// Indicates whether the search should respect case:
-    /// 
-    /// - `True`: the search is case sensitive.
-    /// - `False`: the search is case insensitive.
-    #[serde(rename="matchCase")]
-    pub match_case: Option<bool>,
-}
-
-impl Part for SubstringMatchCriteria {}
 
 
 /// Provides control over how write requests are executed.
@@ -2626,40 +1447,6 @@ pub struct WriteControl {
 impl Part for WriteControl {}
 
 
-/// The contents and style of a cell in a Table.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableCell {
-    /// The content of the cell.
-    pub content: Option<Vec<StructuralElement>>,
-    /// The zero-based end index of this cell, exclusive, in UTF-16 code units.
-    #[serde(rename="endIndex")]
-    pub end_index: Option<i32>,
-    /// The zero-based start index of this cell, in UTF-16 code units.
-    #[serde(rename="startIndex")]
-    pub start_index: Option<i32>,
-    /// The style of the cell.
-    #[serde(rename="tableCellStyle")]
-    pub table_cell_style: Option<TableCellStyle>,
-    /// The suggested changes to the table cell style, keyed by suggestion ID.
-    #[serde(rename="suggestedTableCellStyleChanges")]
-    pub suggested_table_cell_style_changes: Option<HashMap<String, SuggestedTableCellStyle>>,
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this content.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The suggested insertion IDs. A TableCell
-    /// may have multiple insertion IDs if it is a nested suggested change. If
-    /// empty, then this is not a suggested insertion.
-    #[serde(rename="suggestedInsertionIds")]
-    pub suggested_insertion_ids: Option<Vec<String>>,
-}
-
-impl Part for TableCell {}
-
-
 /// The properties of an image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2685,8 +1472,6 @@ pub struct ImageProperties {
     /// [-1.0, 1.0], where 0 means no effect.
     pub brightness: Option<f32>,
     /// The crop properties of the image.
-    /// 
-    /// After cropping, the image will be stretched to fit in its container.
     #[serde(rename="cropProperties")]
     pub crop_properties: Option<CropProperties>,
     /// The contrast effect of the image. The value should be in the interval
@@ -2713,124 +1498,6 @@ pub struct Header {
 }
 
 impl Part for Header {}
-
-
-/// A mask that indicates which of the fields on the base ParagraphStyle have been changed in this suggestion.
-/// For any field set to true, there is a new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ParagraphStyleSuggestionState {
-    /// Indicates if there was a suggested change to avoid_widow_and_orphan.
-    #[serde(rename="avoidWidowAndOrphanSuggested")]
-    pub avoid_widow_and_orphan_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_bottom.
-    #[serde(rename="borderBottomSuggested")]
-    pub border_bottom_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to named_style_type.
-    #[serde(rename="namedStyleTypeSuggested")]
-    pub named_style_type_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_between.
-    #[serde(rename="borderBetweenSuggested")]
-    pub border_between_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_top.
-    #[serde(rename="borderTopSuggested")]
-    pub border_top_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to keep_with_next.
-    #[serde(rename="keepWithNextSuggested")]
-    pub keep_with_next_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to space_above.
-    #[serde(rename="spaceAboveSuggested")]
-    pub space_above_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to alignment.
-    #[serde(rename="alignmentSuggested")]
-    pub alignment_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to indent_end.
-    #[serde(rename="indentEndSuggested")]
-    pub indent_end_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to direction.
-    #[serde(rename="directionSuggested")]
-    pub direction_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_right.
-    #[serde(rename="borderRightSuggested")]
-    pub border_right_suggested: Option<bool>,
-    /// A mask that indicates which of the fields in shading have been changed in
-    /// this suggestion.
-    #[serde(rename="shadingSuggestionState")]
-    pub shading_suggestion_state: Option<ShadingSuggestionState>,
-    /// Indicates if there was a suggested change to keep_lines_together.
-    #[serde(rename="keepLinesTogetherSuggested")]
-    pub keep_lines_together_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to line_spacing.
-    #[serde(rename="lineSpacingSuggested")]
-    pub line_spacing_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to spacing_mode.
-    #[serde(rename="spacingModeSuggested")]
-    pub spacing_mode_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to indent_start.
-    #[serde(rename="indentStartSuggested")]
-    pub indent_start_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to space_below.
-    #[serde(rename="spaceBelowSuggested")]
-    pub space_below_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to border_left.
-    #[serde(rename="borderLeftSuggested")]
-    pub border_left_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to indent_first_line.
-    #[serde(rename="indentFirstLineSuggested")]
-    pub indent_first_line_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to heading_id.
-    #[serde(rename="headingIdSuggested")]
-    pub heading_id_suggested: Option<bool>,
-}
-
-impl Part for ParagraphStyleSuggestionState {}
-
-
-/// A tab stop within a paragraph.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TabStop {
-    /// The alignment of this tab stop. If unset, the value defaults to START.
-    pub alignment: Option<String>,
-    /// The offset between this tab stop and the start margin.
-    pub offset: Option<Dimension>,
-}
-
-impl Part for TabStop {}
-
-
-/// Deletes bullets from all of the paragraphs that overlap with the given range.
-/// 
-/// The nesting level of each paragraph will be visually preserved by adding
-/// indent to the start of the corresponding paragraph.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteParagraphBulletsRequest {
-    /// The range to delete bullets from.
-    pub range: Option<Range>,
-}
-
-impl Part for DeleteParagraphBulletsRequest {}
-
-
-/// The result of creating a named range.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateNamedRangeResponse {
-    /// The ID of the created named range.
-    #[serde(rename="namedRangeId")]
-    pub named_range_id: Option<String>,
-}
-
-impl Part for CreateNamedRangeResponse {}
 
 
 /// A reference to another portion of a document or an external URL resource.
@@ -2902,48 +1569,6 @@ pub struct TextRun {
 }
 
 impl Part for TextRun {}
-
-
-/// A suggested change to a TextStyle.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SuggestedTextStyle {
-    /// A TextStyle that only includes
-    /// the changes made in this suggestion. This can be used along with the
-    /// text_style_suggestion_state
-    /// to see which fields have changed and their new values.
-    #[serde(rename="textStyle")]
-    pub text_style: Option<TextStyle>,
-    /// A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion.
-    #[serde(rename="textStyleSuggestionState")]
-    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
-}
-
-impl Part for SuggestedTextStyle {}
-
-
-/// A mask that indicates which of the fields on the base
-/// PositionedObjectProperties
-/// have been changed in this suggestion. For any field set to true, there is a
-/// new suggested value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PositionedObjectPropertiesSuggestionState {
-    /// A mask that indicates which of the fields in positioning have been
-    /// changed in this suggestion.
-    #[serde(rename="positioningSuggestionState")]
-    pub positioning_suggestion_state: Option<PositionedObjectPositioningSuggestionState>,
-    /// A mask that indicates which of the fields in embedded_object have been
-    /// changed in this suggestion.
-    #[serde(rename="embeddedObjectSuggestionState")]
-    pub embedded_object_suggestion_state: Option<EmbeddedObjectSuggestionState>,
-}
-
-impl Part for PositionedObjectPropertiesSuggestionState {}
 
 
 /// A mask that indicates which of the fields on the base
@@ -3133,26 +1758,23 @@ pub struct NestingLevel {
 impl Part for NestingLevel {}
 
 
-/// A suggested change to PositionedObjectProperties.
+/// A criteria that matches a specific string of text in the document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SuggestedPositionedObjectProperties {
-    /// A PositionedObjectProperties that only includes the
-    /// changes made in this suggestion. This can be used along with the
-    /// positioned_object_properties_suggestion_state
-    /// to see which fields have changed and their new values.
-    #[serde(rename="positionedObjectProperties")]
-    pub positioned_object_properties: Option<PositionedObjectProperties>,
-    /// A mask that indicates which of the fields on the base
-    /// PositionedObjectProperties have been changed in this
-    /// suggestion.
-    #[serde(rename="positionedObjectPropertiesSuggestionState")]
-    pub positioned_object_properties_suggestion_state: Option<PositionedObjectPropertiesSuggestionState>,
+pub struct SubstringMatchCriteria {
+    /// The text to search for in the document.
+    pub text: Option<String>,
+    /// Indicates whether the search should respect case:
+    /// 
+    /// - `True`: the search is case sensitive.
+    /// - `False`: the search is case insensitive.
+    #[serde(rename="matchCase")]
+    pub match_case: Option<bool>,
 }
 
-impl Part for SuggestedPositionedObjectProperties {}
+impl Part for SubstringMatchCriteria {}
 
 
 /// A mask that indicates which of the fields on the base ImageProperties have been changed in this suggestion.
@@ -3211,52 +1833,38 @@ pub struct Equation {
 impl Part for Equation {}
 
 
-/// A List represents the list attributes for a group of paragraphs that all
-/// belong to the same list. A paragraph that is part of a list has a reference
-/// to the list's ID in its bullet.
+/// Updates the
+/// TableColumnProperties of columns
+/// in a table.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct List {
-    /// The properties of the list.
-    #[serde(rename="listProperties")]
-    pub list_properties: Option<ListProperties>,
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this list.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The suggested changes to the list properties, keyed by suggestion
-    /// ID.
-    #[serde(rename="suggestedListPropertiesChanges")]
-    pub suggested_list_properties_changes: Option<HashMap<String, SuggestedListProperties>>,
-    /// The suggested insertion ID. If empty, then this is not a suggested
-    /// insertion.
-    #[serde(rename="suggestedInsertionId")]
-    pub suggested_insertion_id: Option<String>,
-}
-
-impl Part for List {}
-
-
-/// The properties of a list which describe the look
-/// and feel of bullets belonging to paragraphs associated with a list.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListProperties {
-    /// Describes the properties of the bullets at the associated level.
+pub struct UpdateTableColumnPropertiesRequest {
+    /// The list of zero-based column indices whose property should be updated. If
+    /// no indices are specified, all columns will be updated.
+    #[serde(rename="columnIndices")]
+    pub column_indices: Option<Vec<i32>>,
+    /// The fields that should be updated.
     /// 
-    /// A list has at most nine levels of nesting with nesting level 0
-    /// corresponding to the top-most level and nesting level 8 corresponding to
-    /// the most nested level. The nesting levels are returned in ascending order
-    /// with the least nested returned first.
-    #[serde(rename="nestingLevels")]
-    pub nesting_levels: Option<Vec<NestingLevel>>,
+    /// At least one field must be specified. The root `tableColumnProperties` is
+    /// implied and should not be specified. A single `"*"` can be used as
+    /// short-hand for listing every field.
+    /// 
+    /// For example to update the column width, set `fields` to `"width"`.
+    pub fields: Option<String>,
+    /// The table column properties to update.
+    /// 
+    /// If the value of `table_column_properties#width` is less than 5 points
+    /// (5/72 inch), a 400 bad request error is returned.
+    #[serde(rename="tableColumnProperties")]
+    pub table_column_properties: Option<TableColumnProperties>,
+    /// The location where the table starts in the document.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
 }
 
-impl Part for ListProperties {}
+impl Part for UpdateTableColumnPropertiesRequest {}
 
 
 /// Location at the end of a body, header, footer or footnote. The location is
@@ -3275,116 +1883,72 @@ pub struct EndOfSegmentLocation {
 impl Part for EndOfSegmentLocation {}
 
 
-/// A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion.
-/// For any field set to true, there is a new suggested value.
+/// A single update to apply to a document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TextStyleSuggestionState {
-    /// Indicates if there was a suggested change to font_size.
-    #[serde(rename="fontSizeSuggested")]
-    pub font_size_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to strikethrough.
-    #[serde(rename="strikethroughSuggested")]
-    pub strikethrough_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to weighted_font_family.
-    #[serde(rename="weightedFontFamilySuggested")]
-    pub weighted_font_family_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to underline.
-    #[serde(rename="underlineSuggested")]
-    pub underline_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to small_caps.
-    #[serde(rename="smallCapsSuggested")]
-    pub small_caps_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to link.
-    #[serde(rename="linkSuggested")]
-    pub link_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to italic.
-    #[serde(rename="italicSuggested")]
-    pub italic_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to bold.
-    #[serde(rename="boldSuggested")]
-    pub bold_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to baseline_offset.
-    #[serde(rename="baselineOffsetSuggested")]
-    pub baseline_offset_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to foreground_color.
-    #[serde(rename="foregroundColorSuggested")]
-    pub foreground_color_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to background_color.
-    #[serde(rename="backgroundColorSuggested")]
-    pub background_color_suggested: Option<bool>,
+pub struct Request {
+    /// Inserts text at the specified location.
+    #[serde(rename="insertText")]
+    pub insert_text: Option<InsertTextRequest>,
+    /// Creates bullets for paragraphs.
+    #[serde(rename="createParagraphBullets")]
+    pub create_paragraph_bullets: Option<CreateParagraphBulletsRequest>,
+    /// Updates the row style in a table.
+    #[serde(rename="updateTableRowStyle")]
+    pub update_table_row_style: Option<UpdateTableRowStyleRequest>,
+    /// Updates the paragraph style at the specified range.
+    #[serde(rename="updateParagraphStyle")]
+    pub update_paragraph_style: Option<UpdateParagraphStyleRequest>,
+    /// Replaces all instances of the specified text.
+    #[serde(rename="replaceAllText")]
+    pub replace_all_text: Option<ReplaceAllTextRequest>,
+    /// Inserts an empty column into a table.
+    #[serde(rename="insertTableColumn")]
+    pub insert_table_column: Option<InsertTableColumnRequest>,
+    /// Deletes a row from a table.
+    #[serde(rename="deleteTableRow")]
+    pub delete_table_row: Option<DeleteTableRowRequest>,
+    /// Inserts a page break at the specified location.
+    #[serde(rename="insertPageBreak")]
+    pub insert_page_break: Option<InsertPageBreakRequest>,
+    /// Creates a named range.
+    #[serde(rename="createNamedRange")]
+    pub create_named_range: Option<CreateNamedRangeRequest>,
+    /// Updates the properties of columns in a table.
+    #[serde(rename="updateTableColumnProperties")]
+    pub update_table_column_properties: Option<UpdateTableColumnPropertiesRequest>,
+    /// Deletes content from the document.
+    #[serde(rename="deleteContentRange")]
+    pub delete_content_range: Option<DeleteContentRangeRequest>,
+    /// Deletes bullets from paragraphs.
+    #[serde(rename="deleteParagraphBullets")]
+    pub delete_paragraph_bullets: Option<DeleteParagraphBulletsRequest>,
+    /// Deletes a named range.
+    #[serde(rename="deleteNamedRange")]
+    pub delete_named_range: Option<DeleteNamedRangeRequest>,
+    /// Inserts a table at the specified location.
+    #[serde(rename="insertTable")]
+    pub insert_table: Option<InsertTableRequest>,
+    /// Inserts an empty row into a table.
+    #[serde(rename="insertTableRow")]
+    pub insert_table_row: Option<InsertTableRowRequest>,
+    /// Updates the text style at the specified range.
+    #[serde(rename="updateTextStyle")]
+    pub update_text_style: Option<UpdateTextStyleRequest>,
+    /// Deletes a positioned object from the document.
+    #[serde(rename="deletePositionedObject")]
+    pub delete_positioned_object: Option<DeletePositionedObjectRequest>,
+    /// Deletes a column from a table.
+    #[serde(rename="deleteTableColumn")]
+    pub delete_table_column: Option<DeleteTableColumnRequest>,
+    /// Inserts an inline image at the specified location.
+    #[serde(rename="insertInlineImage")]
+    pub insert_inline_image: Option<InsertInlineImageRequest>,
 }
 
-impl Part for TextStyleSuggestionState {}
-
-
-/// An embedded object in the document.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EmbeddedObject {
-    /// The properties of an image.
-    #[serde(rename="imageProperties")]
-    pub image_properties: Option<ImageProperties>,
-    /// The description of the embedded object. The `title` and `description` are
-    /// both combined to display alt text.
-    pub description: Option<String>,
-    /// The title of the embedded object. The `title` and `description` are both
-    /// combined to display alt text.
-    pub title: Option<String>,
-    /// The properties of an embedded drawing.
-    #[serde(rename="embeddedDrawingProperties")]
-    pub embedded_drawing_properties: Option<EmbeddedDrawingProperties>,
-    /// The bottom margin of the embedded object.
-    #[serde(rename="marginBottom")]
-    pub margin_bottom: Option<Dimension>,
-    /// The border of the embedded object.
-    #[serde(rename="embeddedObjectBorder")]
-    pub embedded_object_border: Option<EmbeddedObjectBorder>,
-    /// A reference to the external linked source content. For example, it contains
-    /// a reference to the source Sheets chart when the embedded object is a linked
-    /// chart.
-    /// 
-    /// If unset, then the embedded object is not linked.
-    #[serde(rename="linkedContentReference")]
-    pub linked_content_reference: Option<LinkedContentReference>,
-    /// The left margin of the embedded object.
-    #[serde(rename="marginLeft")]
-    pub margin_left: Option<Dimension>,
-    /// The right margin of the embedded object.
-    #[serde(rename="marginRight")]
-    pub margin_right: Option<Dimension>,
-    /// The top margin of the embedded object.
-    #[serde(rename="marginTop")]
-    pub margin_top: Option<Dimension>,
-    /// The size of the embedded object.
-    pub size: Option<Size>,
-}
-
-impl Part for EmbeddedObject {}
-
-
-/// A suggested change to the NamedStyles.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SuggestedNamedStyles {
-    /// A mask that indicates which of the fields on the base NamedStyles have been changed in this suggestion.
-    #[serde(rename="namedStylesSuggestionState")]
-    pub named_styles_suggestion_state: Option<NamedStylesSuggestionState>,
-    /// A NamedStyles that only includes the
-    /// changes made in this suggestion. This can be used along with the
-    /// named_styles_suggestion_state to
-    /// see which fields have changed and their new values.
-    #[serde(rename="namedStyles")]
-    pub named_styles: Option<NamedStyles>,
-}
-
-impl Part for SuggestedNamedStyles {}
+impl Part for Request {}
 
 
 /// The result of inserting an inline image.
@@ -3436,28 +2000,6 @@ pub struct Dimension {
 impl Part for Dimension {}
 
 
-/// A suggested change to InlineObjectProperties.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SuggestedInlineObjectProperties {
-    /// An InlineObjectProperties
-    /// that only includes the changes made in this suggestion. This can be used
-    /// along with the inline_object_properties_suggestion_state
-    /// to see which fields have changed and their new values.
-    #[serde(rename="inlineObjectProperties")]
-    pub inline_object_properties: Option<InlineObjectProperties>,
-    /// A mask that indicates which of the fields on the base
-    /// InlineObjectProperties have
-    /// been changed in this suggestion.
-    #[serde(rename="inlineObjectPropertiesSuggestionState")]
-    pub inline_object_properties_suggestion_state: Option<InlineObjectPropertiesSuggestionState>,
-}
-
-impl Part for SuggestedInlineObjectProperties {}
-
-
 /// A mask that indicates which of the fields on the base
 /// LinkedContentReference have
 /// been changed in this suggestion. For any field set to true, there is a new
@@ -3476,78 +2018,75 @@ pub struct LinkedContentReferenceSuggestionState {
 impl Part for LinkedContentReferenceSuggestionState {}
 
 
-/// A ParagraphElement describes content within a
-/// Paragraph.
+/// The style of the document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ParagraphElement {
-    /// The zero-base end index of this paragraph element, exclusive, in UTF-16
-    /// code units.
-    #[serde(rename="endIndex")]
-    pub end_index: Option<i32>,
-    /// An equation paragraph element.
-    pub equation: Option<Equation>,
-    /// A column break paragraph element.
-    #[serde(rename="columnBreak")]
-    pub column_break: Option<ColumnBreak>,
-    /// The zero-based start index of this paragraph element, in UTF-16 code units.
-    #[serde(rename="startIndex")]
-    pub start_index: Option<i32>,
-    /// A page break paragraph element.
-    #[serde(rename="pageBreak")]
-    pub page_break: Option<PageBreak>,
-    /// A horizontal rule paragraph element.
-    #[serde(rename="horizontalRule")]
-    pub horizontal_rule: Option<HorizontalRule>,
-    /// A text run paragraph element.
-    #[serde(rename="textRun")]
-    pub text_run: Option<TextRun>,
-    /// An auto text paragraph element.
-    #[serde(rename="autoText")]
-    pub auto_text: Option<AutoText>,
-    /// An inline object paragraph element.
-    #[serde(rename="inlineObjectElement")]
-    pub inline_object_element: Option<InlineObjectElement>,
-    /// A footnote reference paragraph element.
-    #[serde(rename="footnoteReference")]
-    pub footnote_reference: Option<FootnoteReference>,
+pub struct DocumentStyle {
+    /// The ID of the default footer. If not set, there is no default footer.
+    #[serde(rename="defaultFooterId")]
+    pub default_footer_id: Option<String>,
+    /// The ID of the footer used only for even pages. The value of
+    /// use_even_page_header_footer determines
+    /// whether to use the default_footer_id or this value for the
+    /// footer on even pages. If not set, there is no even page footer.
+    #[serde(rename="evenPageFooterId")]
+    pub even_page_footer_id: Option<String>,
+    /// The ID of the footer used only for the first page. If not set then
+    /// a unique footer for the first page does not exist. The value of
+    /// use_first_page_header_footer determines
+    /// whether to use the default_footer_id or this value for the
+    /// footer on the first page. If not set, there is no first page footer.
+    #[serde(rename="firstPageFooterId")]
+    pub first_page_footer_id: Option<String>,
+    /// The size of a page in the document.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<Size>,
+    /// The ID of the default header. If not set, there is no default header.
+    #[serde(rename="defaultHeaderId")]
+    pub default_header_id: Option<String>,
+    /// The bottom page margin.
+    #[serde(rename="marginBottom")]
+    pub margin_bottom: Option<Dimension>,
+    /// The ID of the header used only for the first page. If not set then
+    /// a unique header for the first page does not exist.
+    /// The value of use_first_page_header_footer determines
+    /// whether to use the default_header_id or this value for the
+    /// header on the first page. If not set, there is no first page header.
+    #[serde(rename="firstPageHeaderId")]
+    pub first_page_header_id: Option<String>,
+    /// The ID of the header used only for even pages. The value of
+    /// use_even_page_header_footer determines
+    /// whether to use the default_header_id or this value for the
+    /// header on even pages. If not set, there is no even page header.
+    #[serde(rename="evenPageHeaderId")]
+    pub even_page_header_id: Option<String>,
+    /// Indicates whether to use the first page header / footer IDs for the first
+    /// page.
+    #[serde(rename="useFirstPageHeaderFooter")]
+    pub use_first_page_header_footer: Option<bool>,
+    /// The left page margin.
+    #[serde(rename="marginLeft")]
+    pub margin_left: Option<Dimension>,
+    /// Indicates whether to use the even page header / footer IDs for the even
+    /// pages.
+    #[serde(rename="useEvenPageHeaderFooter")]
+    pub use_even_page_header_footer: Option<bool>,
+    /// The background of the document.
+    pub background: Option<Background>,
+    /// The right page margin.
+    #[serde(rename="marginRight")]
+    pub margin_right: Option<Dimension>,
+    /// The page number from which to start counting the number of pages.
+    #[serde(rename="pageNumberStart")]
+    pub page_number_start: Option<i32>,
+    /// The top page margin.
+    #[serde(rename="marginTop")]
+    pub margin_top: Option<Dimension>,
 }
 
-impl Part for ParagraphElement {}
-
-
-/// An object that is tethered to a Paragraph
-/// and positioned relative to the beginning of the paragraph. A PositionedObject
-/// contains an EmbeddedObject such as an
-/// image.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PositionedObject {
-    /// The properties of this positioned object.
-    #[serde(rename="positionedObjectProperties")]
-    pub positioned_object_properties: Option<PositionedObjectProperties>,
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this content.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The ID of this positioned object.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
-    /// The suggested changes to the positioned object properties, keyed by
-    /// suggestion ID.
-    #[serde(rename="suggestedPositionedObjectPropertiesChanges")]
-    pub suggested_positioned_object_properties_changes: Option<HashMap<String, SuggestedPositionedObjectProperties>>,
-    /// The suggested insertion ID. If empty, then this is not a suggested
-    /// insertion.
-    #[serde(rename="suggestedInsertionId")]
-    pub suggested_insertion_id: Option<String>,
-}
-
-impl Part for PositionedObject {}
+impl Part for DocumentStyle {}
 
 
 /// Deletes a PositionedObject from the
@@ -3581,26 +2120,6 @@ pub struct InlineObjectPropertiesSuggestionState {
 }
 
 impl Part for InlineObjectPropertiesSuggestionState {}
-
-
-/// A suggested change to the DocumentStyle.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SuggestedDocumentStyle {
-    /// A DocumentStyle that only includes
-    /// the changes made in this suggestion. This can be used along with the
-    /// document_style_suggestion_state
-    /// to see which fields have changed and their new values.
-    #[serde(rename="documentStyle")]
-    pub document_style: Option<DocumentStyle>,
-    /// A mask that indicates which of the fields on the base DocumentStyle have been changed in this suggestion.
-    #[serde(rename="documentStyleSuggestionState")]
-    pub document_style_suggestion_state: Option<DocumentStyleSuggestionState>,
-}
-
-impl Part for SuggestedDocumentStyle {}
 
 
 /// The contents and style of a row in a Table.
@@ -3659,25 +2178,6 @@ pub struct TableStyle {
 impl Part for TableStyle {}
 
 
-/// The suggestion state of a NamedStyles
-/// message.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NamedStylesSuggestionState {
-    /// A mask that indicates which of the fields on the corresponding NamedStyle in styles have been changed in this
-    /// suggestion.
-    /// 
-    /// The order of these named style suggestion states match the order of the
-    /// corresponding named style within the named styles suggestion.
-    #[serde(rename="stylesSuggestionStates")]
-    pub styles_suggestion_states: Option<Vec<NamedStyleSuggestionState>>,
-}
-
-impl Part for NamedStylesSuggestionState {}
-
-
 /// Specifies a contiguous range of text.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3705,23 +2205,6 @@ pub struct Range {
 impl Part for Range {}
 
 
-/// An RGB color.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RgbColor {
-    /// The blue component of the color, from 0.0 to 1.0.
-    pub blue: Option<f32>,
-    /// The green component of the color, from 0.0 to 1.0.
-    pub green: Option<f32>,
-    /// The red component of the color, from 0.0 to 1.0.
-    pub red: Option<f32>,
-}
-
-impl Part for RgbColor {}
-
-
 /// Deletes a row from a table.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3738,36 +2221,6 @@ pub struct DeleteTableRowRequest {
 }
 
 impl Part for DeleteTableRowRequest {}
-
-
-/// Update the styling of all paragraphs that overlap with the given range.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateParagraphStyleRequest {
-    /// The fields that should be updated.
-    /// 
-    /// At least one field must be specified. The root `paragraph_style` is implied
-    /// and should not be specified.
-    /// 
-    /// For example, to update the paragraph style's alignment property, set
-    /// `fields` to `"alignment"`.
-    /// 
-    /// To reset a property to its default value, include its field name in the
-    /// field mask but leave the field itself unset.
-    pub fields: Option<String>,
-    /// The range overlapping the paragraphs to style.
-    pub range: Option<Range>,
-    /// The styles to set on the paragraphs.
-    /// 
-    /// Certain paragraph style changes may cause other changes in order to mirror
-    /// the behavior of the Docs editor. See the documentation of ParagraphStyle for more information.
-    #[serde(rename="paragraphStyle")]
-    pub paragraph_style: Option<ParagraphStyle>,
-}
-
-impl Part for UpdateParagraphStyleRequest {}
 
 
 /// A reference to a linked chart embedded from Google Sheets.
@@ -3813,6 +2266,1667 @@ pub struct CreateParagraphBulletsRequest {
 impl Part for CreateParagraphBulletsRequest {}
 
 
+/// A suggested change to a
+/// TableRowStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedTableRowStyle {
+    /// A TableRowStyle that only includes
+    /// the changes made in this suggestion. This can be used along with the
+    /// table_row_style_suggestion_state
+    /// to see which fields have changed and their new values.
+    #[serde(rename="tableRowStyle")]
+    pub table_row_style: Option<TableRowStyle>,
+    /// A mask that indicates which of the fields on the base TableRowStyle have been changed in this suggestion.
+    #[serde(rename="tableRowStyleSuggestionState")]
+    pub table_row_style_suggestion_state: Option<TableRowStyleSuggestionState>,
+}
+
+impl Part for SuggestedTableRowStyle {}
+
+
+/// A mask that indicates which of the fields on the base Shading have been changed in this
+/// suggested change. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ShadingSuggestionState {
+    /// Indicates if there was a suggested change to the Shading.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+}
+
+impl Part for ShadingSuggestionState {}
+
+
+/// A mask that indicates which of the fields on the base CropProperties have been changed in this suggestion.
+/// For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CropPropertiesSuggestionState {
+    /// Indicates if there was a suggested change to offset_bottom.
+    #[serde(rename="offsetBottomSuggested")]
+    pub offset_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to offset_left.
+    #[serde(rename="offsetLeftSuggested")]
+    pub offset_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to offset_right.
+    #[serde(rename="offsetRightSuggested")]
+    pub offset_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to angle.
+    #[serde(rename="angleSuggested")]
+    pub angle_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to offset_top.
+    #[serde(rename="offsetTopSuggested")]
+    pub offset_top_suggested: Option<bool>,
+}
+
+impl Part for CropPropertiesSuggestionState {}
+
+
+/// A collection of object IDs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ObjectReferences {
+    /// The object IDs.
+    #[serde(rename="objectIds")]
+    pub object_ids: Option<Vec<String>>,
+}
+
+impl Part for ObjectReferences {}
+
+
+/// Represents a font family and weight of text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WeightedFontFamily {
+    /// The font family of the text.
+    /// 
+    /// The font family can be any font from the Font menu in Docs or from
+    /// [Google Fonts] (https://fonts.google.com/). If the font name is
+    /// unrecognized, the text is rendered in `Arial`.
+    #[serde(rename="fontFamily")]
+    pub font_family: Option<String>,
+    /// The weight of the font. This field can have any value that is a multiple of
+    /// `100` between `100` and `900`, inclusive. This range corresponds to the
+    /// numerical values described in the CSS 2.1 Specification,
+    /// [section 15.6](https://www.w3.org/TR/CSS21/fonts.html#font-boldness), with
+    /// non-numerical values disallowed.
+    /// 
+    /// The default value is `400` ("normal").
+    /// 
+    /// The font weight makes up just one component of the rendered font weight.
+    /// The rendered weight is determined by a combination of the `weight` and the
+    /// text style's resolved `bold` value, after accounting for inheritance:
+    /// 
+    /// * If the text is bold and the weight is less than `400`, the rendered
+    ///   weight is 400.
+    /// * If the text is bold and the weight is greater than or equal to `400` but
+    ///   is less than `700`, the rendered weight is `700`.
+    /// * If the weight is greater than or equal to `700`, the rendered weight is
+    ///   equal to the weight.
+    /// * If the text is not bold, the rendered weight is equal to the weight.
+    pub weight: Option<i32>,
+}
+
+impl Part for WeightedFontFamily {}
+
+
+/// A StructuralElement representing
+/// a table of contents.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableOfContents {
+    /// The content of the table of contents.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A TableOfContents may have multiple insertion IDs if it
+    /// is a nested suggested change. If empty, then this is not a suggested
+    /// insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+}
+
+impl Part for TableOfContents {}
+
+
+/// Inserts an InlineObject containing an
+/// image at the given location.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertInlineImageRequest {
+    /// The size that the image should appear as in the document. This property is
+    /// optional and the final size of the image in the document is determined by
+    /// the following rules:
+    ///  * If neither width nor height is specified, then a default size of the
+    ///  image is calculated based on its resolution.
+    ///  * If one dimension is specified then the other dimension is calculated to
+    ///  preserve the aspect ratio of the image.
+    ///  * If both width and height are specified, the image is scaled to fit
+    ///  within the provided dimensions while maintaining its aspect ratio.
+    #[serde(rename="objectSize")]
+    pub object_size: Option<Size>,
+    /// Inserts the text at the end of a header, footer or the document body.
+    /// 
+    /// Inline images cannot be inserted inside a footnote.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the image at a specific index in the document.
+    /// 
+    /// The image must be inserted inside the bounds of an existing
+    /// Paragraph. For instance, it cannot be
+    /// inserted at a table's start index (i.e. between the table and its
+    /// preceding paragraph).
+    /// 
+    /// Inline images cannot be inserted inside a footnote or equation.
+    pub location: Option<Location>,
+    /// The image URI.
+    /// 
+    /// The image is fetched once at insertion time and a copy is stored for
+    /// display inside the document. Images must be less than 50MB in size, cannot
+    /// exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format.
+    /// 
+    /// The provided URI can be at most 2 kB in length. The URI itself is saved
+    /// with the image, and exposed via the ImageProperties.content_uri field.
+    pub uri: Option<String>,
+}
+
+impl Part for InsertInlineImageRequest {}
+
+
+/// A mask that indicates which of the fields on the base TableCellStyle have been changed in this suggestion.
+/// For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCellStyleSuggestionState {
+    /// Indicates if there was a suggested change to border_bottom.
+    #[serde(rename="borderBottomSuggested")]
+    pub border_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_right.
+    #[serde(rename="borderRightSuggested")]
+    pub border_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_bottom.
+    #[serde(rename="paddingBottomSuggested")]
+    pub padding_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to content_alignment.
+    #[serde(rename="contentAlignmentSuggested")]
+    pub content_alignment_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_left.
+    #[serde(rename="paddingLeftSuggested")]
+    pub padding_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_left.
+    #[serde(rename="borderLeftSuggested")]
+    pub border_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_top.
+    #[serde(rename="borderTopSuggested")]
+    pub border_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to column_span.
+    #[serde(rename="columnSpanSuggested")]
+    pub column_span_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_right.
+    #[serde(rename="paddingRightSuggested")]
+    pub padding_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to background_color.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to row_span.
+    #[serde(rename="rowSpanSuggested")]
+    pub row_span_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to padding_top.
+    #[serde(rename="paddingTopSuggested")]
+    pub padding_top_suggested: Option<bool>,
+}
+
+impl Part for TableCellStyleSuggestionState {}
+
+
+/// Updates the TableRowStyle of rows in a
+/// table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateTableRowStyleRequest {
+    /// The fields that should be updated.
+    /// 
+    /// At least one field must be specified. The root `tableRowStyle` is implied
+    /// and should not be specified. A single `"*"` can be used as short-hand for
+    /// listing every field.
+    /// 
+    /// For example to update the minimum row height, set `fields` to
+    /// `"min_row_height"`.
+    pub fields: Option<String>,
+    /// The styles to be set on the rows.
+    #[serde(rename="tableRowStyle")]
+    pub table_row_style: Option<TableRowStyle>,
+    /// The list of zero-based row indices whose style should be updated. If no
+    /// indices are specified, all rows will be updated.
+    #[serde(rename="rowIndices")]
+    pub row_indices: Option<Vec<i32>>,
+    /// The location where the table starts in the document.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
+}
+
+impl Part for UpdateTableRowStyleRequest {}
+
+
+/// A mask that indicates which of the fields on the base DocumentStyle have been changed in this suggestion.
+/// For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DocumentStyleSuggestionState {
+    /// Indicates if there was a suggested change to margin_bottom.
+    #[serde(rename="marginBottomSuggested")]
+    pub margin_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to even_page_header_id.
+    #[serde(rename="evenPageHeaderIdSuggested")]
+    pub even_page_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to first_page_header_id.
+    #[serde(rename="firstPageHeaderIdSuggested")]
+    pub first_page_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_right.
+    #[serde(rename="marginRightSuggested")]
+    pub margin_right_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to page_number_start.
+    #[serde(rename="pageNumberStartSuggested")]
+    pub page_number_start_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to default_header_id.
+    #[serde(rename="defaultHeaderIdSuggested")]
+    pub default_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to default_footer_id.
+    #[serde(rename="defaultFooterIdSuggested")]
+    pub default_footer_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_left.
+    #[serde(rename="marginLeftSuggested")]
+    pub margin_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_top.
+    #[serde(rename="marginTopSuggested")]
+    pub margin_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to first_page_footer_id.
+    #[serde(rename="firstPageFooterIdSuggested")]
+    pub first_page_footer_id_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in size have been changed in this
+    /// suggestion.
+    #[serde(rename="pageSizeSuggestionState")]
+    pub page_size_suggestion_state: Option<SizeSuggestionState>,
+    /// Indicates if there was a suggested change to use_first_page_header_footer.
+    #[serde(rename="useFirstPageHeaderFooterSuggested")]
+    pub use_first_page_header_footer_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to even_page_footer_id.
+    #[serde(rename="evenPageFooterIdSuggested")]
+    pub even_page_footer_id_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in background have been changed in this
+    /// suggestion.
+    #[serde(rename="backgroundSuggestionState")]
+    pub background_suggestion_state: Option<BackgroundSuggestionState>,
+    /// Indicates if there was a suggested change to use_even_page_header_footer.
+    #[serde(rename="useEvenPageHeaderFooterSuggested")]
+    pub use_even_page_header_footer_suggested: Option<bool>,
+}
+
+impl Part for DocumentStyleSuggestionState {}
+
+
+/// The result of inserting an embedded Google Sheets chart.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertInlineSheetsChartResponse {
+    /// The object ID of the inserted chart.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+}
+
+impl Part for InsertInlineSheetsChartResponse {}
+
+
+/// The positioning of a PositionedObject. The positioned object is positioned
+/// relative to the beginning of the Paragraph
+/// it is tethered to.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObjectPositioning {
+    /// The offset of the left edge of the positioned object relative to the
+    /// beginning of the Paragraph it is tethered
+    /// to. The exact positioning of the object can depend on other content in the
+    /// document and the document's styling.
+    #[serde(rename="leftOffset")]
+    pub left_offset: Option<Dimension>,
+    /// The offset of the top edge of the positioned object relative to the
+    /// beginning of the Paragraph it is tethered
+    /// to. The exact positioning of the object can depend on other content in the
+    /// document and the document's styling.
+    #[serde(rename="topOffset")]
+    pub top_offset: Option<Dimension>,
+    /// The layout of this positioned object.
+    pub layout: Option<String>,
+}
+
+impl Part for PositionedObjectPositioning {}
+
+
+/// The style of a TableCell.
+/// 
+/// Inherited table cell styles are represented as unset fields in this message.
+/// A table cell style can inherit from the table's style.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCellStyle {
+    /// The bottom padding of the cell.
+    #[serde(rename="paddingBottom")]
+    pub padding_bottom: Option<Dimension>,
+    /// The bottom border of the cell.
+    #[serde(rename="borderBottom")]
+    pub border_bottom: Option<TableCellBorder>,
+    /// The top padding of the cell.
+    #[serde(rename="paddingTop")]
+    pub padding_top: Option<Dimension>,
+    /// The row span of the cell. This property is read-only.
+    #[serde(rename="rowSpan")]
+    pub row_span: Option<i32>,
+    /// The column span of the cell. This property is read-only.
+    #[serde(rename="columnSpan")]
+    pub column_span: Option<i32>,
+    /// The background color of the cell.
+    #[serde(rename="backgroundColor")]
+    pub background_color: Option<OptionalColor>,
+    /// The right border of the cell.
+    #[serde(rename="borderRight")]
+    pub border_right: Option<TableCellBorder>,
+    /// The left padding of the cell.
+    #[serde(rename="paddingLeft")]
+    pub padding_left: Option<Dimension>,
+    /// The top border of the cell.
+    #[serde(rename="borderTop")]
+    pub border_top: Option<TableCellBorder>,
+    /// The right padding of the cell.
+    #[serde(rename="paddingRight")]
+    pub padding_right: Option<Dimension>,
+    /// The left border of the cell.
+    #[serde(rename="borderLeft")]
+    pub border_left: Option<TableCellBorder>,
+    /// The alignment of the content in the table cell. The default alignment
+    /// matches the alignment for newly created table cells in the Docs editor.
+    #[serde(rename="contentAlignment")]
+    pub content_alignment: Option<String>,
+}
+
+impl Part for TableCellStyle {}
+
+
+/// Inserts an empty row into a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertTableRowRequest {
+    /// The reference table cell location from which rows will be inserted.
+    /// 
+    /// A new row will be inserted above (or below) the row where the reference
+    /// cell is. If the reference cell is a merged cell, a new row will be
+    /// inserted above (or below) the merged cell.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
+    /// Whether to insert new row below the reference cell location.
+    /// 
+    /// - `True`: insert below the cell.
+    /// - `False`: insert above the cell.
+    #[serde(rename="insertBelow")]
+    pub insert_below: Option<bool>,
+}
+
+impl Part for InsertTableRowRequest {}
+
+
+/// A single response from an update.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Response {
+    /// The result of creating a named range.
+    #[serde(rename="createNamedRange")]
+    pub create_named_range: Option<CreateNamedRangeResponse>,
+    /// The result of inserting an inline Google Sheets chart.
+    #[serde(rename="insertInlineSheetsChart")]
+    pub insert_inline_sheets_chart: Option<InsertInlineSheetsChartResponse>,
+    /// The result of replacing text.
+    #[serde(rename="replaceAllText")]
+    pub replace_all_text: Option<ReplaceAllTextResponse>,
+    /// The result of inserting an inline image.
+    #[serde(rename="insertInlineImage")]
+    pub insert_inline_image: Option<InsertInlineImageResponse>,
+}
+
+impl Part for Response {}
+
+
+/// Styles that apply to a whole paragraph.
+/// 
+/// Inherited paragraph styles are represented as unset fields in this message.
+/// A paragraph style's parent depends on where the paragraph style is defined:
+/// 
+///   * The ParagraphStyle on a Paragraph
+///     inherits from the paragraph's corresponding named style type.
+///   * The ParagraphStyle on a named style
+///     inherits from the normal text named style.
+///   * The ParagraphStyle of the normal text named style inherits
+///     from the default paragraph style in the Docs editor.
+///   * The ParagraphStyle on a Paragraph
+///     element that is contained in a table may inherit its paragraph style from
+///     the table style.
+/// 
+/// If the paragraph style does not inherit from a parent, unsetting fields will
+/// revert the style to a value matching the defaults in the Docs editor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParagraphStyle {
+    /// The spacing mode for the paragraph.
+    #[serde(rename="spacingMode")]
+    pub spacing_mode: Option<String>,
+    /// The text direction of this paragraph. If unset, the value defaults to
+    /// LEFT_TO_RIGHT since
+    /// paragraph direction is not inherited.
+    pub direction: Option<String>,
+    /// Whether at least a part of this paragraph should be laid out on the same
+    /// page or column as the next paragraph if possible. If unset, the value is
+    /// inherited from the parent.
+    #[serde(rename="keepWithNext")]
+    pub keep_with_next: Option<bool>,
+    /// The amount of space between lines, as a percentage of normal, where normal
+    /// is represented as 100.0. If unset, the value is inherited from the parent.
+    #[serde(rename="lineSpacing")]
+    pub line_spacing: Option<f32>,
+    /// The amount of indentation for the paragraph on the side that corresponds to
+    /// the start of the text, based on the current paragraph direction. If unset,
+    /// the value is inherited from the parent.
+    #[serde(rename="indentStart")]
+    pub indent_start: Option<Dimension>,
+    /// The border at the bottom of this paragraph. If unset, the value is
+    /// inherited from the parent.
+    /// 
+    /// The bottom border is rendered when the paragraph below has different border
+    /// and indent properties.
+    /// 
+    /// Paragraph borders cannot be partially updated. When making
+    /// changes to a paragraph border the new border must be specified in
+    /// its entirety.
+    #[serde(rename="borderBottom")]
+    pub border_bottom: Option<ParagraphBorder>,
+    /// The border to the right of this paragraph. If unset, the value is inherited
+    /// from the parent.
+    /// 
+    /// Paragraph borders cannot be partially updated. When making
+    /// changes to a paragraph border the new border must be specified in
+    /// its entirety.
+    #[serde(rename="borderRight")]
+    pub border_right: Option<ParagraphBorder>,
+    /// The border to the left of this paragraph. If unset, the value is inherited
+    /// from the parent.
+    /// 
+    /// Paragraph borders cannot be partially updated. When making
+    /// changes to a paragraph border the new border must be specified in
+    /// its entirety.
+    #[serde(rename="borderLeft")]
+    pub border_left: Option<ParagraphBorder>,
+    /// The heading ID of the paragraph. If empty, then this paragraph is not a
+    /// heading. This property is read-only.
+    #[serde(rename="headingId")]
+    pub heading_id: Option<String>,
+    /// The shading of the paragraph. If unset, the value is inherited from the
+    /// parent.
+    pub shading: Option<Shading>,
+    /// The border at the top of this paragraph. If unset, the value is inherited
+    /// from the parent.
+    /// 
+    /// The top border is rendered when the paragraph above has different border
+    /// and indent properties.
+    /// 
+    /// Paragraph borders cannot be partially updated. When making
+    /// changes to a paragraph border the new border must be specified in
+    /// its entirety.
+    #[serde(rename="borderTop")]
+    pub border_top: Option<ParagraphBorder>,
+    /// A list of the tab stops for this paragraph. The list of tab stops is not
+    /// inherited. This property is read-only.
+    #[serde(rename="tabStops")]
+    pub tab_stops: Option<Vec<TabStop>>,
+    /// The amount of indentation for the first line of the paragraph. If unset,
+    /// the value is inherited from the parent.
+    #[serde(rename="indentFirstLine")]
+    pub indent_first_line: Option<Dimension>,
+    /// The text alignment for this paragraph.
+    pub alignment: Option<String>,
+    /// The amount of extra space below the paragraph. If unset, the value is
+    /// inherited from the parent.
+    #[serde(rename="spaceBelow")]
+    pub space_below: Option<Dimension>,
+    /// Whether to avoid widows and orphans for the paragraph. If unset, the value
+    /// is inherited from the parent.
+    #[serde(rename="avoidWidowAndOrphan")]
+    pub avoid_widow_and_orphan: Option<bool>,
+    /// The border between this paragraph and the next and previous paragraphs.
+    /// If unset, the value is inherited from the parent.
+    /// 
+    /// The between border is rendered when the adjacent paragraph has the same
+    /// border and indent properties.
+    /// 
+    /// Paragraph borders cannot be partially updated. When making
+    /// changes to a paragraph border the new border must be specified in
+    /// its entirety.
+    #[serde(rename="borderBetween")]
+    pub border_between: Option<ParagraphBorder>,
+    /// The amount of extra space above the paragraph. If unset, the value is
+    /// inherited from the parent.
+    #[serde(rename="spaceAbove")]
+    pub space_above: Option<Dimension>,
+    /// The amount of indentation for the paragraph on the side that corresponds to
+    /// the end of the text, based on the current paragraph direction. If unset,
+    /// the value is inherited from the parent.
+    #[serde(rename="indentEnd")]
+    pub indent_end: Option<Dimension>,
+    /// The named style type of the paragraph.
+    /// 
+    /// Since updating the named style type affects other properties within
+    /// ParagraphStyle, the named style type is applied before the other properties
+    /// are updated.
+    #[serde(rename="namedStyleType")]
+    pub named_style_type: Option<String>,
+    /// Whether all lines of the paragraph should be laid out on the same page or
+    /// column if possible. If unset, the value is inherited from the parent.
+    #[serde(rename="keepLinesTogether")]
+    pub keep_lines_together: Option<bool>,
+}
+
+impl Part for ParagraphStyle {}
+
+
+/// A StructuralElement representing a
+/// section break. A section is a range of content which has the same
+/// SectionStyle. A section break represents
+/// the start of a new section, and the section style applies to the section
+/// after the section break.
+/// 
+/// The document body always begins with a section break.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SectionBreak {
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The style of the section after this section break.
+    #[serde(rename="sectionStyle")]
+    pub section_style: Option<SectionStyle>,
+    /// The suggested insertion IDs. A SectionBreak may have multiple insertion IDs if it is
+    /// a nested suggested change. If empty, then this is not a suggested
+    /// insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+}
+
+impl Part for SectionBreak {}
+
+
+/// Describes the bullet of a paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Bullet {
+    /// The nesting level of this paragraph in the list.
+    #[serde(rename="nestingLevel")]
+    pub nesting_level: Option<i32>,
+    /// The ID of the list this paragraph belongs to.
+    #[serde(rename="listId")]
+    pub list_id: Option<String>,
+    /// The paragraph specific text style applied to this bullet.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+}
+
+impl Part for Bullet {}
+
+
+/// A document footer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Footer {
+    /// The contents of the footer.
+    /// 
+    /// The indexes for a footer's content begin at zero.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The ID of the footer.
+    #[serde(rename="footerId")]
+    pub footer_id: Option<String>,
+}
+
+impl Part for Footer {}
+
+
+/// A mask that indicates which of the fields on the base NestingLevel have been changed in this suggestion. For
+/// any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NestingLevelSuggestionState {
+    /// A mask that indicates which of the fields in text style have been changed in this
+    /// suggestion.
+    #[serde(rename="textStyleSuggestionState")]
+    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
+    /// Indicates if there was a suggested change to
+    /// glyph_format.
+    #[serde(rename="glyphFormatSuggested")]
+    pub glyph_format_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to
+    /// indent_start.
+    #[serde(rename="indentStartSuggested")]
+    pub indent_start_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to
+    /// start_number.
+    #[serde(rename="startNumberSuggested")]
+    pub start_number_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to
+    /// glyph_type.
+    #[serde(rename="glyphTypeSuggested")]
+    pub glyph_type_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to
+    /// indent_first_line.
+    #[serde(rename="indentFirstLineSuggested")]
+    pub indent_first_line_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to
+    /// glyph_symbol.
+    #[serde(rename="glyphSymbolSuggested")]
+    pub glyph_symbol_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to
+    /// bullet_alignment.
+    #[serde(rename="bulletAlignmentSuggested")]
+    pub bullet_alignment_suggested: Option<bool>,
+}
+
+impl Part for NestingLevelSuggestionState {}
+
+
+/// A suggested change to a
+/// ParagraphStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedParagraphStyle {
+    /// A mask that indicates which of the fields on the base ParagraphStyle have been changed in this suggestion.
+    #[serde(rename="paragraphStyleSuggestionState")]
+    pub paragraph_style_suggestion_state: Option<ParagraphStyleSuggestionState>,
+    /// A ParagraphStyle that only includes
+    /// the changes made in this suggestion. This can be used along with the
+    /// paragraph_suggestion_state
+    /// to see which fields have changed and their new values.
+    #[serde(rename="paragraphStyle")]
+    pub paragraph_style: Option<ParagraphStyle>,
+}
+
+impl Part for SuggestedParagraphStyle {}
+
+
+/// An object that is tethered to a Paragraph
+/// and positioned relative to the beginning of the paragraph. A PositionedObject
+/// contains an EmbeddedObject such as an
+/// image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObject {
+    /// The properties of this positioned object.
+    #[serde(rename="positionedObjectProperties")]
+    pub positioned_object_properties: Option<PositionedObjectProperties>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The ID of this positioned object.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The suggested changes to the positioned object properties, keyed by
+    /// suggestion ID.
+    #[serde(rename="suggestedPositionedObjectPropertiesChanges")]
+    pub suggested_positioned_object_properties_changes: Option<HashMap<String, SuggestedPositionedObjectProperties>>,
+    /// The suggested insertion ID. If empty, then this is not a suggested
+    /// insertion.
+    #[serde(rename="suggestedInsertionId")]
+    pub suggested_insertion_id: Option<String>,
+}
+
+impl Part for PositionedObject {}
+
+
+/// A named style. Paragraphs in the document can inherit their
+/// TextStyle and
+/// ParagraphStyle from this named style
+/// when they have the same named style type.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NamedStyle {
+    /// The text style of this named style.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+    /// The type of this named style.
+    #[serde(rename="namedStyleType")]
+    pub named_style_type: Option<String>,
+    /// The paragraph style of this named style.
+    #[serde(rename="paragraphStyle")]
+    pub paragraph_style: Option<ParagraphStyle>,
+}
+
+impl Part for NamedStyle {}
+
+
+/// A mask that indicates which of the fields on the base TableRowStyle have been changed in this suggestion.
+/// For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableRowStyleSuggestionState {
+    /// Indicates if there was a suggested change to min_row_height.
+    #[serde(rename="minRowHeightSuggested")]
+    pub min_row_height_suggested: Option<bool>,
+}
+
+impl Part for TableRowStyleSuggestionState {}
+
+
+/// A collection of Ranges with the same named range
+/// ID.
+/// 
+/// Named ranges allow developers to associate parts of a document with an
+/// arbitrary user-defined label so their contents can be programmatically read
+/// or edited at a later time. A document can contain multiple named ranges with
+/// the same name, but every named range has a unique ID.
+/// 
+/// A named range is created with a single Range,
+/// and content inserted inside a named range generally expands that range.
+/// However, certain document changes can cause the range to be split into
+/// multiple ranges.
+/// 
+/// Named ranges are not private. All applications and collaborators that have
+/// access to the document can see its named ranges.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NamedRange {
+    /// The ranges that belong to this named range.
+    pub ranges: Option<Vec<Range>>,
+    /// The ID of the named range.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+    /// The name of the named range.
+    pub name: Option<String>,
+}
+
+impl Part for NamedRange {}
+
+
+/// Location of a single cell within a table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCellLocation {
+    /// The zero-based row index. For example, the second row in the table has a
+    /// row index of 1.
+    #[serde(rename="rowIndex")]
+    pub row_index: Option<i32>,
+    /// The zero-based column index. For example, the second column in the table
+    /// has a column index of 1.
+    #[serde(rename="columnIndex")]
+    pub column_index: Option<i32>,
+    /// The location where the table starts in the document.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
+}
+
+impl Part for TableCellLocation {}
+
+
+/// A document footnote.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Footnote {
+    /// The contents of the footnote.
+    /// 
+    /// The indexes for a footnote's content begin at zero.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The ID of the footnote.
+    #[serde(rename="footnoteId")]
+    pub footnote_id: Option<String>,
+}
+
+impl Part for Footnote {}
+
+
+/// Deletes bullets from all of the paragraphs that overlap with the given range.
+/// 
+/// The nesting level of each paragraph will be visually preserved by adding
+/// indent to the start of the corresponding paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteParagraphBulletsRequest {
+    /// The range to delete bullets from.
+    pub range: Option<Range>,
+}
+
+impl Part for DeleteParagraphBulletsRequest {}
+
+
+/// Properties of a PositionedObject.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObjectProperties {
+    /// The positioning of this positioned object relative to the newline of the
+    /// Paragraph that references this positioned
+    /// object.
+    pub positioning: Option<PositionedObjectPositioning>,
+    /// The embedded object of this positioned object.
+    #[serde(rename="embeddedObject")]
+    pub embedded_object: Option<EmbeddedObject>,
+}
+
+impl Part for PositionedObjectProperties {}
+
+
+/// A mask that indicates which of the fields on the base EmbeddedObjectBorder have been changed in this
+/// suggestion. For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmbeddedObjectBorderSuggestionState {
+    /// Indicates if there was a suggested change to color.
+    #[serde(rename="colorSuggested")]
+    pub color_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to dash_style.
+    #[serde(rename="dashStyleSuggested")]
+    pub dash_style_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to width.
+    #[serde(rename="widthSuggested")]
+    pub width_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to property_state.
+    #[serde(rename="propertyStateSuggested")]
+    pub property_state_suggested: Option<bool>,
+}
+
+impl Part for EmbeddedObjectBorderSuggestionState {}
+
+
+/// A mask that indicates which of the fields on the base Background have been changed in this suggestion.
+/// For any field set to true, the Backgound has a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BackgroundSuggestionState {
+    /// Indicates whether the current background color has been modified in this
+    /// suggestion.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+}
+
+impl Part for BackgroundSuggestionState {}
+
+
+/// A width and height.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Size {
+    /// The width of the object.
+    pub width: Option<Dimension>,
+    /// The height of the object.
+    pub height: Option<Dimension>,
+}
+
+impl Part for Size {}
+
+
+/// Deletes a NamedRange.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteNamedRangeRequest {
+    /// The ID of the named range to delete.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+    /// The name of the range(s) to delete. All named ranges with the given
+    /// name will be deleted.
+    pub name: Option<String>,
+}
+
+impl Part for DeleteNamedRangeRequest {}
+
+
+/// Creates a NamedRange referencing the given
+/// range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateNamedRangeRequest {
+    /// The range to apply the name to.
+    pub range: Option<Range>,
+    /// The name of the NamedRange. Names do not need to be unique.
+    /// 
+    /// Names must be at least 1 character and no more than 256 characters,
+    /// measured in UTF-16 code units.
+    pub name: Option<String>,
+}
+
+impl Part for CreateNamedRangeRequest {}
+
+
+/// Properties that apply to a section's column.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SectionColumnProperties {
+    /// The width of the column.
+    pub width: Option<Dimension>,
+    /// The padding at the end of the column.
+    #[serde(rename="paddingEnd")]
+    pub padding_end: Option<Dimension>,
+}
+
+impl Part for SectionColumnProperties {}
+
+
+/// Inserts a page break followed by a newline at the specified location.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertPageBreakRequest {
+    /// Inserts the page break at the end of the document body.
+    /// 
+    /// Page breaks cannot be inserted inside a footnote, header or footer.
+    /// Since page breaks can only be inserted inside the body, the segment ID field must be
+    /// empty.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the page break at a specific index in the document.
+    /// 
+    /// The page break must be inserted inside the bounds of an existing
+    /// Paragraph. For instance, it cannot be
+    /// inserted at a table's start index (i.e. between the table and its
+    /// preceding paragraph).
+    /// 
+    /// Page breaks cannot be inserted inside a table, equation, footnote, header
+    /// or footer. Since page breaks can only be inserted inside the body, the
+    /// segment ID field must be
+    /// empty.
+    pub location: Option<Location>,
+}
+
+impl Part for InsertPageBreakRequest {}
+
+
+/// The contents and style of a cell in a Table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableCell {
+    /// The content of the cell.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The zero-based end index of this cell, exclusive, in UTF-16 code units.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// The zero-based start index of this cell, in UTF-16 code units.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// The style of the cell.
+    #[serde(rename="tableCellStyle")]
+    pub table_cell_style: Option<TableCellStyle>,
+    /// The suggested changes to the table cell style, keyed by suggestion ID.
+    #[serde(rename="suggestedTableCellStyleChanges")]
+    pub suggested_table_cell_style_changes: Option<HashMap<String, SuggestedTableCellStyle>>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A TableCell
+    /// may have multiple insertion IDs if it is a nested suggested change. If
+    /// empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+}
+
+impl Part for TableCell {}
+
+
+/// A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion.
+/// For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextStyleSuggestionState {
+    /// Indicates if there was a suggested change to font_size.
+    #[serde(rename="fontSizeSuggested")]
+    pub font_size_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to strikethrough.
+    #[serde(rename="strikethroughSuggested")]
+    pub strikethrough_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to weighted_font_family.
+    #[serde(rename="weightedFontFamilySuggested")]
+    pub weighted_font_family_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to underline.
+    #[serde(rename="underlineSuggested")]
+    pub underline_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to small_caps.
+    #[serde(rename="smallCapsSuggested")]
+    pub small_caps_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to link.
+    #[serde(rename="linkSuggested")]
+    pub link_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to italic.
+    #[serde(rename="italicSuggested")]
+    pub italic_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to bold.
+    #[serde(rename="boldSuggested")]
+    pub bold_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to baseline_offset.
+    #[serde(rename="baselineOffsetSuggested")]
+    pub baseline_offset_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to foreground_color.
+    #[serde(rename="foregroundColorSuggested")]
+    pub foreground_color_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to background_color.
+    #[serde(rename="backgroundColorSuggested")]
+    pub background_color_suggested: Option<bool>,
+}
+
+impl Part for TextStyleSuggestionState {}
+
+
+/// A mask that indicates which of the fields on the base ParagraphStyle have been changed in this suggestion.
+/// For any field set to true, there is a new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParagraphStyleSuggestionState {
+    /// Indicates if there was a suggested change to avoid_widow_and_orphan.
+    #[serde(rename="avoidWidowAndOrphanSuggested")]
+    pub avoid_widow_and_orphan_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_bottom.
+    #[serde(rename="borderBottomSuggested")]
+    pub border_bottom_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to named_style_type.
+    #[serde(rename="namedStyleTypeSuggested")]
+    pub named_style_type_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_between.
+    #[serde(rename="borderBetweenSuggested")]
+    pub border_between_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_top.
+    #[serde(rename="borderTopSuggested")]
+    pub border_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to keep_with_next.
+    #[serde(rename="keepWithNextSuggested")]
+    pub keep_with_next_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to space_above.
+    #[serde(rename="spaceAboveSuggested")]
+    pub space_above_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to alignment.
+    #[serde(rename="alignmentSuggested")]
+    pub alignment_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_end.
+    #[serde(rename="indentEndSuggested")]
+    pub indent_end_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to direction.
+    #[serde(rename="directionSuggested")]
+    pub direction_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_right.
+    #[serde(rename="borderRightSuggested")]
+    pub border_right_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in shading have been changed in
+    /// this suggestion.
+    #[serde(rename="shadingSuggestionState")]
+    pub shading_suggestion_state: Option<ShadingSuggestionState>,
+    /// Indicates if there was a suggested change to keep_lines_together.
+    #[serde(rename="keepLinesTogetherSuggested")]
+    pub keep_lines_together_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to line_spacing.
+    #[serde(rename="lineSpacingSuggested")]
+    pub line_spacing_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to spacing_mode.
+    #[serde(rename="spacingModeSuggested")]
+    pub spacing_mode_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_start.
+    #[serde(rename="indentStartSuggested")]
+    pub indent_start_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to space_below.
+    #[serde(rename="spaceBelowSuggested")]
+    pub space_below_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to border_left.
+    #[serde(rename="borderLeftSuggested")]
+    pub border_left_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to indent_first_line.
+    #[serde(rename="indentFirstLineSuggested")]
+    pub indent_first_line_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to heading_id.
+    #[serde(rename="headingIdSuggested")]
+    pub heading_id_suggested: Option<bool>,
+}
+
+impl Part for ParagraphStyleSuggestionState {}
+
+
+/// A tab stop within a paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TabStop {
+    /// The alignment of this tab stop. If unset, the value defaults to START.
+    pub alignment: Option<String>,
+    /// The offset between this tab stop and the start margin.
+    pub offset: Option<Dimension>,
+}
+
+impl Part for TabStop {}
+
+
+/// Properties of an InlineObject.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InlineObjectProperties {
+    /// The embedded object of this inline object.
+    #[serde(rename="embeddedObject")]
+    pub embedded_object: Option<EmbeddedObject>,
+}
+
+impl Part for InlineObjectProperties {}
+
+
+/// Represents the background of a document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Background {
+    /// The background color.
+    pub color: Option<OptionalColor>,
+}
+
+impl Part for Background {}
+
+
+/// A suggested change to a TextStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedTextStyle {
+    /// A TextStyle that only includes
+    /// the changes made in this suggestion. This can be used along with the
+    /// text_style_suggestion_state
+    /// to see which fields have changed and their new values.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+    /// A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion.
+    #[serde(rename="textStyleSuggestionState")]
+    pub text_style_suggestion_state: Option<TextStyleSuggestionState>,
+}
+
+impl Part for SuggestedTextStyle {}
+
+
+/// A mask that indicates which of the fields on the base
+/// PositionedObjectProperties
+/// have been changed in this suggestion. For any field set to true, there is a
+/// new suggested value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PositionedObjectPropertiesSuggestionState {
+    /// A mask that indicates which of the fields in positioning have been
+    /// changed in this suggestion.
+    #[serde(rename="positioningSuggestionState")]
+    pub positioning_suggestion_state: Option<PositionedObjectPositioningSuggestionState>,
+    /// A mask that indicates which of the fields in embedded_object have been
+    /// changed in this suggestion.
+    #[serde(rename="embeddedObjectSuggestionState")]
+    pub embedded_object_suggestion_state: Option<EmbeddedObjectSuggestionState>,
+}
+
+impl Part for PositionedObjectPropertiesSuggestionState {}
+
+
+/// A suggested change to PositionedObjectProperties.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedPositionedObjectProperties {
+    /// A PositionedObjectProperties that only includes the
+    /// changes made in this suggestion. This can be used along with the
+    /// positioned_object_properties_suggestion_state
+    /// to see which fields have changed and their new values.
+    #[serde(rename="positionedObjectProperties")]
+    pub positioned_object_properties: Option<PositionedObjectProperties>,
+    /// A mask that indicates which of the fields on the base
+    /// PositionedObjectProperties have been changed in this
+    /// suggestion.
+    #[serde(rename="positionedObjectPropertiesSuggestionState")]
+    pub positioned_object_properties_suggestion_state: Option<PositionedObjectPropertiesSuggestionState>,
+}
+
+impl Part for SuggestedPositionedObjectProperties {}
+
+
+/// A List represents the list attributes for a group of paragraphs that all
+/// belong to the same list. A paragraph that is part of a list has a reference
+/// to the list's ID in its bullet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct List {
+    /// The properties of the list.
+    #[serde(rename="listProperties")]
+    pub list_properties: Option<ListProperties>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this list.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested changes to the list properties, keyed by suggestion
+    /// ID.
+    #[serde(rename="suggestedListPropertiesChanges")]
+    pub suggested_list_properties_changes: Option<HashMap<String, SuggestedListProperties>>,
+    /// The suggested insertion ID. If empty, then this is not a suggested
+    /// insertion.
+    #[serde(rename="suggestedInsertionId")]
+    pub suggested_insertion_id: Option<String>,
+}
+
+impl Part for List {}
+
+
+/// The properties of a list which describe the look
+/// and feel of bullets belonging to paragraphs associated with a list.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListProperties {
+    /// Describes the properties of the bullets at the associated level.
+    /// 
+    /// A list has at most nine levels of nesting with nesting level 0
+    /// corresponding to the top-most level and nesting level 8 corresponding to
+    /// the most nested level. The nesting levels are returned in ascending order
+    /// with the least nested returned first.
+    #[serde(rename="nestingLevels")]
+    pub nesting_levels: Option<Vec<NestingLevel>>,
+}
+
+impl Part for ListProperties {}
+
+
+/// A ParagraphElement representing a
+/// page break. A page break makes the subsequent text start at the top of the
+/// next page.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PageBreak {
+    /// The text style of this PageBreak.
+    /// 
+    /// Similar to text content, like text runs and footnote references, the text
+    /// style of a page break can affect content layout as well as the styling of
+    /// text inserted adjacent to it.
+    #[serde(rename="textStyle")]
+    pub text_style: Option<TextStyle>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested text style changes to this PageBreak, keyed by suggestion ID.
+    #[serde(rename="suggestedTextStyleChanges")]
+    pub suggested_text_style_changes: Option<HashMap<String, SuggestedTextStyle>>,
+    /// The suggested insertion IDs. A PageBreak
+    /// may have multiple insertion IDs if it is a nested suggested change. If
+    /// empty, then this is not a suggested insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
+}
+
+impl Part for PageBreak {}
+
+
+/// An embedded object in the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmbeddedObject {
+    /// The properties of an image.
+    #[serde(rename="imageProperties")]
+    pub image_properties: Option<ImageProperties>,
+    /// The description of the embedded object. The `title` and `description` are
+    /// both combined to display alt text.
+    pub description: Option<String>,
+    /// The title of the embedded object. The `title` and `description` are both
+    /// combined to display alt text.
+    pub title: Option<String>,
+    /// The properties of an embedded drawing.
+    #[serde(rename="embeddedDrawingProperties")]
+    pub embedded_drawing_properties: Option<EmbeddedDrawingProperties>,
+    /// The bottom margin of the embedded object.
+    #[serde(rename="marginBottom")]
+    pub margin_bottom: Option<Dimension>,
+    /// The border of the embedded object.
+    #[serde(rename="embeddedObjectBorder")]
+    pub embedded_object_border: Option<EmbeddedObjectBorder>,
+    /// A reference to the external linked source content. For example, it contains
+    /// a reference to the source Sheets chart when the embedded object is a linked
+    /// chart.
+    /// 
+    /// If unset, then the embedded object is not linked.
+    #[serde(rename="linkedContentReference")]
+    pub linked_content_reference: Option<LinkedContentReference>,
+    /// The left margin of the embedded object.
+    #[serde(rename="marginLeft")]
+    pub margin_left: Option<Dimension>,
+    /// The right margin of the embedded object.
+    #[serde(rename="marginRight")]
+    pub margin_right: Option<Dimension>,
+    /// The top margin of the embedded object.
+    #[serde(rename="marginTop")]
+    pub margin_top: Option<Dimension>,
+    /// The visible size of the image after cropping.
+    pub size: Option<Size>,
+}
+
+impl Part for EmbeddedObject {}
+
+
+/// A suggested change to the NamedStyles.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedNamedStyles {
+    /// A mask that indicates which of the fields on the base NamedStyles have been changed in this suggestion.
+    #[serde(rename="namedStylesSuggestionState")]
+    pub named_styles_suggestion_state: Option<NamedStylesSuggestionState>,
+    /// A NamedStyles that only includes the
+    /// changes made in this suggestion. This can be used along with the
+    /// named_styles_suggestion_state to
+    /// see which fields have changed and their new values.
+    #[serde(rename="namedStyles")]
+    pub named_styles: Option<NamedStyles>,
+}
+
+impl Part for SuggestedNamedStyles {}
+
+
+/// An object that appears inline with text. An InlineObject contains
+/// an EmbeddedObject such as an image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InlineObject {
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The properties of this inline object.
+    #[serde(rename="inlineObjectProperties")]
+    pub inline_object_properties: Option<InlineObjectProperties>,
+    /// The suggested changes to the inline object properties, keyed by suggestion
+    /// ID.
+    #[serde(rename="suggestedInlineObjectPropertiesChanges")]
+    pub suggested_inline_object_properties_changes: Option<HashMap<String, SuggestedInlineObjectProperties>>,
+    /// The ID of this inline object.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
+    /// The suggested insertion ID. If empty, then this is not a suggested
+    /// insertion.
+    #[serde(rename="suggestedInsertionId")]
+    pub suggested_insertion_id: Option<String>,
+}
+
+impl Part for InlineObject {}
+
+
+/// A suggested change to InlineObjectProperties.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedInlineObjectProperties {
+    /// An InlineObjectProperties
+    /// that only includes the changes made in this suggestion. This can be used
+    /// along with the inline_object_properties_suggestion_state
+    /// to see which fields have changed and their new values.
+    #[serde(rename="inlineObjectProperties")]
+    pub inline_object_properties: Option<InlineObjectProperties>,
+    /// A mask that indicates which of the fields on the base
+    /// InlineObjectProperties have
+    /// been changed in this suggestion.
+    #[serde(rename="inlineObjectPropertiesSuggestionState")]
+    pub inline_object_properties_suggestion_state: Option<InlineObjectPropertiesSuggestionState>,
+}
+
+impl Part for SuggestedInlineObjectProperties {}
+
+
+/// A ParagraphElement describes content within a
+/// Paragraph.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParagraphElement {
+    /// The zero-base end index of this paragraph element, exclusive, in UTF-16
+    /// code units.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// An equation paragraph element.
+    pub equation: Option<Equation>,
+    /// A column break paragraph element.
+    #[serde(rename="columnBreak")]
+    pub column_break: Option<ColumnBreak>,
+    /// The zero-based start index of this paragraph element, in UTF-16 code units.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// A page break paragraph element.
+    #[serde(rename="pageBreak")]
+    pub page_break: Option<PageBreak>,
+    /// A horizontal rule paragraph element.
+    #[serde(rename="horizontalRule")]
+    pub horizontal_rule: Option<HorizontalRule>,
+    /// A text run paragraph element.
+    #[serde(rename="textRun")]
+    pub text_run: Option<TextRun>,
+    /// An auto text paragraph element.
+    #[serde(rename="autoText")]
+    pub auto_text: Option<AutoText>,
+    /// An inline object paragraph element.
+    #[serde(rename="inlineObjectElement")]
+    pub inline_object_element: Option<InlineObjectElement>,
+    /// A footnote reference paragraph element.
+    #[serde(rename="footnoteReference")]
+    pub footnote_reference: Option<FootnoteReference>,
+}
+
+impl Part for ParagraphElement {}
+
+
+/// A suggested change to the DocumentStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SuggestedDocumentStyle {
+    /// A DocumentStyle that only includes
+    /// the changes made in this suggestion. This can be used along with the
+    /// document_style_suggestion_state
+    /// to see which fields have changed and their new values.
+    #[serde(rename="documentStyle")]
+    pub document_style: Option<DocumentStyle>,
+    /// A mask that indicates which of the fields on the base DocumentStyle have been changed in this suggestion.
+    #[serde(rename="documentStyleSuggestionState")]
+    pub document_style_suggestion_state: Option<DocumentStyleSuggestionState>,
+}
+
+impl Part for SuggestedDocumentStyle {}
+
+
+/// A solid color.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Color {
+    /// The RGB color value.
+    #[serde(rename="rgbColor")]
+    pub rgb_color: Option<RgbColor>,
+}
+
+impl Part for Color {}
+
+
+/// The suggestion state of a NamedStyles
+/// message.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NamedStylesSuggestionState {
+    /// A mask that indicates which of the fields on the corresponding NamedStyle in styles have been changed in this
+    /// suggestion.
+    /// 
+    /// The order of these named style suggestion states match the order of the
+    /// corresponding named style within the named styles suggestion.
+    #[serde(rename="stylesSuggestionStates")]
+    pub styles_suggestion_states: Option<Vec<NamedStyleSuggestionState>>,
+}
+
+impl Part for NamedStylesSuggestionState {}
+
+
+/// An RGB color.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RgbColor {
+    /// The blue component of the color, from 0.0 to 1.0.
+    pub blue: Option<f32>,
+    /// The green component of the color, from 0.0 to 1.0.
+    pub green: Option<f32>,
+    /// The red component of the color, from 0.0 to 1.0.
+    pub red: Option<f32>,
+}
+
+impl Part for RgbColor {}
+
+
+/// Update the styling of all paragraphs that overlap with the given range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateParagraphStyleRequest {
+    /// The fields that should be updated.
+    /// 
+    /// At least one field must be specified. The root `paragraph_style` is implied
+    /// and should not be specified.
+    /// 
+    /// For example, to update the paragraph style's alignment property, set
+    /// `fields` to `"alignment"`.
+    /// 
+    /// To reset a property to its default value, include its field name in the
+    /// field mask but leave the field itself unset.
+    pub fields: Option<String>,
+    /// The range overlapping the paragraphs to style.
+    pub range: Option<Range>,
+    /// The styles to set on the paragraphs.
+    /// 
+    /// Certain paragraph style changes may cause other changes in order to mirror
+    /// the behavior of the Docs editor. See the documentation of ParagraphStyle for more information.
+    #[serde(rename="paragraphStyle")]
+    pub paragraph_style: Option<ParagraphStyle>,
+}
+
+impl Part for UpdateParagraphStyleRequest {}
+
+
+/// The result of creating a named range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateNamedRangeResponse {
+    /// The ID of the created named range.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+}
+
+impl Part for CreateNamedRangeResponse {}
+
+
 /// A StructuralElement representing a
 /// table.
 /// 
@@ -3847,40 +3961,21 @@ pub struct Table {
 impl Part for Table {}
 
 
-/// A suggested change to a
-/// TableRowStyle.
+/// A collection of all the NamedRanges in the
+/// document that share a given name.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SuggestedTableRowStyle {
-    /// A TableRowStyle that only includes
-    /// the changes made in this suggestion. This can be used along with the
-    /// table_row_style_suggestion_state
-    /// to see which fields have changed and their new values.
-    #[serde(rename="tableRowStyle")]
-    pub table_row_style: Option<TableRowStyle>,
-    /// A mask that indicates which of the fields on the base TableRowStyle have been changed in this suggestion.
-    #[serde(rename="tableRowStyleSuggestionState")]
-    pub table_row_style_suggestion_state: Option<TableRowStyleSuggestionState>,
+pub struct NamedRanges {
+    /// The NamedRanges that share the same name.
+    #[serde(rename="namedRanges")]
+    pub named_ranges: Option<Vec<NamedRange>>,
+    /// The name that all the named ranges share.
+    pub name: Option<String>,
 }
 
-impl Part for SuggestedTableRowStyle {}
-
-
-/// A width and height.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Size {
-    /// The width of the object.
-    pub width: Option<Dimension>,
-    /// The height of the object.
-    pub height: Option<Dimension>,
-}
-
-impl Part for Size {}
+impl Part for NamedRanges {}
 
 
 /// Response message from a BatchUpdateDocument request.

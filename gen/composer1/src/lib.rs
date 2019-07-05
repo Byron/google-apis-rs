@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Composer* crate version *1.0.8+20190323*, where *20190323* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Composer* crate version *1.0.9+20190613*, where *20190613* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Composer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/composer/).
@@ -221,9 +221,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -336,7 +334,7 @@ impl<'a, C, A> CloudComposer<C, A>
         CloudComposer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://composer.googleapis.com/".to_string(),
             _root_url: "https://composer.googleapis.com/".to_string(),
         }
@@ -347,7 +345,7 @@ impl<'a, C, A> CloudComposer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -396,7 +394,8 @@ pub struct EnvironmentConfig {
     pub node_config: Option<NodeConfig>,
     /// Output only.
     /// The URI of the Apache Airflow Web UI hosted within this environment (see
-    /// [Airflow web interface](/composer/docs/how-to/accessing/airflow-web-interface)).
+    /// [Airflow web
+    /// interface](/composer/docs/how-to/accessing/airflow-web-interface)).
     #[serde(rename="airflowUri")]
     pub airflow_uri: Option<String>,
     /// Output only.
@@ -414,56 +413,11 @@ impl Part for EnvironmentConfig {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -517,20 +471,21 @@ pub struct SoftwareConfig {
     /// official Apache Airflow repository
     /// [release name](https://github.com/apache/incubator-airflow/releases).
     /// 
-    /// See also [Version List](/composer/docs/concepts/versioning/composer-versions).
+    /// See also [Version
+    /// List](/composer/docs/concepts/versioning/composer-versions).
     #[serde(rename="imageVersion")]
     pub image_version: Option<String>,
     /// Optional. Apache Airflow configuration properties to override.
     /// 
-    /// Property keys contain the section and property names, separated by a hyphen,
-    /// for example "core-dags_are_paused_at_creation". Section names must not
-    /// contain hyphens ("-"), opening square brackets ("["),  or closing square
-    /// brackets ("]"). The property name must not be empty and must not contain
-    /// an equals sign ("=") or semicolon (";"). Section and property names must
-    /// not contain a period ("."). Apache Airflow configuration property names
-    /// must be written in [snake_case](https://en.wikipedia.org/wiki/Snake_case).
-    /// Property values can contain any character, and can be written in any
-    /// lower/upper case format.
+    /// Property keys contain the section and property names, separated by a
+    /// hyphen, for example "core-dags_are_paused_at_creation". Section names must
+    /// not contain hyphens ("-"), opening square brackets ("["),  or closing
+    /// square brackets ("]"). The property name must not be empty and must not
+    /// contain an equals sign ("=") or semicolon (";"). Section and property names
+    /// must not contain a period ("."). Apache Airflow configuration property
+    /// names must be written in
+    /// [snake_case](https://en.wikipedia.org/wiki/Snake_case). Property values can
+    /// contain any character, and can be written in any lower/upper case format.
     /// 
     /// Certain Apache Airflow configuration property values are
     /// [blacklisted](/composer/docs/how-to/managing/setting-airflow-configurations#airflow_configuration_blacklists),
@@ -647,8 +602,8 @@ pub struct NodeConfig {
     /// Optional. The Compute Engine
     /// [machine type](/compute/docs/machine-types) used for cluster instances,
     /// specified as a
-    /// [relative resource name](/apis/design/resource_names#relative_resource_name).
-    /// For example:
+    /// [relative resource
+    /// name](/apis/design/resource_names#relative_resource_name). For example:
     /// "projects/{projectId}/zones/{zoneId}/machineTypes/{machineTypeId}".
     /// 
     /// The `machineType` must belong to the enclosing environment's project and
@@ -666,8 +621,9 @@ pub struct NodeConfig {
     pub machine_type: Option<String>,
     /// Optional. The Compute Engine network to be used for machine
     /// communications, specified as a
-    /// [relative resource name](/apis/design/resource_names#relative_resource_name).
-    /// For example: "projects/{projectId}/global/networks/{networkId}".
+    /// [relative resource
+    /// name](/apis/design/resource_names#relative_resource_name). For example:
+    /// "projects/{projectId}/global/networks/{networkId}".
     /// 
     /// [Shared VPC](/vpc/docs/shared-vpc) is not currently supported. The
     /// network must belong to the environment's project. If unspecified, the
@@ -696,8 +652,9 @@ pub struct NodeConfig {
     pub disk_size_gb: Option<i32>,
     /// Optional. The Compute Engine [zone](/compute/docs/regions-zones) in which
     /// to deploy the VMs used to run the Apache Airflow software, specified as a
-    /// [relative resource name](/apis/design/resource_names#relative_resource_name).
-    /// For example: "projects/{projectId}/zones/{zoneId}".
+    /// [relative resource
+    /// name](/apis/design/resource_names#relative_resource_name). For example:
+    /// "projects/{projectId}/zones/{zoneId}".
     /// 
     /// This `location` must belong to the enclosing environment's project and
     /// location. If both this field and `nodeConfig.machineType` are specified,
@@ -710,8 +667,8 @@ pub struct NodeConfig {
     pub location: Option<String>,
     /// Optional. The Compute Engine subnetwork to be used for machine
     /// communications, specified as a
-    /// [relative resource name](/apis/design/resource_names#relative_resource_name).
-    /// For example:
+    /// [relative resource
+    /// name](/apis/design/resource_names#relative_resource_name). For example:
     /// "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"
     /// 
     /// If a subnetwork is provided, `nodeConfig.network` must also be provided,
@@ -800,7 +757,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -971,7 +928,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent must be of the form "projects/{projectId}/locations/{locationId}".
+    /// * `parent` - The parent must be of the form
+    ///              "projects/{projectId}/locations/{locationId}".
     pub fn locations_environments_create(&self, request: Environment, parent: &str) -> ProjectLocationEnvironmentCreateCall<'a, C, A> {
         ProjectLocationEnvironmentCreateCall {
             hub: self.hub,
@@ -1692,7 +1650,8 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
     ///  <tr>
     ///  <td>config.nodeCount</td>
     ///  <td>Horizontally scale the number of nodes in the environment. An integer
-    ///  greater than or equal to 3 must be provided in the `config.nodeCount` field.
+    ///  greater than or equal to 3 must be provided in the `config.nodeCount`
+    ///  field.
     ///  </td>
     ///  </tr>
     ///  <tr>
@@ -2271,7 +2230,8 @@ impl<'a, C, A> ProjectLocationEnvironmentCreateCall<'a, C, A> where C: BorrowMut
         self._request = new_value;
         self
     }
-    /// The parent must be of the form "projects/{projectId}/locations/{locationId}".
+    /// The parent must be of the form
+    /// "projects/{projectId}/locations/{locationId}".
     ///
     /// Sets the *parent* path property to the given value.
     ///

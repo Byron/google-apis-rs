@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdExchangeBuyerII* API at revision *20190403*. The CLI is at version *1.0.8*.
+This documentation was generated from the *AdExchangeBuyerII* API at revision *20190701*. The CLI is at version *1.0.9*.
 
 ```bash
 adexchangebuyer2-v2-beta1 [options]
@@ -65,7 +65,6 @@ adexchangebuyer2-v2-beta1 [options]
                 publisher-profiles-get <account-id> <publisher-profile-id> [-p <v>]... [-o <out>]
                 publisher-profiles-list <account-id> [-p <v>]... [-o <out>]
         bidders
-                accounts-creatives-delete <owner-name> <creative-id> [-p <v>]... [-o <out>]
                 accounts-filter-sets-bid-metrics-list <filter-set-name> [-p <v>]... [-o <out>]
                 accounts-filter-sets-bid-response-errors-list <filter-set-name> [-p <v>]... [-o <out>]
                 accounts-filter-sets-bid-responses-without-bids-list <filter-set-name> [-p <v>]... [-o <out>]

@@ -993,9 +993,8 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the Google Cloud Platform Console project that the Google service
-        account is associated with.
-        Required."##),
+                     Some(r##"Required. The ID of the Google Cloud Platform Console project that the
+        Google service account is associated with."##),
                      Some(true),
                      Some(false)),
         
@@ -1042,8 +1041,7 @@ fn main() {
                   vec![
                     (Some(r##"job-name"##),
                      None,
-                     Some(r##"The job to get.
-        Required."##),
+                     Some(r##"Required. The job to get."##),
                      Some(true),
                      Some(false)),
         
@@ -1083,8 +1081,7 @@ fn main() {
                   vec![
                     (Some(r##"job-name"##),
                      None,
-                     Some(r##"The name of job to update.
-        Required."##),
+                     Some(r##"Required. The name of job to update."##),
                      Some(true),
                      Some(false)),
         
@@ -1192,7 +1189,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The value `transferOperations`."##),
+                     Some(r##"Required. The value `transferOperations`."##),
                      Some(true),
                      Some(false)),
         
@@ -1214,8 +1211,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the transfer operation.
-        Required."##),
+                     Some(r##"Required. The name of the transfer operation."##),
                      Some(true),
                      Some(false)),
         
@@ -1243,8 +1239,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the transfer operation.
-        Required."##),
+                     Some(r##"Required. The name of the transfer operation."##),
                      Some(true),
                      Some(false)),
         
@@ -1272,7 +1267,7 @@ fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190330")
+           .version("1.0.9+20190702")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")

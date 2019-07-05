@@ -3026,7 +3026,7 @@ fn main() {
     
     let mut app = App::new("cloudprivatecatalogproducer1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190330")
+           .version("1.0.9+20190622")
            .about("Enables cloud users to manage and share enterprise catalogs intheir organizations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudprivatecatalogproducer1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: AdSense v1.0.8+20190402
+site_name: AdSense v1.0.9+20190703
 site_url: http://byron.github.io/google-apis-rs/google-adsense1d4-cli
 site_description: A complete library to interact with AdSense (protocol v1.4)
 
@@ -51,5 +51,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

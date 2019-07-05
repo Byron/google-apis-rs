@@ -138,7 +138,7 @@
             }
         }
     }, 
-    "revision": "20190401", 
+    "revision": "20190624", 
     "rootUrl": "https://run.googleapis.com/", 
     "schemas": {
         "Location": {

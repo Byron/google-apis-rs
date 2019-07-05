@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *1.0.8+20190328*, where *20190328* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *SQL Admin* crate version *1.0.9+20190607*, where *20190607* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -261,9 +261,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -380,7 +378,7 @@ impl<'a, C, A> SQLAdmin<C, A>
         SQLAdmin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/sql/v1beta4/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -412,7 +410,7 @@ impl<'a, C, A> SQLAdmin<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -483,6 +481,8 @@ pub struct BackupRun {
     pub id: Option<String>,
     /// Name of the database instance.
     pub instance: Option<String>,
+    /// The location of the backup.
+    pub location: Option<String>,
     /// The time the backup operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
@@ -548,6 +548,8 @@ pub struct RestoreBackupContext {
     /// The ID of the instance that the backup was taken from.
     #[serde(rename="instanceId")]
     pub instance_id: Option<String>,
+    /// The full project ID of the source instance.
+    pub project: Option<String>,
     /// This is always sql#restoreBackupContext.
     pub kind: Option<String>,
     /// The ID of the backup run to restore from.
@@ -602,19 +604,21 @@ impl Part for DiskEncryptionStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupConfiguration {
-    /// Whether this configuration is enabled.
-    pub enabled: Option<bool>,
     /// This is always sql#backupConfiguration.
     pub kind: Option<String>,
+    /// The location of the backup.
+    pub location: Option<String>,
+    /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - HH:MM.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// Whether this configuration is enabled.
+    pub enabled: Option<bool>,
     /// Reserved for future use.
     #[serde(rename="replicationLogArchivingEnabled")]
     pub replication_log_archiving_enabled: Option<bool>,
     /// Whether binary log is enabled. If backup configuration is disabled, binary log must be disabled as well.
     #[serde(rename="binaryLogEnabled")]
     pub binary_log_enabled: Option<bool>,
-    /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - HH:MM.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
 }
 
 impl Part for BackupConfiguration {}
@@ -799,7 +803,7 @@ pub struct IpMapping {
     /// The IP address assigned.
     #[serde(rename="ipAddress")]
     pub ip_address: Option<String>,
-    /// The type of this IP address. A PRIMARY address is an address that can accept incoming connections. An OUTGOING address is the source address of connections originating from the instance, if supported.
+    /// The type of this IP address. A PRIMARY address is a public address that can accept incoming connections. A PRIVATE address is a private address that can accept incoming connections. An OUTGOING address is the source address of connections originating from the instance, if supported.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1730,6 +1734,9 @@ pub struct DatabaseInstance {
     /// Configuration specific to failover replicas and read replicas.
     #[serde(rename="replicaConfiguration")]
     pub replica_configuration: Option<ReplicaConfiguration>,
+    /// Initial root password. Use only on creation.
+    #[serde(rename="rootPassword")]
+    pub root_password: Option<String>,
     /// The Compute Engine zone that the instance is currently serving from. This value could be different from the zone that was specified when the instance was created if the instance has failed over to its secondary zone.
     #[serde(rename="gceZone")]
     pub gce_zone: Option<String>,

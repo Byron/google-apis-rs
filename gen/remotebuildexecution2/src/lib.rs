@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Remote Build Execution* crate version *1.0.8+20190326*, where *20190326* is the exact revision of the *remotebuildexecution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Remote Build Execution* crate version *1.0.9+20190702*, where *20190702* is the exact revision of the *remotebuildexecution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Remote Build Execution* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/remote-build-execution/docs/).
@@ -91,7 +91,6 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_remotebuildexecution2 as remotebuildexecution2;
-//! use remotebuildexecution2::BuildBazelRemoteExecutionV2ActionResult;
 //! use remotebuildexecution2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -110,16 +109,13 @@
 //!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = RemoteBuildExecution::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = BuildBazelRemoteExecutionV2ActionResult::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.action_results().update(req, "instanceName", "hash", "sizeBytes")
-//!              .results_cache_policy_priority(-22)
+//! let result = hub.action_results().get("instanceName", "hash", "sizeBytes")
+//!              .inline_stdout(false)
+//!              .inline_stderr(true)
+//!              .add_inline_output_files("erat")
 //!              .doit();
 //! 
 //! match result {
@@ -228,9 +224,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -277,7 +271,6 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_remotebuildexecution2 as remotebuildexecution2;
-/// use remotebuildexecution2::BuildBazelRemoteExecutionV2ActionResult;
 /// use remotebuildexecution2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -296,16 +289,13 @@ impl Default for Scope {
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = RemoteBuildExecution::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = BuildBazelRemoteExecutionV2ActionResult::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.action_results().update(req, "instanceName", "hash", "sizeBytes")
-///              .results_cache_policy_priority(-81)
+/// let result = hub.action_results().get("instanceName", "hash", "sizeBytes")
+///              .inline_stdout(true)
+///              .inline_stderr(false)
+///              .add_inline_output_files("sadipscing")
 ///              .doit();
 /// 
 /// match result {
@@ -343,7 +333,7 @@ impl<'a, C, A> RemoteBuildExecution<C, A>
         RemoteBuildExecution {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://remotebuildexecution.googleapis.com/".to_string(),
             _root_url: "https://remotebuildexecution.googleapis.com/".to_string(),
         }
@@ -366,7 +356,7 @@ impl<'a, C, A> RemoteBuildExecution<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -446,6 +436,11 @@ impl Part for BuildBazelRemoteExecutionV2SymlinkNode {}
 /// * Every child in the directory must have a path of exactly one segment.
 ///   Multiple levels of directory hierarchy may not be collapsed.
 /// * Each child in the directory must have a unique path segment (file name).
+///   Note that while the API itself is case-sensitive, the environment where
+///   the Action is executed may or may not be case-sensitive. That is, it is
+///   legal to call the API with a Directory that has both "Foo" and "foo" as
+///   children, but the Action may be rejected by the remote system upon
+///   execution.
 /// * The files, directories and symlinks in the directory must each be sorted
 ///   in lexicographical order by path. The path strings must be sorted by code
 ///   point, equivalently, by UTF-8 bytes.
@@ -644,8 +639,9 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// the action completed, a single entry will be present either in this field,
     /// or in the `output_files` field, if the file was not a symbolic link.
     /// 
-    /// If the action does not produce the requested output, or produces a
-    /// directory where a regular file is expected or vice versa, then that output
+    /// If an output symbolic link of the same name was found, but its target
+    /// type was not a regular file, the server will return a FAILED_PRECONDITION.
+    /// If the action does not produce the requested output, then that output
     /// will be omitted from the list. The server is free to arrange the output
     /// list as desired; clients MUST NOT assume that the output list is sorted.
     #[serde(rename="outputFileSymlinks")]
@@ -653,39 +649,36 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// The digest for a blob containing the standard error of the action, which
     /// can be retrieved from the
     /// ContentAddressableStorage.
-    /// See `stderr_raw` for when this will be set.
     #[serde(rename="stderrDigest")]
     pub stderr_digest: Option<BuildBazelRemoteExecutionV2Digest>,
-    /// The standard output buffer of the action. The server will determine, based
-    /// on the size of the buffer, whether to return it in raw form or to return
-    /// a digest in `stdout_digest` that points to the buffer. If neither is set,
-    /// then the buffer is empty. The client SHOULD NOT assume it will get one of
-    /// the raw buffer or a digest on any given request and should be prepared to
-    /// handle either.
+    /// The standard output buffer of the action. The server SHOULD NOT inline
+    /// stdout unless requested by the client in the
+    /// GetActionResultRequest
+    /// message. The server MAY omit inlining, even if requested, and MUST do so if inlining
+    /// would cause the response to exceed message size limits.
     #[serde(rename="stdoutRaw")]
     pub stdout_raw: Option<String>,
-    /// The standard error buffer of the action. The server will determine, based
-    /// on the size of the buffer, whether to return it in raw form or to return
-    /// a digest in `stderr_digest` that points to the buffer. If neither is set,
-    /// then the buffer is empty. The client SHOULD NOT assume it will get one of
-    /// the raw buffer or a digest on any given request and should be prepared to
-    /// handle either.
+    /// The standard error buffer of the action. The server SHOULD NOT inline
+    /// stderr unless requested by the client in the
+    /// GetActionResultRequest
+    /// message. The server MAY omit inlining, even if requested, and MUST do so if inlining
+    /// would cause the response to exceed message size limits.
     #[serde(rename="stderrRaw")]
     pub stderr_raw: Option<String>,
     /// The digest for a blob containing the standard output of the action, which
     /// can be retrieved from the
     /// ContentAddressableStorage.
-    /// See `stdout_raw` for when this will be set.
     #[serde(rename="stdoutDigest")]
     pub stdout_digest: Option<BuildBazelRemoteExecutionV2Digest>,
     /// The output files of the action. For each output file requested in the
     /// `output_files` field of the Action, if the corresponding file existed after
     /// the action completed, a single entry will be present either in this field,
-    /// or in the output_file_symlinks field, if the file was a symbolic link to
+    /// or the `output_file_symlinks` field if the file was a symbolic link to
     /// another file.
     /// 
-    /// If the action does not produce the requested output, or produces a
-    /// directory where a regular file is expected or vice versa, then that output
+    /// If an output of the same name was found, but was a directory rather
+    /// than a regular file, the server will return a FAILED_PRECONDITION.
+    /// If the action does not produce the requested output, then that output
     /// will be omitted from the list. The server is free to arrange the output
     /// list as desired; clients MUST NOT assume that the output list is sorted.
     #[serde(rename="outputFiles")]
@@ -696,12 +689,13 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// if the server supports
     /// SymlinkAbsolutePathStrategy.ALLOWED.
     /// For each output directory requested in the `output_directories` field of
-    /// the Action, if the directory file existed after
-    /// the action completed, a single entry will be present either in this field,
-    /// or in the `output_directories` field, if the directory was not a symbolic link.
+    /// the Action, if the directory existed after the action completed, a
+    /// single entry will be present either in this field, or in the
+    /// `output_directories` field, if the directory was not a symbolic link.
     /// 
-    /// If the action does not produce the requested output, or produces a
-    /// file where a directory is expected or vice versa, then that output
+    /// If an output of the same name was found, but was a symbolic link to a file
+    /// instead of a directory, the server will return a FAILED_PRECONDITION.
+    /// If the action does not produce the requested output, then that output
     /// will be omitted from the list. The server is free to arrange the output
     /// list as desired; clients MUST NOT assume that the output list is sorted.
     #[serde(rename="outputDirectorySymlinks")]
@@ -765,6 +759,8 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     ///   }
     /// }
     /// ```
+    /// If an output of the same name was found, but was not a directory, the
+    /// server will return a FAILED_PRECONDITION.
     #[serde(rename="outputDirectories")]
     pub output_directories: Option<Vec<BuildBazelRemoteExecutionV2OutputDirectory>>,
     /// The exit code of the command.
@@ -886,9 +882,19 @@ pub struct BuildBazelRemoteExecutionV2ExecuteRequest {
     /// This may be applied to both the ActionResult and the associated blobs.
     #[serde(rename="resultsCachePolicy")]
     pub results_cache_policy: Option<BuildBazelRemoteExecutionV2ResultsCachePolicy>,
-    /// If true, the action will be executed anew even if its result was already
-    /// present in the cache. If false, the result may be served from the
-    /// ActionCache.
+    /// If true, the action will be executed even if its result is already
+    /// present in the ActionCache.
+    /// The execution is still allowed to be merged with other in-flight executions
+    /// of the same action, however - semantically, the service MUST only guarantee
+    /// that the results of an execution with this field set were not visible
+    /// before the corresponding execution request was sent.
+    /// Note that actions from execution requests setting this field set are still
+    /// eligible to be entered into the action cache upon completion, and services
+    /// SHOULD overwrite any existing entries that may exist. This allows
+    /// skip_cache_lookup requests to be used as a mechanism for replacing action
+    /// cache entries that reference outputs no longer available or that are
+    /// poisoned in any way.
+    /// If false, the result may be served from the action cache.
     #[serde(rename="skipCacheLookup")]
     pub skip_cache_lookup: Option<bool>,
     /// The digest of the Action to
@@ -989,7 +995,7 @@ pub struct BuildBazelRemoteExecutionV2FindMissingBlobsRequest {
 impl RequestValue for BuildBazelRemoteExecutionV2FindMissingBlobsRequest {}
 
 
-/// A response corresponding to a single blob that the client tried to upload.
+/// A response corresponding to a single blob that the client tried to download.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1049,56 +1055,11 @@ impl Part for BuildBazelRemoteExecutionV2BatchUpdateBlobsResponseResponse {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1141,8 +1102,6 @@ impl Part for BuildBazelRemoteExecutionV2FileNode {}
 /// output in an `ActionResult`. It allows a full file path rather than
 /// only a name.
 /// 
-/// `OutputFile` is binary-compatible with `FileNode`.
-/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1154,6 +1113,12 @@ pub struct BuildBazelRemoteExecutionV2OutputFile {
     /// True if file is executable, false otherwise.
     #[serde(rename="isExecutable")]
     pub is_executable: Option<bool>,
+    /// The contents of the file if inlining was requested. The server SHOULD NOT inline
+    /// file contents unless requested by the client in the
+    /// GetActionResultRequest
+    /// message. The server MAY omit inlining, even if requested, and MUST do so if inlining
+    /// would cause the response to exceed message size limits.
+    pub contents: Option<String>,
     /// The digest of the file's content.
     pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
 }
@@ -1379,7 +1344,7 @@ pub struct GoogleLongrunningOperation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -1506,6 +1471,13 @@ impl<'a, C, A> ActionResultMethods<'a, C, A> {
     ///
     /// Retrieve a cached execution result.
     /// 
+    /// Implementations SHOULD ensure that any blobs referenced from the
+    /// ContentAddressableStorage
+    /// are available at the time of returning the
+    /// ActionResult and will be
+    /// for some period of time afterwards. The TTLs of the referenced blobs SHOULD be increased
+    /// if necessary and applicable.
+    /// 
     /// Errors:
     /// 
     /// * `NOT_FOUND`: The requested `ActionResult` is not in the cache.
@@ -1526,6 +1498,9 @@ impl<'a, C, A> ActionResultMethods<'a, C, A> {
             _instance_name: instance_name.to_string(),
             _hash: hash.to_string(),
             _size_bytes: size_bytes.to_string(),
+            _inline_stdout: Default::default(),
+            _inline_stderr: Default::default(),
+            _inline_output_files: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1953,7 +1928,14 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// GetCapabilities returns the server capabilities configuration.
+    /// GetCapabilities returns the server capabilities configuration of the
+    /// remote endpoint.
+    /// Only the capabilities of the services supported by the endpoint will
+    /// be returned:
+    /// * Execution + CAS + Action Cache endpoints should return both
+    ///   CacheCapabilities and ExecutionCapabilities.
+    /// * Execution only endpoints should return ExecutionCapabilities.
+    /// * CAS + Action Cache only endpoints should return CacheCapabilities.
     /// 
     /// # Arguments
     ///
@@ -2268,6 +2250,13 @@ impl<'a, C, A> OperationWaitExecutionCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 /// Retrieve a cached execution result.
 /// 
+/// Implementations SHOULD ensure that any blobs referenced from the
+/// ContentAddressableStorage
+/// are available at the time of returning the
+/// ActionResult and will be
+/// for some period of time afterwards. The TTLs of the referenced blobs SHOULD be increased
+/// if necessary and applicable.
+/// 
 /// Errors:
 /// 
 /// * `NOT_FOUND`: The requested `ActionResult` is not in the cache.
@@ -2298,6 +2287,9 @@ impl<'a, C, A> OperationWaitExecutionCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.action_results().get("instanceName", "hash", "sizeBytes")
+///              .inline_stdout(true)
+///              .inline_stderr(true)
+///              .add_inline_output_files("et")
 ///              .doit();
 /// # }
 /// ```
@@ -2308,6 +2300,9 @@ pub struct ActionResultGetCall<'a, C, A>
     _instance_name: String,
     _hash: String,
     _size_bytes: String,
+    _inline_stdout: Option<bool>,
+    _inline_stderr: Option<bool>,
+    _inline_output_files: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2330,11 +2325,22 @@ impl<'a, C, A> ActionResultGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "remotebuildexecution.actionResults.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("instanceName", self._instance_name.to_string()));
         params.push(("hash", self._hash.to_string()));
         params.push(("sizeBytes", self._size_bytes.to_string()));
-        for &field in ["alt", "instanceName", "hash", "sizeBytes"].iter() {
+        if let Some(value) = self._inline_stdout {
+            params.push(("inlineStdout", value.to_string()));
+        }
+        if let Some(value) = self._inline_stderr {
+            params.push(("inlineStderr", value.to_string()));
+        }
+        if self._inline_output_files.len() > 0 {
+            for f in self._inline_output_files.iter() {
+                params.push(("inlineOutputFiles", f.to_string()));
+            }
+        }
+        for &field in ["alt", "instanceName", "hash", "sizeBytes", "inlineStdout", "inlineStderr", "inlineOutputFiles"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2484,6 +2490,32 @@ impl<'a, C, A> ActionResultGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._size_bytes = new_value.to_string();
         self
     }
+    /// A hint to the server to request inlining stdout in the
+    /// ActionResult message.
+    ///
+    /// Sets the *inline stdout* query property to the given value.
+    pub fn inline_stdout(mut self, new_value: bool) -> ActionResultGetCall<'a, C, A> {
+        self._inline_stdout = Some(new_value);
+        self
+    }
+    /// A hint to the server to request inlining stderr in the
+    /// ActionResult message.
+    ///
+    /// Sets the *inline stderr* query property to the given value.
+    pub fn inline_stderr(mut self, new_value: bool) -> ActionResultGetCall<'a, C, A> {
+        self._inline_stderr = Some(new_value);
+        self
+    }
+    /// A hint to the server to inline the contents of the listed output files.
+    /// Each path needs to exactly match one path in `output_files` in the
+    /// Command message.
+    ///
+    /// Append the given value to the *inline output files* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_inline_output_files(mut self, new_value: &str) -> ActionResultGetCall<'a, C, A> {
+        self._inline_output_files.push(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -2596,7 +2628,7 @@ impl<'a, C, A> ActionResultGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.action_results().update(req, "instanceName", "hash", "sizeBytes")
-///              .results_cache_policy_priority(-66)
+///              .results_cache_policy_priority(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -3833,8 +3865,8 @@ impl<'a, C, A> BlobBatchReadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.blobs().get_tree("instanceName", "hash", "sizeBytes")
-///              .page_token("ipsum")
-///              .page_size(-5)
+///              .page_token("sadipscing")
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -4456,7 +4488,14 @@ impl<'a, C, A> ActionExecuteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// GetCapabilities returns the server capabilities configuration.
+/// GetCapabilities returns the server capabilities configuration of the
+/// remote endpoint.
+/// Only the capabilities of the services supported by the endpoint will
+/// be returned:
+/// * Execution + CAS + Action Cache endpoints should return both
+///   CacheCapabilities and ExecutionCapabilities.
+/// * Execution only endpoints should return ExecutionCapabilities.
+/// * CAS + Action Cache only endpoints should return CacheCapabilities.
 ///
 /// A builder for the *getCapabilities* method.
 /// It is not used directly, but through a `MethodMethods` instance.

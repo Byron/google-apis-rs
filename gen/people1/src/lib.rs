@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *People Service* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *People Service* crate version *1.0.9+20190702*, where *20190702* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *People Service* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/people/).
@@ -222,9 +222,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -236,9 +234,6 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View your basic profile info, including your age range and language
-    PluLogin,
-
     /// View your complete date of birth
     UserBirthdayRead,
 
@@ -267,7 +262,6 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::PluLogin => "https://www.googleapis.com/auth/plus.login",
             Scope::UserBirthdayRead => "https://www.googleapis.com/auth/user.birthday.read",
             Scope::ContactReadonly => "https://www.googleapis.com/auth/contacts.readonly",
             Scope::UserEmailRead => "https://www.googleapis.com/auth/user.emails.read",
@@ -365,7 +359,7 @@ impl<'a, C, A> PeopleService<C, A>
         PeopleService {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://people.googleapis.com/".to_string(),
             _root_url: "https://people.googleapis.com/".to_string(),
         }
@@ -379,7 +373,7 @@ impl<'a, C, A> PeopleService<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -564,14 +558,17 @@ impl Part for Tagline {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContactGroupMembership {
-    /// The contact group ID for the contact group membership. The contact group
-    /// ID can be custom or one of these predefined values:
-    /// 
-    /// *  `myContacts`
-    /// *  `starred`
-    /// *  A numerical ID for user-created groups.
+    /// The read-only contact group ID for the contact group membership.
     #[serde(rename="contactGroupId")]
     pub contact_group_id: Option<String>,
+    /// The resource name for the contact group, assigned by the server. An ASCII
+    /// string, in the form of `contactGroups/`<var>contact_group_id</var>.
+    /// Only contact_group_resource_name can be used for modifying memberships.
+    /// Any contact group membership can be removed, but only user group or
+    /// "myContacts" or "starred" system groups memberships can be added. A
+    /// contact must always have at least one contact group membership.
+    #[serde(rename="contactGroupResourceName")]
+    pub contact_group_resource_name: Option<String>,
 }
 
 impl Part for ContactGroupMembership {}
@@ -794,7 +791,8 @@ impl Resource for ContactGroup {}
 impl ResponseResult for ContactGroup {}
 
 
-/// A person's read-only membership in a group.
+/// A person's membership in a group. Only contact group memberships can be
+/// modified.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -803,7 +801,7 @@ pub struct Membership {
     /// The contact group membership.
     #[serde(rename="contactGroupMembership")]
     pub contact_group_membership: Option<ContactGroupMembership>,
-    /// The domain membership.
+    /// The read-only domain membership.
     #[serde(rename="domainMembership")]
     pub domain_membership: Option<DomainMembership>,
     /// Metadata about the membership.
@@ -1035,56 +1033,11 @@ impl Part for ContactGroupResponse {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1272,7 +1225,7 @@ impl Part for Residence {}
 
 /// A request to modify an existing contact group's members. Contacts can be
 /// removed from any group but they can only be added to a user group or
-/// myContacts or starred system groups.
+/// "myContacts" or "starred" system groups.
 /// 
 /// # Activities
 /// 
@@ -1395,7 +1348,7 @@ pub struct Person {
     pub user_defined: Option<Vec<UserDefined>>,
     /// The person's skills.
     pub skills: Option<Vec<Skill>>,
-    /// The person's read-only group memberships.
+    /// The person's group memberships.
     pub memberships: Option<Vec<Membership>>,
     /// The person's read-only taglines.
     pub taglines: Option<Vec<Tagline>>,
@@ -1735,13 +1688,13 @@ pub struct Occupation {
 impl Part for Occupation {}
 
 
-/// A Google Apps Domain membership.
+/// A read-only G Suite Domain membership.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DomainMembership {
-    /// True if the person is in the viewer's Google Apps domain.
+    /// True if the person is in the viewer's G Suite domain.
     #[serde(rename="inViewerDomain")]
     pub in_viewer_domain: Option<bool>,
 }
@@ -5436,6 +5389,7 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * imClients
     /// * interests
     /// * locales
+    /// * memberships
     /// * names
     /// * nicknames
     /// * occupations

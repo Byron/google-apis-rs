@@ -15,7 +15,7 @@
     "description": "Reads and publishes results from Firebase Test Lab.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://firebase.google.com/docs/test-lab/", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/u6UkjierhxUyi5DUai9HVVngHCo\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/rSHkBO8WWiZ0SSJDO3DwsVNnyIM\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -1093,6 +1093,116 @@
                                                 }
                                             }
                                         }, 
+                                        "testCases": {
+                                            "methods": {
+                                                "get": {
+                                                    "description": "Gets details of a Test Case for a Step. Experimental test cases API. Still in active development.\n\nMay return any of the following canonical error codes:\n\n- PERMISSION_DENIED - if the user is not authorized to write to project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the containing Test Case does not exist", 
+                                                    "httpMethod": "GET", 
+                                                    "id": "toolresults.projects.histories.executions.steps.testCases.get", 
+                                                    "parameterOrder": [
+                                                        "projectId", 
+                                                        "historyId", 
+                                                        "executionId", 
+                                                        "stepId", 
+                                                        "testCaseId"
+                                                    ], 
+                                                    "parameters": {
+                                                        "executionId": {
+                                                            "description": "A Execution id\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }, 
+                                                        "historyId": {
+                                                            "description": "A History id.\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }, 
+                                                        "projectId": {
+                                                            "description": "A Project id.\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }, 
+                                                        "stepId": {
+                                                            "description": "A Step id. Note: This step must include a TestExecutionStep.\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }, 
+                                                        "testCaseId": {
+                                                            "description": "A Test Case id.\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }
+                                                    }, 
+                                                    "path": "{projectId}/histories/{historyId}/executions/{executionId}/steps/{stepId}/testCases/{testCaseId}", 
+                                                    "response": {
+                                                        "$ref": "TestCase"
+                                                    }, 
+                                                    "scopes": [
+                                                        "https://www.googleapis.com/auth/cloud-platform"
+                                                    ]
+                                                }, 
+                                                "list": {
+                                                    "description": "Lists Test Cases attached to a Step. Experimental test cases API. Still in active development.\n\nMay return any of the following canonical error codes:\n\n- PERMISSION_DENIED - if the user is not authorized to write to project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the containing Step does not exist", 
+                                                    "httpMethod": "GET", 
+                                                    "id": "toolresults.projects.histories.executions.steps.testCases.list", 
+                                                    "parameterOrder": [
+                                                        "projectId", 
+                                                        "historyId", 
+                                                        "executionId", 
+                                                        "stepId"
+                                                    ], 
+                                                    "parameters": {
+                                                        "executionId": {
+                                                            "description": "A Execution id\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }, 
+                                                        "historyId": {
+                                                            "description": "A History id.\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }, 
+                                                        "pageSize": {
+                                                            "description": "The maximum number of TestCases to fetch.\n\nDefault value: 100. The server will use this default if the field is not set or has a value of 0.\n\nOptional.", 
+                                                            "format": "int32", 
+                                                            "location": "query", 
+                                                            "type": "integer"
+                                                        }, 
+                                                        "pageToken": {
+                                                            "description": "A continuation token to resume the query at the next item.\n\nOptional.", 
+                                                            "location": "query", 
+                                                            "type": "string"
+                                                        }, 
+                                                        "projectId": {
+                                                            "description": "A Project id.\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }, 
+                                                        "stepId": {
+                                                            "description": "A Step id. Note: This step must include a TestExecutionStep.\n\nRequired.", 
+                                                            "location": "path", 
+                                                            "required": true, 
+                                                            "type": "string"
+                                                        }
+                                                    }, 
+                                                    "path": "{projectId}/histories/{historyId}/executions/{executionId}/steps/{stepId}/testCases", 
+                                                    "response": {
+                                                        "$ref": "ListTestCasesResponse"
+                                                    }, 
+                                                    "scopes": [
+                                                        "https://www.googleapis.com/auth/cloud-platform"
+                                                    ]
+                                                }
+                                            }
+                                        }, 
                                         "thumbnails": {
                                             "methods": {
                                                 "list": {
@@ -1161,7 +1271,7 @@
             }
         }
     }, 
-    "revision": "20190403", 
+    "revision": "20190704", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "AndroidAppInfo": {
@@ -1482,6 +1592,7 @@
             "type": "object"
         }, 
         "FailureDetail": {
+            "description": "Details for an outcome with a FAILURE outcome summary.", 
             "id": "FailureDetail", 
             "properties": {
                 "crashed": {
@@ -1646,10 +1757,15 @@
             "type": "object"
         }, 
         "InconclusiveDetail": {
+            "description": "Details for an outcome with an INCONCLUSIVE outcome summary.", 
             "id": "InconclusiveDetail", 
             "properties": {
                 "abortedByUser": {
                     "description": "If the end user aborted the test execution before a pass or fail could be determined. For example, the user pressed ctrl-c which sent a kill signal to the test runner while the test was running.", 
+                    "type": "boolean"
+                }, 
+                "hasErrorLogs": {
+                    "description": "If results are being provided to the user in certain cases of infrastructure failures", 
                     "type": "boolean"
                 }, 
                 "infrastructureFailure": {
@@ -1663,6 +1779,11 @@
             "description": "Step Id and outcome of each individual step that was run as a group with other steps with the same configuration.", 
             "id": "IndividualOutcome", 
             "properties": {
+                "multistepNumber": {
+                    "description": "Unique int given to each step. Ranges from 0(inclusive) to total number of steps(exclusive). The primary step is 0.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
                 "outcomeSummary": {
                     "enum": [
                         "failure", 
@@ -1681,6 +1802,10 @@
                         ""
                     ], 
                     "type": "string"
+                }, 
+                "runDuration": {
+                    "$ref": "Duration", 
+                    "description": "How long it took for this step to run."
                 }, 
                 "stepId": {
                     "type": "string"
@@ -1795,6 +1920,23 @@
                     "description": "Steps.", 
                     "items": {
                         "$ref": "Step"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "ListTestCasesResponse": {
+            "description": "Response message for StepService.ListTestCases.", 
+            "id": "ListTestCasesResponse", 
+            "properties": {
+                "nextPageToken": {
+                    "type": "string"
+                }, 
+                "testCases": {
+                    "description": "List of test cases.", 
+                    "items": {
+                        "$ref": "TestCase"
                     }, 
                     "type": "array"
                 }
@@ -2108,6 +2250,7 @@
             "type": "object"
         }, 
         "SkippedDetail": {
+            "description": "Details for an outcome with a SKIPPED outcome summary.", 
             "id": "SkippedDetail", 
             "properties": {
                 "incompatibleAppVersion": {
@@ -2148,7 +2291,7 @@
             "type": "object"
         }, 
         "Status": {
-            "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users - Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of [google.rpc.Code][], but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.", 
+            "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).", 
             "id": "Status", 
             "properties": {
                 "code": {
@@ -2280,11 +2423,70 @@
             "type": "object"
         }, 
         "SuccessDetail": {
+            "description": "Details for an outcome with a SUCCESS outcome summary.", 
             "id": "SuccessDetail", 
             "properties": {
                 "otherNativeCrash": {
                     "description": "If a native process other than the app crashed.", 
                     "type": "boolean"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TestCase": {
+            "id": "TestCase", 
+            "properties": {
+                "endTime": {
+                    "$ref": "Timestamp", 
+                    "description": "The end time of the test case.\n\nOptional."
+                }, 
+                "skippedMessage": {
+                    "description": "Why the test case was skipped.\n\nPresent only for skipped test case", 
+                    "type": "string"
+                }, 
+                "stackTraces": {
+                    "description": "The stack trace details if the test case failed or encountered an error.\n\nThe maximum size of the stack traces is 100KiB, beyond which the stack track will be truncated.\n\nZero if the test case passed.", 
+                    "items": {
+                        "$ref": "StackTrace"
+                    }, 
+                    "type": "array"
+                }, 
+                "startTime": {
+                    "$ref": "Timestamp", 
+                    "description": "The start time of the test case.\n\nOptional."
+                }, 
+                "status": {
+                    "description": "The status of the test case.\n\nRequired.", 
+                    "enum": [
+                        "error", 
+                        "failed", 
+                        "flaky", 
+                        "passed", 
+                        "skipped"
+                    ], 
+                    "enumDescriptions": [
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        ""
+                    ], 
+                    "type": "string"
+                }, 
+                "testCaseId": {
+                    "description": "A unique identifier within a Step for this Test Case.", 
+                    "type": "string"
+                }, 
+                "testCaseReference": {
+                    "$ref": "TestCaseReference", 
+                    "description": "Test case reference, e.g. name, class name and test suite name.\n\nRequired."
+                }, 
+                "toolOutputs": {
+                    "description": "References to opaque files of any format output by the tool execution.", 
+                    "items": {
+                        "$ref": "ToolOutputReference"
+                    }, 
+                    "type": "array"
                 }
             }, 
             "type": "object"
@@ -2388,6 +2590,7 @@
                         "availableDeepLinks", 
                         "compatibleWithOrchestrator", 
                         "completeRoboScriptExecution", 
+                        "crashDialogError", 
                         "encounteredLoginScreen", 
                         "encounteredNonAndroidUiWidgetScreen", 
                         "failedToInstall", 
@@ -2433,6 +2636,7 @@
                         "", 
                         "", 
                         "", 
+                        "", 
                         ""
                     ], 
                     "type": "string"
@@ -2448,6 +2652,10 @@
             "description": "A summary of a test suite result either parsed from XML or uploaded directly by a user.\n\nNote: the API related comments are for StepService only. This message is also being used in ExecutionService in a read only mode for the corresponding step.", 
             "id": "TestSuiteOverview", 
             "properties": {
+                "elapsedTime": {
+                    "$ref": "Duration", 
+                    "description": "Elapsed time of test suite."
+                }, 
                 "errorCount": {
                     "description": "Number of test cases in error, typically set by the service by parsing the xml_source.\n\n- In create/response: always set - In update request: never", 
                     "format": "int32", 

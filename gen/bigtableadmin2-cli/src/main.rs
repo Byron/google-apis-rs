@@ -2506,6 +2506,120 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -2622,6 +2736,12 @@ impl<'n> Engine<'n> {
                     },
                     ("instances-update", Some(opt)) => {
                         call_result = self._projects_instances_update(opt, dry_run, &mut err);
+                    },
+                    ("locations-get", Some(opt)) => {
+                        call_result = self._projects_locations_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-list", Some(opt)) => {
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -2828,7 +2948,7 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'instances-app-profiles-create', 'instances-app-profiles-delete', 'instances-app-profiles-get', 'instances-app-profiles-list', 'instances-app-profiles-patch', 'instances-clusters-create', 'instances-clusters-delete', 'instances-clusters-get', 'instances-clusters-list', 'instances-clusters-update', 'instances-create', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-partial-update-instance', 'instances-set-iam-policy', 'instances-tables-check-consistency', 'instances-tables-create', 'instances-tables-delete', 'instances-tables-drop-row-range', 'instances-tables-generate-consistency-token', 'instances-tables-get', 'instances-tables-get-iam-policy', 'instances-tables-list', 'instances-tables-modify-column-families', 'instances-tables-set-iam-policy', 'instances-tables-test-iam-permissions', 'instances-test-iam-permissions' and 'instances-update'", vec![
+        ("projects", "methods: 'instances-app-profiles-create', 'instances-app-profiles-delete', 'instances-app-profiles-get', 'instances-app-profiles-list', 'instances-app-profiles-patch', 'instances-clusters-create', 'instances-clusters-delete', 'instances-clusters-get', 'instances-clusters-list', 'instances-clusters-update', 'instances-create', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-partial-update-instance', 'instances-set-iam-policy', 'instances-tables-check-consistency', 'instances-tables-create', 'instances-tables-delete', 'instances-tables-drop-row-range', 'instances-tables-generate-consistency-token', 'instances-tables-get', 'instances-tables-get-iam-policy', 'instances-tables-list', 'instances-tables-modify-column-families', 'instances-tables-set-iam-policy', 'instances-tables-test-iam-permissions', 'instances-test-iam-permissions', 'instances-update', 'locations-get' and 'locations-list'", vec![
             ("instances-app-profiles-create",
                     Some(r##"Creates an app profile within an instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-app-profiles-create",
@@ -3663,13 +3783,57 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-get",
+                    Some(r##"Gets information about a location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_locations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Resource name for the location."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-list",
+                    Some(r##"Lists information about the supported locations for this service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_locations-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource that owns the locations collection, if applicable."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("bigtableadmin2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190328")
+           .version("1.0.9+20190506")
            .about("Administer your Cloud Bigtable tables and instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli")
            .arg(Arg::with_name("url")

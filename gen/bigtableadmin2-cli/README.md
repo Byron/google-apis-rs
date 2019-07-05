@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Bigtable Admin* API at revision *20190328*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Bigtable Admin* API at revision *20190506*. The CLI is at version *1.0.9*.
 
 ```bash
 bigtableadmin2 [options]
@@ -65,6 +65,8 @@ bigtableadmin2 [options]
                 instances-tables-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
   bigtableadmin2 --help
 
 Configuration:

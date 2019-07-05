@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *testing* crate version *1.0.8+20190403*, where *20190403* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *testing* crate version *1.0.9+20190627*, where *20190627* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *testing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-test-lab/).
@@ -223,9 +223,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -342,7 +340,7 @@ impl<'a, C, A> Testing<C, A>
         Testing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://testing.googleapis.com/".to_string(),
             _root_url: "https://testing.googleapis.com/".to_string(),
         }
@@ -359,7 +357,7 @@ impl<'a, C, A> Testing<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -430,6 +428,9 @@ pub struct ResultStorage {
     /// Output only. The tool results execution that results are written to.
     #[serde(rename="toolResultsExecution")]
     pub tool_results_execution: Option<ToolResultsExecution>,
+    /// Output only. URL to the results in the Firebase Web Console.
+    #[serde(rename="resultsUrl")]
+    pub results_url: Option<String>,
 }
 
 impl Part for ResultStorage {}
@@ -763,7 +764,7 @@ pub struct ClientInfo {
 impl Part for ClientInfo {}
 
 
-/// A description of how to set up an iOS device prior to a test.
+/// A description of how to set up an iOS device prior to running the test.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -851,7 +852,7 @@ pub struct ToolResultsHistory {
 impl Part for ToolResultsHistory {}
 
 
-/// Specifies a single test to be executed in a single environment.
+/// A single test executed in a single environment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -866,7 +867,7 @@ pub struct TestExecution {
     /// Output only. Indicates the current progress of the test execution
     /// (e.g., FINISHED).
     pub state: Option<String>,
-    /// Output only. Unique id set by the backend.
+    /// Output only. Unique id set by the service.
     pub id: Option<String>,
     /// Output only. How the host machine(s) are configured.
     pub environment: Option<Environment>,
@@ -893,6 +894,9 @@ impl Part for TestExecution {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApkManifest {
+    /// Maximum API level on which the application is designed to run.
+    #[serde(rename="maxSdkVersion")]
+    pub max_sdk_version: Option<i32>,
     /// Minimum API level required for the application to run.
     #[serde(rename="minSdkVersion")]
     pub min_sdk_version: Option<i32>,
@@ -900,9 +904,9 @@ pub struct ApkManifest {
     /// "com.example.foo".
     #[serde(rename="packageName")]
     pub package_name: Option<String>,
-    /// Maximum API level on which the application is designed to run.
-    #[serde(rename="maxSdkVersion")]
-    pub max_sdk_version: Option<i32>,
+    /// Specifies the API Level on which the application is designed to run.
+    #[serde(rename="targetSdkVersion")]
+    pub target_sdk_version: Option<i32>,
     /// User-readable name for the application.
     #[serde(rename="applicationLabel")]
     pub application_label: Option<String>,
@@ -1292,10 +1296,10 @@ pub struct TestSpecification {
     /// scripts.
     #[serde(rename="testSetup")]
     pub test_setup: Option<TestSetup>,
-    /// Disables video recording; may reduce test latency.
+    /// Disables video recording. May reduce test latency.
     #[serde(rename="disableVideoRecording")]
     pub disable_video_recording: Option<bool>,
-    /// Disables performance metrics recording; may reduce test latency.
+    /// Disables performance metrics recording. May reduce test latency.
     #[serde(rename="disablePerformanceMetrics")]
     pub disable_performance_metrics: Option<bool>,
     /// An Android Application with a Test Loop.
@@ -1339,12 +1343,12 @@ impl Part for EnvironmentMatrix {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoboStartingIntent {
-    /// no description provided
+    /// An intent that starts an activity with specific details.
     #[serde(rename="startActivity")]
     pub start_activity: Option<StartActivityIntent>,
     /// Timeout in seconds for each intent.
     pub timeout: Option<String>,
-    /// no description provided
+    /// An intent that starts the main launcher activity.
     #[serde(rename="launcherActivity")]
     pub launcher_activity: Option<LauncherActivityIntent>,
 }
@@ -1670,8 +1674,9 @@ pub struct IosDeviceCatalog {
 impl Part for IosDeviceCatalog {}
 
 
-/// A group of one or more TestExecutions, built by taking a
-/// product of values over a pre-defined set of axes.
+/// TestMatrix captures all details about a test. It contains the environment
+/// configuration, test specification, test executions and overall state and
+/// outcome.
 /// 
 /// # Activities
 /// 
@@ -1699,8 +1704,7 @@ pub struct TestMatrix {
     /// Default is 0, which implies no reruns.
     #[serde(rename="flakyTestAttempts")]
     pub flaky_test_attempts: Option<i32>,
-    /// Output only. Indicates the current progress of the test matrix
-    /// (e.g., FINISHED).
+    /// Output only. Indicates the current progress of the test matrix.
     pub state: Option<String>,
     /// Output only. The list of test executions that the service creates for
     /// this matrix.
@@ -1718,9 +1722,13 @@ pub struct TestMatrix {
     /// Only useful for matrices in the INVALID state.
     #[serde(rename="invalidMatrixDetails")]
     pub invalid_matrix_details: Option<String>,
-    /// Required. How the host machine(s) are configured.
+    /// Required. The devices the tests are being executed on.
     #[serde(rename="environmentMatrix")]
     pub environment_matrix: Option<EnvironmentMatrix>,
+    /// Output Only. The overall outcome of the test.
+    /// Only set when the test matrix state is FINISHED.
+    #[serde(rename="outcomeSummary")]
+    pub outcome_summary: Option<String>,
 }
 
 impl RequestValue for TestMatrix {}
@@ -1743,10 +1751,10 @@ impl Part for LauncherActivityIntent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceFile {
-    /// A reference to a regular file
+    /// A reference to a regular file.
     #[serde(rename="regularFile")]
     pub regular_file: Option<RegularFile>,
-    /// A reference to an opaque binary blob file
+    /// A reference to an opaque binary blob file.
     #[serde(rename="obbFile")]
     pub obb_file: Option<ObbFile>,
 }
@@ -1830,7 +1838,7 @@ impl Part for NetworkConfigurationCatalog {}
 
 
 /// Enables automatic Google account login.
-/// If set, the service will automatically generate a Google test account and add
+/// If set, the service automatically generates a Google test account and adds
 /// it to the device, before executing the test. Note that test accounts might be
 /// reused.
 /// Many applications show their full set of functionalities when an account is

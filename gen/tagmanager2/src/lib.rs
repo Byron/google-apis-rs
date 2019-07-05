@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *1.0.8+20190220*, where *20190220* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Tag Manager* crate version *1.0.9+20190516*, where *20190516* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Tag Manager* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v2/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.TagManager.html) ... 
 //! 
 //! * [accounts](struct.Account.html)
-//!  * [*containers create*](struct.AccountContainerCreateCall.html), [*containers delete*](struct.AccountContainerDeleteCall.html), [*containers environments create*](struct.AccountContainerEnvironmentCreateCall.html), [*containers environments delete*](struct.AccountContainerEnvironmentDeleteCall.html), [*containers environments get*](struct.AccountContainerEnvironmentGetCall.html), [*containers environments list*](struct.AccountContainerEnvironmentListCall.html), [*containers environments reauthorize*](struct.AccountContainerEnvironmentReauthorizeCall.html), [*containers environments update*](struct.AccountContainerEnvironmentUpdateCall.html), [*containers get*](struct.AccountContainerGetCall.html), [*containers list*](struct.AccountContainerListCall.html), [*containers update*](struct.AccountContainerUpdateCall.html), [*containers version_headers latest*](struct.AccountContainerVersionHeaderLatestCall.html), [*containers version_headers list*](struct.AccountContainerVersionHeaderListCall.html), [*containers versions delete*](struct.AccountContainerVersionDeleteCall.html), [*containers versions get*](struct.AccountContainerVersionGetCall.html), [*containers versions live*](struct.AccountContainerVersionLiveCall.html), [*containers versions publish*](struct.AccountContainerVersionPublishCall.html), [*containers versions set_latest*](struct.AccountContainerVersionSetLatestCall.html), [*containers versions undelete*](struct.AccountContainerVersionUndeleteCall.html), [*containers versions update*](struct.AccountContainerVersionUpdateCall.html), [*containers workspaces built_in_variables create*](struct.AccountContainerWorkspaceBuiltInVariableCreateCall.html), [*containers workspaces built_in_variables delete*](struct.AccountContainerWorkspaceBuiltInVariableDeleteCall.html), [*containers workspaces built_in_variables list*](struct.AccountContainerWorkspaceBuiltInVariableListCall.html), [*containers workspaces built_in_variables revert*](struct.AccountContainerWorkspaceBuiltInVariableRevertCall.html), [*containers workspaces create*](struct.AccountContainerWorkspaceCreateCall.html), [*containers workspaces create_version*](struct.AccountContainerWorkspaceCreateVersionCall.html), [*containers workspaces delete*](struct.AccountContainerWorkspaceDeleteCall.html), [*containers workspaces folders create*](struct.AccountContainerWorkspaceFolderCreateCall.html), [*containers workspaces folders delete*](struct.AccountContainerWorkspaceFolderDeleteCall.html), [*containers workspaces folders entities*](struct.AccountContainerWorkspaceFolderEntityCall.html), [*containers workspaces folders get*](struct.AccountContainerWorkspaceFolderGetCall.html), [*containers workspaces folders list*](struct.AccountContainerWorkspaceFolderListCall.html), [*containers workspaces folders move_entities_to_folder*](struct.AccountContainerWorkspaceFolderMoveEntitiesToFolderCall.html), [*containers workspaces folders revert*](struct.AccountContainerWorkspaceFolderRevertCall.html), [*containers workspaces folders update*](struct.AccountContainerWorkspaceFolderUpdateCall.html), [*containers workspaces get*](struct.AccountContainerWorkspaceGetCall.html), [*containers workspaces get status*](struct.AccountContainerWorkspaceGetStatuCall.html), [*containers workspaces list*](struct.AccountContainerWorkspaceListCall.html), [*containers workspaces quick_preview*](struct.AccountContainerWorkspaceQuickPreviewCall.html), [*containers workspaces resolve_conflict*](struct.AccountContainerWorkspaceResolveConflictCall.html), [*containers workspaces sync*](struct.AccountContainerWorkspaceSyncCall.html), [*containers workspaces tags create*](struct.AccountContainerWorkspaceTagCreateCall.html), [*containers workspaces tags delete*](struct.AccountContainerWorkspaceTagDeleteCall.html), [*containers workspaces tags get*](struct.AccountContainerWorkspaceTagGetCall.html), [*containers workspaces tags list*](struct.AccountContainerWorkspaceTagListCall.html), [*containers workspaces tags revert*](struct.AccountContainerWorkspaceTagRevertCall.html), [*containers workspaces tags update*](struct.AccountContainerWorkspaceTagUpdateCall.html), [*containers workspaces triggers create*](struct.AccountContainerWorkspaceTriggerCreateCall.html), [*containers workspaces triggers delete*](struct.AccountContainerWorkspaceTriggerDeleteCall.html), [*containers workspaces triggers get*](struct.AccountContainerWorkspaceTriggerGetCall.html), [*containers workspaces triggers list*](struct.AccountContainerWorkspaceTriggerListCall.html), [*containers workspaces triggers revert*](struct.AccountContainerWorkspaceTriggerRevertCall.html), [*containers workspaces triggers update*](struct.AccountContainerWorkspaceTriggerUpdateCall.html), [*containers workspaces update*](struct.AccountContainerWorkspaceUpdateCall.html), [*containers workspaces variables create*](struct.AccountContainerWorkspaceVariableCreateCall.html), [*containers workspaces variables delete*](struct.AccountContainerWorkspaceVariableDeleteCall.html), [*containers workspaces variables get*](struct.AccountContainerWorkspaceVariableGetCall.html), [*containers workspaces variables list*](struct.AccountContainerWorkspaceVariableListCall.html), [*containers workspaces variables revert*](struct.AccountContainerWorkspaceVariableRevertCall.html), [*containers workspaces variables update*](struct.AccountContainerWorkspaceVariableUpdateCall.html), [*containers workspaces zones create*](struct.AccountContainerWorkspaceZoneCreateCall.html), [*containers workspaces zones delete*](struct.AccountContainerWorkspaceZoneDeleteCall.html), [*containers workspaces zones get*](struct.AccountContainerWorkspaceZoneGetCall.html), [*containers workspaces zones list*](struct.AccountContainerWorkspaceZoneListCall.html), [*containers workspaces zones revert*](struct.AccountContainerWorkspaceZoneRevertCall.html), [*containers workspaces zones update*](struct.AccountContainerWorkspaceZoneUpdateCall.html), [*get*](struct.AccountGetCall.html), [*list*](struct.AccountListCall.html), [*update*](struct.AccountUpdateCall.html), [*user_permissions create*](struct.AccountUserPermissionCreateCall.html), [*user_permissions delete*](struct.AccountUserPermissionDeleteCall.html), [*user_permissions get*](struct.AccountUserPermissionGetCall.html), [*user_permissions list*](struct.AccountUserPermissionListCall.html) and [*user_permissions update*](struct.AccountUserPermissionUpdateCall.html)
+//!  * [*containers create*](struct.AccountContainerCreateCall.html), [*containers delete*](struct.AccountContainerDeleteCall.html), [*containers environments create*](struct.AccountContainerEnvironmentCreateCall.html), [*containers environments delete*](struct.AccountContainerEnvironmentDeleteCall.html), [*containers environments get*](struct.AccountContainerEnvironmentGetCall.html), [*containers environments list*](struct.AccountContainerEnvironmentListCall.html), [*containers environments reauthorize*](struct.AccountContainerEnvironmentReauthorizeCall.html), [*containers environments update*](struct.AccountContainerEnvironmentUpdateCall.html), [*containers get*](struct.AccountContainerGetCall.html), [*containers list*](struct.AccountContainerListCall.html), [*containers update*](struct.AccountContainerUpdateCall.html), [*containers version_headers latest*](struct.AccountContainerVersionHeaderLatestCall.html), [*containers version_headers list*](struct.AccountContainerVersionHeaderListCall.html), [*containers versions delete*](struct.AccountContainerVersionDeleteCall.html), [*containers versions get*](struct.AccountContainerVersionGetCall.html), [*containers versions live*](struct.AccountContainerVersionLiveCall.html), [*containers versions publish*](struct.AccountContainerVersionPublishCall.html), [*containers versions set_latest*](struct.AccountContainerVersionSetLatestCall.html), [*containers versions undelete*](struct.AccountContainerVersionUndeleteCall.html), [*containers versions update*](struct.AccountContainerVersionUpdateCall.html), [*containers workspaces built_in_variables create*](struct.AccountContainerWorkspaceBuiltInVariableCreateCall.html), [*containers workspaces built_in_variables delete*](struct.AccountContainerWorkspaceBuiltInVariableDeleteCall.html), [*containers workspaces built_in_variables list*](struct.AccountContainerWorkspaceBuiltInVariableListCall.html), [*containers workspaces built_in_variables revert*](struct.AccountContainerWorkspaceBuiltInVariableRevertCall.html), [*containers workspaces create*](struct.AccountContainerWorkspaceCreateCall.html), [*containers workspaces create_version*](struct.AccountContainerWorkspaceCreateVersionCall.html), [*containers workspaces delete*](struct.AccountContainerWorkspaceDeleteCall.html), [*containers workspaces folders create*](struct.AccountContainerWorkspaceFolderCreateCall.html), [*containers workspaces folders delete*](struct.AccountContainerWorkspaceFolderDeleteCall.html), [*containers workspaces folders entities*](struct.AccountContainerWorkspaceFolderEntityCall.html), [*containers workspaces folders get*](struct.AccountContainerWorkspaceFolderGetCall.html), [*containers workspaces folders list*](struct.AccountContainerWorkspaceFolderListCall.html), [*containers workspaces folders move_entities_to_folder*](struct.AccountContainerWorkspaceFolderMoveEntitiesToFolderCall.html), [*containers workspaces folders revert*](struct.AccountContainerWorkspaceFolderRevertCall.html), [*containers workspaces folders update*](struct.AccountContainerWorkspaceFolderUpdateCall.html), [*containers workspaces get*](struct.AccountContainerWorkspaceGetCall.html), [*containers workspaces get status*](struct.AccountContainerWorkspaceGetStatuCall.html), [*containers workspaces list*](struct.AccountContainerWorkspaceListCall.html), [*containers workspaces quick_preview*](struct.AccountContainerWorkspaceQuickPreviewCall.html), [*containers workspaces resolve_conflict*](struct.AccountContainerWorkspaceResolveConflictCall.html), [*containers workspaces sync*](struct.AccountContainerWorkspaceSyncCall.html), [*containers workspaces tags create*](struct.AccountContainerWorkspaceTagCreateCall.html), [*containers workspaces tags delete*](struct.AccountContainerWorkspaceTagDeleteCall.html), [*containers workspaces tags get*](struct.AccountContainerWorkspaceTagGetCall.html), [*containers workspaces tags list*](struct.AccountContainerWorkspaceTagListCall.html), [*containers workspaces tags revert*](struct.AccountContainerWorkspaceTagRevertCall.html), [*containers workspaces tags update*](struct.AccountContainerWorkspaceTagUpdateCall.html), [*containers workspaces templates create*](struct.AccountContainerWorkspaceTemplateCreateCall.html), [*containers workspaces templates delete*](struct.AccountContainerWorkspaceTemplateDeleteCall.html), [*containers workspaces templates get*](struct.AccountContainerWorkspaceTemplateGetCall.html), [*containers workspaces templates list*](struct.AccountContainerWorkspaceTemplateListCall.html), [*containers workspaces templates revert*](struct.AccountContainerWorkspaceTemplateRevertCall.html), [*containers workspaces templates update*](struct.AccountContainerWorkspaceTemplateUpdateCall.html), [*containers workspaces triggers create*](struct.AccountContainerWorkspaceTriggerCreateCall.html), [*containers workspaces triggers delete*](struct.AccountContainerWorkspaceTriggerDeleteCall.html), [*containers workspaces triggers get*](struct.AccountContainerWorkspaceTriggerGetCall.html), [*containers workspaces triggers list*](struct.AccountContainerWorkspaceTriggerListCall.html), [*containers workspaces triggers revert*](struct.AccountContainerWorkspaceTriggerRevertCall.html), [*containers workspaces triggers update*](struct.AccountContainerWorkspaceTriggerUpdateCall.html), [*containers workspaces update*](struct.AccountContainerWorkspaceUpdateCall.html), [*containers workspaces variables create*](struct.AccountContainerWorkspaceVariableCreateCall.html), [*containers workspaces variables delete*](struct.AccountContainerWorkspaceVariableDeleteCall.html), [*containers workspaces variables get*](struct.AccountContainerWorkspaceVariableGetCall.html), [*containers workspaces variables list*](struct.AccountContainerWorkspaceVariableListCall.html), [*containers workspaces variables revert*](struct.AccountContainerWorkspaceVariableRevertCall.html), [*containers workspaces variables update*](struct.AccountContainerWorkspaceVariableUpdateCall.html), [*containers workspaces zones create*](struct.AccountContainerWorkspaceZoneCreateCall.html), [*containers workspaces zones delete*](struct.AccountContainerWorkspaceZoneDeleteCall.html), [*containers workspaces zones get*](struct.AccountContainerWorkspaceZoneGetCall.html), [*containers workspaces zones list*](struct.AccountContainerWorkspaceZoneListCall.html), [*containers workspaces zones revert*](struct.AccountContainerWorkspaceZoneRevertCall.html), [*containers workspaces zones update*](struct.AccountContainerWorkspaceZoneUpdateCall.html), [*get*](struct.AccountGetCall.html), [*list*](struct.AccountListCall.html), [*update*](struct.AccountUpdateCall.html), [*user_permissions create*](struct.AccountUserPermissionCreateCall.html), [*user_permissions delete*](struct.AccountUserPermissionDeleteCall.html), [*user_permissions get*](struct.AccountUserPermissionGetCall.html), [*user_permissions list*](struct.AccountUserPermissionListCall.html) and [*user_permissions update*](struct.AccountUserPermissionUpdateCall.html)
 //! 
 //! 
 //! 
@@ -56,7 +56,7 @@
 //! let r = hub.accounts().containers_workspaces_built_in_variables_delete(...).doit()
 //! let r = hub.accounts().containers_environments_create(...).doit()
 //! let r = hub.accounts().containers_versions_publish(...).doit()
-//! let r = hub.accounts().containers_workspaces_folders_get(...).doit()
+//! let r = hub.accounts().containers_workspaces_templates_get(...).doit()
 //! let r = hub.accounts().containers_workspaces_zones_revert(...).doit()
 //! let r = hub.accounts().containers_workspaces_tags_create(...).doit()
 //! let r = hub.accounts().containers_environments_delete(...).doit()
@@ -68,18 +68,19 @@
 //! let r = hub.accounts().containers_workspaces_delete(...).doit()
 //! let r = hub.accounts().containers_workspaces_create(...).doit()
 //! let r = hub.accounts().user_permissions_list(...).doit()
-//! let r = hub.accounts().containers_workspaces_folders_delete(...).doit()
+//! let r = hub.accounts().containers_workspaces_templates_delete(...).doit()
 //! let r = hub.accounts().containers_workspaces_quick_preview(...).doit()
 //! let r = hub.accounts().containers_workspaces_variables_get(...).doit()
 //! let r = hub.accounts().containers_versions_set_latest(...).doit()
 //! let r = hub.accounts().containers_workspaces_variables_update(...).doit()
 //! let r = hub.accounts().containers_environments_list(...).doit()
 //! let r = hub.accounts().containers_workspaces_tags_list(...).doit()
-//! let r = hub.accounts().containers_versions_undelete(...).doit()
+//! let r = hub.accounts().containers_workspaces_templates_list(...).doit()
 //! let r = hub.accounts().containers_workspaces_zones_update(...).doit()
 //! let r = hub.accounts().containers_workspaces_zones_get(...).doit()
 //! let r = hub.accounts().containers_workspaces_create_version(...).doit()
 //! let r = hub.accounts().containers_delete(...).doit()
+//! let r = hub.accounts().containers_workspaces_templates_create(...).doit()
 //! let r = hub.accounts().containers_versions_delete(...).doit()
 //! let r = hub.accounts().update(...).doit()
 //! let r = hub.accounts().containers_version_headers_list(...).doit()
@@ -87,13 +88,15 @@
 //! let r = hub.accounts().containers_workspaces_triggers_list(...).doit()
 //! let r = hub.accounts().user_permissions_update(...).doit()
 //! let r = hub.accounts().containers_workspaces_zones_list(...).doit()
+//! let r = hub.accounts().containers_workspaces_templates_update(...).doit()
 //! let r = hub.accounts().get(...).doit()
 //! let r = hub.accounts().containers_versions_live(...).doit()
 //! let r = hub.accounts().list(...).doit()
 //! let r = hub.accounts().containers_workspaces_variables_list(...).doit()
+//! let r = hub.accounts().containers_versions_undelete(...).doit()
 //! let r = hub.accounts().containers_workspaces_variables_revert(...).doit()
 //! let r = hub.accounts().containers_workspaces_zones_delete(...).doit()
-//! let r = hub.accounts().containers_workspaces_folders_entities(...).doit()
+//! let r = hub.accounts().containers_workspaces_folders_get(...).doit()
 //! let r = hub.accounts().containers_workspaces_folders_create(...).doit()
 //! let r = hub.accounts().containers_workspaces_tags_delete(...).doit()
 //! let r = hub.accounts().containers_update(...).doit()
@@ -101,10 +104,13 @@
 //! let r = hub.accounts().containers_workspaces_folders_update(...).doit()
 //! let r = hub.accounts().containers_workspaces_built_in_variables_create(...).doit()
 //! let r = hub.accounts().containers_list(...).doit()
+//! let r = hub.accounts().containers_workspaces_folders_entities(...).doit()
 //! let r = hub.accounts().containers_workspaces_triggers_delete(...).doit()
+//! let r = hub.accounts().containers_workspaces_folders_delete(...).doit()
 //! let r = hub.accounts().containers_workspaces_sync(...).doit()
 //! let r = hub.accounts().containers_workspaces_tags_revert(...).doit()
 //! let r = hub.accounts().containers_workspaces_tags_update(...).doit()
+//! let r = hub.accounts().containers_workspaces_templates_revert(...).doit()
 //! let r = hub.accounts().containers_create(...).doit()
 //! let r = hub.accounts().containers_workspaces_triggers_update(...).doit()
 //! let r = hub.accounts().containers_workspaces_variables_create(...).doit()
@@ -293,9 +299,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -434,7 +438,7 @@ impl<'a, C, A> TagManager<C, A>
         TagManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/tagmanager/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -445,7 +449,7 @@ impl<'a, C, A> TagManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -527,30 +531,22 @@ pub struct AccountAccess {
 impl Part for AccountAccess {}
 
 
-/// There is no detailed description.
+/// The result of reverting a template in a workspace.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [containers workspaces templates revert accounts](struct.AccountContainerWorkspaceTemplateRevertCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VariableFormatValue {
-    /// The value to convert if a variable value is undefined.
-    #[serde(rename="convertUndefinedToValue")]
-    pub convert_undefined_to_value: Option<Parameter>,
-    /// The value to convert if a variable value is false.
-    #[serde(rename="convertFalseToValue")]
-    pub convert_false_to_value: Option<Parameter>,
-    /// The option to convert a string-type variable value to either lowercase or uppercase.
-    #[serde(rename="caseConversionType")]
-    pub case_conversion_type: Option<String>,
-    /// The value to convert if a variable value is null.
-    #[serde(rename="convertNullToValue")]
-    pub convert_null_to_value: Option<Parameter>,
-    /// The value to convert if a variable value is true.
-    #[serde(rename="convertTrueToValue")]
-    pub convert_true_to_value: Option<Parameter>,
+pub struct RevertTemplateResponse {
+    /// Template as it appears in the latest container version since the last workspace synchronization operation. If no template is present, that means the template was deleted in the latest container version.
+    pub template: Option<CustomTemplate>,
 }
 
-impl Part for VariableFormatValue {}
+impl ResponseResult for RevertTemplateResponse {}
 
 
 /// Represents a Google Tag Manager Container, which specifies the platform tags will run on, manages workspaces, and retains container versions.
@@ -783,65 +779,30 @@ impl RequestValue for UserPermission {}
 impl ResponseResult for UserPermission {}
 
 
-/// Represents a Google Tag Manager Container Version.
+/// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [containers versions undelete accounts](struct.AccountContainerVersionUndeleteCall.html) (response)
-/// * [containers versions get accounts](struct.AccountContainerVersionGetCall.html) (response)
-/// * [containers versions set_latest accounts](struct.AccountContainerVersionSetLatestCall.html) (response)
-/// * [containers versions live accounts](struct.AccountContainerVersionLiveCall.html) (response)
-/// * [containers versions update accounts](struct.AccountContainerVersionUpdateCall.html) (request|response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ContainerVersion {
-    /// GTM Container ID.
-    #[serde(rename="containerId")]
-    pub container_id: Option<String>,
-    /// A value of true indicates this container version has been deleted.
-    pub deleted: Option<bool>,
-    /// The tags in the container that this version was taken from.
-    pub tag: Option<Vec<Tag>>,
-    /// Auto generated link to the tag manager UI
-    #[serde(rename="tagManagerUrl")]
-    pub tag_manager_url: Option<String>,
-    /// The Container Version ID uniquely identifies the GTM Container Version.
-    #[serde(rename="containerVersionId")]
-    pub container_version_id: Option<String>,
-    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
-    pub fingerprint: Option<String>,
-    /// The variables in the container that this version was taken from.
-    pub variable: Option<Vec<Variable>>,
-    /// GTM ContainerVersions's API relative path.
-    pub path: Option<String>,
-    /// The custom templates in the container that this version was taken from.
-    #[serde(rename="customTemplate")]
-    pub custom_template: Option<Vec<CustomTemplate>>,
-    /// GTM Account ID.
-    #[serde(rename="accountId")]
-    pub account_id: Option<String>,
-    /// The container that this version was taken from.
-    pub container: Option<Container>,
-    /// Container version display name.
-    pub name: Option<String>,
-    /// The zones in the container that this version was taken from.
-    pub zone: Option<Vec<Zone>>,
-    /// Container version description.
-    pub description: Option<String>,
-    /// The built-in variables in the container that this version was taken from.
-    #[serde(rename="builtInVariable")]
-    pub built_in_variable: Option<Vec<BuiltInVariable>>,
-    /// The triggers in the container that this version was taken from.
-    pub trigger: Option<Vec<Trigger>>,
-    /// The folders in the container that this version was taken from.
-    pub folder: Option<Vec<Folder>>,
+pub struct VariableFormatValue {
+    /// The value to convert if a variable value is undefined.
+    #[serde(rename="convertUndefinedToValue")]
+    pub convert_undefined_to_value: Option<Parameter>,
+    /// The value to convert if a variable value is false.
+    #[serde(rename="convertFalseToValue")]
+    pub convert_false_to_value: Option<Parameter>,
+    /// The option to convert a string-type variable value to either lowercase or uppercase.
+    #[serde(rename="caseConversionType")]
+    pub case_conversion_type: Option<String>,
+    /// The value to convert if a variable value is null.
+    #[serde(rename="convertNullToValue")]
+    pub convert_null_to_value: Option<Parameter>,
+    /// The value to convert if a variable value is true.
+    #[serde(rename="convertTrueToValue")]
+    pub convert_true_to_value: Option<Parameter>,
 }
 
-impl RequestValue for ContainerVersion {}
-impl ResponseResult for ContainerVersion {}
+impl Part for VariableFormatValue {}
 
 
 /// Defines the Google Tag Manager Container access permissions.
@@ -944,7 +905,8 @@ pub struct Parameter {
     /// - integer: The value represents a 64-bit signed integer value, in base 10 
     /// - list: A list of parameters should be specified 
     /// - map: A map of parameters should be specified 
-    /// - template: The value represents any text; this can include variable references (even variable references that might return non-string types)
+    /// - template: The value represents any text; this can include variable references (even variable references that might return non-string types) 
+    /// - trigger_reference: The value represents a trigger, represented as the trigger id
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1036,6 +998,27 @@ pub struct GetWorkspaceStatusResponse {
 }
 
 impl ResponseResult for GetWorkspaceStatusResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [containers workspaces templates list accounts](struct.AccountContainerWorkspaceTemplateListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListTemplatesResponse {
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// All GTM Custom Templates of a GTM Container.
+    pub template: Option<Vec<CustomTemplate>>,
+}
+
+impl ResponseResult for ListTemplatesResponse {}
 
 
 /// A Timestamp represents a point in time independent of any time zone or local calendar, encoded as a count of seconds and fractions of seconds at nanosecond resolution. The count is relative to an epoch at UTC midnight on January 1, 1970, in the proleptic Gregorian calendar which extends the Gregorian calendar backwards to year one.
@@ -1239,6 +1222,67 @@ pub struct ListEnvironmentsResponse {
 impl ResponseResult for ListEnvironmentsResponse {}
 
 
+/// Represents a Google Tag Manager Container Version.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [containers versions undelete accounts](struct.AccountContainerVersionUndeleteCall.html) (response)
+/// * [containers versions get accounts](struct.AccountContainerVersionGetCall.html) (response)
+/// * [containers versions set_latest accounts](struct.AccountContainerVersionSetLatestCall.html) (response)
+/// * [containers versions live accounts](struct.AccountContainerVersionLiveCall.html) (response)
+/// * [containers versions update accounts](struct.AccountContainerVersionUpdateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ContainerVersion {
+    /// GTM Container ID.
+    #[serde(rename="containerId")]
+    pub container_id: Option<String>,
+    /// A value of true indicates this container version has been deleted.
+    pub deleted: Option<bool>,
+    /// The tags in the container that this version was taken from.
+    pub tag: Option<Vec<Tag>>,
+    /// Auto generated link to the tag manager UI
+    #[serde(rename="tagManagerUrl")]
+    pub tag_manager_url: Option<String>,
+    /// The Container Version ID uniquely identifies the GTM Container Version.
+    #[serde(rename="containerVersionId")]
+    pub container_version_id: Option<String>,
+    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
+    pub fingerprint: Option<String>,
+    /// The variables in the container that this version was taken from.
+    pub variable: Option<Vec<Variable>>,
+    /// GTM ContainerVersions's API relative path.
+    pub path: Option<String>,
+    /// The custom templates in the container that this version was taken from.
+    #[serde(rename="customTemplate")]
+    pub custom_template: Option<Vec<CustomTemplate>>,
+    /// GTM Account ID.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
+    /// The container that this version was taken from.
+    pub container: Option<Container>,
+    /// Container version display name.
+    pub name: Option<String>,
+    /// The zones in the container that this version was taken from.
+    pub zone: Option<Vec<Zone>>,
+    /// Container version description.
+    pub description: Option<String>,
+    /// The built-in variables in the container that this version was taken from.
+    #[serde(rename="builtInVariable")]
+    pub built_in_variable: Option<Vec<BuiltInVariable>>,
+    /// The triggers in the container that this version was taken from.
+    pub trigger: Option<Vec<Trigger>>,
+    /// The folders in the container that this version was taken from.
+    pub folder: Option<Vec<Folder>>,
+}
+
+impl RequestValue for ContainerVersion {}
+impl ResponseResult for ContainerVersion {}
+
+
 /// The status of a workspace after synchronization.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1359,7 +1403,14 @@ impl ResponseResult for RevertVariableResponse {}
 
 /// Represents a Google Tag Manager Custom Template's contents.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [containers workspaces templates create accounts](struct.AccountContainerWorkspaceTemplateCreateCall.html) (request|response)
+/// * [containers workspaces templates update accounts](struct.AccountContainerWorkspaceTemplateUpdateCall.html) (request|response)
+/// * [containers workspaces templates get accounts](struct.AccountContainerWorkspaceTemplateGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomTemplate {
@@ -1389,7 +1440,8 @@ pub struct CustomTemplate {
     pub account_id: Option<String>,
 }
 
-impl Part for CustomTemplate {}
+impl RequestValue for CustomTemplate {}
+impl ResponseResult for CustomTemplate {}
 
 
 /// Represents a predicate.
@@ -1428,7 +1480,7 @@ impl Part for Condition {}
 /// * [containers workspaces built_in_variables delete accounts](struct.AccountContainerWorkspaceBuiltInVariableDeleteCall.html) (none)
 /// * [containers environments create accounts](struct.AccountContainerEnvironmentCreateCall.html) (none)
 /// * [containers versions publish accounts](struct.AccountContainerVersionPublishCall.html) (none)
-/// * [containers workspaces folders get accounts](struct.AccountContainerWorkspaceFolderGetCall.html) (none)
+/// * [containers workspaces templates get accounts](struct.AccountContainerWorkspaceTemplateGetCall.html) (none)
 /// * [containers workspaces zones revert accounts](struct.AccountContainerWorkspaceZoneRevertCall.html) (none)
 /// * [containers workspaces tags create accounts](struct.AccountContainerWorkspaceTagCreateCall.html) (none)
 /// * [containers environments delete accounts](struct.AccountContainerEnvironmentDeleteCall.html) (none)
@@ -1440,18 +1492,19 @@ impl Part for Condition {}
 /// * [containers workspaces delete accounts](struct.AccountContainerWorkspaceDeleteCall.html) (none)
 /// * [containers workspaces create accounts](struct.AccountContainerWorkspaceCreateCall.html) (none)
 /// * [user_permissions list accounts](struct.AccountUserPermissionListCall.html) (none)
-/// * [containers workspaces folders delete accounts](struct.AccountContainerWorkspaceFolderDeleteCall.html) (none)
+/// * [containers workspaces templates delete accounts](struct.AccountContainerWorkspaceTemplateDeleteCall.html) (none)
 /// * [containers workspaces quick_preview accounts](struct.AccountContainerWorkspaceQuickPreviewCall.html) (none)
 /// * [containers workspaces variables get accounts](struct.AccountContainerWorkspaceVariableGetCall.html) (none)
 /// * [containers versions set_latest accounts](struct.AccountContainerVersionSetLatestCall.html) (none)
 /// * [containers workspaces variables update accounts](struct.AccountContainerWorkspaceVariableUpdateCall.html) (none)
 /// * [containers environments list accounts](struct.AccountContainerEnvironmentListCall.html) (none)
 /// * [containers workspaces tags list accounts](struct.AccountContainerWorkspaceTagListCall.html) (none)
-/// * [containers versions undelete accounts](struct.AccountContainerVersionUndeleteCall.html) (none)
+/// * [containers workspaces templates list accounts](struct.AccountContainerWorkspaceTemplateListCall.html) (none)
 /// * [containers workspaces zones update accounts](struct.AccountContainerWorkspaceZoneUpdateCall.html) (none)
 /// * [containers workspaces zones get accounts](struct.AccountContainerWorkspaceZoneGetCall.html) (none)
 /// * [containers workspaces create_version accounts](struct.AccountContainerWorkspaceCreateVersionCall.html) (none)
 /// * [containers delete accounts](struct.AccountContainerDeleteCall.html) (none)
+/// * [containers workspaces templates create accounts](struct.AccountContainerWorkspaceTemplateCreateCall.html) (none)
 /// * [containers versions delete accounts](struct.AccountContainerVersionDeleteCall.html) (none)
 /// * [update accounts](struct.AccountUpdateCall.html) (request|response)
 /// * [containers version_headers list accounts](struct.AccountContainerVersionHeaderListCall.html) (none)
@@ -1459,13 +1512,15 @@ impl Part for Condition {}
 /// * [containers workspaces triggers list accounts](struct.AccountContainerWorkspaceTriggerListCall.html) (none)
 /// * [user_permissions update accounts](struct.AccountUserPermissionUpdateCall.html) (none)
 /// * [containers workspaces zones list accounts](struct.AccountContainerWorkspaceZoneListCall.html) (none)
+/// * [containers workspaces templates update accounts](struct.AccountContainerWorkspaceTemplateUpdateCall.html) (none)
 /// * [get accounts](struct.AccountGetCall.html) (response)
 /// * [containers versions live accounts](struct.AccountContainerVersionLiveCall.html) (none)
 /// * [list accounts](struct.AccountListCall.html) (none)
 /// * [containers workspaces variables list accounts](struct.AccountContainerWorkspaceVariableListCall.html) (none)
+/// * [containers versions undelete accounts](struct.AccountContainerVersionUndeleteCall.html) (none)
 /// * [containers workspaces variables revert accounts](struct.AccountContainerWorkspaceVariableRevertCall.html) (none)
 /// * [containers workspaces zones delete accounts](struct.AccountContainerWorkspaceZoneDeleteCall.html) (none)
-/// * [containers workspaces folders entities accounts](struct.AccountContainerWorkspaceFolderEntityCall.html) (none)
+/// * [containers workspaces folders get accounts](struct.AccountContainerWorkspaceFolderGetCall.html) (none)
 /// * [containers workspaces folders create accounts](struct.AccountContainerWorkspaceFolderCreateCall.html) (none)
 /// * [containers workspaces tags delete accounts](struct.AccountContainerWorkspaceTagDeleteCall.html) (none)
 /// * [containers update accounts](struct.AccountContainerUpdateCall.html) (none)
@@ -1473,10 +1528,13 @@ impl Part for Condition {}
 /// * [containers workspaces folders update accounts](struct.AccountContainerWorkspaceFolderUpdateCall.html) (none)
 /// * [containers workspaces built_in_variables create accounts](struct.AccountContainerWorkspaceBuiltInVariableCreateCall.html) (none)
 /// * [containers list accounts](struct.AccountContainerListCall.html) (none)
+/// * [containers workspaces folders entities accounts](struct.AccountContainerWorkspaceFolderEntityCall.html) (none)
 /// * [containers workspaces triggers delete accounts](struct.AccountContainerWorkspaceTriggerDeleteCall.html) (none)
+/// * [containers workspaces folders delete accounts](struct.AccountContainerWorkspaceFolderDeleteCall.html) (none)
 /// * [containers workspaces sync accounts](struct.AccountContainerWorkspaceSyncCall.html) (none)
 /// * [containers workspaces tags revert accounts](struct.AccountContainerWorkspaceTagRevertCall.html) (none)
 /// * [containers workspaces tags update accounts](struct.AccountContainerWorkspaceTagUpdateCall.html) (none)
+/// * [containers workspaces templates revert accounts](struct.AccountContainerWorkspaceTemplateRevertCall.html) (none)
 /// * [containers create accounts](struct.AccountContainerCreateCall.html) (none)
 /// * [containers workspaces triggers update accounts](struct.AccountContainerWorkspaceTriggerUpdateCall.html) (none)
 /// * [containers workspaces variables create accounts](struct.AccountContainerWorkspaceVariableCreateCall.html) (none)
@@ -2156,7 +2214,7 @@ impl ResponseResult for ListContainerVersionsResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `containers_create(...)`, `containers_delete(...)`, `containers_environments_create(...)`, `containers_environments_delete(...)`, `containers_environments_get(...)`, `containers_environments_list(...)`, `containers_environments_reauthorize(...)`, `containers_environments_update(...)`, `containers_get(...)`, `containers_list(...)`, `containers_update(...)`, `containers_version_headers_latest(...)`, `containers_version_headers_list(...)`, `containers_versions_delete(...)`, `containers_versions_get(...)`, `containers_versions_live(...)`, `containers_versions_publish(...)`, `containers_versions_set_latest(...)`, `containers_versions_undelete(...)`, `containers_versions_update(...)`, `containers_workspaces_built_in_variables_create(...)`, `containers_workspaces_built_in_variables_delete(...)`, `containers_workspaces_built_in_variables_list(...)`, `containers_workspaces_built_in_variables_revert(...)`, `containers_workspaces_create(...)`, `containers_workspaces_create_version(...)`, `containers_workspaces_delete(...)`, `containers_workspaces_folders_create(...)`, `containers_workspaces_folders_delete(...)`, `containers_workspaces_folders_entities(...)`, `containers_workspaces_folders_get(...)`, `containers_workspaces_folders_list(...)`, `containers_workspaces_folders_move_entities_to_folder(...)`, `containers_workspaces_folders_revert(...)`, `containers_workspaces_folders_update(...)`, `containers_workspaces_get(...)`, `containers_workspaces_get_status(...)`, `containers_workspaces_list(...)`, `containers_workspaces_quick_preview(...)`, `containers_workspaces_resolve_conflict(...)`, `containers_workspaces_sync(...)`, `containers_workspaces_tags_create(...)`, `containers_workspaces_tags_delete(...)`, `containers_workspaces_tags_get(...)`, `containers_workspaces_tags_list(...)`, `containers_workspaces_tags_revert(...)`, `containers_workspaces_tags_update(...)`, `containers_workspaces_triggers_create(...)`, `containers_workspaces_triggers_delete(...)`, `containers_workspaces_triggers_get(...)`, `containers_workspaces_triggers_list(...)`, `containers_workspaces_triggers_revert(...)`, `containers_workspaces_triggers_update(...)`, `containers_workspaces_update(...)`, `containers_workspaces_variables_create(...)`, `containers_workspaces_variables_delete(...)`, `containers_workspaces_variables_get(...)`, `containers_workspaces_variables_list(...)`, `containers_workspaces_variables_revert(...)`, `containers_workspaces_variables_update(...)`, `containers_workspaces_zones_create(...)`, `containers_workspaces_zones_delete(...)`, `containers_workspaces_zones_get(...)`, `containers_workspaces_zones_list(...)`, `containers_workspaces_zones_revert(...)`, `containers_workspaces_zones_update(...)`, `get(...)`, `list(...)`, `update(...)`, `user_permissions_create(...)`, `user_permissions_delete(...)`, `user_permissions_get(...)`, `user_permissions_list(...)` and `user_permissions_update(...)`
+/// // like `containers_create(...)`, `containers_delete(...)`, `containers_environments_create(...)`, `containers_environments_delete(...)`, `containers_environments_get(...)`, `containers_environments_list(...)`, `containers_environments_reauthorize(...)`, `containers_environments_update(...)`, `containers_get(...)`, `containers_list(...)`, `containers_update(...)`, `containers_version_headers_latest(...)`, `containers_version_headers_list(...)`, `containers_versions_delete(...)`, `containers_versions_get(...)`, `containers_versions_live(...)`, `containers_versions_publish(...)`, `containers_versions_set_latest(...)`, `containers_versions_undelete(...)`, `containers_versions_update(...)`, `containers_workspaces_built_in_variables_create(...)`, `containers_workspaces_built_in_variables_delete(...)`, `containers_workspaces_built_in_variables_list(...)`, `containers_workspaces_built_in_variables_revert(...)`, `containers_workspaces_create(...)`, `containers_workspaces_create_version(...)`, `containers_workspaces_delete(...)`, `containers_workspaces_folders_create(...)`, `containers_workspaces_folders_delete(...)`, `containers_workspaces_folders_entities(...)`, `containers_workspaces_folders_get(...)`, `containers_workspaces_folders_list(...)`, `containers_workspaces_folders_move_entities_to_folder(...)`, `containers_workspaces_folders_revert(...)`, `containers_workspaces_folders_update(...)`, `containers_workspaces_get(...)`, `containers_workspaces_get_status(...)`, `containers_workspaces_list(...)`, `containers_workspaces_quick_preview(...)`, `containers_workspaces_resolve_conflict(...)`, `containers_workspaces_sync(...)`, `containers_workspaces_tags_create(...)`, `containers_workspaces_tags_delete(...)`, `containers_workspaces_tags_get(...)`, `containers_workspaces_tags_list(...)`, `containers_workspaces_tags_revert(...)`, `containers_workspaces_tags_update(...)`, `containers_workspaces_templates_create(...)`, `containers_workspaces_templates_delete(...)`, `containers_workspaces_templates_get(...)`, `containers_workspaces_templates_list(...)`, `containers_workspaces_templates_revert(...)`, `containers_workspaces_templates_update(...)`, `containers_workspaces_triggers_create(...)`, `containers_workspaces_triggers_delete(...)`, `containers_workspaces_triggers_get(...)`, `containers_workspaces_triggers_list(...)`, `containers_workspaces_triggers_revert(...)`, `containers_workspaces_triggers_update(...)`, `containers_workspaces_update(...)`, `containers_workspaces_variables_create(...)`, `containers_workspaces_variables_delete(...)`, `containers_workspaces_variables_get(...)`, `containers_workspaces_variables_list(...)`, `containers_workspaces_variables_revert(...)`, `containers_workspaces_variables_update(...)`, `containers_workspaces_zones_create(...)`, `containers_workspaces_zones_delete(...)`, `containers_workspaces_zones_get(...)`, `containers_workspaces_zones_list(...)`, `containers_workspaces_zones_revert(...)`, `containers_workspaces_zones_update(...)`, `get(...)`, `list(...)`, `update(...)`, `user_permissions_create(...)`, `user_permissions_delete(...)`, `user_permissions_get(...)`, `user_permissions_list(...)` and `user_permissions_update(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
@@ -2341,13 +2399,13 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a GTM Folder.
+    /// Gets a GTM Template.
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
-    pub fn containers_workspaces_folders_get(&self, path: &str) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
-        AccountContainerWorkspaceFolderGetCall {
+    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    pub fn containers_workspaces_templates_get(&self, path: &str) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A> {
+        AccountContainerWorkspaceTemplateGetCall {
             hub: self.hub,
             _path: path.to_string(),
             _delegate: Default::default(),
@@ -2556,13 +2614,13 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a GTM Folder.
+    /// Deletes a GTM Template.
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
-    pub fn containers_workspaces_folders_delete(&self, path: &str) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
-        AccountContainerWorkspaceFolderDeleteCall {
+    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    pub fn containers_workspaces_templates_delete(&self, path: &str) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> {
+        AccountContainerWorkspaceTemplateDeleteCall {
             hub: self.hub,
             _path: path.to_string(),
             _delegate: Default::default(),
@@ -2680,15 +2738,16 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Undeletes a Container Version.
+    /// Lists all GTM Templates of a GTM container workspace.
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
-    pub fn containers_versions_undelete(&self, path: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
-        AccountContainerVersionUndeleteCall {
+    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    pub fn containers_workspaces_templates_list(&self, parent: &str) -> AccountContainerWorkspaceTemplateListCall<'a, C, A> {
+        AccountContainerWorkspaceTemplateListCall {
             hub: self.hub,
-            _path: path.to_string(),
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2762,6 +2821,25 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
         AccountContainerDeleteCall {
             hub: self.hub,
             _path: path.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a GTM Custom Template.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    pub fn containers_workspaces_templates_create(&self, request: CustomTemplate, parent: &str) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {
+        AccountContainerWorkspaceTemplateCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2899,6 +2977,26 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates a GTM Template.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    pub fn containers_workspaces_templates_update(&self, request: CustomTemplate, path: &str) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
+        AccountContainerWorkspaceTemplateUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _path: path.to_string(),
+            _fingerprint: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a GTM Account.
     /// 
     /// # Arguments
@@ -2964,6 +3062,23 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Undeletes a Container Version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    pub fn containers_versions_undelete(&self, path: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
+        AccountContainerVersionUndeleteCall {
+            hub: self.hub,
+            _path: path.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Reverts changes to a GTM Variable in a GTM Workspace.
     /// 
     /// # Arguments
@@ -2999,16 +3114,15 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all entities in a GTM Folder.
+    /// Gets a GTM Folder.
     /// 
     /// # Arguments
     ///
     /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
-    pub fn containers_workspaces_folders_entities(&self, path: &str) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
-        AccountContainerWorkspaceFolderEntityCall {
+    pub fn containers_workspaces_folders_get(&self, path: &str) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
+        AccountContainerWorkspaceFolderGetCall {
             hub: self.hub,
             _path: path.to_string(),
-            _page_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3146,6 +3260,24 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// List all entities in a GTM Folder.
+    /// 
+    /// # Arguments
+    ///
+    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    pub fn containers_workspaces_folders_entities(&self, path: &str) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
+        AccountContainerWorkspaceFolderEntityCall {
+            hub: self.hub,
+            _path: path.to_string(),
+            _page_token: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes a GTM Trigger.
     /// 
     /// # Arguments
@@ -3153,6 +3285,23 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     pub fn containers_workspaces_triggers_delete(&self, path: &str) -> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> {
         AccountContainerWorkspaceTriggerDeleteCall {
+            hub: self.hub,
+            _path: path.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a GTM Folder.
+    /// 
+    /// # Arguments
+    ///
+    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    pub fn containers_workspaces_folders_delete(&self, path: &str) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
+        AccountContainerWorkspaceFolderDeleteCall {
             hub: self.hub,
             _path: path.to_string(),
             _delegate: Default::default(),
@@ -3208,6 +3357,24 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
         AccountContainerWorkspaceTagUpdateCall {
             hub: self.hub,
             _request: request,
+            _path: path.to_string(),
+            _fingerprint: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Reverts changes to a GTM Template in a GTM Workspace.
+    /// 
+    /// # Arguments
+    ///
+    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    pub fn containers_workspaces_templates_revert(&self, path: &str) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
+        AccountContainerWorkspaceTemplateRevertCall {
+            hub: self.hub,
             _path: path.to_string(),
             _fingerprint: Default::default(),
             _delegate: Default::default(),
@@ -5913,9 +6080,9 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Gets a GTM Folder.
+/// Gets a GTM Template.
 ///
-/// A builder for the *containers.workspaces.folders.get* method supported by a *account* resource.
+/// A builder for the *containers.workspaces.templates.get* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -5940,11 +6107,11 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().containers_workspaces_folders_get("path")
+/// let result = hub.accounts().containers_workspaces_templates_get("path")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerWorkspaceFolderGetCall<'a, C, A>
+pub struct AccountContainerWorkspaceTemplateGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TagManager<C, A>,
@@ -5954,13 +6121,13 @@ pub struct AccountContainerWorkspaceFolderGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountContainerWorkspaceFolderGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceTemplateGetCall<'a, C, A> {}
 
-impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerWorkspaceTemplateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Folder)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CustomTemplate)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -5969,7 +6136,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.folders.get",
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.templates.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("path", self._path.to_string()));
@@ -6088,13 +6255,13 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
+    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A> {
         self._path = new_value.to_string();
         self
     }
@@ -6104,7 +6271,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6125,7 +6292,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6145,7 +6312,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceFolderGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8979,9 +9146,9 @@ impl<'a, C, A> AccountUserPermissionListCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Deletes a GTM Folder.
+/// Deletes a GTM Template.
 ///
-/// A builder for the *containers.workspaces.folders.delete* method supported by a *account* resource.
+/// A builder for the *containers.workspaces.templates.delete* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -9006,11 +9173,11 @@ impl<'a, C, A> AccountUserPermissionListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().containers_workspaces_folders_delete("path")
+/// let result = hub.accounts().containers_workspaces_templates_delete("path")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
+pub struct AccountContainerWorkspaceTemplateDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TagManager<C, A>,
@@ -9020,9 +9187,9 @@ pub struct AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9035,7 +9202,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.folders.delete",
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.templates.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("path", self._path.to_string()));
@@ -9143,13 +9310,13 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
     }
 
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
+    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> {
         self._path = new_value.to_string();
         self
     }
@@ -9159,7 +9326,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9180,7 +9347,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9200,7 +9367,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10743,9 +10910,9 @@ impl<'a, C, A> AccountContainerWorkspaceTagListCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Undeletes a Container Version.
+/// Lists all GTM Templates of a GTM container workspace.
 ///
-/// A builder for the *containers.versions.undelete* method supported by a *account* resource.
+/// A builder for the *containers.workspaces.templates.list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -10770,27 +10937,29 @@ impl<'a, C, A> AccountContainerWorkspaceTagListCall<'a, C, A> where C: BorrowMut
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().containers_versions_undelete("path")
+/// let result = hub.accounts().containers_workspaces_templates_list("parent")
+///              .page_token("et")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionUndeleteCall<'a, C, A>
+pub struct AccountContainerWorkspaceTemplateListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TagManager<C, A>,
-    _path: String,
+    _parent: String,
+    _page_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountContainerVersionUndeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceTemplateListCall<'a, C, A> {}
 
-impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerWorkspaceTemplateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ContainerVersion)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListTemplatesResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -10799,11 +10968,14 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.versions.undelete",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("path", self._path.to_string()));
-        for &field in ["alt", "path"].iter() {
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.templates.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10815,12 +10987,12 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:undelete";
+        let mut url = self.hub._base_url.clone() + "{+parent}/templates";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+path}", "path")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -10835,7 +11007,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["path"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -10865,7 +11037,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10918,14 +11090,21 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
-    /// Sets the *path* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn path(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
-        self._path = new_value.to_string();
+    pub fn parent(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Continuation token for fetching the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10934,7 +11113,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUndeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10955,7 +11134,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10964,7 +11143,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::EditContainerversion`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10975,7 +11154,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTemplateListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11021,7 +11200,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_update(req, "path")
-///              .fingerprint("amet")
+///              .fingerprint("et")
 ///              .doit();
 /// # }
 /// ```
@@ -12026,6 +12205,281 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
+/// Creates a GTM Custom Template.
+///
+/// A builder for the *containers.workspaces.templates.create* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager2 as tagmanager2;
+/// use tagmanager2::CustomTemplate;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager2::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CustomTemplate::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_workspaces_templates_create(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerWorkspaceTemplateCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _request: CustomTemplate,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CustomTemplate)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.templates.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+parent}/templates";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CustomTemplate) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Deletes a Container Version.
 ///
 /// A builder for the *containers.versions.delete* method supported by a *account* resource.
@@ -12574,8 +13028,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_version_headers_list("parent")
-///              .page_token("dolor")
-///              .include_deleted(true)
+///              .page_token("consetetur")
+///              .include_deleted(false)
 ///              .doit();
 /// # }
 /// ```
@@ -12842,7 +13296,7 @@ impl<'a, C, A> AccountContainerVersionHeaderListCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_built_in_variables_list("parent")
-///              .page_token("amet.")
+///              .page_token("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -13098,7 +13552,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> where 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_list("parent")
-///              .page_token("Lorem")
+///              .page_token("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -13629,7 +14083,7 @@ impl<'a, C, A> AccountUserPermissionUpdateCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_list("parent")
-///              .page_token("sit")
+///              .page_token("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -13846,6 +14300,293 @@ impl<'a, C, A> AccountContainerWorkspaceZoneListCall<'a, C, A> where C: BorrowMu
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceZoneListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates a GTM Template.
+///
+/// A builder for the *containers.workspaces.templates.update* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager2 as tagmanager2;
+/// use tagmanager2::CustomTemplate;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager2::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CustomTemplate::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_workspaces_templates_update(req, "path")
+///              .fingerprint("consetetur")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerWorkspaceTemplateUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _request: CustomTemplate,
+    _path: String,
+    _fingerprint: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CustomTemplate)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.templates.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("path", self._path.to_string()));
+        if let Some(value) = self._fingerprint {
+            params.push(("fingerprint", value.to_string()));
+        }
+        for &field in ["alt", "path", "fingerprint"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+path}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+path}", "path")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["path"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CustomTemplate) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    ///
+    /// Sets the *path* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
+        self._path = new_value.to_string();
+        self
+    }
+    /// When provided, this fingerprint must match the fingerprint of the templates in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
+        self._fingerprint = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14373,7 +15114,7 @@ impl<'a, C, A> AccountContainerVersionLiveCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list()
-///              .page_token("rebum.")
+///              .page_token("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -14592,7 +15333,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_variables_list("parent")
-///              .page_token("sadipscing")
+///              .page_token("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -14820,6 +15561,250 @@ impl<'a, C, A> AccountContainerWorkspaceVariableListCall<'a, C, A> where C: Borr
 }
 
 
+/// Undeletes a Container Version.
+///
+/// A builder for the *containers.versions.undelete* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager2 as tagmanager2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager2::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_versions_undelete("path")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerVersionUndeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _path: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerVersionUndeleteCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ContainerVersion)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.versions.undelete",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("path", self._path.to_string()));
+        for &field in ["alt", "path"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+path}:undelete";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+path}", "path")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["path"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    ///
+    /// Sets the *path* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn path(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
+        self._path = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUndeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainerversion`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Reverts changes to a GTM Variable in a GTM Workspace.
 ///
 /// A builder for the *containers.workspaces.variables.revert* method supported by a *account* resource.
@@ -14848,7 +15833,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableListCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_variables_revert("path")
-///              .fingerprint("sadipscing")
+///              .fingerprint("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -15309,9 +16294,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> where C: Borrow
 }
 
 
-/// List all entities in a GTM Folder.
+/// Gets a GTM Folder.
 ///
-/// A builder for the *containers.workspaces.folders.entities* method supported by a *account* resource.
+/// A builder for the *containers.workspaces.folders.get* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -15336,29 +16321,27 @@ impl<'a, C, A> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> where C: Borrow
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().containers_workspaces_folders_entities("path")
-///              .page_token("dolore")
+/// let result = hub.accounts().containers_workspaces_folders_get("path")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerWorkspaceFolderEntityCall<'a, C, A>
+pub struct AccountContainerWorkspaceFolderGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _page_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccountContainerWorkspaceFolderEntityCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceFolderGetCall<'a, C, A> {}
 
-impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, FolderEntities)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Folder)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -15367,14 +16350,11 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.folders.entities",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.folders.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("path", self._path.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        for &field in ["alt", "path", "pageToken"].iter() {
+        for &field in ["alt", "path"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15386,9 +16366,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:entities";
+        let mut url = self.hub._base_url.clone() + "{+path}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+path}", "path")].iter() {
@@ -15436,7 +16416,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15495,15 +16475,8 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
+    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
         self._path = new_value.to_string();
-        self
-    }
-    /// Continuation token for fetching the next page of results.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -15512,7 +16485,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15533,7 +16506,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15542,7 +16515,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::EditContainer`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15553,7 +16526,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceFolderGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16107,7 +17080,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagDeleteCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_update(req, "path")
-///              .fingerprint("et")
+///              .fingerprint("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -16919,7 +17892,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_built_in_variables_create("parent")
-///              .add_type("kasd")
+///              .add_type("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -17178,7 +18151,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> wher
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_list("parent")
-///              .page_token("takimata")
+///              .page_token("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -17395,6 +18368,262 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// List all entities in a GTM Folder.
+///
+/// A builder for the *containers.workspaces.folders.entities* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager2 as tagmanager2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager2::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_workspaces_folders_entities("path")
+///              .page_token("rebum.")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerWorkspaceFolderEntityCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _path: String,
+    _page_token: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceFolderEntityCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, FolderEntities)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.folders.entities",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("path", self._path.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        for &field in ["alt", "path", "pageToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+path}:entities";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+path}", "path")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["path"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    ///
+    /// Sets the *path* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
+        self._path = new_value.to_string();
+        self
+    }
+    /// Continuation token for fetching the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17628,6 +18857,239 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> where C: Bor
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a GTM Folder.
+///
+/// A builder for the *containers.workspaces.folders.delete* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager2 as tagmanager2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager2::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_workspaces_folders_delete("path")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _path: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.folders.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        params.push(("path", self._path.to_string()));
+        for &field in ["path"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "{+path}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+path}", "path")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["path"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    ///
+    /// Sets the *path* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
+        self._path = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17911,7 +19373,7 @@ impl<'a, C, A> AccountContainerWorkspaceSyncCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_tags_revert("path")
-///              .fingerprint("ea")
+///              .fingerprint("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -18173,7 +19635,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagRevertCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_tags_update(req, "path")
-///              .fingerprint("rebum.")
+///              .fingerprint("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -18415,6 +19877,262 @@ impl<'a, C, A> AccountContainerWorkspaceTagUpdateCall<'a, C, A> where C: BorrowM
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTagUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Reverts changes to a GTM Template in a GTM Workspace.
+///
+/// A builder for the *containers.workspaces.templates.revert* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager2 as tagmanager2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use tagmanager2::TagManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_workspaces_templates_revert("path")
+///              .fingerprint("sed")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountContainerWorkspaceTemplateRevertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a TagManager<C, A>,
+    _path: String,
+    _fingerprint: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {}
+
+impl<'a, C, A> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, RevertTemplateResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "tagmanager.accounts.containers.workspaces.templates.revert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("path", self._path.to_string()));
+        if let Some(value) = self._fingerprint {
+            params.push(("fingerprint", value.to_string()));
+        }
+        for &field in ["alt", "path", "fingerprint"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+path}:revert";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+path}", "path")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["path"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    ///
+    /// Sets the *path* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn path(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
+        self._path = new_value.to_string();
+        self
+    }
+    /// When provided, this fingerprint must match the fingerprint of the template in storage.
+    ///
+    /// Sets the *fingerprint* query property to the given value.
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
+        self._fingerprint = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::EditContainer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18735,7 +20453,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_update(req, "path")
-///              .fingerprint("sed")
+///              .fingerprint("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -19535,7 +21253,7 @@ impl<'a, C, A> AccountUserPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_revert("path")
-///              .fingerprint("consetetur")
+///              .fingerprint("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -20274,7 +21992,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagGetCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_resolve_conflict(req, "path")
-///              .fingerprint("gubergren")
+///              .fingerprint("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -20550,7 +22268,7 @@ impl<'a, C, A> AccountContainerWorkspaceResolveConflictCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_environments_update(req, "path")
-///              .fingerprint("eos")
+///              .fingerprint("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -21075,7 +22793,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerGetCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_folders_revert("path")
-///              .fingerprint("labore")
+///              .fingerprint("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -21581,7 +23299,7 @@ impl<'a, C, A> AccountContainerWorkspaceGetStatuCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_versions_update(req, "path")
-///              .fingerprint("dolores")
+///              .fingerprint("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -21862,7 +23580,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_versions_get("path")
-///              .container_version_id("diam")
+///              .container_version_id("est")
 ///              .doit();
 /// # }
 /// ```
@@ -22124,7 +23842,7 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_update(req, "path")
-///              .fingerprint("justo")
+///              .fingerprint("invidunt")
 ///              .doit();
 /// # }
 /// ```

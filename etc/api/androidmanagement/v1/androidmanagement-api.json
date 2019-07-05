@@ -918,7 +918,7 @@
             }
         }
     }, 
-    "revision": "20190329", 
+    "revision": "20190624", 
     "rootUrl": "https://androidmanagement.googleapis.com/", 
     "schemas": {
         "AlwaysOnVpnPackage": {
@@ -1173,6 +1173,13 @@
                     "description": "The package name of the app that installed this app.", 
                     "type": "string"
                 }, 
+                "keyedAppStates": {
+                    "description": "List of keyed app states reported by the app.", 
+                    "items": {
+                        "$ref": "KeyedAppState"
+                    }, 
+                    "type": "array"
+                }, 
                 "packageName": {
                     "description": "Package name of the app.", 
                     "type": "string"
@@ -1208,6 +1215,29 @@
                 "versionName": {
                     "description": "The app version as displayed to the user.", 
                     "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "ApplicationReportingSettings": {
+            "description": "Settings controlling the behavior of application reports.", 
+            "id": "ApplicationReportingSettings", 
+            "properties": {
+                "includeRemovedApps": {
+                    "description": "Whether removed apps are included in application reports.", 
+                    "type": "boolean"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "BlockAction": {
+            "description": "An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a device or work profile to displays a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.", 
+            "id": "BlockAction", 
+            "properties": {
+                "blockAfterDays": {
+                    "description": "Number of days the policy is non-compliant before the device or work profile is blocked. To block access immediately, set to 0. blockAfterDays must be less than wipeAfterDays.", 
+                    "format": "int32", 
+                    "type": "integer"
                 }
             }, 
             "type": "object"
@@ -1520,6 +1550,13 @@
                         "The device is being provisioned. Newly enrolled devices are in this state until they have a policy applied."
                     ], 
                     "type": "string"
+                }, 
+                "systemProperties": {
+                    "additionalProperties": {
+                        "type": "string"
+                    }, 
+                    "description": "Map of selected system properties name and value related to the device.", 
+                    "type": "object"
                 }, 
                 "user": {
                     "$ref": "User", 
@@ -1927,6 +1964,49 @@
             }, 
             "type": "object"
         }, 
+        "KeyedAppState": {
+            "description": "Keyed app state reported by the app.", 
+            "id": "KeyedAppState", 
+            "properties": {
+                "createTime": {
+                    "description": "The creation time of the app state on the device.", 
+                    "format": "google-datetime", 
+                    "type": "string"
+                }, 
+                "data": {
+                    "description": "Optionally, a machine-readable value to be read by the EMM. For example, setting values that the admin can choose to query against in the EMM console (e.g. \u201cnotify me if the battery_warning data < 10\u201d).", 
+                    "type": "string"
+                }, 
+                "key": {
+                    "description": "The key for the app state. Acts as a point of reference for what the app is providing state for. For example, when providing managed configuration feedback, this key could be the managed configuration key.", 
+                    "type": "string"
+                }, 
+                "lastUpdateTime": {
+                    "description": "The time the app state was most recently updated.", 
+                    "format": "google-datetime", 
+                    "type": "string"
+                }, 
+                "message": {
+                    "description": "Optionally, a free-form message string to explain the app state. If the state was triggered by a particular value (e.g. a managed configuration value), it should be included in the message.", 
+                    "type": "string"
+                }, 
+                "severity": {
+                    "description": "The severity of the app state.", 
+                    "enum": [
+                        "SEVERITY_UNSPECIFIED", 
+                        "INFO", 
+                        "ERROR"
+                    ], 
+                    "enumDescriptions": [
+                        "Unspecified severity level.", 
+                        "Information severity level.", 
+                        "Error severity level. This should only be set for genuine error conditions that a management organization needs to take action to fix."
+                    ], 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "LaunchAppAction": {
             "description": "An action to launch an app.", 
             "id": "LaunchAppAction", 
@@ -2330,7 +2410,7 @@
                     "type": "object"
                 }, 
                 "name": {
-                    "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations/some/unique/name.", 
+                    "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should be a resource name ending with operations/{unique_id}.", 
                     "type": "string"
                 }, 
                 "response": {
@@ -2606,7 +2686,7 @@
                     "type": "array"
                 }, 
                 "complianceRules": {
-                    "description": "Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules.", 
+                    "description": "Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules. Use policy enforcement rules instead.", 
                     "items": {
                         "$ref": "ComplianceRule"
                     }, 
@@ -2751,6 +2831,11 @@
                     "format": "int64", 
                     "type": "string"
                 }, 
+                "minimumApiLevel": {
+                    "description": "The minimum allowed Android API level.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
                 "mobileNetworksConfigDisabled": {
                     "description": "Whether configuring mobile networks is disabled.", 
                     "type": "boolean"
@@ -2833,6 +2918,13 @@
                         "All apps are available and any app that should not be on the device should be explicitly marked as 'BLOCKED' in the applications policy."
                     ], 
                     "type": "string"
+                }, 
+                "policyEnforcementRules": {
+                    "description": "Rules that define the behavior when a particular policy can not be applied on device", 
+                    "items": {
+                        "$ref": "PolicyEnforcementRule"
+                    }, 
+                    "type": "array"
                 }, 
                 "privateKeySelectionEnabled": {
                     "description": "Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable.", 
@@ -2952,6 +3044,25 @@
                 "wifiConfigsLockdownEnabled": {
                     "description": "DEPRECATED - Use wifi_config_disabled.", 
                     "type": "boolean"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "PolicyEnforcementRule": {
+            "description": "A rule that defines the actions to take if a device or work profile is not compliant with the policy specified in settingName.", 
+            "id": "PolicyEnforcementRule", 
+            "properties": {
+                "blockAction": {
+                    "$ref": "BlockAction", 
+                    "description": "An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified."
+                }, 
+                "settingName": {
+                    "description": "The top-level policy to enforce. For example, applications or passwordPolicies.", 
+                    "type": "string"
+                }, 
+                "wipeAction": {
+                    "$ref": "WipeAction", 
+                    "description": "An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified."
                 }
             }, 
             "type": "object"
@@ -3127,7 +3238,7 @@
             "type": "object"
         }, 
         "Status": {
-            "description": "The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). The error model is designed to be:\nSimple to use and understand for most users\nFlexible enough to meet unexpected needsOverviewThe Status message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers understand and resolve the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package google.rpc that can be used for common error conditions.Language mappingThe Status message is the logical representation of the error model, but it is not necessarily the actual wire format. When the Status message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.Other usesThe error model and the Status message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.Example uses of this error model include:\nPartial errors. If a service needs to return partial errors to the client, it may embed the Status in the normal response to indicate the partial errors.\nWorkflow errors. A typical workflow has multiple steps. Each step may have a Status message for error reporting.\nBatch operations. If a client uses batch request and batch response, the Status message should be used directly inside batch response, one for each error sub-response.\nAsynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the Status message.\nLogging. If some API errors are stored in logs, the message Status could be used directly after any stripping needed for security/privacy reasons.", 
+            "description": "The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). Each Status message contains three pieces of data: error code, error message, and error details.You can find out more about this error model and how to work with it in the API Design Guide (https://cloud.google.com/apis/design/errors).", 
             "id": "Status", 
             "properties": {
                 "code": {
@@ -3157,6 +3268,10 @@
             "description": "Settings controlling the behavior of status reports.", 
             "id": "StatusReportingSettings", 
             "properties": {
+                "applicationReportingSettings": {
+                    "$ref": "ApplicationReportingSettings", 
+                    "description": "Application reporting settings. Only applicable if application_reports_enabled is true."
+                }, 
                 "applicationReportsEnabled": {
                     "description": "Whether app reports are enabled.", 
                     "type": "boolean"
@@ -3357,6 +3472,22 @@
                 "value": {
                     "description": "The token value which is used in the hosting page to generate the iframe with the embedded UI. This is a read-only field generated by the server.", 
                     "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "WipeAction": {
+            "description": "An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified.", 
+            "id": "WipeAction", 
+            "properties": {
+                "preserveFrp": {
+                    "description": "Whether the factory-reset protection data is preserved on the device. This setting doesn\u2019t apply to work profiles.", 
+                    "type": "boolean"
+                }, 
+                "wipeAfterDays": {
+                    "description": "Number of days the policy is non-compliant before the device or work profile is wiped. wipeAfterDays must be greater than blockAfterDays.", 
+                    "format": "int32", 
+                    "type": "integer"
                 }
             }, 
             "type": "object"

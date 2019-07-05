@@ -1125,7 +1125,8 @@ fn main() {
                   ]),
             ("list",
                     Some(r##"Lists the billing accounts that the current authenticated user has
-        permission to [view](https://cloud.google.com/billing/docs/how-to/billing-access)."##),
+        permission to
+        [view](https://cloud.google.com/billing/docs/how-to/billing-access)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudbilling1_cli/billing-accounts_list",
                   vec![
                     (Some(r##"v"##),
@@ -1399,7 +1400,7 @@ fn main() {
     
     let mut app = App::new("cloudbilling1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190314")
+           .version("1.0.9+20190617")
            .about("Allows developers to manage billing for their Google Cloud Platform projects
                programmatically.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudbilling1_cli")

@@ -1274,18 +1274,18 @@ fn main() {
     let arg_data = [
         ("changes", "methods: 'create', 'get' and 'list'", vec![
             ("create",
-                    Some(r##""##),
+                    Some(r##"Atomically update the ResourceRecordSet collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/changes_create",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1308,24 +1308,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##""##),
+                    Some(r##"Fetch the representation of an existing Change."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/changes_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"change-id"##),
                      None,
-                     None,
+                     Some(r##"The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse."##),
                      Some(true),
                      Some(false)),
         
@@ -1342,18 +1342,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##""##),
+                    Some(r##"Enumerate Changes to a ResourceRecordSet collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/changes_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1373,24 +1373,24 @@ fn main() {
         
         ("dns-keys", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##""##),
+                    Some(r##"Fetch the representation of an existing DnsKey."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/dns-keys_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"dns-key-id"##),
                      None,
-                     None,
+                     Some(r##"The identifier of the requested DnsKey."##),
                      Some(true),
                      Some(false)),
         
@@ -1407,18 +1407,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##""##),
+                    Some(r##"Enumerate DnsKeys to a ResourceRecordSet collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/dns-keys_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1438,24 +1438,24 @@ fn main() {
         
         ("managed-zone-operations", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##""##),
+                    Some(r##"Fetch the representation of an existing Operation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zone-operations_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"operation"##),
                      None,
-                     None,
+                     Some(r##"Identifies the operation addressed by this request."##),
                      Some(true),
                      Some(false)),
         
@@ -1472,18 +1472,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##""##),
+                    Some(r##"Enumerate Operations for the given ManagedZone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zone-operations_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request."##),
                      Some(true),
                      Some(false)),
         
@@ -1503,12 +1503,12 @@ fn main() {
         
         ("managed-zones", "methods: 'create', 'delete', 'get', 'list', 'patch' and 'update'", vec![
             ("create",
-                    Some(r##""##),
+                    Some(r##"Create a new ManagedZone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_create",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
@@ -1531,18 +1531,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##""##),
+                    Some(r##"Delete a previously created ManagedZone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_delete",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1553,18 +1553,18 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##""##),
+                    Some(r##"Fetch the representation of an existing ManagedZone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1581,12 +1581,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##""##),
+                    Some(r##"Enumerate ManagedZones that have been created but not yet deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
@@ -1603,18 +1603,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##""##),
+                    Some(r##"Apply a partial update to an existing ManagedZone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_patch",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1637,18 +1637,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##""##),
+                    Some(r##"Update an existing ManagedZone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_update",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1674,12 +1674,12 @@ fn main() {
         
         ("projects", "methods: 'get'", vec![
             ("get",
-                    Some(r##""##),
+                    Some(r##"Fetch the representation of an existing Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/projects_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
@@ -1699,18 +1699,18 @@ fn main() {
         
         ("resource-record-sets", "methods: 'list'", vec![
             ("list",
-                    Some(r##""##),
+                    Some(r##"Enumerate ResourceRecordSets that have been created but not yet deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/resource-record-sets_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     None,
+                     Some(r##"Identifies the project addressed by this request."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     None,
+                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
                      Some(true),
                      Some(false)),
         
@@ -1732,7 +1732,7 @@ fn main() {
     
     let mut app = App::new("dns1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190328")
+           .version("1.0.9+20190625")
            .about("Configures and serves authoritative DNS records.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dns1_cli")
            .arg(Arg::with_name("url")

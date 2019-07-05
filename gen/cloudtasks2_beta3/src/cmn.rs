@@ -748,6 +748,17 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
                 map.remove(key);
             }
         }
+        json::value::Value::Array(ref mut arr) => {
+            let mut i = 0;
+            while i < arr.len() {
+                if arr[i].is_null() {
+                    arr.remove(i);
+                } else {
+                    remove_json_null_values(&mut arr[i]);
+                    i += 1;
+                }
+            }
+        }
         _ => {}
     }
 }

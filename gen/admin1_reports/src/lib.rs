@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *1.0.8+20190210*, where *20190210* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *reports* crate version *1.0.9+20190521*, where *20190521* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -232,9 +232,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -350,7 +348,7 @@ impl<'a, C, A> Reports<C, A>
         Reports {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/admin/reports/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -373,7 +371,7 @@ impl<'a, C, A> Reports<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -401,29 +399,18 @@ impl<'a, C, A> Reports<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// JSON template for a collection of activites.
+/// Nested value of the parameter.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list activities](struct.ActivityListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Activities {
-    /// Token for retrieving the next page
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Each record in read response.
-    pub items: Option<Vec<Activity>>,
-    /// Kind of list response this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
+pub struct ActivityEventsParametersMessageValue {
+    /// Looping to get parameter values.
+    pub parameter: Option<Vec<NestedParameter>>,
 }
 
-impl ResponseResult for Activities {}
+impl NestedType for ActivityEventsParametersMessageValue {}
+impl Part for ActivityEventsParametersMessageValue {}
 
 
 /// Key-Value pairs to give detailed information on the warning.
@@ -461,6 +448,185 @@ pub struct UsageReport {
 }
 
 impl Part for UsageReport {}
+
+
+/// Unique identifier for each activity record.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityId {
+    /// Application name to which the event belongs.
+    #[serde(rename="applicationName")]
+    pub application_name: Option<String>,
+    /// Unique qualifier if multiple events have the same time.
+    #[serde(rename="uniqueQualifier")]
+    pub unique_qualifier: Option<String>,
+    /// Obfuscated customer ID of the source customer.
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
+    /// Time of occurrence of the activity.
+    pub time: Option<String>,
+}
+
+impl NestedType for ActivityId {}
+impl Part for ActivityId {}
+
+
+/// Warnings if any.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsageReportsWarnings {
+    /// Human readable message for the warning.
+    pub message: Option<String>,
+    /// Machine readable code / warning type.
+    pub code: Option<String>,
+    /// Key-Value pairs to give detailed information on the warning.
+    pub data: Option<Vec<UsageReportsWarningsData>>,
+}
+
+impl NestedType for UsageReportsWarnings {}
+impl Part for UsageReportsWarnings {}
+
+
+/// JSON template for the activity resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Activity {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the entry.
+    pub etag: Option<String>,
+    /// Activity events.
+    pub events: Option<Vec<ActivityEvents>>,
+    /// IP Address of the user doing the action.
+    #[serde(rename="ipAddress")]
+    pub ip_address: Option<String>,
+    /// Domain of source customer.
+    #[serde(rename="ownerDomain")]
+    pub owner_domain: Option<String>,
+    /// User doing the action.
+    pub actor: Option<ActivityActor>,
+    /// Unique identifier for each activity record.
+    pub id: Option<ActivityId>,
+}
+
+impl Part for Activity {}
+
+
+/// JSON template for a parameter used in various reports.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NestedParameter {
+    /// Multiple boolean values of the parameter.
+    #[serde(rename="multiBoolValue")]
+    pub multi_bool_value: Option<Vec<bool>>,
+    /// Boolean value of the parameter.
+    #[serde(rename="boolValue")]
+    pub bool_value: Option<bool>,
+    /// Multiple string values of the parameter.
+    #[serde(rename="multiValue")]
+    pub multi_value: Option<Vec<String>>,
+    /// The name of the parameter.
+    pub name: Option<String>,
+    /// Multiple integral values of the parameter.
+    #[serde(rename="multiIntValue")]
+    pub multi_int_value: Option<Vec<String>>,
+    /// Integral value of the parameter.
+    #[serde(rename="intValue")]
+    pub int_value: Option<String>,
+    /// String value of the parameter.
+    pub value: Option<String>,
+}
+
+impl Part for NestedParameter {}
+
+
+/// An notification channel used to watch for resource changes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [watch activities](struct.ActivityWatchCall.html) (request|response)
+/// * [stop channels](struct.ChannelStopCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Channel {
+    /// A version-specific identifier for the watched resource.
+    #[serde(rename="resourceUri")]
+    pub resource_uri: Option<String>,
+    /// Identifies this as a notification channel used to watch for changes to a resource, which is "api#channel".
+    pub kind: Option<String>,
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
+    #[serde(rename="resourceId")]
+    pub resource_id: Option<String>,
+    /// A UUID or similar unique string that identifies this channel.
+    pub id: Option<String>,
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
+    pub token: Option<String>,
+    /// Additional parameters controlling delivery channel behavior. Optional.
+    pub params: Option<HashMap<String, String>>,
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
+    pub expiration: Option<String>,
+    /// The address where notifications are delivered for this channel.
+    pub address: Option<String>,
+    /// The type of delivery mechanism used for this channel.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// A Boolean value to indicate whether payload is wanted. Optional.
+    pub payload: Option<bool>,
+}
+
+impl RequestValue for Channel {}
+impl Resource for Channel {}
+impl ResponseResult for Channel {}
+
+
+/// JSON template for a collection of activites.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list activities](struct.ActivityListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Activities {
+    /// Token for retrieving the next page
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Each record in read response.
+    pub items: Option<Vec<Activity>>,
+    /// Kind of list response this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for Activities {}
+
+
+/// Nested values of the parameter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityEventsParametersMultiMessageValue {
+    /// Parameter value.
+    pub parameter: Option<Vec<NestedParameter>>,
+}
+
+impl NestedType for ActivityEventsParametersMultiMessageValue {}
+impl Part for ActivityEventsParametersMultiMessageValue {}
 
 
 /// Parameter value pairs for various applications.
@@ -514,47 +680,6 @@ impl NestedType for ActivityActor {}
 impl Part for ActivityActor {}
 
 
-/// Unique identifier for each activity record.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ActivityId {
-    /// Application name to which the event belongs.
-    #[serde(rename="applicationName")]
-    pub application_name: Option<String>,
-    /// Unique qualifier if multiple events have the same time.
-    #[serde(rename="uniqueQualifier")]
-    pub unique_qualifier: Option<String>,
-    /// Obfuscated customer ID of the source customer.
-    #[serde(rename="customerId")]
-    pub customer_id: Option<String>,
-    /// Time of occurrence of the activity.
-    pub time: Option<String>,
-}
-
-impl NestedType for ActivityId {}
-impl Part for ActivityId {}
-
-
-/// Warnings if any.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UsageReportsWarnings {
-    /// Human readable message for the warning.
-    pub message: Option<String>,
-    /// Machine readable code / warning type.
-    pub code: Option<String>,
-    /// Key-Value pairs to give detailed information on the warning.
-    pub data: Option<Vec<UsageReportsWarningsData>>,
-}
-
-impl NestedType for UsageReportsWarnings {}
-impl Part for UsageReportsWarnings {}
-
-
 /// JSON template for a collection of usage reports.
 /// 
 /// # Activities
@@ -585,55 +710,34 @@ pub struct UsageReports {
 impl ResponseResult for UsageReports {}
 
 
-/// JSON template for the activity resource.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Activity {
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the entry.
-    pub etag: Option<String>,
-    /// Activity events.
-    pub events: Option<Vec<ActivityEvents>>,
-    /// IP Address of the user doing the action.
-    #[serde(rename="ipAddress")]
-    pub ip_address: Option<String>,
-    /// Domain of source customer.
-    #[serde(rename="ownerDomain")]
-    pub owner_domain: Option<String>,
-    /// User doing the action.
-    pub actor: Option<ActivityActor>,
-    /// Unique identifier for each activity record.
-    pub id: Option<ActivityId>,
-}
-
-impl Part for Activity {}
-
-
 /// Parameter value pairs for various applications.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEventsParameters {
+    /// The name of the parameter.
+    pub name: Option<String>,
+    /// Nested value of the parameter.
+    #[serde(rename="messageValue")]
+    pub message_value: Option<ActivityEventsParametersMessageValue>,
     /// Boolean value of the parameter.
     #[serde(rename="boolValue")]
     pub bool_value: Option<bool>,
-    /// Multi-string value of the parameter.
-    #[serde(rename="multiValue")]
-    pub multi_value: Option<Vec<String>>,
-    /// The name of the parameter.
-    pub name: Option<String>,
-    /// Multi-int value of the parameter.
-    #[serde(rename="multiIntValue")]
-    pub multi_int_value: Option<Vec<String>>,
+    /// String value of the parameter.
+    pub value: Option<String>,
     /// Integral value of the parameter.
     #[serde(rename="intValue")]
     pub int_value: Option<String>,
-    /// String value of the parameter.
-    pub value: Option<String>,
+    /// Multi-string value of the parameter.
+    #[serde(rename="multiValue")]
+    pub multi_value: Option<Vec<String>>,
+    /// Multi-int value of the parameter.
+    #[serde(rename="multiIntValue")]
+    pub multi_int_value: Option<Vec<String>>,
+    /// Nested values of the parameter.
+    #[serde(rename="multiMessageValue")]
+    pub multi_message_value: Option<Vec<ActivityEventsParametersMultiMessageValue>>,
 }
 
 impl NestedType for ActivityEventsParameters {}
@@ -684,48 +788,6 @@ pub struct UsageReportEntity {
 
 impl NestedType for UsageReportEntity {}
 impl Part for UsageReportEntity {}
-
-
-/// An notification channel used to watch for resource changes.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [watch activities](struct.ActivityWatchCall.html) (request|response)
-/// * [stop channels](struct.ChannelStopCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Channel {
-    /// A version-specific identifier for the watched resource.
-    #[serde(rename="resourceUri")]
-    pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
-    pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(rename="resourceId")]
-    pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.
-    pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
-    pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.
-    pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
-    pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.
-    pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.
-    pub payload: Option<bool>,
-}
-
-impl RequestValue for Channel {}
-impl Resource for Channel {}
-impl ResponseResult for Channel {}
 
 
 

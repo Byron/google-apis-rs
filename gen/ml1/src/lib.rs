@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.8+20190325*, where *20190325* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.9+20190621*, where *20190621* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Machine Learning Engine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/ml/).
@@ -11,8 +11,6 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudMachineLearningEngine.html) ... 
 //! 
-//! * operations
-//!  * [*delete*](struct.OperationDeleteCall.html)
 //! * projects
 //!  * [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs get iam policy*](struct.ProjectJobGetIamPolicyCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*jobs patch*](struct.ProjectJobPatchCall.html), [*jobs set iam policy*](struct.ProjectJobSetIamPolicyCall.html), [*jobs test iam permissions*](struct.ProjectJobTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models get iam policy*](struct.ProjectModelGetIamPolicyCall.html), [*models list*](struct.ProjectModelListCall.html), [*models patch*](struct.ProjectModelPatchCall.html), [*models set iam policy*](struct.ProjectModelSetIamPolicyCall.html), [*models test iam permissions*](struct.ProjectModelTestIamPermissionCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions patch*](struct.ProjectModelVersionPatchCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
 //! 
@@ -225,9 +223,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -340,21 +336,18 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
         CloudMachineLearningEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://ml.googleapis.com/".to_string(),
             _root_url: "https://ml.googleapis.com/".to_string(),
         }
     }
 
-    pub fn operations(&'a self) -> OperationMethods<'a, C, A> {
-        OperationMethods { hub: &self }
-    }
     pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -388,16 +381,18 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__BuiltInAlgorithmOutput {
-    /// Framework on which the built-in algorithm was trained on.
+    /// Framework on which the built-in algorithm was trained.
     pub framework: Option<String>,
-    /// Built-in algorithm's saved model path.
-    /// Only set for non-hptuning succeeded jobs.
+    /// The Cloud Storage path to the `model/` directory where the training job
+    /// saves the trained model. Only set for successful jobs that don't use
+    /// hyperparameter tuning.
     #[serde(rename="modelPath")]
     pub model_path: Option<String>,
-    /// CMLE runtime version on which the built-in algorithm was trained on.
+    /// AI Platform runtime version on which the built-in algorithm was
+    /// trained.
     #[serde(rename="runtimeVersion")]
     pub runtime_version: Option<String>,
-    /// Python version on which the built-in algorithm was trained on.
+    /// Python version on which the built-in algorithm was trained.
     #[serde(rename="pythonVersion")]
     pub python_version: Option<String>,
 }
@@ -411,6 +406,11 @@ impl Part for GoogleCloudMlV1__BuiltInAlgorithmOutput {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__ReplicaConfig {
+    /// TensorFlow version used in the custom container. This field is required if
+    /// the replica is a TPU worker that uses a custom container. Otherwise, do not
+    /// specify this field.
+    #[serde(rename="tpuTfVersion")]
+    pub tpu_tf_version: Option<String>,
     /// Represents the type and number of accelerators used by the replica.
     /// [Learn about restrictions on accelerator configurations for
     /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
@@ -528,6 +528,16 @@ impl ResponseResult for GoogleCloudMlV1__Location {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__HyperparameterOutput {
+    /// Output only. Start time for the trial.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// The hyperparameters given to this trial.
+    pub hyperparameters: Option<HashMap<String, String>>,
+    /// The final objective metric seen for this trial.
+    #[serde(rename="finalMetric")]
+    pub final_metric: Option<GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric>,
+    /// Output only. The detailed state of the trial.
+    pub state: Option<String>,
     /// All recorded object metrics for this trial. This field is not currently
     /// populated.
     #[serde(rename="allMetrics")]
@@ -535,18 +545,16 @@ pub struct GoogleCloudMlV1__HyperparameterOutput {
     /// True if the trial is stopped early.
     #[serde(rename="isTrialStoppedEarly")]
     pub is_trial_stopped_early: Option<bool>,
-    /// The hyperparameters given to this trial.
-    pub hyperparameters: Option<HashMap<String, String>>,
+    /// Output only. End time for the trial.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
     /// The trial id for these results.
     #[serde(rename="trialId")]
     pub trial_id: Option<String>,
-    /// Details related to built-in algorithms job.
-    /// Only set this for built-in algorithms jobs and for trials that succeeded.
+    /// Details related to built-in algorithms jobs.
+    /// Only set for trials of built-in algorithms jobs that have succeeded.
     #[serde(rename="builtInAlgorithmOutput")]
     pub built_in_algorithm_output: Option<GoogleCloudMlV1__BuiltInAlgorithmOutput>,
-    /// The final objective metric seen for this trial.
-    #[serde(rename="finalMetric")]
-    pub final_metric: Option<GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric>,
 }
 
 impl Part for GoogleCloudMlV1__HyperparameterOutput {}
@@ -658,7 +666,8 @@ impl ResponseResult for GoogleIamV1__Policy {}
 /// 
 ///     service ResourceService {
 ///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
-///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
+///       rpc UpdateResource(google.api.HttpBody) returns
+///       (google.protobuf.Empty);
 ///     }
 /// 
 /// Example with streaming methods:
@@ -710,9 +719,8 @@ impl ResponseResult for GoogleApi__HttpBody {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [operations cancel projects](struct.ProjectOperationCancelCall.html) (response)
-/// * [delete operations](struct.OperationDeleteCall.html) (response)
 /// * [jobs cancel projects](struct.ProjectJobCancelCall.html) (response)
+/// * [operations cancel projects](struct.ProjectOperationCancelCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobuf__Empty { _never_set: Option<bool> }
@@ -739,15 +747,15 @@ pub struct GoogleCloudMlV1__HyperparameterSpec {
     pub goal: Option<String>,
     /// Optional. The search algorithm specified for the hyperparameter
     /// tuning job.
-    /// Uses the default CloudML Engine hyperparameter tuning
+    /// Uses the default AI Platform hyperparameter tuning
     /// algorithm if unspecified.
     pub algorithm: Option<String>,
-    /// Optional. How many failed trials that need to be seen before failing the
-    /// hyperparameter tuning job. User can specify this field to override the
-    /// default failing criteria for CloudML Engine hyperparameter tuning jobs.
+    /// Optional. The number of failed trials that need to be seen before failing
+    /// the hyperparameter tuning job. You can specify this field to override the
+    /// default failing criteria for AI Platform hyperparameter tuning jobs.
     /// 
-    /// Defaults to zero, which means to let the service decide when a
-    /// hyperparameter job should fail.
+    /// Defaults to zero, which means the service decides when a hyperparameter
+    /// job should fail.
     #[serde(rename="maxFailedTrials")]
     pub max_failed_trials: Option<i32>,
     /// Optional. Indicates if the hyperparameter tuning job enables auto trial
@@ -761,9 +769,9 @@ pub struct GoogleCloudMlV1__HyperparameterSpec {
     pub resume_previous_job_id: Option<String>,
     /// Required. The set of parameters to tune.
     pub params: Option<Vec<GoogleCloudMlV1__ParameterSpec>>,
-    /// Optional. The Tensorflow summary tag name to use for optimizing trials. For
-    /// current versions of Tensorflow, this tag name should exactly match what is
-    /// shown in Tensorboard, including all scopes.  For versions of Tensorflow
+    /// Optional. The TensorFlow summary tag name to use for optimizing trials. For
+    /// current versions of TensorFlow, this tag name should exactly match what is
+    /// shown in TensorBoard, including all scopes.  For versions of TensorFlow
     /// prior to 0.12, this should be only the tag passed to tf.Summary.
     /// By default, "training/hptuning/metric" will be used.
     #[serde(rename="hyperparameterMetricTag")]
@@ -836,7 +844,7 @@ pub struct GoogleLongrunning__Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -867,13 +875,13 @@ impl ResponseResult for GoogleLongrunning__Operation {}
 pub struct GoogleCloudMlV1__Model {
     /// Optional. The description specified for the model when it was created.
     pub description: Option<String>,
-    /// Optional. If true, enables logging of stderr and stdout streams
-    /// for online prediction in Stackdriver Logging. These can be more verbose
-    /// than the standard access logs (see `online_prediction_logging`) and thus
-    /// can incur higher cost. However, they are helpful for debugging. Note that
-    /// since Stackdriver logs may incur a cost, particularly if the total QPS
-    /// in your project is high, be sure to estimate your costs before enabling
-    /// this flag.
+    /// Optional. If true, online prediction nodes send `stderr` and `stdout`
+    /// streams to Stackdriver Logging. These can be more verbose than the standard
+    /// access logs (see `onlinePredictionLogging`) and can incur higher cost.
+    /// However, they are helpful for debugging. Note that
+    /// [Stackdriver logs may incur a cost](/stackdriver/pricing), especially if
+    /// your project receives prediction requests at a high QPS. Estimate your
+    /// costs before enabling this option.
     /// 
     /// Default is false.
     #[serde(rename="onlinePredictionConsoleLogging")]
@@ -888,7 +896,7 @@ pub struct GoogleCloudMlV1__Model {
     /// Currently only one region per model is supported.
     /// Defaults to 'us-central1' if nothing is set.
     /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
-    /// for ML Engine services.
+    /// for AI Platform services.
     /// Note:
     /// *   No matter where a model is deployed, it can always be accessed by
     ///     users from anywhere, both for online and batch prediction.
@@ -914,8 +922,9 @@ pub struct GoogleCloudMlV1__Model {
     /// Optional. If true, online prediction access logs are sent to StackDriver
     /// Logging. These logs are like standard server access logs, containing
     /// information like timestamp and latency for each request. Note that
-    /// Stackdriver logs may incur a cost, particular if the total QPS in your
-    /// project is high.
+    /// [Stackdriver logs may incur a cost](/stackdriver/pricing), especially if
+    /// your project receives prediction requests at a high queries per second rate
+    /// (QPS). Estimate your costs before enabling this option.
     /// 
     /// Default is false.
     #[serde(rename="onlinePredictionLogging")]
@@ -1076,8 +1085,8 @@ impl Part for GoogleIamV1__AuditConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__TrainingInput {
-    /// Optional. The Cloud ML Engine runtime version to use for training. If not
-    /// set, Cloud ML Engine uses the default stable version, 1.0. For more
+    /// Optional. The AI Platform runtime version to use for training. If not
+    /// set, AI Platform uses the default stable version, 1.0. For more
     /// information, see the
     /// <a href="/ml-engine/docs/runtime-version-list">runtime version list</a>
     /// and
@@ -1221,6 +1230,9 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// The default value is zero.
     #[serde(rename="workerCount")]
     pub worker_count: Option<i64>,
+    /// Optional. The maximum job running time. The default is 7 days.
+    #[serde(rename="maxRunningTime")]
+    pub max_running_time: Option<String>,
     /// Optional. The number of parameter server replicas to use for the training
     /// job. Each replica in the cluster will be of the type specified in
     /// `parameter_server_type`.
@@ -1238,7 +1250,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// `masterType`.
     /// 
     /// This value must be consistent with the category of machine type that
-    /// `masterType` uses. In other words, both must be Cloud ML Engine machine
+    /// `masterType` uses. In other words, both must be AI Platform machine
     /// types or both must be Compute Engine machine types.
     /// 
     /// If you use `cloud_tpu` for this value, see special instructions for
@@ -1258,7 +1270,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// 
     /// Set `parameterServerConfig.imageUri` only if you build a custom image for
     /// your parameter server. If `parameterServerConfig.imageUri` has not been
-    /// set, Cloud ML Engine uses the value of `masterConfig.imageUri`.
+    /// set, AI Platform uses the value of `masterConfig.imageUri`.
     /// Learn more about [configuring custom
     /// containers](/ml-engine/docs/distributed-training-containers).
     #[serde(rename="parameterServerConfig")]
@@ -1269,7 +1281,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     pub scale_tier: Option<String>,
     /// Required. The Google Compute Engine region to run the training job in.
     /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
-    /// for ML Engine services.
+    /// for AI Platform services.
     pub region: Option<String>,
     /// Optional. The version of Python used in training. If not set, the default
     /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
@@ -1290,7 +1302,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
     /// 
     /// Set `workerConfig.imageUri` only if you build a custom image for your
-    /// worker. If `workerConfig.imageUri` has not been set, Cloud ML Engine uses
+    /// worker. If `workerConfig.imageUri` has not been set, AI Platform uses
     /// the value of `masterConfig.imageUri`. Learn more about
     /// [configuring custom
     /// containers](/ml-engine/docs/distributed-training-containers).
@@ -1303,7 +1315,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// `master_type`.
     /// 
     /// This value must be consistent with the category of machine type that
-    /// `masterType` uses. In other words, both must be Cloud ML Engine machine
+    /// `masterType` uses. In other words, both must be AI Platform machine
     /// types or both must be Compute Engine machine types.
     /// 
     /// This value must be present when `scaleTier` is set to `CUSTOM` and
@@ -1537,10 +1549,16 @@ pub struct GoogleCloudMlV1__TrainingOutput {
     /// Results for individual Hyperparameter trials.
     /// Only set for hyperparameter tuning jobs.
     pub trials: Option<Vec<GoogleCloudMlV1__HyperparameterOutput>>,
+    /// The TensorFlow summary tag name used for optimizing hyperparameter tuning
+    /// trials. See
+    /// [`HyperparameterSpec.hyperparameterMetricTag`](#HyperparameterSpec.FIELDS.hyperparameter_metric_tag)
+    /// for more information. Only set for hyperparameter tuning jobs.
+    #[serde(rename="hyperparameterMetricTag")]
+    pub hyperparameter_metric_tag: Option<String>,
     /// Whether this job is a hyperparameter tuning job.
     #[serde(rename="isHyperparameterTuningJob")]
     pub is_hyperparameter_tuning_job: Option<bool>,
-    /// Details related to built-in algorithms job.
+    /// Details related to built-in algorithms jobs.
     /// Only set for built-in algorithms jobs.
     #[serde(rename="builtInAlgorithmOutput")]
     pub built_in_algorithm_output: Option<GoogleCloudMlV1__BuiltInAlgorithmOutput>,
@@ -1588,7 +1606,7 @@ pub struct GoogleIamV1__Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<GoogleType__Expr>,
@@ -1677,7 +1695,7 @@ pub struct GoogleCloudMlV1__GetConfigResponse {
 impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
 
 
-/// Represents a training, prediction or explanation job.
+/// Represents a training or prediction job.
 /// 
 /// # Activities
 /// 
@@ -1741,56 +1759,11 @@ impl ResponseResult for GoogleCloudMlV1__Job {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1832,8 +1805,8 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// , which is "serving_default".
     #[serde(rename="signatureName")]
     pub signature_name: Option<String>,
-    /// Optional. The Cloud ML Engine runtime version to use for this batch
-    /// prediction. If not set, Cloud ML Engine will pick the runtime version used
+    /// Optional. The AI Platform runtime version to use for this batch
+    /// prediction. If not set, AI Platform will pick the runtime version used
     /// during the CreateVersion request for this model version, or choose the
     /// latest stable version when model version information is not available
     /// such as when the model is specified by uri.
@@ -1849,8 +1822,8 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// Defaults to 10 if not specified.
     #[serde(rename="maxWorkerCount")]
     pub max_worker_count: Option<i64>,
-    /// Required. The Google Cloud Storage location of the input data files.
-    /// May contain wildcards. See <a href="https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNames</a>
+    /// Required. The Cloud Storage location of the input data files. May contain
+    /// <a href="/storage/docs/gsutil/addlhelp/WildcardNames">wildcards</a>.
     #[serde(rename="inputPaths")]
     pub input_paths: Option<Vec<String>>,
     /// Use this field if you want to specify a Google Cloud Storage path for
@@ -1871,7 +1844,7 @@ pub struct GoogleCloudMlV1__PredictionInput {
     pub version_name: Option<String>,
     /// Required. The Google Compute Engine region to run the prediction job in.
     /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
-    /// for ML Engine services.
+    /// for AI Platform services.
     pub region: Option<String>,
     /// Optional. Format of the output data files, defaults to JSON.
     #[serde(rename="outputDataFormat")]
@@ -1909,7 +1882,6 @@ impl ResponseResult for GoogleCloudMlV1__ListLocationsResponse {}
 /// prediction requests. A model can have multiple versions. You can get
 /// information about all of the versions of a given model by calling
 /// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
-/// Next ID: 30
 /// 
 /// # Activities
 /// 
@@ -1944,8 +1916,8 @@ pub struct GoogleCloudMlV1__Version {
     pub machine_type: Option<String>,
     /// Optional. The description specified for the version when it was created.
     pub description: Option<String>,
-    /// Optional. The Cloud ML Engine runtime version to use for this deployment.
-    /// If not set, Cloud ML Engine uses the default stable version, 1.0. For more
+    /// Optional. The AI Platform runtime version to use for this deployment.
+    /// If not set, AI Platform uses the default stable version, 1.0. For more
     /// information, see the
     /// [runtime version list](/ml-engine/docs/runtime-version-list) and
     /// [how to manage runtime versions](/ml-engine/docs/versioning).
@@ -1965,12 +1937,15 @@ pub struct GoogleCloudMlV1__Version {
     /// For more information, see the documentation on
     /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
     pub labels: Option<HashMap<String, String>>,
-    /// Optional. The machine learning framework Cloud ML Engine uses to train
+    /// Optional. The machine learning framework AI Platform uses to train
     /// this version of the model. Valid values are `TENSORFLOW`, `SCIKIT_LEARN`,
-    /// `XGBOOST`. If you do not specify a framework, Cloud ML Engine
+    /// `XGBOOST`. If you do not specify a framework, AI Platform
     /// will analyze files in the deployment_uri to determine a framework. If you
     /// choose `SCIKIT_LEARN` or `XGBOOST`, you must also set the runtime version
     /// of the model to 1.4 or greater.
+    /// 
+    /// Do **not** specify a framework if you're deploying a [custom
+    /// prediction routine](/ml-engine/docs/tensorflow/custom-prediction-routines).
     pub framework: Option<String>,
     /// Output only. The time the version was created.
     #[serde(rename="createTime")]
@@ -1979,12 +1954,86 @@ pub struct GoogleCloudMlV1__Version {
     /// 
     /// The version name must be unique within the model it is created in.
     pub name: Option<String>,
+    /// Optional. The fully qualified name
+    /// (<var>module_name</var>.<var>class_name</var>) of a class that implements
+    /// the Predictor interface described in this reference field. The module
+    /// containing this class should be included in a package provided to the
+    /// [`packageUris` field](#Version.FIELDS.package_uris).
+    /// 
+    /// Specify this field if and only if you are deploying a [custom prediction
+    /// routine (beta)](/ml-engine/docs/tensorflow/custom-prediction-routines).
+    /// If you specify this field, you must set
+    /// [`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater.
+    /// 
+    /// The following code sample provides the Predictor interface:
+    /// 
+    /// ```py
+    /// class Predictor(object):
+    /// """Interface for constructing custom predictors."""
+    /// 
+    /// def predict(self, instances, **kwargs):
+    ///     """Performs custom prediction.
+    /// 
+    ///     Instances are the decoded values from the request. They have already
+    ///     been deserialized from JSON.
+    /// 
+    ///     Args:
+    ///         instances: A list of prediction input instances.
+    ///         **kwargs: A dictionary of keyword args provided as additional
+    ///             fields on the predict request body.
+    /// 
+    ///     Returns:
+    ///         A list of outputs containing the prediction results. This list must
+    ///         be JSON serializable.
+    ///     """
+    ///     raise NotImplementedError()
+    /// 
+    /// @classmethod
+    /// def from_path(cls, model_dir):
+    ///     """Creates an instance of Predictor using the given path.
+    /// 
+    ///     Loading of the predictor should be done in this method.
+    /// 
+    ///     Args:
+    ///         model_dir: The local directory that contains the exported model
+    ///             file along with any additional files uploaded when creating the
+    ///             version resource.
+    /// 
+    ///     Returns:
+    ///         An instance implementing this Predictor class.
+    ///     """
+    ///     raise NotImplementedError()
+    /// ```
+    /// 
+    /// Learn more about [the Predictor interface and custom prediction
+    /// routines](/ml-engine/docs/tensorflow/custom-prediction-routines).
+    #[serde(rename="predictionClass")]
+    pub prediction_class: Option<String>,
     /// Automatically scale the number of nodes used to serve the model in
     /// response to increases and decreases in traffic. Care should be
     /// taken to ramp up traffic according to the model's ability to scale
     /// or you will start seeing increases in latency and 429 response codes.
     #[serde(rename="autoScaling")]
     pub auto_scaling: Option<GoogleCloudMlV1__AutoScaling>,
+    /// Optional. Specifies the service account for resource access control.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
+    /// Optional. Cloud Storage paths (`gs://…`) of packages for [custom
+    /// prediction routines](/ml-engine/docs/tensorflow/custom-prediction-routines)
+    /// or [scikit-learn pipelines with custom
+    /// code](/ml-engine/docs/scikit/exporting-for-prediction#custom-pipeline-code).
+    /// 
+    /// For a custom prediction routine, one of these packages must contain your
+    /// Predictor class (see
+    /// [`predictionClass`](#Version.FIELDS.prediction_class)). Additionally,
+    /// include any dependencies used by your Predictor or scikit-learn pipeline
+    /// uses that are not already included in your selected [runtime
+    /// version](/ml-engine/docs/tensorflow/runtime-version-list).
+    /// 
+    /// If you specify this field, you must also set
+    /// [`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater.
+    #[serde(rename="packageUris")]
+    pub package_uris: Option<Vec<String>>,
     /// Optional. The version of Python used in prediction. If not set, the default
     /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
     /// to '1.4' and above. Python '2.7' works with all supported runtime versions.
@@ -2003,7 +2052,7 @@ pub struct GoogleCloudMlV1__Version {
     /// Output only. The time the version was last used for prediction.
     #[serde(rename="lastUseTime")]
     pub last_use_time: Option<String>,
-    /// Required. The Google Cloud Storage location of the trained model used to
+    /// Required. The Cloud Storage location of the trained model used to
     /// create the version. See the
     /// [guide to model
     /// deployment](/ml-engine/docs/tensorflow/deploying-models) for more
@@ -2100,68 +2149,6 @@ impl Part for GoogleCloudMlV1__AutoScaling {}
 // MethodBuilders ###
 // #################
 
-/// A builder providing access to all methods supported on *operation* resources.
-/// It is not used directly, but through the `CloudMachineLearningEngine` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_ml1 as ml1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use ml1::CloudMachineLearningEngine;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`
-/// // to build up your call.
-/// let rb = hub.operations();
-/// # }
-/// ```
-pub struct OperationMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudMachineLearningEngine<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for OperationMethods<'a, C, A> {}
-
-impl<'a, C, A> OperationMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes a long-running operation. This method indicates that the client is
-    /// no longer interested in the operation result. It does not cancel the
-    /// operation. If the server doesn't support this method, it returns
-    /// `google.rpc.Code.UNIMPLEMENTED`.
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C, A> {
-        OperationDeleteCall {
-            hub: self.hub,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
 /// A builder providing access to all methods supported on *project* resources.
 /// It is not used directly, but through the `CloudMachineLearningEngine` hub.
 ///
@@ -2225,7 +2212,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Performs prediction on the data in the request.
-    /// Cloud ML Engine implements a custom `predict` verb on top of an HTTP POST
+    /// AI Platform implements a custom `predict` verb on top of an HTTP POST
     /// method. <p>For details of the request and response format, see the **guide
     /// to the [predict request format](/ml-engine/docs/v1/predict-request)**.
     /// 
@@ -2862,257 +2849,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Deletes a long-running operation. This method indicates that the client is
-/// no longer interested in the operation result. It does not cancel the
-/// operation. If the server doesn't support this method, it returns
-/// `google.rpc.Code.UNIMPLEMENTED`.
-///
-/// A builder for the *delete* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_ml1 as ml1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use ml1::CloudMachineLearningEngine;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().delete("name")
-///              .doit();
-/// # }
-/// ```
-pub struct OperationDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudMachineLearningEngine<C, A>,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OperationDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleProtobuf__Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "ml.operations.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the operation resource to be deleted.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 ///
@@ -3395,7 +3131,7 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
 /// Performs prediction on the data in the request.
-/// Cloud ML Engine implements a custom `predict` verb on top of an HTTP POST
+/// AI Platform implements a custom `predict` verb on top of an HTTP POST
 /// method. <p>For details of the request and response format, see the **guide
 /// to the [predict request format](/ml-engine/docs/v1/predict-request)**.
 ///
@@ -4824,7 +4560,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_patch(req, "name")
-///              .update_mask("nonumy")
+///              .update_mask("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -5655,8 +5391,8 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("parent")
-///              .page_token("aliquyam")
-///              .page_size(-66)
+///              .page_token("sadipscing")
+///              .page_size(-31)
 ///              .doit();
 /// # }
 /// ```
@@ -5833,9 +5569,9 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. The number of locations to retrieve per "page" of results. If there
-    /// are more remaining results than this number, the response message will
-    /// contain a valid value in the `next_page_token` field.
+    /// Optional. The number of locations to retrieve per "page" of results. If
+    /// there are more remaining results than this number, the response message
+    /// will contain a valid value in the `next_page_token` field.
     /// 
     /// The default value is 20, and the maximum page size is 100.
     ///
@@ -6471,7 +6207,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_versions_patch(req, "name")
-///              .update_mask("et")
+///              .update_mask("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -7028,7 +6764,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().jobs_patch(req, "name")
-///              .update_mask("ipsum")
+///              .update_mask("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -8126,9 +7862,9 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
-///              .page_token("sea")
-///              .page_size(-55)
-///              .filter("eos")
+///              .page_token("aliquyam")
+///              .page_size(-9)
+///              .filter("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -8954,9 +8690,9 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_versions_list("parent")
-///              .page_token("eirmod")
-///              .page_size(-43)
-///              .filter("amet")
+///              .page_token("dolor")
+///              .page_size(-39)
+///              .filter("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -10290,9 +10026,9 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().jobs_list("parent")
-///              .page_token("aliquyam")
-///              .page_size(-73)
-///              .filter("Lorem")
+///              .page_token("invidunt")
+///              .page_size(-82)
+///              .filter("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -10486,9 +10222,9 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Optional. Specifies the subset of jobs to retrieve.
     /// You can filter on the value of one or more attributes of the job object.
     /// For example, retrieve jobs with a job identifier that starts with 'census':
-    /// <p><code>gcloud ml-engine jobs list --filter='jobId:census*'</code>
+    /// <p><code>gcloud ai-platform jobs list --filter='jobId:census*'</code>
     /// <p>List all failed jobs with names that start with 'rnn':
-    /// <p><code>gcloud ml-engine jobs list --filter='jobId:rnn*
+    /// <p><code>gcloud ai-platform jobs list --filter='jobId:rnn*
     /// AND state:FAILED'</code>
     /// <p>For more examples, see the guide to
     /// <a href="/ml-engine/docs/tensorflow/monitor-training">monitoring jobs</a>.
@@ -10845,9 +10581,9 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_list("parent")
-///              .page_token("duo")
-///              .page_size(-21)
-///              .filter("eirmod")
+///              .page_token("et")
+///              .page_size(-70)
+///              .filter("et")
 ///              .doit();
 /// # }
 /// ```

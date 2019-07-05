@@ -363,7 +363,7 @@ fn main() {
     
     let mut app = App::new("firebaseremoteconfig1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20171129")
+           .version("1.0.9+20171129")
            .about("Firebase Remote Config API allows the 3P clients to manage Remote Config conditions and parameters for Firebase applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebaseremoteconfig1_cli")
            .arg(Arg::with_name("folder")

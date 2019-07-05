@@ -137,9 +137,10 @@ impl<'n> Engine<'n> {
                     "asset-types" => Some(("assetTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.gcs-destination.uri-prefix" => Some(("outputConfig.gcsDestination.uriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-config.gcs-destination.uri" => Some(("outputConfig.gcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["asset-types", "content-type", "gcs-destination", "output-config", "read-time", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["asset-types", "content-type", "gcs-destination", "output-config", "read-time", "uri", "uri-prefix"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -464,7 +465,7 @@ fn main() {
     
     let mut app = App::new("cloudasset1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190327")
+           .version("1.0.9+20190625")
            .about("The cloud asset API manages the history and inventory of cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudasset1_cli")
            .arg(Arg::with_name("url")

@@ -46,6 +46,90 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _files_annotate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchAnnotateFilesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.files().annotate(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _files_async_batch_annotate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -165,6 +249,92 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::BatchAnnotateImagesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.images().annotate(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _images_async_batch_annotate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "output-config.batch-size" => Some(("outputConfig.batchSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "output-config.gcs-destination.uri" => Some(("outputConfig.gcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["batch-size", "gcs-destination", "output-config", "uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AsyncBatchAnnotateImagesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.images().async_batch_annotate(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -483,6 +653,58 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1779,6 +2001,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -1786,6 +2060,9 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("files", Some(opt)) => {
                 match opt.subcommand() {
+                    ("annotate", Some(opt)) => {
+                        call_result = self._files_annotate(opt, dry_run, &mut err);
+                    },
                     ("async-batch-annotate", Some(opt)) => {
                         call_result = self._files_async_batch_annotate(opt, dry_run, &mut err);
                     },
@@ -1799,6 +2076,9 @@ impl<'n> Engine<'n> {
                 match opt.subcommand() {
                     ("annotate", Some(opt)) => {
                         call_result = self._images_annotate(opt, dry_run, &mut err);
+                    },
+                    ("async-batch-annotate", Some(opt)) => {
+                        call_result = self._images_async_batch_annotate(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("images".to_string()));
@@ -1839,6 +2119,9 @@ impl<'n> Engine<'n> {
             },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-operations-get", Some(opt)) => {
+                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err);
+                    },
                     ("locations-product-sets-add-product", Some(opt)) => {
                         call_result = self._projects_locations_product_sets_add_product(opt, dry_run, &mut err);
                     },
@@ -1892,6 +2175,9 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-products-reference-images-list", Some(opt)) => {
                         call_result = self._projects_locations_products_reference_images_list(opt, dry_run, &mut err);
+                    },
+                    ("operations-get", Some(opt)) => {
+                        call_result = self._projects_operations_get(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1984,7 +2270,35 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("files", "methods: 'async-batch-annotate'", vec![
+        ("files", "methods: 'annotate' and 'async-batch-annotate'", vec![
+            ("annotate",
+                    Some(r##"Service that performs image detection and annotation for a batch of files.
+        Now only "application/pdf", "image/tiff" and "image/gif" are supported.
+        
+        This service will extract at most 5 (customers can specify which 5 in
+        AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each
+        file provided and perform detection and annotation for each image
+        extracted."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/files_annotate",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("async-batch-annotate",
                     Some(r##"Run asynchronous image detection and annotation for a list of generic
         files, such as PDF files, which may contain multiple pages and multiple
@@ -2014,10 +2328,40 @@ fn main() {
                   ]),
             ]),
         
-        ("images", "methods: 'annotate'", vec![
+        ("images", "methods: 'annotate' and 'async-batch-annotate'", vec![
             ("annotate",
                     Some(r##"Run image detection and annotation for a batch of images."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/images_annotate",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("async-batch-annotate",
+                    Some(r##"Run asynchronous image detection and annotation for a list of images.
+        
+        Progress and results can be retrieved through the
+        `google.longrunning.Operations` interface.
+        `Operation.metadata` contains `OperationMetadata` (metadata).
+        `Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).
+        
+        This service will write image annotation outputs to json files in customer
+        GCS bucket, each json file containing BatchAnnotateImagesResponse proto."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/images_async-batch-annotate",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -2186,7 +2530,31 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-product-sets-add-product', 'locations-product-sets-create', 'locations-product-sets-delete', 'locations-product-sets-get', 'locations-product-sets-import', 'locations-product-sets-list', 'locations-product-sets-patch', 'locations-product-sets-products-list', 'locations-product-sets-remove-product', 'locations-products-create', 'locations-products-delete', 'locations-products-get', 'locations-products-list', 'locations-products-patch', 'locations-products-reference-images-create', 'locations-products-reference-images-delete', 'locations-products-reference-images-get' and 'locations-products-reference-images-list'", vec![
+        ("projects", "methods: 'locations-operations-get', 'locations-product-sets-add-product', 'locations-product-sets-create', 'locations-product-sets-delete', 'locations-product-sets-get', 'locations-product-sets-import', 'locations-product-sets-list', 'locations-product-sets-patch', 'locations-product-sets-products-list', 'locations-product-sets-remove-product', 'locations-products-create', 'locations-products-delete', 'locations-products-get', 'locations-products-list', 'locations-products-patch', 'locations-products-reference-images-create', 'locations-products-reference-images-delete', 'locations-products-reference-images-get', 'locations-products-reference-images-list' and 'operations-get'", vec![
+            ("locations-operations-get",
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/projects_locations-operations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-product-sets-add-product",
                     Some(r##"Adds a Product to the specified ProductSet. If the Product is already
         present, no change is made.
@@ -2264,11 +2632,7 @@ fn main() {
                     Some(r##"Permanently deletes a ProductSet. Products and ReferenceImages in the
         ProductSet are not deleted.
         
-        The actual image files are not deleted from Google Cloud Storage.
-        
-        Possible errors:
-        
-        * Returns NOT_FOUND if the ProductSet does not exist."##),
+        The actual image files are not deleted from Google Cloud Storage."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/projects_locations-product-sets-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2462,11 +2826,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-product-sets-remove-product",
-                    Some(r##"Removes a Product from the specified ProductSet.
-        
-        Possible errors:
-        
-        * Returns NOT_FOUND If the Product is not found under the ProductSet."##),
+                    Some(r##"Removes a Product from the specified ProductSet."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/projects_locations-product-sets-remove-product",
                   vec![
                     (Some(r##"name"##),
@@ -2539,11 +2899,7 @@ fn main() {
         
         Metadata of the product and all its images will be deleted right away, but
         search queries against ProductSets containing the product may still work
-        until all related caches are refreshed.
-        
-        Possible errors:
-        
-        * Returns NOT_FOUND if the product does not exist."##),
+        until all related caches are refreshed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/projects_locations-products-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2728,11 +3084,7 @@ fn main() {
         against ProductSets containing the image may still work until all related
         caches are refreshed.
         
-        The actual image files are not deleted from Google Cloud Storage.
-        
-        Possible errors:
-        
-        * Returns NOT_FOUND if the reference image does not exist."##),
+        The actual image files are not deleted from Google Cloud Storage."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/projects_locations-products-reference-images-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2818,13 +3170,37 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("operations-get",
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vision1_cli/projects_operations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("vision1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190314")
+           .version("1.0.9+20190628")
            .about("Integrates Google Vision features, including image labeling, face, logo, and landmark detection, optical character recognition (OCR), and detection of explicit content, into applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vision1_cli")
            .arg(Arg::with_name("url")

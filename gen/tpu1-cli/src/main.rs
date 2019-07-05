@@ -301,6 +301,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "scheduling-config.preemptible" => Some(("schedulingConfig.preemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scheduling-config.reserved" => Some(("schedulingConfig.reserved", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-description" => Some(("healthDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -316,7 +317,7 @@ impl<'n> Engine<'n> {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "cidr-block", "create-time", "description", "health", "health-description", "ip-address", "labels", "name", "network", "port", "preemptible", "scheduling-config", "service-account", "state", "tensorflow-version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "cidr-block", "create-time", "description", "health", "health-description", "ip-address", "labels", "name", "network", "port", "preemptible", "reserved", "scheduling-config", "service-account", "state", "tensorflow-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1708,7 +1709,7 @@ fn main() {
     
     let mut app = App::new("tpu1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190312")
+           .version("1.0.9+20190619")
            .about("TPU API provides customers with access to Google TPU technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tpu1_cli")
            .arg(Arg::with_name("url")

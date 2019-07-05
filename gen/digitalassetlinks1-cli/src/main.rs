@@ -310,10 +310,11 @@ fn main() {
         an HTTPS website or an Android app, the API will ensure that any
         statements used to generate the response have been made in a secure way by
         the owner of that asset.  Conversely, if the source asset is an insecure
-        HTTP website (that is, the URL starts with `http://` instead of `https://`),
-        the API cannot verify its statements securely, and it is not possible to
-        ensure that the website's statements have not been altered by a third
-        party.  For more information, see the [Digital Asset Links technical design
+        HTTP website (that is, the URL starts with `http://` instead of
+        `https://`), the API cannot verify its statements securely, and it is not
+        possible to ensure that the website's statements have not been altered by a
+        third party.  For more information, see the [Digital Asset Links technical
+        design
         specification](https://github.com/google/digitalassetlinks/blob/master/well-known/details.md)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_digitalassetlinks1_cli/assetlinks_check",
                   vec![
@@ -370,7 +371,7 @@ fn main() {
     
     let mut app = App::new("digitalassetlinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190323")
+           .version("1.0.9+20190619")
            .about("Discovers relationships between online assets such as websites or mobile apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_digitalassetlinks1_cli")
            .arg(Arg::with_name("folder")

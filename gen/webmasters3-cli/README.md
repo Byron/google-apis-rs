@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *webmasters* API at revision *20180627*. The CLI is at version *1.0.8*.
+This documentation was generated from the *webmasters* API at revision *20190428*. The CLI is at version *1.0.9*.
 
 ```bash
 webmasters3 [options]
@@ -41,12 +41,6 @@ webmasters3 [options]
                 delete <site-url> [-p <v>]...
                 get <site-url> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
-        urlcrawlerrorscounts
-                query <site-url> [-p <v>]... [-o <out>]
-        urlcrawlerrorssamples
-                get <site-url> <url> <category> <platform> [-p <v>]... [-o <out>]
-                list <site-url> <category> <platform> [-p <v>]... [-o <out>]
-                mark-as-fixed <site-url> <url> <category> <platform> [-p <v>]...
   webmasters3 --help
 
 Configuration:

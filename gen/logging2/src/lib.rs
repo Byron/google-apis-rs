@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Logging* crate version *1.0.8+20190325*, where *20190325* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Logging* crate version *1.0.9+20190629*, where *20190629* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Logging* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/logging/docs/).
@@ -253,9 +253,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -385,7 +383,7 @@ impl<'a, C, A> Logging<C, A>
         Logging {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://logging.googleapis.com/".to_string(),
             _root_url: "https://logging.googleapis.com/".to_string(),
         }
@@ -420,7 +418,7 @@ impl<'a, C, A> Logging<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -660,7 +658,7 @@ pub struct MetricDescriptorMetadata {
     /// The delay of data points caused by ingestion. Data points older than this age are guaranteed to be ingested and available to be read, excluding data loss due to errors.
     #[serde(rename="ingestDelay")]
     pub ingest_delay: Option<String>,
-    /// The launch stage of the metric definition.
+    /// Deprecated. Please use the MetricDescriptor.launch_stage instead. The launch stage of the metric definition.
     #[serde(rename="launchStage")]
     pub launch_stage: Option<String>,
     /// The sampling period of metric data points. For metrics which are written periodically, consecutive data points are stored at this time interval, excluding data loss due to errors. Metrics with a higher granularity have a smaller sampling period.
@@ -920,8 +918,11 @@ pub struct MetricDescriptor {
     pub value_type: Option<String>,
     /// The set of labels that can be used to describe a specific instance of this metric type. For example, the appengine.googleapis.com/http/server/response_latencies metric type has a label for the HTTP response code, response_code, so you can look at latencies for successful responses or just for responses that failed.
     pub labels: Option<Vec<LabelDescriptor>>,
-    /// The resource name of the metric descriptor.
-    pub name: Option<String>,
+    /// Optional. The launch stage of the metric definition.
+    #[serde(rename="launchStage")]
+    pub launch_stage: Option<String>,
+    /// Optional. Metadata which can be used to guide usage of the metric.
+    pub metadata: Option<MetricDescriptorMetadata>,
     /// The metric type, including its DNS name prefix. The type is not URL-encoded. All user-defined metric types have the DNS name custom.googleapis.com or external.googleapis.com. Metric types should use a natural hierarchical grouping. For example:
     /// "custom.googleapis.com/invoice/paid/amount"
     /// "external.googleapis.com/prometheus/up"
@@ -972,8 +973,8 @@ pub struct MetricDescriptor {
     /// 1 represents dimensionless value 1, such as in 1/s.
     /// % represents dimensionless value 1/100, and annotates values giving  a percentage.
     pub unit: Option<String>,
-    /// Optional. Metadata which can be used to guide usage of the metric.
-    pub metadata: Option<MetricDescriptorMetadata>,
+    /// The resource name of the metric descriptor.
+    pub name: Option<String>,
 }
 
 impl Part for MetricDescriptor {}
@@ -1159,7 +1160,7 @@ pub struct LogEntry {
     /// Optional. Source code location information associated with the log entry, if any.
     #[serde(rename="sourceLocation")]
     pub source_location: Option<LogEntrySourceLocation>,
-    /// Required. The primary monitored resource associated with this log entry.Example: a log entry that reports a database error would be associated with the monitored resource designating the particular database that reported the error.
+    /// Required. The monitored resource that produced this log entry.Example: a log entry that reports a database error would be associated with the monitored resource designating the particular database that reported the error.
     pub resource: Option<MonitoredResource>,
     /// Optional. The severity of the log entry. The default value is LogSeverity.DEFAULT.
     pub severity: Option<String>,
@@ -1172,7 +1173,7 @@ pub struct LogEntry {
     /// The log entry payload, represented as a structure that is expressed as a JSON object.
     #[serde(rename="jsonPayload")]
     pub json_payload: Option<HashMap<String, String>>,
-    /// The log entry payload, represented as a protocol buffer. Some Google Cloud Platform services use this field for their log entry payloads.
+    /// The log entry payload, represented as a protocol buffer. Some Google Cloud Platform services use this field for their log entry payloads.The following protocol buffer types are supported; user-defined types are not supported:"type.googleapis.com/google.cloud.audit.AuditLog"  "type.googleapis.com/google.appengine.logging.v1.RequestLog"
     #[serde(rename="protoPayload")]
     pub proto_payload: Option<HashMap<String, String>>,
     /// Optional. The sampling decision of the trace associated with the log entry.True means that the trace resource name in the trace field was sampled for storage in a trace backend. False means that the trace was not sampled for storage when this log entry was written, or the sampling decision was unknown at the time. A non-sampled trace value is still useful as a request correlation identifier. The default is False.
@@ -1265,13 +1266,16 @@ pub struct MonitoredResourceDescriptor {
     /// Optional. A concise name for the monitored resource type that might be displayed in user interfaces. It should be a Title Cased Noun Phrase, without any article or other determiners. For example, "Google Cloud SQL Database".
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// Optional. A detailed description of the monitored resource type that might be used in documentation.
+    pub description: Option<String>,
     /// Required. A set of labels used to describe instances of this monitored resource type. For example, an individual Google Cloud SQL database is identified by values for the labels "database_id" and "zone".
     pub labels: Option<Vec<LabelDescriptor>>,
     /// Required. The monitored resource type. For example, the type "cloudsql_database" represents databases in Google Cloud SQL. The maximum length of this value is 256 characters.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Optional. A detailed description of the monitored resource type that might be used in documentation.
-    pub description: Option<String>,
+    /// Optional. The launch stage of the monitored resource definition.
+    #[serde(rename="launchStage")]
+    pub launch_stage: Option<String>,
     /// Optional. The resource name of the monitored resource descriptor: "projects/{project_id}/monitoredResourceDescriptors/{type}" where {type} is the value of the type field in this object and {project_id} is a project ID that provides API-specific context for accessing the type. APIs that do not use project information can use the resource name format "monitoredResourceDescriptors/{type}".
     pub name: Option<String>,
 }

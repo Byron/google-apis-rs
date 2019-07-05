@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20190320*. The CLI is at version *1.0.8*.
+This documentation was generated from the *compute* API at revision *20190618*. The CLI is at version *1.0.9*.
 
 ```bash
 compute1 [options]
@@ -73,6 +73,7 @@ compute1 [options]
                 get <project> <zone> <disk-type> [-p <v>]... [-o <out>]
                 list <project> <zone> [-p <v>]... [-o <out>]
         disks
+                add-resource-policies <project> <zone> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 create-snapshot <project> <zone> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <zone> <disk> [-p <v>]... [-o <out>]
@@ -80,6 +81,7 @@ compute1 [options]
                 get-iam-policy <project> <zone> <resource> [-p <v>]... [-o <out>]
                 insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <zone> [-p <v>]... [-o <out>]
+                remove-resource-policies <project> <zone> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 resize <project> <zone> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <project> <zone> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-labels <project> <zone> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -186,6 +188,7 @@ compute1 [options]
                 delete-access-config <project> <zone> <instance> <access-config> <network-interface> [-p <v>]... [-o <out>]
                 detach-disk <project> <zone> <instance> <device-name> [-p <v>]... [-o <out>]
                 get <project> <zone> <instance> [-p <v>]... [-o <out>]
+                get-guest-attributes <project> <zone> <instance> [-p <v>]... [-o <out>]
                 get-iam-policy <project> <zone> <resource> [-p <v>]... [-o <out>]
                 get-serial-port-output <project> <zone> <instance> [-p <v>]... [-o <out>]
                 get-shielded-instance-identity <project> <zone> <instance> [-p <v>]... [-o <out>]
@@ -328,11 +331,13 @@ compute1 [options]
                 get <project> <region> <disk-type> [-p <v>]... [-o <out>]
                 list <project> <region> [-p <v>]... [-o <out>]
         region-disks
+                add-resource-policies <project> <region> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 create-snapshot <project> <region> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <region> <disk> [-p <v>]... [-o <out>]
                 get <project> <region> <disk> [-p <v>]... [-o <out>]
                 insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <region> [-p <v>]... [-o <out>]
+                remove-resource-policies <project> <region> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 resize <project> <region> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-labels <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -361,6 +366,25 @@ compute1 [options]
         regions
                 get <project> <region> [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+        reservations
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <zone> <reservation> [-p <v>]... [-o <out>]
+                get <project> <zone> <reservation> [-p <v>]... [-o <out>]
+                get-iam-policy <project> <zone> <resource> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                resize <project> <zone> <reservation> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <project> <zone> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <project> <zone> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        resource-policies
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <region> <resource-policy> [-p <v>]... [-o <out>]
+                get <project> <region> <resource-policy> [-p <v>]... [-o <out>]
+                get-iam-policy <project> <region> <resource> [-p <v>]... [-o <out>]
+                insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <region> [-p <v>]... [-o <out>]
+                set-iam-policy <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
         routers
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 delete <project> <region> <router> [-p <v>]... [-o <out>]

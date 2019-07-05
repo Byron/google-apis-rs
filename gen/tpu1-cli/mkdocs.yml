@@ -1,4 +1,4 @@
-site_name: TPU v1.0.8+20190312
+site_name: TPU v1.0.9+20190619
 site_url: http://byron.github.io/google-apis-rs/google-tpu1-cli
 site_description: A complete library to interact with TPU (protocol v1)
 
@@ -29,5 +29,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

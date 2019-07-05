@@ -4,11 +4,11 @@
 [package]
 
 name = "google-cloudprivatecatalogproducer1_beta1-cli"
-version = "1.0.8+20190330"
+version = "1.0.9+20190622"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud PrivateCatalog Producer (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudprivatecatalogproducer1_beta1-cli"
-homepage = "https://sites.google.com/corp/google.com/cloudprivatecatalog"
+homepage = "https://cloud.google.com/private-catalog/"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudprivatecatalogproducer1_beta1_cli"
 license = "MIT"
 keywords = ["cloudprivatecatalogp", "google", "cli"]
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-cloudprivatecatalogproducer1_beta1]
 path = "../cloudprivatecatalogproducer1_beta1"
-version = "1.0.8+20190330"
+version = "1.0.9+20190622"

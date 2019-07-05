@@ -8335,7 +8335,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("filters-get",
-                    Some(r##"Returns a filters to which the user has access."##),
+                    Some(r##"Returns filters to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_filters-get",
                   vec![
                     (Some(r##"account-id"##),
@@ -10383,7 +10383,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180730")
+           .version("1.0.9+20190604")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

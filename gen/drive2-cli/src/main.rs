@@ -39,7 +39,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Drive<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::DriveHub<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -234,6 +234,12 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
+                "drive-id" => {
+                    call = call.drive_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -247,7 +253,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["team-drive-id", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["drive-id", "team-drive-id", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -293,6 +299,12 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
+                "drive-id" => {
+                    call = call.drive_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -306,7 +318,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["team-drive-id", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["drive-id", "team-drive-id", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -352,6 +364,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "start-change-id" => {
                     call = call.start_change_id(value.unwrap_or(""));
                 },
@@ -370,11 +385,17 @@ impl<'n> Engine<'n> {
                 "include-subscribed" => {
                     call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
                 },
+                "include-items-from-all-drives" => {
+                    call = call.include_items_from_all_drives(arg_from_str(value.unwrap_or("false"), err, "include-items-from-all-drives", "boolean"));
+                },
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
                 "include-corpus-removals" => {
                     call = call.include_corpus_removals(arg_from_str(value.unwrap_or("false"), err, "include-corpus-removals", "boolean"));
+                },
+                "drive-id" => {
+                    call = call.drive_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -389,7 +410,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-subscribed", "include-deleted", "include-team-drive-items", "max-results", "page-token", "spaces", "supports-team-drives", "start-change-id", "team-drive-id", "include-corpus-removals"].iter().map(|v|*v));
+                                                                           v.extend(["include-subscribed", "include-deleted", "include-team-drive-items", "supports-team-drives", "supports-all-drives", "drive-id", "page-token", "spaces", "max-results", "start-change-id", "team-drive-id", "include-items-from-all-drives", "include-corpus-removals"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -477,6 +498,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "start-change-id" => {
                     call = call.start_change_id(value.unwrap_or(""));
                 },
@@ -495,11 +519,17 @@ impl<'n> Engine<'n> {
                 "include-subscribed" => {
                     call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
                 },
+                "include-items-from-all-drives" => {
+                    call = call.include_items_from_all_drives(arg_from_str(value.unwrap_or("false"), err, "include-items-from-all-drives", "boolean"));
+                },
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
                 "include-corpus-removals" => {
                     call = call.include_corpus_removals(arg_from_str(value.unwrap_or("false"), err, "include-corpus-removals", "boolean"));
+                },
+                "drive-id" => {
+                    call = call.drive_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -514,7 +544,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-subscribed", "include-deleted", "include-team-drive-items", "max-results", "page-token", "spaces", "supports-team-drives", "start-change-id", "team-drive-id", "include-corpus-removals"].iter().map(|v|*v));
+                                                                           v.extend(["include-subscribed", "include-deleted", "include-team-drive-items", "supports-team-drives", "supports-all-drives", "drive-id", "page-token", "spaces", "max-results", "start-change-id", "team-drive-id", "include-items-from-all-drives", "include-corpus-removals"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -775,6 +805,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -788,7 +821,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1364,6 +1397,515 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _drives_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.drives().delete(opt.value_of("drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _drives_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.drives().get(opt.value_of("drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _drives_hide(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.drives().hide(opt.value_of("drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _drives_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "restrictions.admin-managed-restrictions" => Some(("restrictions.adminManagedRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.drive-members-only" => Some(("restrictions.driveMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-copy-requires-writer-permission-restriction" => Some(("capabilities.canChangeCopyRequiresWriterPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-drive" => Some(("capabilities.canDeleteDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-manage-members" => Some(("capabilities.canManageMembers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-drive-members-only-restriction" => Some(("capabilities.canChangeDriveMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-drive-background" => Some(("capabilities.canChangeDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename-drive" => Some(("capabilities.canRenameDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "background-image-file.width" => Some(("backgroundImageFile.width", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-file.x-coordinate" => Some(("backgroundImageFile.xCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hidden" => Some(("hidden", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Drive = json::value::from_value(object).unwrap();
+        let mut call = self.hub.drives().insert(request, opt.value_of("request-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _drives_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.drives().list();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
+                "q" => {
+                    call = call.q(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["q", "page-token", "use-domain-admin-access", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _drives_unhide(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.drives().unhide(opt.value_of("drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _drives_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "restrictions.admin-managed-restrictions" => Some(("restrictions.adminManagedRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.drive-members-only" => Some(("restrictions.driveMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-copy-requires-writer-permission-restriction" => Some(("capabilities.canChangeCopyRequiresWriterPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-drive" => Some(("capabilities.canDeleteDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-manage-members" => Some(("capabilities.canManageMembers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-drive-members-only-restriction" => Some(("capabilities.canChangeDriveMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-drive-background" => Some(("capabilities.canChangeDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename-drive" => Some(("capabilities.canRenameDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "background-image-file.width" => Some(("backgroundImageFile.width", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "background-image-file.x-coordinate" => Some(("backgroundImageFile.xCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hidden" => Some(("hidden", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-drive-background", "can-change-drive-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-rename", "can-rename-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-date", "domain-users-only", "drive-members-only", "hidden", "id", "kind", "name", "restrictions", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Drive = json::value::from_value(object).unwrap();
+        let mut call = self.hub.drives().update(request, opt.value_of("drive-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _files_copy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1418,6 +1960,7 @@ impl<'n> Engine<'n> {
                     "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1431,21 +1974,26 @@ impl<'n> Engine<'n> {
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-move-item-out-of-drive" => Some(("capabilities.canMoveItemOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-out-of-team-drive" => Some(("capabilities.canMoveItemOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1507,7 +2055,7 @@ impl<'n> Engine<'n> {
                     "modified-by-me-date" => Some(("modifiedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.mime-type" => Some(("thumbnail.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.image" => Some(("thumbnail.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "drive-id" => Some(("driveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1534,7 +2082,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-team-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-team-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1559,6 +2107,9 @@ impl<'n> Engine<'n> {
                 },
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
                 },
                 "pinned" => {
                     call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
@@ -1585,7 +2136,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "ocr-language", "supports-team-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["convert", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1628,6 +2179,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1641,7 +2195,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1840,6 +2394,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "revision-id" => {
                     call = call.revision_id(value.unwrap_or(""));
                 },
@@ -1865,7 +2422,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "revision-id", "supports-team-drives", "supports-all-drives", "acknowledge-abuse", "update-viewed-date"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1958,6 +2515,7 @@ impl<'n> Engine<'n> {
                     "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1971,21 +2529,26 @@ impl<'n> Engine<'n> {
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-move-item-out-of-drive" => Some(("capabilities.canMoveItemOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-out-of-team-drive" => Some(("capabilities.canMoveItemOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2047,7 +2610,7 @@ impl<'n> Engine<'n> {
                     "modified-by-me-date" => Some(("modifiedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.mime-type" => Some(("thumbnail.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.image" => Some(("thumbnail.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "drive-id" => Some(("driveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2074,7 +2637,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-team-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-team-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2103,6 +2666,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "pinned" => {
                     call = call.pinned(arg_from_str(value.unwrap_or("false"), err, "pinned", "boolean"));
                 },
@@ -2128,7 +2694,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["convert", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2178,6 +2744,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "spaces" => {
                     call = call.spaces(value.unwrap_or(""));
                 },
@@ -2199,6 +2768,12 @@ impl<'n> Engine<'n> {
                 "include-team-drive-items" => {
                     call = call.include_team_drive_items(arg_from_str(value.unwrap_or("false"), err, "include-team-drive-items", "boolean"));
                 },
+                "include-items-from-all-drives" => {
+                    call = call.include_items_from_all_drives(arg_from_str(value.unwrap_or("false"), err, "include-items-from-all-drives", "boolean"));
+                },
+                "drive-id" => {
+                    call = call.drive_id(value.unwrap_or(""));
+                },
                 "corpus" => {
                     call = call.corpus(value.unwrap_or(""));
                 },
@@ -2218,7 +2793,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "projection", "include-team-drive-items", "corpora", "supports-team-drives", "q", "page-token", "spaces", "max-results", "team-drive-id", "corpus"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "drive-id", "projection", "include-team-drive-items", "corpora", "supports-team-drives", "supports-all-drives", "q", "page-token", "spaces", "max-results", "team-drive-id", "corpus", "include-items-from-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2306,6 +2881,7 @@ impl<'n> Engine<'n> {
                     "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2319,21 +2895,26 @@ impl<'n> Engine<'n> {
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-move-item-out-of-drive" => Some(("capabilities.canMoveItemOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-out-of-team-drive" => Some(("capabilities.canMoveItemOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2395,7 +2976,7 @@ impl<'n> Engine<'n> {
                     "modified-by-me-date" => Some(("modifiedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.mime-type" => Some(("thumbnail.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.image" => Some(("thumbnail.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "drive-id" => Some(("driveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2422,7 +3003,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-team-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-team-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2450,6 +3031,9 @@ impl<'n> Engine<'n> {
                 },
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
                 },
                 "set-modified-date" => {
                     call = call.set_modified_date(arg_from_str(value.unwrap_or("false"), err, "set-modified-date", "boolean"));
@@ -2491,7 +3075,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2534,6 +3118,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2547,7 +3134,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2590,6 +3177,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2603,7 +3193,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2646,6 +3236,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2659,7 +3252,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2747,6 +3340,7 @@ impl<'n> Engine<'n> {
                     "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.height" => Some(("videoMediaMetadata.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2760,21 +3354,26 @@ impl<'n> Engine<'n> {
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marked-viewed-by-me-date" => Some(("markedViewedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner-names" => Some(("ownerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "capabilities.can-move-item-out-of-drive" => Some(("capabilities.canMoveItemOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-out-of-team-drive" => Some(("capabilities.canMoveItemOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2836,7 +3435,7 @@ impl<'n> Engine<'n> {
                     "modified-by-me-date" => Some(("modifiedByMeDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.mime-type" => Some(("thumbnail.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thumbnail.image" => Some(("thumbnail.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "drive-id" => Some(("driveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.with-link" => Some(("userPermission.withLink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "user-permission.domain" => Some(("userPermission.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-permission.name" => Some(("userPermission.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2863,7 +3462,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-team-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-team-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2891,6 +3490,9 @@ impl<'n> Engine<'n> {
                 },
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
+                },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
                 },
                 "set-modified-date" => {
                     call = call.set_modified_date(arg_from_str(value.unwrap_or("false"), err, "set-modified-date", "boolean"));
@@ -2932,7 +3534,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3025,6 +3627,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "revision-id" => {
                     call = call.revision_id(value.unwrap_or(""));
                 },
@@ -3050,7 +3655,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["revision-id", "update-viewed-date", "acknowledge-abuse", "projection", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "revision-id", "supports-team-drives", "supports-all-drives", "acknowledge-abuse", "update-viewed-date"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3231,6 +3836,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3244,7 +3852,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3342,6 +3950,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3355,7 +3966,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["use-domain-admin-access", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3393,6 +4004,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3406,7 +4020,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["use-domain-admin-access", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3552,6 +4166,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "send-notification-emails" => {
                     call = call.send_notification_emails(arg_from_str(value.unwrap_or("false"), err, "send-notification-emails", "boolean"));
                 },
@@ -3571,7 +4188,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["email-message", "send-notification-emails", "use-domain-admin-access", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["email-message", "send-notification-emails", "use-domain-admin-access", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3617,6 +4234,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -3636,7 +4256,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "use-domain-admin-access", "max-results", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "use-domain-admin-access", "max-results", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3733,6 +4353,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "remove-expiration" => {
                     call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
                 },
@@ -3749,7 +4372,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["use-domain-admin-access", "transfer-ownership", "supports-team-drives", "remove-expiration"].iter().map(|v|*v));
+                                                                           v.extend(["remove-expiration", "use-domain-admin-access", "transfer-ownership", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3846,6 +4469,9 @@ impl<'n> Engine<'n> {
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
+                "supports-all-drives" => {
+                    call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
+                },
                 "remove-expiration" => {
                     call = call.remove_expiration(arg_from_str(value.unwrap_or("false"), err, "remove-expiration", "boolean"));
                 },
@@ -3862,7 +4488,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["use-domain-admin-access", "transfer-ownership", "supports-team-drives", "remove-expiration"].iter().map(|v|*v));
+                                                                           v.extend(["remove-expiration", "use-domain-admin-access", "transfer-ownership", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5780,6 +6406,35 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("drives", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._drives_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._drives_get(opt, dry_run, &mut err);
+                    },
+                    ("hide", Some(opt)) => {
+                        call_result = self._drives_hide(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._drives_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._drives_list(opt, dry_run, &mut err);
+                    },
+                    ("unhide", Some(opt)) => {
+                        call_result = self._drives_unhide(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._drives_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("drives".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("files", Some(opt)) => {
                 match opt.subcommand() {
                     ("copy", Some(opt)) => {
@@ -6045,7 +6700,7 @@ impl<'n> Engine<'n> {
             };
         let engine = Engine {
             opt: opt,
-            hub: api::Drive::new(client, auth),
+            hub: api::DriveHub::new(client, auth),
             gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
             gpm: vec![
                     ("oauth-token", "oauth_token"),
@@ -6174,7 +6829,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the changes for a user or Team Drive."##),
+                    Some(r##"Lists the changes for a user or shared drive."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_list",
                   vec![
                     (Some(r##"v"##),
@@ -6506,6 +7161,163 @@ fn main() {
                   ]),
             ]),
         
+        ("drives", "methods: 'delete', 'get', 'hide', 'insert', 'list', 'unhide' and 'update'", vec![
+            ("delete",
+                    Some(r##"Permanently deletes a shared drive for which the user is an organizer. The shared drive cannot contain any untrashed items."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_delete",
+                  vec![
+                    (Some(r##"drive-id"##),
+                     None,
+                     Some(r##"The ID of the shared drive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",
+                    Some(r##"Gets a shared drive's metadata by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_get",
+                  vec![
+                    (Some(r##"drive-id"##),
+                     None,
+                     Some(r##"The ID of the shared drive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("hide",
+                    Some(r##"Hides a shared drive from the default view."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_hide",
+                  vec![
+                    (Some(r##"drive-id"##),
+                     None,
+                     Some(r##"The ID of the shared drive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",
+                    Some(r##"Creates a new shared drive."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_insert",
+                  vec![
+                    (Some(r##"request-id"##),
+                     None,
+                     Some(r##"An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a shared drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same shared drive. If the shared drive already exists a 409 error will be returned."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"Lists the user's shared drives."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("unhide",
+                    Some(r##"Restores a shared drive to the default view."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_unhide",
+                  vec![
+                    (Some(r##"drive-id"##),
+                     None,
+                     Some(r##"The ID of the shared drive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",
+                    Some(r##"Updates the metadata for a shared drive."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_update",
+                  vec![
+                    (Some(r##"drive-id"##),
+                     None,
+                     Some(r##"The ID of the shared drive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("files", "methods: 'copy', 'delete', 'empty-trash', 'export', 'generate-ids', 'get', 'insert', 'list', 'patch', 'touch', 'trash', 'untrash', 'update' and 'watch'", vec![
             ("copy",
                     Some(r##"Creates a copy of the specified file."##),
@@ -6536,7 +7348,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file or be an organizer on the parent for Team Drive files."##),
+                    Some(r##"Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file or be an organizer on the parent for shared drive files."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_delete",
                   vec![
                     (Some(r##"file-id"##),
@@ -6590,7 +7402,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("generate-ids",
-                    Some(r##"Generates a set of file IDs which can be provided in insert requests."##),
+                    Some(r##"Generates a set of file IDs which can be provided in insert or copy requests."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_generate-ids",
                   vec![
                     (Some(r##"v"##),
@@ -6722,7 +7534,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("trash",
-                    Some(r##"Moves a file to the trash. The currently authenticated user must own the file or be at least a fileOrganizer on the parent for Team Drive files."##),
+                    Some(r##"Moves a file to the trash. The currently authenticated user must own the file or be at least a fileOrganizer on the parent for shared drive files."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_trash",
                   vec![
                     (Some(r##"file-id"##),
@@ -6934,12 +7746,12 @@ fn main() {
         
         ("permissions", "methods: 'delete', 'get', 'get-id-for-email', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a permission from a file or Team Drive."##),
+                    Some(r##"Deletes a permission from a file or shared drive."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_delete",
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file or Team Drive."##),
+                     Some(r##"The ID for the file or shared drive."##),
                      Some(true),
                      Some(false)),
         
@@ -6961,7 +7773,7 @@ fn main() {
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file or Team Drive."##),
+                     Some(r##"The ID for the file or shared drive."##),
                      Some(true),
                      Some(false)),
         
@@ -7006,12 +7818,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Inserts a permission for a file or Team Drive."##),
+                    Some(r##"Inserts a permission for a file or shared drive."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_insert",
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file or Team Drive."##),
+                     Some(r##"The ID for the file or shared drive."##),
                      Some(true),
                      Some(false)),
         
@@ -7034,12 +7846,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists a file's or Team Drive's permissions."##),
+                    Some(r##"Lists a file's or shared drive's permissions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_list",
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file or Team Drive."##),
+                     Some(r##"The ID for the file or shared drive."##),
                      Some(true),
                      Some(false)),
         
@@ -7061,7 +7873,7 @@ fn main() {
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file or Team Drive."##),
+                     Some(r##"The ID for the file or shared drive."##),
                      Some(true),
                      Some(false)),
         
@@ -7095,7 +7907,7 @@ fn main() {
                   vec![
                     (Some(r##"file-id"##),
                      None,
-                     Some(r##"The ID for the file or Team Drive."##),
+                     Some(r##"The ID for the file or shared drive."##),
                      Some(true),
                      Some(false)),
         
@@ -7695,7 +8507,7 @@ fn main() {
         
         ("teamdrives", "methods: 'delete', 'get', 'insert', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Permanently deletes a Team Drive for which the user is an organizer. The Team Drive cannot contain any untrashed items."##),
+                    Some(r##"Deprecated use drives.delete instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_delete",
                   vec![
                     (Some(r##"team-drive-id"##),
@@ -7711,7 +8523,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Gets a Team Drive's metadata by ID."##),
+                    Some(r##"Deprecated use drives.get instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_get",
                   vec![
                     (Some(r##"team-drive-id"##),
@@ -7733,7 +8545,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a new Team Drive."##),
+                    Some(r##"Deprecated use drives.insert instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_insert",
                   vec![
                     (Some(r##"request-id"##),
@@ -7761,7 +8573,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the user's Team Drives."##),
+                    Some(r##"Deprecated use drives.list instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_list",
                   vec![
                     (Some(r##"v"##),
@@ -7777,7 +8589,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a Team Drive's metadata"##),
+                    Some(r##"Deprecated use drives.update instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/teamdrives_update",
                   vec![
                     (Some(r##"team-drive-id"##),
@@ -7810,7 +8622,7 @@ fn main() {
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190328")
+           .version("1.0.9+20190620")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")

@@ -687,13 +687,14 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "github.owner" => Some(("github.owner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "github.installation-id" => Some(("github.installationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.pull-request.comment-control" => Some(("github.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.pull-request.branch" => Some(("github.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.name" => Some(("github.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "github.installation-id" => Some(("github.installationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "ignored-files" => Some(("ignoredFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "trigger-template.project-id" => Some(("triggerTemplate.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-template.commit-sha" => Some(("triggerTemplate.commitSha", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -701,9 +702,9 @@ impl<'n> Engine<'n> {
                     "trigger-template.tag-name" => Some(("triggerTemplate.tagName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-template.branch-name" => Some(("triggerTemplate.branchName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-template.dir" => Some(("triggerTemplate.dir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.status" => Some(("build.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.finish-time" => Some(("build.finishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.timeout" => Some(("build.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -757,9 +758,9 @@ impl<'n> Engine<'n> {
                     "build.substitutions" => Some(("build.substitutions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "build.create-time" => Some(("build.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.build-trigger-id" => Some(("build.buildTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "substitutions" => Some(("substitutions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-manifest", "artifact-timing", "artifacts", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment-control", "commit-sha", "create-time", "description", "dir", "disabled", "disk-size-gb", "end-time", "env", "filename", "finish-time", "generation", "github", "id", "ignored-files", "images", "included-files", "installation-id", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "paths", "project-id", "pull-request", "push", "repo-name", "repo-source", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "results", "secret-env", "source", "source-provenance", "source-provenance-hash", "start-time", "status", "status-detail", "storage-source", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "trigger-template", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1008,13 +1009,14 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "github.owner" => Some(("github.owner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "github.installation-id" => Some(("github.installationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.pull-request.comment-control" => Some(("github.pullRequest.commentControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.pull-request.branch" => Some(("github.pullRequest.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "github.name" => Some(("github.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "github.installation-id" => Some(("github.installationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "github.push.tag" => Some(("github.push.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "github.push.branch" => Some(("github.push.branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "ignored-files" => Some(("ignoredFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "trigger-template.project-id" => Some(("triggerTemplate.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-template.commit-sha" => Some(("triggerTemplate.commitSha", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1022,9 +1024,9 @@ impl<'n> Engine<'n> {
                     "trigger-template.tag-name" => Some(("triggerTemplate.tagName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-template.branch-name" => Some(("triggerTemplate.branchName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-template.dir" => Some(("triggerTemplate.dir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "build.status" => Some(("build.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.finish-time" => Some(("build.finishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.timeout" => Some(("build.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1078,9 +1080,9 @@ impl<'n> Engine<'n> {
                     "build.substitutions" => Some(("build.substitutions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "build.create-time" => Some(("build.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.build-trigger-id" => Some(("build.buildTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "included-files" => Some(("includedFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "substitutions" => Some(("substitutions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-manifest", "artifact-timing", "artifacts", "branch", "branch-name", "bucket", "build", "build-step-images", "build-step-outputs", "build-trigger-id", "comment-control", "commit-sha", "create-time", "description", "dir", "disabled", "disk-size-gb", "end-time", "env", "filename", "finish-time", "generation", "github", "id", "ignored-files", "images", "included-files", "installation-id", "location", "log-streaming-option", "log-url", "logging", "logs-bucket", "machine-type", "name", "num-artifacts", "object", "objects", "options", "owner", "paths", "project-id", "pull-request", "push", "repo-name", "repo-source", "requested-verify-option", "resolved-repo-source", "resolved-storage-source", "results", "secret-env", "source", "source-provenance", "source-provenance-hash", "start-time", "status", "status-detail", "storage-source", "substitution-option", "substitutions", "tag", "tag-name", "tags", "timeout", "timing", "trigger-template", "worker-pool"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1848,7 +1850,7 @@ fn main() {
     
     let mut app = App::new("cloudbuild1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190323")
+           .version("1.0.9+20190702")
            .about("Creates and manages builds on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli")
            .arg(Arg::with_name("url")

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Redis* API at revision *20190327*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud Redis* API at revision *20190628*. The CLI is at version *1.0.9*.
 
 ```bash
 redis1 [options]
@@ -33,8 +33,10 @@ redis1 [options]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-instances-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-delete <name> [-p <v>]... [-o <out>]
+                locations-instances-export <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-failover <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-get <name> [-p <v>]... [-o <out>]
+                locations-instances-import <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-list <parent> [-p <v>]... [-o <out>]
                 locations-instances-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]

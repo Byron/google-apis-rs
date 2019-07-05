@@ -55,6 +55,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -68,7 +71,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -103,6 +106,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -116,7 +122,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -203,6 +209,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -216,7 +225,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -259,6 +268,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -272,7 +284,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -359,6 +371,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -372,7 +387,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -459,6 +474,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -472,7 +490,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -515,6 +533,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "if-metageneration-not-match" => {
                     call = call.if_metageneration_not_match(value.unwrap_or(""));
                 },
@@ -534,7 +555,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-not-match", "user-project", "if-metageneration-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-not-match", "user-project", "provisional-user-project", "if-metageneration-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -569,6 +590,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -591,7 +615,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "user-project", "projection"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match", "user-project", "provisional-user-project", "projection"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -634,6 +658,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -647,7 +674,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -704,35 +731,38 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.not-found-page" => Some(("website.notFoundPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.main-page-suffix" => Some(("website.mainPageSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logging.log-object-prefix" => Some(("logging.logObjectPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logging.log-bucket" => Some(("logging.logBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-type" => Some(("locationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.effective-time" => Some(("retentionPolicy.effectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.is-locked" => Some(("retentionPolicy.isLocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retention-policy.retention-period" => Some(("retentionPolicy.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iam-configuration.uniform-bucket-level-access.enabled" => Some(("iamConfiguration.uniformBucketLevelAccess.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "iam-configuration.uniform-bucket-level-access.locked-time" => Some(("iamConfiguration.uniformBucketLevelAccess.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.enabled" => Some(("iamConfiguration.bucketPolicyOnly.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.locked-time" => Some(("iamConfiguration.bucketPolicyOnly.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -748,6 +778,9 @@ impl<'n> Engine<'n> {
             match key {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
+                },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -771,7 +804,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["predefined-acl", "user-project", "projection", "predefined-default-object-acl"].iter().map(|v|*v));
+                                                                           v.extend(["predefined-acl", "user-project", "provisional-user-project", "projection", "predefined-default-object-acl"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -814,6 +847,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -839,7 +875,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "prefix", "user-project", "projection", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "user-project", "max-results", "page-token", "prefix", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -882,6 +918,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -895,7 +934,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -952,35 +991,38 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.not-found-page" => Some(("website.notFoundPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.main-page-suffix" => Some(("website.mainPageSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logging.log-object-prefix" => Some(("logging.logObjectPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logging.log-bucket" => Some(("logging.logBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-type" => Some(("locationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.effective-time" => Some(("retentionPolicy.effectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.is-locked" => Some(("retentionPolicy.isLocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retention-policy.retention-period" => Some(("retentionPolicy.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iam-configuration.uniform-bucket-level-access.enabled" => Some(("iamConfiguration.uniformBucketLevelAccess.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "iam-configuration.uniform-bucket-level-access.locked-time" => Some(("iamConfiguration.uniformBucketLevelAccess.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.enabled" => Some(("iamConfiguration.bucketPolicyOnly.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.locked-time" => Some(("iamConfiguration.bucketPolicyOnly.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -996,6 +1038,9 @@ impl<'n> Engine<'n> {
             match key {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
+                },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -1025,7 +1070,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "if-metageneration-match", "user-project", "predefined-default-object-acl", "predefined-acl", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "if-metageneration-not-match", "user-project", "predefined-default-object-acl", "predefined-acl", "provisional-user-project", "if-metageneration-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1103,6 +1148,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1116,7 +1164,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1159,6 +1207,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1172,7 +1223,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1229,35 +1280,38 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.not-found-page" => Some(("website.notFoundPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.main-page-suffix" => Some(("website.mainPageSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logging.log-object-prefix" => Some(("logging.logObjectPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logging.log-bucket" => Some(("logging.logBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-type" => Some(("locationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.effective-time" => Some(("retentionPolicy.effectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.is-locked" => Some(("retentionPolicy.isLocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retention-policy.retention-period" => Some(("retentionPolicy.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iam-configuration.uniform-bucket-level-access.enabled" => Some(("iamConfiguration.uniformBucketLevelAccess.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "iam-configuration.uniform-bucket-level-access.locked-time" => Some(("iamConfiguration.uniformBucketLevelAccess.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.enabled" => Some(("iamConfiguration.bucketPolicyOnly.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.locked-time" => Some(("iamConfiguration.bucketPolicyOnly.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1273,6 +1327,9 @@ impl<'n> Engine<'n> {
             match key {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
+                },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -1302,7 +1359,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "if-metageneration-match", "user-project", "predefined-default-object-acl", "predefined-acl", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "if-metageneration-not-match", "user-project", "predefined-default-object-acl", "predefined-acl", "provisional-user-project", "if-metageneration-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1431,6 +1488,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1444,7 +1504,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1479,6 +1539,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1492,7 +1555,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1581,6 +1644,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1594,7 +1660,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1637,6 +1703,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "if-metageneration-not-match" => {
                     call = call.if_metageneration_not_match(value.unwrap_or(""));
                 },
@@ -1656,7 +1725,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-not-match", "user-project", "if-metageneration-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-not-match", "user-project", "provisional-user-project", "if-metageneration-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1745,6 +1814,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1758,7 +1830,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1847,6 +1919,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1860,7 +1935,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1903,6 +1978,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1916,7 +1994,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1951,6 +2029,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1964,7 +2045,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2048,6 +2129,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2061,7 +2145,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2104,6 +2188,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2117,7 +2204,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2160,6 +2247,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -2176,7 +2266,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2211,6 +2301,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -2227,7 +2320,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2316,6 +2409,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -2332,7 +2428,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2375,6 +2471,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -2391,7 +2490,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2480,6 +2579,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -2496,7 +2598,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2585,6 +2687,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -2601,7 +2706,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2709,6 +2814,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "kms-key-name" => {
                     call = call.kms_key_name(value.unwrap_or(""));
                 },
@@ -2734,7 +2842,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "user-project", "destination-predefined-acl", "if-generation-match", "kms-key-name"].iter().map(|v|*v));
+                                                                           v.extend(["if-metageneration-match", "user-project", "destination-predefined-acl", "kms-key-name", "if-generation-match", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2844,6 +2952,9 @@ impl<'n> Engine<'n> {
                 "source-generation" => {
                     call = call.source_generation(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -2887,7 +2998,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-source-generation-match", "projection", "if-source-metageneration-not-match", "if-metageneration-not-match", "user-project", "source-generation", "destination-predefined-acl", "if-source-generation-not-match", "if-source-metageneration-match", "if-generation-match", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-source-generation-match", "projection", "if-source-metageneration-not-match", "if-metageneration-not-match", "user-project", "source-generation", "destination-predefined-acl", "if-source-generation-not-match", "if-source-metageneration-match", "if-generation-match", "provisional-user-project", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2930,6 +3041,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "if-metageneration-not-match" => {
                     call = call.if_metageneration_not_match(value.unwrap_or(""));
                 },
@@ -2958,7 +3072,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-generation-not-match", "generation", "if-metageneration-not-match", "user-project", "if-generation-match", "if-metageneration-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-generation-not-match", "generation", "if-metageneration-not-match", "user-project", "if-generation-match", "provisional-user-project", "if-metageneration-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2994,6 +3108,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3028,7 +3145,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "generation", "if-metageneration-match", "user-project", "if-generation-match", "if-metageneration-not-match", "if-generation-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "generation", "if-metageneration-match", "user-project", "if-generation-match", "provisional-user-project", "if-metageneration-not-match", "if-generation-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3076,6 +3193,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -3092,7 +3212,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3199,6 +3319,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3239,7 +3362,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-generation-match", "projection", "if-metageneration-not-match", "user-project", "content-encoding", "if-generation-not-match", "kms-key-name", "predefined-acl", "if-metageneration-match", "name"].iter().map(|v|*v));
+                                                                           v.extend(["if-generation-match", "projection", "if-metageneration-not-match", "user-project", "content-encoding", "if-generation-not-match", "kms-key-name", "predefined-acl", "provisional-user-project", "if-metageneration-match", "name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3289,6 +3412,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3320,7 +3446,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "page-token", "prefix", "include-trailing-delimiter"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "page-token", "prefix", "include-trailing-delimiter", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3427,6 +3553,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3461,7 +3590,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-generation-match", "projection", "generation", "if-metageneration-match", "user-project", "predefined-acl", "if-metageneration-not-match", "if-generation-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-generation-match", "projection", "generation", "if-metageneration-match", "user-project", "predefined-acl", "provisional-user-project", "if-metageneration-not-match", "if-generation-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3574,6 +3703,9 @@ impl<'n> Engine<'n> {
                 "rewrite-token" => {
                     call = call.rewrite_token(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3623,7 +3755,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-source-generation-match", "if-generation-match", "projection", "if-source-metageneration-not-match", "destination-kms-key-name", "if-metageneration-not-match", "user-project", "source-generation", "max-bytes-rewritten-per-call", "if-source-generation-not-match", "destination-predefined-acl", "if-source-metageneration-match", "rewrite-token", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-source-generation-match", "if-generation-match", "projection", "if-source-metageneration-not-match", "destination-kms-key-name", "if-metageneration-not-match", "user-project", "source-generation", "max-bytes-rewritten-per-call", "if-source-generation-not-match", "destination-predefined-acl", "if-source-metageneration-match", "rewrite-token", "provisional-user-project", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3701,6 +3833,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -3717,7 +3852,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3760,6 +3895,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "generation" => {
                     call = call.generation(value.unwrap_or(""));
                 },
@@ -3776,7 +3914,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["generation", "user-project"].iter().map(|v|*v));
+                                                                           v.extend(["generation", "user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3883,6 +4021,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -3917,7 +4058,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-generation-match", "projection", "generation", "if-metageneration-match", "user-project", "predefined-acl", "if-metageneration-not-match", "if-generation-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-generation-match", "projection", "generation", "if-metageneration-match", "user-project", "predefined-acl", "provisional-user-project", "if-metageneration-not-match", "if-generation-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4005,6 +4146,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
                 },
@@ -4036,7 +4180,333 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "page-token", "prefix", "include-trailing-delimiter"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "page-token", "prefix", "include-trailing-delimiter", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_hmac_keys_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().hmac_keys_create(opt.value_of("project-id").unwrap_or(""), opt.value_of("service-account-email").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-project" => {
+                    call = call.user_project(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_hmac_keys_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().hmac_keys_delete(opt.value_of("project-id").unwrap_or(""), opt.value_of("access-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-project" => {
+                    call = call.user_project(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_hmac_keys_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().hmac_keys_get(opt.value_of("project-id").unwrap_or(""), opt.value_of("access-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-project" => {
+                    call = call.user_project(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_hmac_keys_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().hmac_keys_list(opt.value_of("project-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-project" => {
+                    call = call.user_project(value.unwrap_or(""));
+                },
+                "show-deleted-keys" => {
+                    call = call.show_deleted_keys(arg_from_str(value.unwrap_or("false"), err, "show-deleted-keys", "boolean"));
+                },
+                "service-account-email" => {
+                    call = call.service_account_email(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["show-deleted-keys", "user-project", "service-account-email", "max-results", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_hmac_keys_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access-id" => Some(("accessId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-id", "etag", "id", "kind", "project-id", "self-link", "service-account-email", "state", "time-created", "updated"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HmacKeyMetadata = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().hmac_keys_update(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("access-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "user-project" => {
+                    call = call.user_project(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4079,6 +4549,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "provisional-user-project" => {
+                    call = call.provisional_user_project(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4092,7 +4565,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4327,6 +4800,21 @@ impl<'n> Engine<'n> {
             },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("hmac-keys-create", Some(opt)) => {
+                        call_result = self._projects_hmac_keys_create(opt, dry_run, &mut err);
+                    },
+                    ("hmac-keys-delete", Some(opt)) => {
+                        call_result = self._projects_hmac_keys_delete(opt, dry_run, &mut err);
+                    },
+                    ("hmac-keys-get", Some(opt)) => {
+                        call_result = self._projects_hmac_keys_get(opt, dry_run, &mut err);
+                    },
+                    ("hmac-keys-list", Some(opt)) => {
+                        call_result = self._projects_hmac_keys_list(opt, dry_run, &mut err);
+                    },
+                    ("hmac-keys-update", Some(opt)) => {
+                        call_result = self._projects_hmac_keys_update(opt, dry_run, &mut err);
+                    },
                     ("service-account-get", Some(opt)) => {
                         call_result = self._projects_service_account_get(opt, dry_run, &mut err);
                     },
@@ -5770,7 +6258,141 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'service-account-get'", vec![
+        ("projects", "methods: 'hmac-keys-create', 'hmac-keys-delete', 'hmac-keys-get', 'hmac-keys-list', 'hmac-keys-update' and 'service-account-get'", vec![
+            ("hmac-keys-create",
+                    Some(r##"Creates a new HMAC key for the specified service account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/projects_hmac-keys-create",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Project ID owning the service account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"service-account-email"##),
+                     None,
+                     Some(r##"Email address of the service account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("hmac-keys-delete",
+                    Some(r##"Deletes an HMAC key."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/projects_hmac-keys-delete",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Project ID owning the requested key"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"access-id"##),
+                     None,
+                     Some(r##"Name of the HMAC key to be deleted."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("hmac-keys-get",
+                    Some(r##"Retrieves an HMAC key's metadata"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/projects_hmac-keys-get",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Project ID owning the service account of the requested key."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"access-id"##),
+                     None,
+                     Some(r##"Name of the HMAC key."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("hmac-keys-list",
+                    Some(r##"Retrieves a list of HMAC keys matching the criteria."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/projects_hmac-keys-list",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Name of the project in which to look for HMAC keys."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("hmac-keys-update",
+                    Some(r##"Updates the state of an HMAC key. See the HMAC Key resource descriptor for valid states."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/projects_hmac-keys-update",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Project ID owning the service account of the updated key."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"access-id"##),
+                     None,
+                     Some(r##"Name of the HMAC key being updated."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("service-account-get",
                     Some(r##"Get the email address of this project's Google Cloud Storage service account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/projects_service-account-get",
@@ -5799,7 +6421,7 @@ fn main() {
     
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190226")
+           .version("1.0.9+20190624")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")

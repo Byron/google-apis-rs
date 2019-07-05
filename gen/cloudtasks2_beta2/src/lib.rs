@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *1.0.8+20190326*, where *20190326* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Tasks* crate version *1.0.9+20190618*, where *20190618* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/tasks/).
@@ -223,9 +223,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -338,7 +336,7 @@ impl<'a, C, A> CloudTasks<C, A>
         CloudTasks {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://cloudtasks.googleapis.com/".to_string(),
             _root_url: "https://cloudtasks.googleapis.com/".to_string(),
         }
@@ -349,7 +347,7 @@ impl<'a, C, A> CloudTasks<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -467,13 +465,17 @@ impl Part for PullMessage {}
 /// required`](https://cloud.google.com/appengine/docs/standard/python/config/appref)
 /// Task dispatches also do not follow redirects.
 /// 
-/// The task attempt has succeeded if the app's request handler returns
-/// an HTTP response code in the range [`200` - `299`]. `503` is
-/// considered an App Engine system error instead of an application
-/// error. Requests returning error `503` will be retried regardless of
-/// retry configuration and not counted against retry counts.
-/// Any other response code or a failure to receive a response before the
-/// deadline is a failed attempt.
+/// The task attempt has succeeded if the app's request handler returns an HTTP
+/// response code in the range [`200` - `299`]. The task attempt has failed if
+/// the app's handler returns a non-2xx response code or Cloud Tasks does
+/// not receive response before the deadline. Failed
+/// tasks will be retried according to the
+/// retry configuration. `503` (Service Unavailable) is
+/// considered an App Engine system error instead of an application error and
+/// will cause Cloud Tasks' traffic congestion control to temporarily throttle
+/// the queue's dispatches. Unlike other types of task targets, a `429` (Too Many
+/// Requests) response from an app handler does not cause traffic congestion
+/// control to throttle the queue.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -988,6 +990,17 @@ pub struct LeaseTasksRequest {
     /// permission on the Task resource.
     #[serde(rename="responseView")]
     pub response_view: Option<String>,
+    /// Required.
+    /// 
+    /// The duration of the lease.
+    /// 
+    /// Each task returned in the response will
+    /// have its schedule_time set to the current
+    /// time plus the `lease_duration`. The task is leased until its
+    /// schedule_time; thus, the task will not be
+    /// returned to another LeaseTasks call
+    /// before its schedule_time.
+    /// 
     /// 
     /// After the worker has successfully finished the work associated
     /// with the task, the worker must call via
@@ -1032,56 +1045,11 @@ impl ResponseResult for Empty {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1791,7 +1759,7 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -2088,8 +2056,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// WARNING: Using this method may have unintended side effects if you are
     /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
     /// Read
-    /// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-    /// before using this method.
+    /// [Overview of Queue Management and
+    /// queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+    /// this method.
     /// 
     /// # Arguments
     ///
@@ -2150,8 +2119,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// WARNING: Using this method may have unintended side effects if you are
     /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
     /// Read
-    /// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-    /// before using this method.
+    /// [Overview of Queue Management and
+    /// queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+    /// this method.
     /// 
     /// # Arguments
     ///
@@ -2195,8 +2165,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// WARNING: Using this method may have unintended side effects if you are
     /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
     /// Read
-    /// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-    /// before using this method.
+    /// [Overview of Queue Management and
+    /// queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+    /// this method.
     /// 
     /// # Arguments
     ///
@@ -2334,7 +2305,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// WARNING: Resuming many high-QPS queues at the same time can
     /// lead to target overloading. If you are resuming high-QPS
     /// queues, follow the 500/50/5 pattern described in
-    /// [Managing Cloud Tasks Scaling Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
+    /// [Managing Cloud Tasks Scaling
+    /// Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
     /// 
     /// # Arguments
     ///
@@ -3188,13 +3160,14 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Requested page size. Fewer tasks than requested might be returned.
+    /// Maximum page size.
     /// 
-    /// The maximum page size is 1000. If unspecified, the page size will
-    /// be the maximum. Fewer tasks than requested might be returned,
-    /// even if more tasks exist; use
-    /// next_page_token in the
-    /// response to determine if more tasks exist.
+    /// Fewer tasks than requested might be returned, even if more tasks exist; use
+    /// next_page_token in the response to
+    /// determine if more tasks exist.
+    /// 
+    /// The maximum page size is 1000. If unspecified, the page size will be the
+    /// maximum.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationQueueTaskListCall<'a, C, A> {
@@ -3274,8 +3247,9 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
 /// WARNING: Using this method may have unintended side effects if you are
 /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
 /// Read
-/// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-/// before using this method.
+/// [Overview of Queue Management and
+/// queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+/// this method.
 ///
 /// A builder for the *locations.queues.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3828,8 +3802,9 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
 /// WARNING: Using this method may have unintended side effects if you are
 /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
 /// Read
-/// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-/// before using this method.
+/// [Overview of Queue Management and
+/// queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+/// this method.
 ///
 /// A builder for the *locations.queues.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4149,8 +4124,9 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
 /// WARNING: Using this method may have unintended side effects if you are
 /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
 /// Read
-/// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-/// before using this method.
+/// [Overview of Queue Management and
+/// queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+/// this method.
 ///
 /// A builder for the *locations.queues.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5537,7 +5513,8 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
 /// WARNING: Resuming many high-QPS queues at the same time can
 /// lead to target overloading. If you are resuming high-QPS
 /// queues, follow the 500/50/5 pattern described in
-/// [Managing Cloud Tasks Scaling Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
+/// [Managing Cloud Tasks Scaling
+/// Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
 ///
 /// A builder for the *locations.queues.resume* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6342,7 +6319,8 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     /// field can be used as a filter and several operators as supported.
     /// For example: `<=, <, >=, >, !=, =, :`. The filter syntax is the same as
     /// described in
-    /// [Stackdriver's Advanced Logs Filters](https://cloud.google.com/logging/docs/view/advanced_filters).
+    /// [Stackdriver's Advanced Logs
+    /// Filters](https://cloud.google.com/logging/docs/view/advanced_filters).
     /// 
     /// Sample filter "app_engine_http_target: *".
     /// 

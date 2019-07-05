@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *drive* API at revision *20190328*. The CLI is at version *1.0.8*.
+This documentation was generated from the *drive* API at revision *20190620*. The CLI is at version *1.0.9*.
 
 ```bash
 drive2 [options]
@@ -53,6 +53,14 @@ drive2 [options]
                 list <file-id> [-p <v>]... [-o <out>]
                 patch <file-id> <comment-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <file-id> <comment-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        drives
+                delete <drive-id> [-p <v>]...
+                get <drive-id> [-p <v>]... [-o <out>]
+                hide <drive-id> [-p <v>]... [-o <out>]
+                insert <request-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                unhide <drive-id> [-p <v>]... [-o <out>]
+                update <drive-id> (-r <kv>)... [-p <v>]... [-o <out>]
         files
                 copy <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <file-id> [-p <v>]...

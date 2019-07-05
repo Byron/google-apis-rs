@@ -2325,7 +2325,7 @@ fn main() {
     
     let mut app = App::new("firestore1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190105")
+           .version("1.0.9+20190419")
            .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli")

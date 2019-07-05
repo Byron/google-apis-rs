@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20190220*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Tag Manager* API at revision *20190516*. The CLI is at version *1.0.9*.
 
 ```bash
 tagmanager2 [options]
@@ -77,6 +77,12 @@ tagmanager2 [options]
                 containers-workspaces-tags-list <parent> [-p <v>]... [-o <out>]
                 containers-workspaces-tags-revert <path> [-p <v>]... [-o <out>]
                 containers-workspaces-tags-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-workspaces-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-workspaces-templates-delete <path> [-p <v>]...
+                containers-workspaces-templates-get <path> [-p <v>]... [-o <out>]
+                containers-workspaces-templates-list <parent> [-p <v>]... [-o <out>]
+                containers-workspaces-templates-revert <path> [-p <v>]... [-o <out>]
+                containers-workspaces-templates-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-triggers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-triggers-delete <path> [-p <v>]...
                 containers-workspaces-triggers-get <path> [-p <v>]... [-o <out>]

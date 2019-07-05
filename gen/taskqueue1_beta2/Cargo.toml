@@ -4,12 +4,12 @@
 [package]
 
 name = "google-taskqueue1_beta2"
-version = "1.0.8+20160428"
+version = "1.0.9+20160428"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with taskqueue (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/taskqueue1_beta2"
 homepage = "https://developers.google.com/appengine/docs/python/taskqueue/rest"
-documentation = "https://docs.rs/google-taskqueue1_beta2/1.0.8+20160428"
+documentation = "https://docs.rs/google-taskqueue1_beta2/1.0.9+20160428"
 license = "MIT"
 keywords = ["taskqueue", "google", "protocol", "web", "api"]
 autobins = false

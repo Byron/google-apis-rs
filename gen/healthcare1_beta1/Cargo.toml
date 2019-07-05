@@ -4,12 +4,12 @@
 [package]
 
 name = "google-healthcare1_beta1"
-version = "1.0.8+20190401"
+version = "1.0.9+20190628"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Healthcare (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/healthcare1_beta1"
 homepage = "https://cloud.google.com/healthcare"
-documentation = "https://docs.rs/google-healthcare1_beta1/1.0.8+20190401"
+documentation = "https://docs.rs/google-healthcare1_beta1/1.0.9+20190628"
 license = "MIT"
 keywords = ["healthcare", "google", "protocol", "web", "api"]
 autobins = false

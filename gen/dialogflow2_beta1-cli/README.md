@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Dialogflow* API can be found at the
-[official documentation site](https://cloud.google.com/dialogflow-enterprise/).
+[official documentation site](https://cloud.google.com/dialogflow/).
 
 # Installation and Source Code
 
@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dialogflow* API at revision *20190402*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Dialogflow* API at revision *20190629*. The CLI is at version *1.0.9*.
 
 ```bash
 dialogflow2-beta1 [options]
         projects
+                agent <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-entity-types-batch-delete <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-entity-types-batch-update <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-entity-types-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -87,6 +88,7 @@ dialogflow2-beta1 [options]
                 agent-sessions-entity-types-list <parent> [-p <v>]... [-o <out>]
                 agent-sessions-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-train <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete-agent <parent> [-p <v>]... [-o <out>]
                 get-agent <parent> [-p <v>]... [-o <out>]
                 knowledge-bases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 knowledge-bases-delete <name> [-p <v>]... [-o <out>]

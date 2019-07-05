@@ -4,7 +4,7 @@
 [package]
 
 name = "google-jobs3-cli"
-version = "1.0.8+20190322"
+version = "1.0.9+20190702"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Talent Solution (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/jobs3-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-jobs3]
 path = "../jobs3"
-version = "1.0.8+20190322"
+version = "1.0.9+20190702"

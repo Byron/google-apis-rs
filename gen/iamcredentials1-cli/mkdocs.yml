@@ -1,4 +1,4 @@
-site_name: IAM Credentials v1.0.8+20190329
+site_name: IAM Credentials v1.0.9+20190620
 site_url: http://byron.github.io/google-apis-rs/google-iamcredentials1-cli
 site_description: A complete library to interact with IAM Credentials (protocol v1)
 
@@ -17,5 +17,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

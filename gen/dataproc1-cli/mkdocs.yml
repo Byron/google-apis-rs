@@ -1,4 +1,4 @@
-site_name: Dataproc v1.0.8+20190313
+site_name: Dataproc v1.0.9+20190620
 site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
 site_description: A complete library to interact with Dataproc (protocol v1)
 
@@ -9,6 +9,9 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_locations-autoscaling-policies-get-iam-policy.md', 'Projects', 'Locations Autoscaling Policies Get Iam Policy']
+- ['projects_locations-autoscaling-policies-set-iam-policy.md', 'Projects', 'Locations Autoscaling Policies Set Iam Policy']
+- ['projects_locations-autoscaling-policies-test-iam-permissions.md', 'Projects', 'Locations Autoscaling Policies Test Iam Permissions']
 - ['projects_locations-workflow-templates-create.md', 'Projects', 'Locations Workflow Templates Create']
 - ['projects_locations-workflow-templates-delete.md', 'Projects', 'Locations Workflow Templates Delete']
 - ['projects_locations-workflow-templates-get.md', 'Projects', 'Locations Workflow Templates Get']
@@ -19,6 +22,9 @@ pages:
 - ['projects_locations-workflow-templates-set-iam-policy.md', 'Projects', 'Locations Workflow Templates Set Iam Policy']
 - ['projects_locations-workflow-templates-test-iam-permissions.md', 'Projects', 'Locations Workflow Templates Test Iam Permissions']
 - ['projects_locations-workflow-templates-update.md', 'Projects', 'Locations Workflow Templates Update']
+- ['projects_regions-autoscaling-policies-get-iam-policy.md', 'Projects', 'Regions Autoscaling Policies Get Iam Policy']
+- ['projects_regions-autoscaling-policies-set-iam-policy.md', 'Projects', 'Regions Autoscaling Policies Set Iam Policy']
+- ['projects_regions-autoscaling-policies-test-iam-permissions.md', 'Projects', 'Regions Autoscaling Policies Test Iam Permissions']
 - ['projects_regions-clusters-create.md', 'Projects', 'Regions Clusters Create']
 - ['projects_regions-clusters-delete.md', 'Projects', 'Regions Clusters Delete']
 - ['projects_regions-clusters-diagnose.md', 'Projects', 'Regions Clusters Diagnose']
@@ -57,5 +63,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

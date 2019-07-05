@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.9+20190701*, where *20190701* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -225,9 +225,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -340,7 +338,7 @@ impl<'a, C, A> CloudResourceManager<C, A>
         CloudResourceManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
             _root_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
         }
@@ -354,7 +352,7 @@ impl<'a, C, A> CloudResourceManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -430,7 +428,11 @@ impl Part for AuditLogConfig {}
 /// * [get iam policy organizations](struct.OrganizationGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -893,6 +895,23 @@ pub struct ListProjectsResponse {
 impl ResponseResult for ListProjectsResponse {}
 
 
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
+
+
 /// A container to reference an id for any resource type. A `resource` in Google
 /// Cloud Platform is a generic term for something you (a developer) may want to
 /// interact with through one of our API's. Some examples are an App Engine app,
@@ -924,7 +943,7 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -1519,8 +1538,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// However, you cannot update the project.
     /// 
     /// After the deletion completes, the Project is not retrievable by
-    /// the  GetProject and
-    /// ListProjects methods.
+    /// the  GetProject
+    /// and ListProjects
+    /// methods.
     /// 
     /// The caller must have modify permissions for this Project.
     /// 
@@ -1540,12 +1560,22 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists Projects that are visible to the user and satisfy the
-    /// specified filter. This method returns Projects in an unspecified order.
+    /// Lists Projects that the caller has the `resourcemanager.projects.get`
+    /// permission on and satisfy the specified filter.
+    /// 
+    /// This method returns Projects in an unspecified order.
     /// This method is eventually consistent with project mutations; this means
     /// that a newly created project may not appear in the results or recent
     /// updates to an existing project may not be reflected in the results. To
-    /// retrieve the latest state of a project, use the GetProjectmethod.
+    /// retrieve the latest state of a project, use the
+    /// GetProject method.
+    /// 
+    /// NOTE: If the request filter contains a `parent.type` and `parent.id` and
+    /// the caller has the `resourcemanager.projects.list` permission on the
+    /// parent, the results will be drawn from an alternate index which provides
+    /// more consistent results. In future versions of this API, this List method
+    /// will be split into List and Search to properly capture the behavorial
+    /// difference.
     pub fn list(&self) -> ProjectListCall<'a, C, A> {
         ProjectListCall {
             hub: self.hub,
@@ -3146,10 +3176,10 @@ impl<'a, C, A> OrganizationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Organizations may be filtered by `owner.directoryCustomerId` or by
     /// `domain`, where the domain is a G Suite domain, for example:
     /// 
-    /// |Filter|Description|
-    /// |------|-----------|
-    /// |owner.directorycustomerid:123456789|Organizations with `owner.directory_customer_id` equal to `123456789`.|
-    /// |domain:google.com|Organizations corresponding to the domain `google.com`.|
+    /// * Filter `owner.directorycustomerid:123456789` returns Organization
+    /// resources with `owner.directory_customer_id` equal to `123456789`.
+    /// * Filter `domain:google.com` returns Organization resources corresponding
+    /// to the domain `google.com`.
     /// 
     /// This field is optional.
     ///
@@ -5468,8 +5498,9 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// However, you cannot update the project.
 /// 
 /// After the deletion completes, the Project is not retrievable by
-/// the  GetProject and
-/// ListProjects methods.
+/// the  GetProject
+/// and ListProjects
+/// methods.
 /// 
 /// The caller must have modify permissions for this Project.
 ///
@@ -5717,12 +5748,22 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Lists Projects that are visible to the user and satisfy the
-/// specified filter. This method returns Projects in an unspecified order.
+/// Lists Projects that the caller has the `resourcemanager.projects.get`
+/// permission on and satisfy the specified filter.
+/// 
+/// This method returns Projects in an unspecified order.
 /// This method is eventually consistent with project mutations; this means
 /// that a newly created project may not appear in the results or recent
 /// updates to an existing project may not be reflected in the results. To
-/// retrieve the latest state of a project, use the GetProjectmethod.
+/// retrieve the latest state of a project, use the
+/// GetProject method.
+/// 
+/// NOTE: If the request filter contains a `parent.type` and `parent.id` and
+/// the caller has the `resourcemanager.projects.list` permission on the
+/// parent, the results will be drawn from an alternate index which provides
+/// more consistent results. In future versions of this API, this List method
+/// will be split into List and Search to properly capture the behavorial
+/// difference.
 ///
 /// A builder for the *list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5911,28 +5952,32 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// 
     /// + `name`
     /// + `id`
-    /// + <code>labels.<em>key</em></code> where *key* is the name of a label
+    /// + `labels.<key>` (where *key* is the name of a label)
+    /// + `parent.type`
+    /// + `parent.id`
     /// 
     /// Some examples of using labels as filters:
     /// 
-    /// |Filter|Description|
-    /// |------|-----------|
-    /// |name:how*|The project's name starts with "how".|
-    /// |name:Howl|The project's name is `Howl` or `howl`.|
-    /// |name:HOWL|Equivalent to above.|
-    /// |NAME:howl|Equivalent to above.|
-    /// |labels.color:*|The project has the label `color`.|
-    /// |labels.color:red|The project's label `color` has the value `red`.|
-    /// |labels.color:red&nbsp;labels.size:big|The project's label `color` has the value `red` and its label `size` has the value `big`.
+    /// | Filter           | Description                                         |
+    /// |------------------|-----------------------------------------------------|
+    /// | name:how*        | The project's name starts with "how".               |
+    /// | name:Howl        | The project's name is `Howl` or `howl`.             |
+    /// | name:HOWL        | Equivalent to above.                                |
+    /// | NAME:howl        | Equivalent to above.                                |
+    /// | labels.color:*   | The project has the label `color`.                  |
+    /// | labels.color:red | The project's label `color` has the value `red`.    |
+    /// | labels.color:red&nbsp;labels.size:big |The project's label `color` has
+    ///   the value `red` and its label `size` has the value `big`.              |
     /// 
-    /// If you specify a filter that has both `parent.type` and `parent.id`, then
-    /// the `resourcemanager.projects.list` permission is checked on the parent.
-    /// If the user has this permission, all projects under the parent will be
-    /// returned after remaining filters have been applied. If the user lacks this
-    /// permission, then all projects for which the user has the
-    /// `resourcemanager.projects.get` permission will be returned after remaining
-    /// filters have been applied. If no filter is specified, the call will return
-    /// projects for which the user has `resourcemanager.projects.get` permissions.
+    /// If no filter is specified, the call will return projects for which the user
+    /// has the `resourcemanager.projects.get` permission.
+    /// 
+    /// NOTE: To perform a by-parent query (eg., what projects are directly in a
+    /// Folder), the caller must have the `resourcemanager.projects.list`
+    /// permission on the parent and the filter must contain both a `parent.type`
+    /// and a `parent.id` restriction
+    /// (example: "parent.type:folder parent.id:123"). In this case an alternate
+    /// search index is used which provides more consistent results.
     /// 
     /// Optional.
     ///

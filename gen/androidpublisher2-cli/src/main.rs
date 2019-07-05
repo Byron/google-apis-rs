@@ -5264,7 +5264,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal"."##),
+                     Some(r##"The track to read or modify."##),
                      Some(true),
                      Some(false)),
         
@@ -5298,7 +5298,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal"."##),
+                     Some(r##"The track to read or modify."##),
                      Some(true),
                      Some(false)),
         
@@ -5338,7 +5338,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal"."##),
+                     Some(r##"The track to read or modify."##),
                      Some(true),
                      Some(false)),
         
@@ -5423,7 +5423,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("tracks-patch",
-                    Some(r##"Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume. This method supports patch semantics."##),
+                    Some(r##"Updates the track configuration for the specified track type. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_tracks-patch",
                   vec![
                     (Some(r##"package-name"##),
@@ -5463,7 +5463,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("tracks-update",
-                    Some(r##"Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume."##),
+                    Some(r##"Updates the track configuration for the specified track type."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_tracks-update",
                   vec![
                     (Some(r##"package-name"##),
@@ -6036,7 +6036,7 @@ fn main() {
     
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190402")
+           .version("1.0.9+20190702")
            .about("Accesses Android application developers' Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")

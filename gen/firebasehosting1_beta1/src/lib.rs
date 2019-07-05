@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Hosting* crate version *1.0.8+20190318*, where *20190318* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Firebase Hosting* crate version *1.0.9+20190626*, where *20190626* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Firebase Hosting* *v1_beta1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/hosting/).
@@ -219,9 +219,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -345,7 +343,7 @@ impl<'a, C, A> FirebaseHosting<C, A>
         FirebaseHosting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://firebasehosting.googleapis.com/".to_string(),
             _root_url: "https://firebasehosting.googleapis.com/".to_string(),
         }
@@ -356,7 +354,7 @@ impl<'a, C, A> FirebaseHosting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -506,20 +504,20 @@ impl RequestValue for Domain {}
 impl ResponseResult for Domain {}
 
 
-/// A configured rewrite that will direct any requests to a Cloud Run service. If
-/// the Cloud Run service does not exist when setting or updating your Firebase
-/// Hosting configuration then the request will fail. Any errors from the Cloud
-/// Run service (including when the service has been deleted) will be passed back
-/// down to the end user.
+/// A configured rewrite that directs requests to a Cloud Run service. If the
+/// Cloud Run service does not exist when setting or updating your Firebase
+/// Hosting configuration, then the request fails. Any errors from the Cloud Run
+/// service are passed to the end user (for example, if you delete a service, any
+/// requests directed to that service receive a `404` error).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudRunRewrite {
-    /// Optional. The region where the Cloud Run service is hosted.  Defaults to
-    /// `us-central1` if not supplied.
+    /// Optional. User-provided region where the Cloud Run service is hosted.<br>
+    /// Defaults to `us-central1` if not supplied.
     pub region: Option<String>,
-    /// Required. User supplied ID of the Cloud Run service.
+    /// Required. User-defined ID of the Cloud Run service.
     #[serde(rename="serviceId")]
     pub service_id: Option<String>,
 }

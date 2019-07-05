@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Security Command Center* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Security Command Center* crate version *1.0.9+20190628*, where *20190628* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Security Command Center* *v1* API can be found at the
 //! [official documentation site](https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview).
@@ -220,9 +220,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -335,7 +333,7 @@ impl<'a, C, A> SecurityCommandCenter<C, A>
         SecurityCommandCenter {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://securitycenter.googleapis.com/".to_string(),
             _root_url: "https://securitycenter.googleapis.com/".to_string(),
         }
@@ -346,7 +344,7 @@ impl<'a, C, A> SecurityCommandCenter<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -579,15 +577,16 @@ pub struct GroupFindingsRequest {
     /// * boolean literals `true` and `false` without quotes.
     /// 
     /// The following field and operator combinations are supported:
-    /// name | `=`
-    /// parent | '=', ':'
-    /// resource_name | '=', ':'
-    /// state | '=', ':'
-    /// category | '=', ':'
-    /// external_uri | '=', ':'
-    /// event_time | `>`, `<`, `>=`, `<=`
-    /// security_marks | '=', ':'
-    /// source_properties | '=', ':', `>`, `<`, `>=`, `<=`
+    /// 
+    /// * name: `=`
+    /// * parent: `=`, `:`
+    /// * resource_name: `=`, `:`
+    /// * state: `=`, `:`
+    /// * category: `=`, `:`
+    /// * external_uri: `=`, `:`
+    /// * event_time: `>`, `<`, `>=`, `<=`
+    /// * security_marks: `=`, `:`
+    /// * source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
     /// 
     /// For example, `source_properties.size = 100` is a valid filter string.
     pub filter: Option<String>,
@@ -678,8 +677,8 @@ pub struct Finding {
     /// Example: "XSS_FLASH_INJECTION"
     pub category: Option<String>,
     /// The time at which the event took place. For example, if the finding
-    /// represents an open firewall it would capture the time the open firewall was
-    /// detected.
+    /// represents an open firewall it would capture the time the detector believes
+    /// the firewall became open. The accuracy is determined by the detector.
     #[serde(rename="eventTime")]
     pub event_time: Option<String>,
     /// Source specific properties. These properties are managed by the source
@@ -781,56 +780,11 @@ impl ResponseResult for Empty {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1112,7 +1066,11 @@ impl Part for AuditLogConfig {}
 /// * [sources get iam policy organizations](struct.OrganizationSourceGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -1240,16 +1198,18 @@ pub struct GroupAssetsRequest {
     /// * boolean literals `true` and `false` without quotes.
     /// 
     /// The following field and operator combinations are supported:
-    /// name | `=`
-    /// update_time | `>`, `<`, `>=`, `<=`
-    /// iam_policy.policy_blob | '=', ':'
-    /// resource_properties | '=', ':', `>`, `<`, `>=`, `<=`
-    /// security_marks | '=', ':'
-    /// security_center_properties.resource_name | '=', ':'
-    /// security_center_properties.resource_type | '=', ':'
-    /// security_center_properties.resource_parent | '=', ':'
-    /// security_center_properties.resource_project | '=', ':'
-    /// security_center_properties.resource_owners | '=', ':'
+    /// 
+    /// * name: `=`
+    /// * update_time: `>`, `<`, `>=`, `<=`, `=`
+    /// * create_time: `>`, `<`, `>=`, `<=`, `=`
+    /// * iam_policy.policy_blob: `=`, `:`
+    /// * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
+    /// * security_marks: `=`, `:`
+    /// * security_center_properties.resource_name: `=`, `:`
+    /// * security_center_properties.resource_type: `=`, `:`
+    /// * security_center_properties.resource_parent: `=`, `:`
+    /// * security_center_properties.resource_project: `=`, `:`
+    /// * security_center_properties.resource_owners: `=`, `:`
     /// 
     /// For example, `resource_properties.size = 100` is a valid filter string.
     pub filter: Option<String>,
@@ -1385,13 +1345,11 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Source {
-    /// The source’s display name.
-    /// A source’s display name must be unique amongst its siblings, for example,
+    /// The source's display name.
+    /// A source's display name must be unique amongst its siblings, for example,
     /// two sources with the same parent can't share the same display name.
-    /// The display name must start and end with a letter or digit, may contain
-    /// letters, digits, spaces, hyphens, and underscores, and can be no longer
-    /// than 32 characters. This is captured by the regular expression:
-    /// [\p{L}\p{N}]({\p{L}\p{N}_- ]{0,30}[\p{L}\p{N}])?.
+    /// The display name must have a length between 1 and 64 characters
+    /// (inclusive).
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// The description of the source (max of 1024 characters).
@@ -1411,6 +1369,23 @@ pub struct Source {
 
 impl RequestValue for Source {}
 impl ResponseResult for Source {}
+
+
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
 
 
 /// Associates `members` with a `role`.
@@ -1573,7 +1548,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -4991,15 +4966,16 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// * boolean literals `true` and `false` without quotes.
     /// 
     /// The following field and operator combinations are supported:
-    /// name | `=`
-    /// parent | '=', ':'
-    /// resource_name | '=', ':'
-    /// state | '=', ':'
-    /// category | '=', ':'
-    /// external_uri | '=', ':'
-    /// event_time | `>`, `<`, `>=`, `<=`
-    /// security_marks | '=', ':'
-    /// source_properties | '=', ':', `>`, `<`, `>=`, `<=`
+    /// 
+    /// name: `=`
+    /// parent: `=`, `:`
+    /// resource_name: `=`, `:`
+    /// state: `=`, `:`
+    /// category: `=`, `:`
+    /// external_uri: `=`, `:`
+    /// event_time: `>`, `<`, `>=`, `<=`
+    /// security_marks: `=`, `:`
+    /// source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
     /// 
     /// For example, `source_properties.size = 100` is a valid filter string.
     ///
@@ -5008,9 +4984,7 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Optional.
-    /// 
-    /// A field mask to specify the Finding fields to be listed in the response.
+    /// Optional. A field mask to specify the Finding fields to be listed in the response.
     /// An empty field mask will list all fields.
     ///
     /// Sets the *field mask* query property to the given value.
@@ -6601,16 +6575,17 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * boolean literals `true` and `false` without quotes.
     /// 
     /// The following are the allowed field and operator combinations:
-    /// name | `=`
-    /// update_time | `>`, `<`, `>=`, `<=`
-    /// iam_policy.policy_blob | '=', ':'
-    /// resource_properties | '=', ':', `>`, `<`, `>=`, `<=`
-    /// security_marks | '=', ':'
-    /// security_center_properties.resource_name | '=', ':'
-    /// security_center_properties.resource_type | '=', ':'
-    /// security_center_properties.resource_parent | '=', ':'
-    /// security_center_properties.resource_project | '=', ':'
-    /// security_center_properties.resource_owners | '=', ':'
+    /// 
+    /// * name: `=`
+    /// * update_time: `>`, `<`, `>=`, `<=`
+    /// * iam_policy.policy_blob: `=`, `:`
+    /// * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
+    /// * security_marks: `=`, `:`
+    /// * security_center_properties.resource_name: `=`, `:`
+    /// * security_center_properties.resource_type: `=`, `:`
+    /// * security_center_properties.resource_parent: `=`, `:`
+    /// * security_center_properties.resource_project: `=`, `:`
+    /// * security_center_properties.resource_owners: `=`, `:`
     /// 
     /// For example, `resource_properties.size = 100` is a valid filter string.
     ///
@@ -6619,9 +6594,7 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Optional.
-    /// 
-    /// A field mask to specify the ListAssetsResult fields to be listed in the
+    /// Optional. A field mask to specify the ListAssetsResult fields to be listed in the
     /// response.
     /// An empty field mask will list all fields.
     ///

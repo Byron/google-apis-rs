@@ -4,11 +4,11 @@
 [package]
 
 name = "google-dialogflow2_beta1-cli"
-version = "1.0.8+20190402"
+version = "1.0.9+20190629"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dialogflow (protocol v2beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow2_beta1-cli"
-homepage = "https://cloud.google.com/dialogflow-enterprise/"
+homepage = "https://cloud.google.com/dialogflow/"
 documentation = "http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli"
 license = "MIT"
 keywords = ["dialogflow", "google", "cli"]
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-dialogflow2_beta1]
 path = "../dialogflow2_beta1"
-version = "1.0.8+20190402"
+version = "1.0.9+20190629"

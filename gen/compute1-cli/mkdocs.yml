@@ -1,4 +1,4 @@
-site_name: compute v1.0.8+20190320
+site_name: compute v1.0.9+20190618
 site_url: http://byron.github.io/google-apis-rs/google-compute1-cli
 site_description: A complete library to interact with compute (protocol v1)
 
@@ -46,6 +46,7 @@ pages:
 - ['disk-types_aggregated-list.md', 'Disk Types', 'Aggregated List']
 - ['disk-types_get.md', 'Disk Types', 'Get']
 - ['disk-types_list.md', 'Disk Types', 'List']
+- ['disks_add-resource-policies.md', 'Disks', 'Add Resource Policies']
 - ['disks_aggregated-list.md', 'Disks', 'Aggregated List']
 - ['disks_create-snapshot.md', 'Disks', 'Create Snapshot']
 - ['disks_delete.md', 'Disks', 'Delete']
@@ -53,6 +54,7 @@ pages:
 - ['disks_get-iam-policy.md', 'Disks', 'Get Iam Policy']
 - ['disks_insert.md', 'Disks', 'Insert']
 - ['disks_list.md', 'Disks', 'List']
+- ['disks_remove-resource-policies.md', 'Disks', 'Remove Resource Policies']
 - ['disks_resize.md', 'Disks', 'Resize']
 - ['disks_set-iam-policy.md', 'Disks', 'Set Iam Policy']
 - ['disks_set-labels.md', 'Disks', 'Set Labels']
@@ -146,6 +148,7 @@ pages:
 - ['instances_delete-access-config.md', 'Instances', 'Delete Access Config']
 - ['instances_detach-disk.md', 'Instances', 'Detach Disk']
 - ['instances_get.md', 'Instances', 'Get']
+- ['instances_get-guest-attributes.md', 'Instances', 'Get Guest Attributes']
 - ['instances_get-iam-policy.md', 'Instances', 'Get Iam Policy']
 - ['instances_get-serial-port-output.md', 'Instances', 'Get Serial Port Output']
 - ['instances_get-shielded-instance-identity.md', 'Instances', 'Get Shielded Instance Identity']
@@ -271,11 +274,13 @@ pages:
 - ['region-commitments_list.md', 'Region Commitments', 'List']
 - ['region-disk-types_get.md', 'Region Disk Types', 'Get']
 - ['region-disk-types_list.md', 'Region Disk Types', 'List']
+- ['region-disks_add-resource-policies.md', 'Region Disks', 'Add Resource Policies']
 - ['region-disks_create-snapshot.md', 'Region Disks', 'Create Snapshot']
 - ['region-disks_delete.md', 'Region Disks', 'Delete']
 - ['region-disks_get.md', 'Region Disks', 'Get']
 - ['region-disks_insert.md', 'Region Disks', 'Insert']
 - ['region-disks_list.md', 'Region Disks', 'List']
+- ['region-disks_remove-resource-policies.md', 'Region Disks', 'Remove Resource Policies']
 - ['region-disks_resize.md', 'Region Disks', 'Resize']
 - ['region-disks_set-labels.md', 'Region Disks', 'Set Labels']
 - ['region-disks_test-iam-permissions.md', 'Region Disks', 'Test Iam Permissions']
@@ -300,6 +305,23 @@ pages:
 - ['region-operations_list.md', 'Region Operations', 'List']
 - ['regions_get.md', 'Regions', 'Get']
 - ['regions_list.md', 'Regions', 'List']
+- ['reservations_aggregated-list.md', 'Reservations', 'Aggregated List']
+- ['reservations_delete.md', 'Reservations', 'Delete']
+- ['reservations_get.md', 'Reservations', 'Get']
+- ['reservations_get-iam-policy.md', 'Reservations', 'Get Iam Policy']
+- ['reservations_insert.md', 'Reservations', 'Insert']
+- ['reservations_list.md', 'Reservations', 'List']
+- ['reservations_resize.md', 'Reservations', 'Resize']
+- ['reservations_set-iam-policy.md', 'Reservations', 'Set Iam Policy']
+- ['reservations_test-iam-permissions.md', 'Reservations', 'Test Iam Permissions']
+- ['resource-policies_aggregated-list.md', 'Resource Policies', 'Aggregated List']
+- ['resource-policies_delete.md', 'Resource Policies', 'Delete']
+- ['resource-policies_get.md', 'Resource Policies', 'Get']
+- ['resource-policies_get-iam-policy.md', 'Resource Policies', 'Get Iam Policy']
+- ['resource-policies_insert.md', 'Resource Policies', 'Insert']
+- ['resource-policies_list.md', 'Resource Policies', 'List']
+- ['resource-policies_set-iam-policy.md', 'Resource Policies', 'Set Iam Policy']
+- ['resource-policies_test-iam-permissions.md', 'Resource Policies', 'Test Iam Permissions']
 - ['routers_aggregated-list.md', 'Routers', 'Aggregated List']
 - ['routers_delete.md', 'Routers', 'Delete']
 - ['routers_get.md', 'Routers', 'Get']
@@ -421,5 +443,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

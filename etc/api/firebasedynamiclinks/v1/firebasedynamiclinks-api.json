@@ -223,7 +223,7 @@
             }
         }
     }, 
-    "revision": "20190403", 
+    "revision": "20190628", 
     "rootUrl": "https://firebasedynamiclinks.googleapis.com/", 
     "schemas": {
         "AnalyticsInfo": {
@@ -270,10 +270,10 @@
             "properties": {
                 "dynamicLinkInfo": {
                     "$ref": "DynamicLinkInfo", 
-                    "description": "Information about the Dynamic Link to be shortened.\n[Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener)."
+                    "description": "Information about the Dynamic Link to be shortened.\n[Learn\nmore](https://firebase.google.com/docs/reference/dynamic-links/link-shortener)."
                 }, 
                 "longDynamicLink": {
-                    "description": "Full long Dynamic Link URL with desired query parameters specified.\nFor example,\n\"https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample\",\n[Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).", 
+                    "description": "Full long Dynamic Link URL with desired query parameters specified.\nFor example,\n\"https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample\",\n[Learn\nmore](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).", 
                     "type": "string"
                 }, 
                 "name": {
@@ -319,10 +319,10 @@
             "properties": {
                 "dynamicLinkInfo": {
                     "$ref": "DynamicLinkInfo", 
-                    "description": "Information about the Dynamic Link to be shortened.\n[Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener)."
+                    "description": "Information about the Dynamic Link to be shortened.\n[Learn\nmore](https://firebase.google.com/docs/reference/dynamic-links/link-shortener)."
                 }, 
                 "longDynamicLink": {
-                    "description": "Full long Dynamic Link URL with desired query parameters specified.\nFor example,\n\"https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample\",\n[Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).", 
+                    "description": "Full long Dynamic Link URL with desired query parameters specified.\nFor example,\n\"https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample\",\n[Learn\nmore](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).", 
                     "type": "string"
                 }, 
                 "sdkVersion": {
@@ -730,12 +730,20 @@
                     "description": "Scion campaign value to be propagated by iSDK to Scion at post-install.", 
                     "type": "string"
                 }, 
+                "utmContent": {
+                    "description": "Scion content value to be propagated by iSDK to Scion at app-reopen.", 
+                    "type": "string"
+                }, 
                 "utmMedium": {
                     "description": "Scion medium value to be propagated by iSDK to Scion at post-install.", 
                     "type": "string"
                 }, 
                 "utmSource": {
                     "description": "Scion source value to be propagated by iSDK to Scion at post-install.", 
+                    "type": "string"
+                }, 
+                "utmTerm": {
+                    "description": "Scion term value to be propagated by iSDK to Scion at app-reopen.", 
                     "type": "string"
                 }
             }, 
@@ -784,12 +792,20 @@
                     "description": "Scion campaign value to be propagated by iSDK to Scion at app-reopen.", 
                     "type": "string"
                 }, 
+                "utmContent": {
+                    "description": "Scion content value to be propagated by iSDK to Scion at app-reopen.", 
+                    "type": "string"
+                }, 
                 "utmMedium": {
                     "description": "Scion medium value to be propagated by iSDK to Scion at app-reopen.", 
                     "type": "string"
                 }, 
                 "utmSource": {
                     "description": "Scion source value to be propagated by iSDK to Scion at app-reopen.", 
+                    "type": "string"
+                }, 
+                "utmTerm": {
+                    "description": "Scion term value to be propagated by iSDK to Scion at app-reopen.", 
                     "type": "string"
                 }
             }, 

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-analytics3"
-version = "1.0.8+20180730"
+version = "1.0.9+20190604"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with analytics (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analytics3"
 homepage = "https://developers.google.com/analytics/"
-documentation = "https://docs.rs/google-analytics3/1.0.8+20180730"
+documentation = "https://docs.rs/google-analytics3/1.0.9+20190604"
 license = "MIT"
 keywords = ["analytics", "google", "protocol", "web", "api"]
 autobins = false

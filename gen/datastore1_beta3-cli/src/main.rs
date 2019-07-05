@@ -994,7 +994,7 @@ fn main() {
     
     let mut app = App::new("datastore1-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190105")
+           .version("1.0.9+20190421")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli")

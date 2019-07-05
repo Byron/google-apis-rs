@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Spanner* crate version *1.0.8+20190312*, where *20190312* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Spanner* crate version *1.0.9+20190613*, where *20190613* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Spanner* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/spanner/).
@@ -224,9 +224,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -346,7 +344,7 @@ impl<'a, C, A> Spanner<C, A>
         Spanner {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://spanner.googleapis.com/".to_string(),
             _root_url: "https://spanner.googleapis.com/".to_string(),
         }
@@ -357,7 +355,7 @@ impl<'a, C, A> Spanner<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -450,12 +448,13 @@ pub struct Instance {
     /// Required. A unique identifier for the instance, which cannot be changed
     /// after the instance is created. Values are of the form
     /// `projects/<project>/instances/a-z*[a-z0-9]`. The final
-    /// segment of the name must be between 6 and 30 characters in length.
+    /// segment of the name must be between 2 and 64 characters in length.
     pub name: Option<String>,
     /// Required. The number of nodes allocated to this instance. This may be zero
     /// in API responses for instances that are not yet in state `READY`.
     /// 
-    /// See [the documentation](https://cloud.google.com/spanner/docs/instances#node_count)
+    /// See [the
+    /// documentation](https://cloud.google.com/spanner/docs/instances#node_count)
     /// for more information about nodes.
     #[serde(rename="nodeCount")]
     pub node_count: Option<i32>,
@@ -498,7 +497,8 @@ impl ResponseResult for Instance {}
 /// 
 /// Keys are represented by lists, where the ith value in the list
 /// corresponds to the ith component of the table or index primary key.
-/// Individual values are encoded as described here.
+/// Individual values are encoded as described
+/// here.
 /// 
 /// For example, consider the following table definition:
 /// 
@@ -673,58 +673,26 @@ pub struct Statement {
 impl Part for Statement {}
 
 
-/// Enqueues the given DDL statements to be applied, in order but not
-/// necessarily all at once, to the database schema at some point (or
-/// points) in the future. The server checks that the statements
-/// are executable (syntactically valid, name tables that exist, etc.)
-/// before enqueueing them, but they may still fail upon
-/// later execution (e.g., if a statement from another batch of
-/// statements is applied first and it conflicts in some way, or if
-/// there is some data-related problem like a `NULL` value in a column to
-/// which `NOT NULL` would be added). If a statement fails, all
-/// subsequent statements in the batch are automatically cancelled.
+/// There is no detailed description.
 /// 
-/// Each batch of statements is assigned a name which can be used with
-/// the Operations API to monitor
-/// progress. See the
-/// operation_id field for more
-/// details.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases update ddl projects](struct.ProjectInstanceDatabaseUpdateDdlCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateDatabaseDdlRequest {
-    /// DDL statements to be applied to the database.
-    pub statements: Option<Vec<String>>,
-    /// If empty, the new update request is assigned an
-    /// automatically-generated operation ID. Otherwise, `operation_id`
-    /// is used to construct the name of the resulting
-    /// Operation.
-    /// 
-    /// Specifying an explicit operation ID simplifies determining
-    /// whether the statements were executed in the event that the
-    /// UpdateDatabaseDdl call is replayed,
-    /// or the return value is otherwise lost: the database and
-    /// `operation_id` fields can be combined to form the
-    /// name of the resulting
-    /// longrunning.Operation: `<database>/operations/<operation_id>`.
-    /// 
-    /// `operation_id` should be unique within the database, and must be
-    /// a valid identifier: `a-z*`. Note that
-    /// automatically-generated operation IDs always begin with an
-    /// underscore. If the named operation already exists,
-    /// UpdateDatabaseDdl returns
-    /// `ALREADY_EXISTS`.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+pub struct ReplicaInfo {
+    /// If true, this location is designated as the default leader location where
+    /// leader replicas are placed. See the [region types
+    /// documentation](https://cloud.google.com/spanner/docs/instances#region_types)
+    /// for more details.
+    #[serde(rename="defaultLeaderLocation")]
+    pub default_leader_location: Option<bool>,
+    /// The type of replica.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The location of the serving resources, e.g. "us-central1".
+    pub location: Option<String>,
 }
 
-impl RequestValue for UpdateDatabaseDdlRequest {}
+impl Part for ReplicaInfo {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -757,58 +725,13 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -860,7 +783,7 @@ impl ResponseResult for TestIamPermissionsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateInstanceRequest {
     /// Required. The ID of the instance to create.  Valid identifiers are of the
-    /// form `a-z*[a-z0-9]` and must be between 6 and 30 characters in
+    /// form `a-z*[a-z0-9]` and must be between 2 and 64 characters in
     /// length.
     #[serde(rename="instanceId")]
     pub instance_id: Option<String>,
@@ -936,19 +859,21 @@ impl ResponseResult for Database {}
 /// Clients can determine whether all DML statements have run successfully, or if
 /// a statement failed, using one of the following approaches:
 /// 
-///   1. Check if 'status' field is OkStatus.
-///   2. Check if result_sets_size() equals the number of statements in
+///   1. Check if `'status'` field is `OkStatus`.
+///   2. Check if `result_sets_size()` equals the number of statements in
 ///      ExecuteBatchDmlRequest.
 /// 
 /// Example 1: A request with 5 DML statements, all executed successfully.
+/// 
 /// Result: A response with 5 ResultSets, one for each statement in the same
-/// order, and an OK status.
+/// order, and an `OkStatus`.
 /// 
 /// Example 2: A request with 5 DML statements. The 3rd statement has a syntax
 /// error.
+/// 
 /// Result: A response with 2 ResultSets, for the first 2 statements that
-/// run successfully, and a syntax error (INVALID_ARGUMENT) status. From
-/// result_set_size() client can determine that the 3rd statement has failed.
+/// run successfully, and a syntax error (`INVALID_ARGUMENT`) status. From
+/// `result_set_size()` client can determine that the 3rd statement has failed.
 /// 
 /// # Activities
 /// 
@@ -1103,8 +1028,8 @@ pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
-    /// Unimplemented. The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// The condition that is associated with this binding.
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -1128,7 +1053,7 @@ pub struct Binding {
     ///    For example, `admins@example.com`.
     /// 
     /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
     /// 
@@ -1453,7 +1378,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -1822,6 +1747,60 @@ pub struct Policy {
 }
 
 impl ResponseResult for Policy {}
+
+
+/// Enqueues the given DDL statements to be applied, in order but not
+/// necessarily all at once, to the database schema at some point (or
+/// points) in the future. The server checks that the statements
+/// are executable (syntactically valid, name tables that exist, etc.)
+/// before enqueueing them, but they may still fail upon
+/// later execution (e.g., if a statement from another batch of
+/// statements is applied first and it conflicts in some way, or if
+/// there is some data-related problem like a `NULL` value in a column to
+/// which `NOT NULL` would be added). If a statement fails, all
+/// subsequent statements in the batch are automatically cancelled.
+/// 
+/// Each batch of statements is assigned a name which can be used with
+/// the Operations API to monitor
+/// progress. See the
+/// operation_id field for more
+/// details.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases update ddl projects](struct.ProjectInstanceDatabaseUpdateDdlCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateDatabaseDdlRequest {
+    /// DDL statements to be applied to the database.
+    pub statements: Option<Vec<String>>,
+    /// If empty, the new update request is assigned an
+    /// automatically-generated operation ID. Otherwise, `operation_id`
+    /// is used to construct the name of the resulting
+    /// Operation.
+    /// 
+    /// Specifying an explicit operation ID simplifies determining
+    /// whether the statements were executed in the event that the
+    /// UpdateDatabaseDdl call is replayed,
+    /// or the return value is otherwise lost: the database and
+    /// `operation_id` fields can be combined to form the
+    /// name of the resulting
+    /// longrunning.Operation: `<database>/operations/<operation_id>`.
+    /// 
+    /// `operation_id` should be unique within the database, and must be
+    /// a valid identifier: `a-z*`. Note that
+    /// automatically-generated operation IDs always begin with an
+    /// underscore. If the named operation already exists,
+    /// UpdateDatabaseDdl returns
+    /// `ALREADY_EXISTS`.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+}
+
+impl RequestValue for UpdateDatabaseDdlRequest {}
 
 
 /// `Type` indicates the type of a Cloud Spanner value, as might be stored in a
@@ -2500,7 +2479,7 @@ pub struct ExecuteBatchDmlRequest {
     /// i+1. Each statement must be a DML statement. Execution will stop at the
     /// first failed statement; the remaining statements will not run.
     /// 
-    /// REQUIRES: statements_size() > 0.
+    /// REQUIRES: `statements_size()` > 0.
     pub statements: Option<Vec<Statement>>,
 }
 
@@ -2615,6 +2594,9 @@ pub struct InstanceConfig {
     /// are of the form
     /// `projects/<project>/instanceConfigs/a-z*`
     pub name: Option<String>,
+    /// The geographic placement of nodes in this instance configuration and their
+    /// replication properties.
+    pub replicas: Option<Vec<ReplicaInfo>>,
 }
 
 impl ResponseResult for InstanceConfig {}
@@ -3347,7 +3329,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `name` - Required. A unique identifier for the instance, which cannot be changed
     ///            after the instance is created. Values are of the form
     ///            `projects/<project>/instances/a-z*[a-z0-9]`. The final
-    ///            segment of the name must be between 6 and 30 characters in length.
+    ///            segment of the name must be between 2 and 64 characters in length.
     pub fn instances_patch(&self, request: UpdateInstanceRequest, name: &str) -> ProjectInstancePatchCall<'a, C, A> {
         ProjectInstancePatchCall {
             hub: self.hub,
@@ -9476,7 +9458,7 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Required. A unique identifier for the instance, which cannot be changed
     /// after the instance is created. Values are of the form
     /// `projects/<project>/instances/a-z*[a-z0-9]`. The final
-    /// segment of the name must be between 6 and 30 characters in length.
+    /// segment of the name must be between 2 and 64 characters in length.
     ///
     /// Sets the *name* path property to the given value.
     ///

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.8+20190403*, where *20190403* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.9+20190701*, where *20190701* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *AdExchangeBuyerII* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/reference/rest/).
@@ -14,7 +14,7 @@
 //! * accounts
 //!  * [*clients create*](struct.AccountClientCreateCall.html), [*clients get*](struct.AccountClientGetCall.html), [*clients invitations create*](struct.AccountClientInvitationCreateCall.html), [*clients invitations get*](struct.AccountClientInvitationGetCall.html), [*clients invitations list*](struct.AccountClientInvitationListCall.html), [*clients list*](struct.AccountClientListCall.html), [*clients update*](struct.AccountClientUpdateCall.html), [*clients users get*](struct.AccountClientUserGetCall.html), [*clients users list*](struct.AccountClientUserListCall.html), [*clients users update*](struct.AccountClientUserUpdateCall.html), [*creatives create*](struct.AccountCreativeCreateCall.html), [*creatives deal associations add*](struct.AccountCreativeDealAssociationAddCall.html), [*creatives deal associations list*](struct.AccountCreativeDealAssociationListCall.html), [*creatives deal associations remove*](struct.AccountCreativeDealAssociationRemoveCall.html), [*creatives get*](struct.AccountCreativeGetCall.html), [*creatives list*](struct.AccountCreativeListCall.html), [*creatives stop watching*](struct.AccountCreativeStopWatchingCall.html), [*creatives update*](struct.AccountCreativeUpdateCall.html), [*creatives watch*](struct.AccountCreativeWatchCall.html), [*finalized proposals list*](struct.AccountFinalizedProposalListCall.html), [*products get*](struct.AccountProductGetCall.html), [*products list*](struct.AccountProductListCall.html), [*proposals accept*](struct.AccountProposalAcceptCall.html), [*proposals add note*](struct.AccountProposalAddNoteCall.html), [*proposals cancel negotiation*](struct.AccountProposalCancelNegotiationCall.html), [*proposals complete setup*](struct.AccountProposalCompleteSetupCall.html), [*proposals create*](struct.AccountProposalCreateCall.html), [*proposals get*](struct.AccountProposalGetCall.html), [*proposals list*](struct.AccountProposalListCall.html), [*proposals pause*](struct.AccountProposalPauseCall.html), [*proposals resume*](struct.AccountProposalResumeCall.html), [*proposals update*](struct.AccountProposalUpdateCall.html), [*publisher profiles get*](struct.AccountPublisherProfileGetCall.html) and [*publisher profiles list*](struct.AccountPublisherProfileListCall.html)
 //! * bidders
-//!  * [*accounts creatives delete*](struct.BidderAccountCreativeDeleteCall.html), [*accounts filter sets bid metrics list*](struct.BidderAccountFilterSetBidMetricListCall.html), [*accounts filter sets bid response errors list*](struct.BidderAccountFilterSetBidResponseErrorListCall.html), [*accounts filter sets bid responses without bids list*](struct.BidderAccountFilterSetBidResponsesWithoutBidListCall.html), [*accounts filter sets create*](struct.BidderAccountFilterSetCreateCall.html), [*accounts filter sets delete*](struct.BidderAccountFilterSetDeleteCall.html), [*accounts filter sets filtered bid requests list*](struct.BidderAccountFilterSetFilteredBidRequestListCall.html), [*accounts filter sets filtered bids creatives list*](struct.BidderAccountFilterSetFilteredBidCreativeListCall.html), [*accounts filter sets filtered bids details list*](struct.BidderAccountFilterSetFilteredBidDetailListCall.html), [*accounts filter sets filtered bids list*](struct.BidderAccountFilterSetFilteredBidListCall.html), [*accounts filter sets get*](struct.BidderAccountFilterSetGetCall.html), [*accounts filter sets impression metrics list*](struct.BidderAccountFilterSetImpressionMetricListCall.html), [*accounts filter sets list*](struct.BidderAccountFilterSetListCall.html), [*accounts filter sets losing bids list*](struct.BidderAccountFilterSetLosingBidListCall.html), [*accounts filter sets non billable winning bids list*](struct.BidderAccountFilterSetNonBillableWinningBidListCall.html), [*filter sets bid metrics list*](struct.BidderFilterSetBidMetricListCall.html), [*filter sets bid response errors list*](struct.BidderFilterSetBidResponseErrorListCall.html), [*filter sets bid responses without bids list*](struct.BidderFilterSetBidResponsesWithoutBidListCall.html), [*filter sets create*](struct.BidderFilterSetCreateCall.html), [*filter sets delete*](struct.BidderFilterSetDeleteCall.html), [*filter sets filtered bid requests list*](struct.BidderFilterSetFilteredBidRequestListCall.html), [*filter sets filtered bids creatives list*](struct.BidderFilterSetFilteredBidCreativeListCall.html), [*filter sets filtered bids details list*](struct.BidderFilterSetFilteredBidDetailListCall.html), [*filter sets filtered bids list*](struct.BidderFilterSetFilteredBidListCall.html), [*filter sets get*](struct.BidderFilterSetGetCall.html), [*filter sets impression metrics list*](struct.BidderFilterSetImpressionMetricListCall.html), [*filter sets list*](struct.BidderFilterSetListCall.html), [*filter sets losing bids list*](struct.BidderFilterSetLosingBidListCall.html) and [*filter sets non billable winning bids list*](struct.BidderFilterSetNonBillableWinningBidListCall.html)
+//!  * [*accounts filter sets bid metrics list*](struct.BidderAccountFilterSetBidMetricListCall.html), [*accounts filter sets bid response errors list*](struct.BidderAccountFilterSetBidResponseErrorListCall.html), [*accounts filter sets bid responses without bids list*](struct.BidderAccountFilterSetBidResponsesWithoutBidListCall.html), [*accounts filter sets create*](struct.BidderAccountFilterSetCreateCall.html), [*accounts filter sets delete*](struct.BidderAccountFilterSetDeleteCall.html), [*accounts filter sets filtered bid requests list*](struct.BidderAccountFilterSetFilteredBidRequestListCall.html), [*accounts filter sets filtered bids creatives list*](struct.BidderAccountFilterSetFilteredBidCreativeListCall.html), [*accounts filter sets filtered bids details list*](struct.BidderAccountFilterSetFilteredBidDetailListCall.html), [*accounts filter sets filtered bids list*](struct.BidderAccountFilterSetFilteredBidListCall.html), [*accounts filter sets get*](struct.BidderAccountFilterSetGetCall.html), [*accounts filter sets impression metrics list*](struct.BidderAccountFilterSetImpressionMetricListCall.html), [*accounts filter sets list*](struct.BidderAccountFilterSetListCall.html), [*accounts filter sets losing bids list*](struct.BidderAccountFilterSetLosingBidListCall.html), [*accounts filter sets non billable winning bids list*](struct.BidderAccountFilterSetNonBillableWinningBidListCall.html), [*filter sets bid metrics list*](struct.BidderFilterSetBidMetricListCall.html), [*filter sets bid response errors list*](struct.BidderFilterSetBidResponseErrorListCall.html), [*filter sets bid responses without bids list*](struct.BidderFilterSetBidResponsesWithoutBidListCall.html), [*filter sets create*](struct.BidderFilterSetCreateCall.html), [*filter sets delete*](struct.BidderFilterSetDeleteCall.html), [*filter sets filtered bid requests list*](struct.BidderFilterSetFilteredBidRequestListCall.html), [*filter sets filtered bids creatives list*](struct.BidderFilterSetFilteredBidCreativeListCall.html), [*filter sets filtered bids details list*](struct.BidderFilterSetFilteredBidDetailListCall.html), [*filter sets filtered bids list*](struct.BidderFilterSetFilteredBidListCall.html), [*filter sets get*](struct.BidderFilterSetGetCall.html), [*filter sets impression metrics list*](struct.BidderFilterSetImpressionMetricListCall.html), [*filter sets list*](struct.BidderFilterSetListCall.html), [*filter sets losing bids list*](struct.BidderFilterSetLosingBidListCall.html) and [*filter sets non billable winning bids list*](struct.BidderFilterSetNonBillableWinningBidListCall.html)
 //! 
 //! 
 //! 
@@ -226,9 +226,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -340,7 +338,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
         AdExchangeBuyerII {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://adexchangebuyer.googleapis.com/".to_string(),
             _root_url: "https://adexchangebuyer.googleapis.com/".to_string(),
         }
@@ -354,7 +352,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -432,7 +430,7 @@ pub struct ListCreativeStatusBreakdownByDetailResponse {
 impl ResponseResult for ListCreativeStatusBreakdownByDetailResponse {}
 
 
-/// @OutputOnly The reason and details for a disapproval.
+/// Output only. The reason and details for a disapproval.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -483,20 +481,16 @@ pub struct Note {
     /// Note: This field may be set only when creating the resource. Modifying
     /// this field while updating the resource will result in an error.
     pub note: Option<String>,
-    /// The role of the person (buyer/seller) creating the note.
-    /// @OutputOnly
+    /// Output only. The role of the person (buyer/seller) creating the note.
     #[serde(rename="creatorRole")]
     pub creator_role: Option<String>,
-    /// The revision number of the proposal when the note is created.
-    /// @OutputOnly
+    /// Output only. The revision number of the proposal when the note is created.
     #[serde(rename="proposalRevision")]
     pub proposal_revision: Option<String>,
-    /// The unique ID for the note.
-    /// @OutputOnly
+    /// Output only. The unique ID for the note.
     #[serde(rename="noteId")]
     pub note_id: Option<String>,
-    /// The timestamp for when this note was created.
-    /// @OutputOnly
+    /// Output only. The timestamp for when this note was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
 }
@@ -659,34 +653,6 @@ pub struct ListFilterSetsResponse {
 impl ResponseResult for ListFilterSetsResponse {}
 
 
-/// Response message for listing all reasons that bid responses resulted in an
-/// error.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [filter sets bid response errors list bidders](struct.BidderFilterSetBidResponseErrorListCall.html) (response)
-/// * [accounts filter sets bid response errors list bidders](struct.BidderAccountFilterSetBidResponseErrorListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListBidResponseErrorsResponse {
-    /// List of rows, with counts of bid responses aggregated by callout status.
-    #[serde(rename="calloutStatusRows")]
-    pub callout_status_rows: Option<Vec<CalloutStatusRow>>,
-    /// A token to retrieve the next page of results.
-    /// Pass this value in the
-    /// ListBidResponseErrorsRequest.pageToken
-    /// field in the subsequent call to the bidResponseErrors.list
-    /// method to retrieve the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-}
-
-impl ResponseResult for ListBidResponseErrorsResponse {}
-
-
 /// The number of impressions with the specified dimension values where the
 /// corresponding bid request or bid response was not successful, as described by
 /// the specified callout status.
@@ -696,7 +662,8 @@ impl ResponseResult for ListBidResponseErrorsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalloutStatusRow {
     /// The ID of the callout status.
-    /// See [callout-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/callout-status-codes).
+    /// See
+    /// [callout-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/callout-status-codes).
     #[serde(rename="calloutStatusId")]
     pub callout_status_id: Option<i32>,
     /// The values of all dimensions associated with metric values in this row.
@@ -709,6 +676,41 @@ pub struct CalloutStatusRow {
 }
 
 impl Part for CalloutStatusRow {}
+
+
+/// Detected ad technology provider information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AdTechnologyProviders {
+    /// Whether the creative contains an unidentified ad technology provider.
+    /// 
+    /// If true for a given creative, any bid submitted with that creative for an
+    /// impression that will serve to an EEA user will be filtered before the
+    /// auction.
+    #[serde(rename="hasUnidentifiedProvider")]
+    pub has_unidentified_provider: Option<bool>,
+    /// The detected ad technology provider IDs for this creative.
+    /// See https://storage.googleapis.com/adx-rtb-dictionaries/providers.csv for
+    /// mapping of provider ID to provided name, a privacy policy URL, and a list
+    /// of domains which can be attributed to the provider.
+    /// 
+    /// If the creative contains provider IDs that are outside of those listed in
+    /// the `BidRequest.adslot.consented_providers_settings.consented_providers`
+    /// field on the (Google bid
+    /// protocol)[https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto]
+    /// and the
+    /// `BidRequest.user.ext.consented_providers_settings.consented_providers`
+    /// field on the (OpenRTB
+    /// protocol)[https://developers.google.com/authorized-buyers/rtb/downloads/openrtb-adx-proto],
+    /// and a bid is submitted with that creative for an impression that will
+    /// serve to an EEA user, the bid will be filtered before the auction.
+    #[serde(rename="detectedProviderIds")]
+    pub detected_provider_ids: Option<Vec<String>>,
+}
+
+impl Part for AdTechnologyProviders {}
 
 
 /// The association between a creative and a deal.
@@ -731,7 +733,7 @@ pub struct CreativeDealAssociation {
 impl Part for CreativeDealAssociation {}
 
 
-/// @OutputOnly The app type the restriction applies to for mobile device.
+/// Output only. The app type the restriction applies to for mobile device.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -758,24 +760,6 @@ pub struct NonGuaranteedFixedPriceTerms {
 }
 
 impl Part for NonGuaranteedFixedPriceTerms {}
-
-
-/// A specific filtering status and how many times it occurred.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Reason {
-    /// The number of times the creative was filtered for the status. The
-    /// count is aggregated across all publishers on the exchange.
-    pub count: Option<String>,
-    /// The filtering status code. Please refer to the
-    /// [creative-status-codes.txt](https://storage.googleapis.com/adx-rtb-dictionaries/creative-status-codes.txt)
-    /// file for different statuses.
-    pub status: Option<i32>,
-}
-
-impl Part for Reason {}
 
 
 /// An absolute date range, specified by its start date and end date.
@@ -931,9 +915,9 @@ pub struct DayPart {
     /// The day of the week to target. If unspecified, applicable to all days.
     #[serde(rename="dayOfWeek")]
     pub day_of_week: Option<String>,
-    /// The ending time of the day for the ad to show (minute level granularity).
-    /// The end time is exclusive.
-    /// This field is not available for filtering in PQL queries.
+    /// The ending time of the day for the ad to show (minute level
+    /// granularity). The end time is exclusive. This field is not available
+    /// for filtering in PQL queries.
     #[serde(rename="endTime")]
     pub end_time: Option<TimeOfDay>,
     /// The starting time of day for the ad to show (minute level granularity).
@@ -946,7 +930,7 @@ pub struct DayPart {
 impl Part for DayPart {}
 
 
-/// @OutputOnly The Geo criteria the restriction applies to.
+/// Output only. The Geo criteria the restriction applies to.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1002,7 +986,7 @@ pub struct CreativeSpecification {
 impl Part for CreativeSpecification {}
 
 
-/// @OutputOnly A security context.
+/// Output only. A security context.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1099,7 +1083,7 @@ pub struct Date {
 impl Part for Date {}
 
 
-/// @OutputOnly The auction type the restriction applies to.
+/// Output only. The auction type the restriction applies to.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1205,7 +1189,8 @@ pub struct CreativeStatusRow {
     #[serde(rename="bidCount")]
     pub bid_count: Option<MetricValue>,
     /// The ID of the creative status.
-    /// See [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes).
+    /// See
+    /// [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes).
     #[serde(rename="creativeStatusId")]
     pub creative_status_id: Option<i32>,
     /// The values of all dimensions associated with metric values in this row.
@@ -1229,7 +1214,7 @@ impl Part for CreativeStatusRow {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Creative {
-    /// @OutputOnly Shows any corrections that were applied to this creative.
+    /// Output only. Shows any corrections that were applied to this creative.
     pub corrections: Option<Vec<Correction>>,
     /// The set of URLs to be called to record an impression.
     #[serde(rename="impressionTrackingUrls")]
@@ -1237,18 +1222,14 @@ pub struct Creative {
     /// The agency ID for this creative.
     #[serde(rename="agencyId")]
     pub agency_id: Option<String>,
-    /// @OutputOnly The filtering stats for this creative.
-    /// Deprecated; please use
-    /// bidders.accounts.filterSets.filteredBids.creatives.list
-    /// method instead.
-    #[serde(rename="filteringStats")]
-    pub filtering_stats: Option<FilteringStats>,
+    /// Output only. The detected ad technology providers.
+    #[serde(rename="adTechnologyProviders")]
+    pub ad_technology_providers: Option<AdTechnologyProviders>,
     /// The set of declared destination URLs for the creative.
     #[serde(rename="declaredClickThroughUrls")]
     pub declared_click_through_urls: Option<Vec<String>>,
-    /// @OutputOnly
-    /// The detected languages for this creative. The order is arbitrary. The codes
-    /// are 2 or 5 characters and are documented at
+    /// Output only. The detected languages for this creative. The order is
+    /// arbitrary. The codes are 2 or 5 characters and are documented at
     /// https://developers.google.com/adwords/api/docs/appendix/languagecodes.
     #[serde(rename="detectedLanguages")]
     pub detected_languages: Option<Vec<String>>,
@@ -1258,7 +1239,7 @@ pub struct Creative {
     /// The set of destination URLs for the creative.
     #[serde(rename="clickThroughUrls")]
     pub click_through_urls: Option<Vec<String>>,
-    /// @OutputOnly The top-level open auction status of this creative.
+    /// Output only. The top-level open auction status of this creative.
     /// If disapproved, an entry for 'auctionType = OPEN_AUCTION' (or 'ALL') in
     /// serving_restrictions will also exist. Note
     /// that this may be nuanced with other contextual restrictions, in which case,
@@ -1268,7 +1249,7 @@ pub struct Creative {
     /// method.
     #[serde(rename="openAuctionStatus")]
     pub open_auction_status: Option<String>,
-    /// @OutputOnly Detected sensitive categories, if any.
+    /// Output only. Detected sensitive categories, if any.
     /// See the ad-sensitive-categories.txt file in the technical documentation for
     /// a list of IDs. You should use these IDs along with the
     /// excluded-sensitive-category field in the bid request to filter your bids.
@@ -1279,7 +1260,7 @@ pub struct Creative {
     /// creatives.list
     /// method.
     pub attributes: Option<Vec<String>>,
-    /// @OutputOnly The top-level deals status of this creative.
+    /// Output only. The top-level deals status of this creative.
     /// If disapproved, an entry for 'auctionType=DIRECT_DEALS' (or 'ALL') in
     /// serving_restrictions will also exist. Note
     /// that this may be nuanced with other contextual restrictions, in which case,
@@ -1295,7 +1276,7 @@ pub struct Creative {
     /// method.
     #[serde(rename="creativeId")]
     pub creative_id: Option<String>,
-    /// @OutputOnly Detected advertiser IDs, if any.
+    /// Output only. Detected advertiser IDs, if any.
     #[serde(rename="detectedAdvertiserIds")]
     pub detected_advertiser_ids: Option<Vec<String>>,
     /// The link to AdChoices destination page.
@@ -1308,12 +1289,12 @@ pub struct Creative {
     /// for possible values.
     #[serde(rename="vendorIds")]
     pub vendor_ids: Option<Vec<i32>>,
-    /// @OutputOnly Detected product categories, if any.
+    /// Output only. Detected product categories, if any.
     /// See the ad-product-categories.txt file in the technical documentation
     /// for a list of IDs.
     #[serde(rename="detectedProductCategories")]
     pub detected_product_categories: Option<Vec<i32>>,
-    /// @OutputOnly The granular status of this ad in specific contexts.
+    /// Output only. The granular status of this ad in specific contexts.
     /// A context here relates to where something ultimately serves (for example,
     /// a physical location, a platform, an HTTPS vs HTTP request, or the type
     /// of auction).
@@ -1321,16 +1302,15 @@ pub struct Creative {
     pub serving_restrictions: Option<Vec<ServingRestriction>>,
     /// An HTML creative.
     pub html: Option<HtmlContent>,
-    /// @OutputOnly The version of this creative.
+    /// Output only. The version of this creative.
     pub version: Option<i32>,
-    /// @OutputOnly The last update timestamp of the creative via API.
+    /// Output only. The last update timestamp of the creative via API.
     #[serde(rename="apiUpdateTime")]
     pub api_update_time: Option<String>,
     /// All restricted categories for the ads that may be shown from this creative.
     #[serde(rename="restrictedCategories")]
     pub restricted_categories: Option<Vec<String>>,
-    /// @OutputOnly
-    /// The detected domains for this creative.
+    /// Output only. The detected domains for this creative.
     #[serde(rename="detectedDomains")]
     pub detected_domains: Option<Vec<String>>,
     /// A video creative.
@@ -1347,7 +1327,7 @@ impl RequestValue for Creative {}
 impl ResponseResult for Creative {}
 
 
-/// @OutputOnly A representation of the status of an ad in a
+/// Output only. A representation of the status of an ad in a
 /// specific context. A context here relates to where something ultimately serves
 /// (for example, a user or publisher geo, a platform, an HTTPS vs HTTP request,
 /// or the type of auction).
@@ -2015,20 +1995,17 @@ impl RequestValue for AddNoteRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Proposal {
-    /// The time when the proposal was last revised.
-    /// @OutputOnly
+    /// Output only. The time when the proposal was last revised.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// Private auction ID if this proposal is a private auction proposal.
-    /// @OutputOnly
+    /// Output only. Private auction ID if this proposal is a private auction
+    /// proposal.
     #[serde(rename="privateAuctionId")]
     pub private_auction_id: Option<String>,
-    /// Indicates whether the buyer/seller created the proposal.
-    /// @OutputOnly
+    /// Output only. Indicates whether the buyer/seller created the proposal.
     #[serde(rename="originatorRole")]
     pub originator_role: Option<String>,
-    /// Contact information for the seller.
-    /// @OutputOnly
+    /// Output only. Contact information for the seller.
     #[serde(rename="sellerContacts")]
     pub seller_contacts: Option<Vec<ContactInformation>>,
     /// Reference to the buyer on the proposal.
@@ -2039,25 +2016,22 @@ pub struct Proposal {
     /// The name for the proposal.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The current state of the proposal.
-    /// @OutputOnly
+    /// Output only. The current state of the proposal.
     #[serde(rename="proposalState")]
     pub proposal_state: Option<String>,
-    /// The revision number for the proposal.
+    /// Output only. The revision number for the proposal.
     /// Each update to the proposal or the deal causes the proposal revision number
     /// to auto-increment. The buyer keeps track of the last revision number they
     /// know of and pass it in when making an update. If the head revision number
     /// on the server has since incremented, then an ABORTED error is returned
     /// during the update operation to let the buyer know that a subsequent update
     /// was made.
-    /// @OutputOnly
     #[serde(rename="proposalRevision")]
     pub proposal_revision: Option<String>,
     /// Private data for buyer. (hidden from seller).
     #[serde(rename="buyerPrivateData")]
     pub buyer_private_data: Option<PrivateData>,
-    /// Reference to the buyer that will get billed for this proposal.
-    /// @OutputOnly
+    /// Output only. Reference to the buyer that will get billed for this proposal.
     #[serde(rename="billedBuyer")]
     pub billed_buyer: Option<Buyer>,
     /// Reference to the seller on the proposal.
@@ -2065,27 +2039,23 @@ pub struct Proposal {
     /// Note: This field may be set only when creating the resource. Modifying
     /// this field while updating the resource will result in an error.
     pub seller: Option<Seller>,
-    /// The deals associated with this proposal. For Private Auction proposals (whose deals have
-    /// NonGuaranteedAuctionTerms), there will only be one deal.
+    /// The deals associated with this proposal. For Private Auction proposals
+    /// (whose deals have NonGuaranteedAuctionTerms), there will only be one deal.
     pub deals: Option<Vec<Deal>>,
-    /// The unique ID of the proposal.
-    /// @OutputOnly
+    /// Output only. The unique ID of the proposal.
     #[serde(rename="proposalId")]
     pub proposal_id: Option<String>,
-    /// True if the proposal is being renegotiated.
-    /// @OutputOnly
+    /// Output only. True if the proposal is being renegotiated.
     #[serde(rename="isRenegotiating")]
     pub is_renegotiating: Option<bool>,
-    /// True, if the buyside inventory setup is complete for this proposal.
-    /// @OutputOnly
+    /// Output only. True, if the buyside inventory setup is complete for this
+    /// proposal.
     #[serde(rename="isSetupComplete")]
     pub is_setup_complete: Option<bool>,
-    /// The notes associated with this proposal.
-    /// @OutputOnly
+    /// Output only. The notes associated with this proposal.
     pub notes: Option<Vec<Note>>,
-    /// The role of the last user that either updated the proposal or left a
-    /// comment.
-    /// @OutputOnly
+    /// Output only. The role of the last user that either updated the proposal or
+    /// left a comment.
     #[serde(rename="lastUpdaterOrCommentorRole")]
     pub last_updater_or_commentor_role: Option<String>,
     /// Contact information for the buyer.
@@ -2169,9 +2139,9 @@ pub struct Product {
     /// adding a new deal to a proposal.
     #[serde(rename="webPropertyCode")]
     pub web_property_code: Option<String>,
-    /// Inventory availability dates. The start time will be truncated to seconds during serving.
-    /// Thus, a field specified as 3:23:34.456 (HH:mm:ss.SSS) will be truncated to 3:23:34
-    /// when serving.
+    /// Inventory availability dates. The start time will be truncated to seconds
+    /// during serving. Thus, a field specified as 3:23:34.456 (HH:mm:ss.SSS) will
+    /// be truncated to 3:23:34 when serving.
     #[serde(rename="availableStartTime")]
     pub available_start_time: Option<String>,
     /// If the creator has already signed off on the product, then the buyer can
@@ -2189,8 +2159,8 @@ pub struct Product {
     /// information about the seller that created this product.
     #[serde(rename="publisherProfileId")]
     pub publisher_profile_id: Option<String>,
-    /// The proposed end time for the deal. The field will be truncated to the order of
-    /// seconds during serving.
+    /// The proposed end time for the deal. The field will be truncated to the
+    /// order of seconds during serving.
     #[serde(rename="availableEndTime")]
     pub available_end_time: Option<String>,
     /// Creation time.
@@ -2245,23 +2215,32 @@ pub struct AddDealAssociationRequest {
 impl RequestValue for AddDealAssociationRequest {}
 
 
-/// @OutputOnly Filtering reasons for this creative during a period of a single
-/// day (from midnight to midnight Pacific).
+/// Response message for listing all reasons that bid responses resulted in an
+/// error.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [filter sets bid response errors list bidders](struct.BidderFilterSetBidResponseErrorListCall.html) (response)
+/// * [accounts filter sets bid response errors list bidders](struct.BidderAccountFilterSetBidResponseErrorListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FilteringStats {
-    /// The day during which the data was collected.
-    /// The data is collected from 00:00:00 to 23:59:59 PT.
-    /// During switches from PST to PDT and back, the day may
-    /// contain 23 or 25 hours of data instead of the usual 24.
-    pub date: Option<Date>,
-    /// The set of filtering reasons for this date.
-    pub reasons: Option<Vec<Reason>>,
+pub struct ListBidResponseErrorsResponse {
+    /// List of rows, with counts of bid responses aggregated by callout status.
+    #[serde(rename="calloutStatusRows")]
+    pub callout_status_rows: Option<Vec<CalloutStatusRow>>,
+    /// A token to retrieve the next page of results.
+    /// Pass this value in the
+    /// ListBidResponseErrorsRequest.pageToken
+    /// field in the subsequent call to the bidResponseErrors.list
+    /// method to retrieve the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
 }
 
-impl Part for FilteringStats {}
+impl ResponseResult for ListBidResponseErrorsResponse {}
 
 
 /// Represents a price and a pricing type for a product / deal.
@@ -2310,7 +2289,6 @@ impl Part for ContactInformation {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [accounts creatives delete bidders](struct.BidderAccountCreativeDeleteCall.html) (response)
 /// * [accounts filter sets delete bidders](struct.BidderAccountFilterSetDeleteCall.html) (response)
 /// * [creatives deal associations add accounts](struct.AccountCreativeDealAssociationAddCall.html) (response)
 /// * [creatives deal associations remove accounts](struct.AccountCreativeDealAssociationRemoveCall.html) (response)
@@ -2445,8 +2423,8 @@ impl ResponseResult for ClientUser {}
 /// 
 /// Represents a publisher profile in Marketplace.
 /// 
-/// All fields are read only. All string fields are free-form text entered by the publisher
-/// unless noted otherwise.
+/// All fields are read only. All string fields are free-form text entered by the
+/// publisher unless noted otherwise.
 /// 
 /// # Activities
 /// 
@@ -2466,12 +2444,14 @@ pub struct PublisherProfile {
     /// Name of the publisher profile.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Contact information for programmatic deals. This is free text entered by the publisher
-    /// and may include information like names, phone numbers and email addresses.
+    /// Contact information for programmatic deals. This is free text entered by
+    /// the publisher and may include information like names, phone numbers and
+    /// email addresses.
     #[serde(rename="programmaticDealsContact")]
     pub programmatic_deals_contact: Option<String>,
-    /// Contact information for direct reservation deals. This is free text entered by the publisher
-    /// and may include information like names, phone numbers and email addresses.
+    /// Contact information for direct reservation deals. This is free text entered
+    /// by the publisher and may include information like names, phone numbers and
+    /// email addresses.
     #[serde(rename="directDealsContact")]
     pub direct_deals_contact: Option<String>,
     /// URL to additional marketing and sales materials.
@@ -2479,8 +2459,8 @@ pub struct PublisherProfile {
     pub media_kit_url: Option<String>,
     /// Overview of the publisher.
     pub overview: Option<String>,
-    /// Statement explaining what's unique about publisher's business, and why buyers should
-    /// partner with the publisher.
+    /// Statement explaining what's unique about publisher's business, and why
+    /// buyers should partner with the publisher.
     #[serde(rename="buyerPitchStatement")]
     pub buyer_pitch_statement: Option<String>,
     /// Seller of the publisher profile.
@@ -2495,13 +2475,14 @@ pub struct PublisherProfile {
     /// For example "#1 Mobile News Site for 20 Straight Months".
     #[serde(rename="topHeadlines")]
     pub top_headlines: Option<Vec<String>>,
-    /// A Google public URL to the logo for this publisher profile. The logo is stored as
-    /// a PNG, JPG, or GIF image.
+    /// A Google public URL to the logo for this publisher profile. The logo is
+    /// stored as a PNG, JPG, or GIF image.
     #[serde(rename="logoUrl")]
     pub logo_url: Option<String>,
-    /// The list of domains represented in this publisher profile. Empty if this is a parent profile.
-    /// These are top private domains, meaning that these will not contain a string like
-    /// "photos.google.co.uk/123", but will instead contain "google.co.uk".
+    /// The list of domains represented in this publisher profile. Empty if this is
+    /// a parent profile. These are top private domains, meaning that these will
+    /// not contain a string like "photos.google.co.uk/123", but will instead
+    /// contain "google.co.uk".
     pub domains: Option<Vec<String>>,
     /// Unique ID for publisher profile.
     #[serde(rename="publisherProfileId")]
@@ -2651,9 +2632,8 @@ pub struct CreativeSize {
     /// The creative size type.
     #[serde(rename="creativeSizeType")]
     pub creative_size_type: Option<String>,
-    /// The native template for this creative. It will have a value only if
-    /// creative_size_type = CreativeSizeType.NATIVE.
-    /// @OutputOnly
+    /// Output only. The native template for this creative. It will have a value
+    /// only if creative_size_type = CreativeSizeType.NATIVE.
     #[serde(rename="nativeTemplate")]
     pub native_template: Option<String>,
     /// What formats are allowed by the publisher.
@@ -2819,8 +2799,7 @@ impl Part for MarketplaceTargeting {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DealServingMetadata {
-    /// Tracks which parties (if any) have paused a deal.
-    /// @OutputOnly
+    /// Output only. Tracks which parties (if any) have paused a deal.
     #[serde(rename="dealPauseStatus")]
     pub deal_pause_status: Option<DealPauseStatus>,
 }
@@ -2828,7 +2807,7 @@ pub struct DealServingMetadata {
 impl Part for DealServingMetadata {}
 
 
-/// @OutputOnly The type of platform the restriction applies to.
+/// Output only. The type of platform the restriction applies to.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2926,16 +2905,13 @@ impl Part for TargetingValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeliveryControl {
-    /// Specifies any frequency caps.
-    /// @OutputOnly
+    /// Output only. Specifies any frequency caps.
     #[serde(rename="frequencyCaps")]
     pub frequency_caps: Option<Vec<FrequencyCap>>,
-    /// Specified the creative blocking levels to be applied.
-    /// @OutputOnly
+    /// Output only. Specified the creative blocking levels to be applied.
     #[serde(rename="creativeBlockingLevel")]
     pub creative_blocking_level: Option<String>,
-    /// Specifies how the impression delivery will be paced.
-    /// @OutputOnly
+    /// Output only. Specifies how the impression delivery will be paced.
     #[serde(rename="deliveryRateType")]
     pub delivery_rate_type: Option<String>,
 }
@@ -2964,8 +2940,8 @@ impl Part for AdSize {}
 
 
 /// A deal represents a segment of inventory for displaying ads on.
-/// A proposal can contain multiple deals. A deal contains the terms and targeting information that
-/// is used for serving.
+/// A proposal can contain multiple deals. A deal contains the terms and
+/// targeting information that is used for serving.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2975,8 +2951,7 @@ pub struct Deal {
     /// to see but are non-negotiable. These are set by the publisher.
     #[serde(rename="deliveryControl")]
     pub delivery_control: Option<DeliveryControl>,
-    /// The time when the deal was last updated.
-    /// @OutputOnly
+    /// Output only. The time when the deal was last updated.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
     /// Description for the deal terms.
@@ -2997,33 +2972,30 @@ pub struct Deal {
     /// this field while updating the resource will result in an error.
     #[serde(rename="createProductRevision")]
     pub create_product_revision: Option<String>,
-    /// A unique deal ID for the deal (server-assigned).
-    /// @OutputOnly
+    /// Output only. A unique deal ID for the deal (server-assigned).
     #[serde(rename="dealId")]
     pub deal_id: Option<String>,
-    /// Specifies the creative source for programmatic deals. PUBLISHER means
-    /// creative is provided by seller and ADVERTISER means creative is
-    /// provided by buyer.
-    /// @OutputOnly
+    /// Output only. Specifies the creative source for programmatic deals.
+    /// PUBLISHER means creative is provided by seller and ADVERTISER means
+    /// creative is provided by buyer.
     #[serde(rename="programmaticCreativeSource")]
     pub programmatic_creative_source: Option<String>,
     /// Optional proposed flight start time of the deal.
-    /// This will generally be stored in the granularity of one second since deal serving
-    /// starts at seconds boundary. Any time specified with more granularity
-    /// (e.g., in milliseconds) will be truncated towards the start of time in seconds.
+    /// This will generally be stored in the granularity of one second since deal
+    /// serving starts at seconds boundary. Any time specified with more
+    /// granularity (e.g., in milliseconds) will be truncated towards the start of
+    /// time in seconds.
     #[serde(rename="availableStartTime")]
     pub available_start_time: Option<String>,
-    /// Specifies whether the creative is safeFrame compatible.
-    /// @OutputOnly
+    /// Output only. Specifies whether the creative is safeFrame compatible.
     #[serde(rename="creativeSafeFrameCompatibility")]
     pub creative_safe_frame_compatibility: Option<String>,
-    /// Specifies the creative pre-approval policy.
-    /// @OutputOnly
+    /// Output only. Specifies the creative pre-approval policy.
     #[serde(rename="creativePreApprovalPolicy")]
     pub creative_pre_approval_policy: Option<String>,
-    /// Restricitions about the creatives associated with the deal (i.e., size)
-    /// This is available for Programmatic Guaranteed/Preferred Deals in Ad Manager.
-    /// @OutputOnly
+    /// Output only. Restricitions about the creatives associated with the deal
+    /// (i.e., size) This is available for Programmatic Guaranteed/Preferred Deals
+    /// in Ad Manager.
     #[serde(rename="creativeRestrictions")]
     pub creative_restrictions: Option<CreativeRestrictions>,
     /// Proposed flight end time of the deal.
@@ -3040,12 +3012,10 @@ pub struct Deal {
     /// The negotiable terms of the deal.
     #[serde(rename="dealTerms")]
     pub deal_terms: Option<DealTerms>,
-    /// Seller contact information for the deal.
-    /// @OutputOnly
+    /// Output only. Seller contact information for the deal.
     #[serde(rename="sellerContacts")]
     pub seller_contacts: Option<Vec<ContactInformation>>,
-    /// Specifies the subset of inventory targeted by the deal.
-    /// @OutputOnly
+    /// Output only. Specifies the subset of inventory targeted by the deal.
     pub targeting: Option<MarketplaceTargeting>,
     /// Buyer private data (hidden from seller).
     #[serde(rename="buyerPrivateData")]
@@ -3056,28 +3026,24 @@ pub struct Deal {
     /// this field while updating the resource will result in an error.
     #[serde(rename="syndicationProduct")]
     pub syndication_product: Option<String>,
-    /// The external deal ID assigned to this deal once the deal is finalized.
-    /// This is the deal ID that shows up in serving/reporting etc.
-    /// @OutputOnly
+    /// Output only. The external deal ID assigned to this deal once the deal is
+    /// finalized. This is the deal ID that shows up in serving/reporting etc.
     #[serde(rename="externalDealId")]
     pub external_deal_id: Option<String>,
-    /// The time of the deal creation.
-    /// @OutputOnly
+    /// Output only. The time of the deal creation.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
     /// The web property code for the seller copied over from the product.
     #[serde(rename="webPropertyCode")]
     pub web_property_code: Option<String>,
-    /// ID of the proposal that this deal is part of.
-    /// @OutputOnly
+    /// Output only. ID of the proposal that this deal is part of.
     #[serde(rename="proposalId")]
     pub proposal_id: Option<String>,
-    /// Metadata about the serving status of this deal.
-    /// @OutputOnly
+    /// Output only. Metadata about the serving status of this deal.
     #[serde(rename="dealServingMetadata")]
     pub deal_serving_metadata: Option<DealServingMetadata>,
-    /// True, if the buyside inventory setup is complete for this deal.
-    /// @OutputOnly
+    /// Output only. True, if the buyside inventory setup is complete for this
+    /// deal.
     #[serde(rename="isSetupComplete")]
     pub is_setup_complete: Option<bool>,
 }
@@ -3109,7 +3075,7 @@ pub struct Money {
 impl Part for Money {}
 
 
-/// @OutputOnly Shows any corrections that were applied to this creative.
+/// Output only. Shows any corrections that were applied to this creative.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -3354,7 +3320,7 @@ impl Part for NonGuaranteedAuctionTerms {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `accounts_creatives_delete(...)`, `accounts_filter_sets_bid_metrics_list(...)`, `accounts_filter_sets_bid_response_errors_list(...)`, `accounts_filter_sets_bid_responses_without_bids_list(...)`, `accounts_filter_sets_create(...)`, `accounts_filter_sets_delete(...)`, `accounts_filter_sets_filtered_bid_requests_list(...)`, `accounts_filter_sets_filtered_bids_creatives_list(...)`, `accounts_filter_sets_filtered_bids_details_list(...)`, `accounts_filter_sets_filtered_bids_list(...)`, `accounts_filter_sets_get(...)`, `accounts_filter_sets_impression_metrics_list(...)`, `accounts_filter_sets_list(...)`, `accounts_filter_sets_losing_bids_list(...)`, `accounts_filter_sets_non_billable_winning_bids_list(...)`, `filter_sets_bid_metrics_list(...)`, `filter_sets_bid_response_errors_list(...)`, `filter_sets_bid_responses_without_bids_list(...)`, `filter_sets_create(...)`, `filter_sets_delete(...)`, `filter_sets_filtered_bid_requests_list(...)`, `filter_sets_filtered_bids_creatives_list(...)`, `filter_sets_filtered_bids_details_list(...)`, `filter_sets_filtered_bids_list(...)`, `filter_sets_get(...)`, `filter_sets_impression_metrics_list(...)`, `filter_sets_list(...)`, `filter_sets_losing_bids_list(...)` and `filter_sets_non_billable_winning_bids_list(...)`
+/// // like `accounts_filter_sets_bid_metrics_list(...)`, `accounts_filter_sets_bid_response_errors_list(...)`, `accounts_filter_sets_bid_responses_without_bids_list(...)`, `accounts_filter_sets_create(...)`, `accounts_filter_sets_delete(...)`, `accounts_filter_sets_filtered_bid_requests_list(...)`, `accounts_filter_sets_filtered_bids_creatives_list(...)`, `accounts_filter_sets_filtered_bids_details_list(...)`, `accounts_filter_sets_filtered_bids_list(...)`, `accounts_filter_sets_get(...)`, `accounts_filter_sets_impression_metrics_list(...)`, `accounts_filter_sets_list(...)`, `accounts_filter_sets_losing_bids_list(...)`, `accounts_filter_sets_non_billable_winning_bids_list(...)`, `filter_sets_bid_metrics_list(...)`, `filter_sets_bid_response_errors_list(...)`, `filter_sets_bid_responses_without_bids_list(...)`, `filter_sets_create(...)`, `filter_sets_delete(...)`, `filter_sets_filtered_bid_requests_list(...)`, `filter_sets_filtered_bids_creatives_list(...)`, `filter_sets_filtered_bids_details_list(...)`, `filter_sets_filtered_bids_list(...)`, `filter_sets_get(...)`, `filter_sets_impression_metrics_list(...)`, `filter_sets_list(...)`, `filter_sets_losing_bids_list(...)` and `filter_sets_non_billable_winning_bids_list(...)`
 /// // to build up your call.
 /// let rb = hub.bidders();
 /// # }
@@ -3549,34 +3515,6 @@ impl<'a, C, A> BidderMethods<'a, C, A> {
         BidderAccountFilterSetDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes a single creative.
-    /// 
-    /// A creative is deactivated upon deletion and does not count against active
-    /// snippet quota. A deleted creative should not be used in bidding (all bids
-    /// with that creative will be rejected).
-    /// 
-    /// # Arguments
-    ///
-    /// * `ownerName` - Name of the owner (bidder or account) of the creative to be deleted.
-    ///                 For example:
-    ///                 - For an account-level creative for the buyer account representing bidder
-    ///                   123: `bidders/123/accounts/123`
-    ///                 - For an account-level creative for the child seat buyer account 456
-    ///                   whose bidder is 123: `bidders/123/accounts/456`
-    /// * `creativeId` - The ID of the creative to delete.
-    pub fn accounts_creatives_delete(&self, owner_name: &str, creative_id: &str) -> BidderAccountCreativeDeleteCall<'a, C, A> {
-        BidderAccountCreativeDeleteCall {
-            hub: self.hub,
-            _owner_name: owner_name.to_string(),
-            _creative_id: creative_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4409,6 +4347,29 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// List finalized proposals, regardless if a proposal is being renegotiated.
+    /// A filter expression (PQL query) may be specified to filter the results.
+    /// The notes will not be returned.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID of the buyer.
+    pub fn finalized_proposals_list(&self, account_id: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
+        AccountFinalizedProposalListCall {
+            hub: self.hub,
+            _account_id: account_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter_syntax: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves an existing client user.
     /// 
     /// # Arguments
@@ -4621,29 +4582,6 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _account_id: account_id.to_string(),
             _client_account_id: client_account_id.to_string(),
             _user_id: user_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// List finalized proposals, regardless if a proposal is being renegotiated.
-    /// A filter expression (PQL query) may be specified to filter the results.
-    /// The notes will not be returned.
-    /// 
-    /// # Arguments
-    ///
-    /// * `accountId` - Account ID of the buyer.
-    pub fn finalized_proposals_list(&self, account_id: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
-        AccountFinalizedProposalListCall {
-            hub: self.hub,
-            _account_id: account_id.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _filter_syntax: Default::default(),
-            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6979,277 +6917,6 @@ impl<'a, C, A> BidderAccountFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Deletes a single creative.
-/// 
-/// A creative is deactivated upon deletion and does not count against active
-/// snippet quota. A deleted creative should not be used in bidding (all bids
-/// with that creative will be rejected).
-///
-/// A builder for the *accounts.creatives.delete* method supported by a *bidder* resource.
-/// It is not used directly, but through a `BidderMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().accounts_creatives_delete("ownerName", "creativeId")
-///              .doit();
-/// # }
-/// ```
-pub struct BidderAccountCreativeDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AdExchangeBuyerII<C, A>,
-    _owner_name: String,
-    _creative_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for BidderAccountCreativeDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> BidderAccountCreativeDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.bidders.accounts.creatives.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("ownerName", self._owner_name.to_string()));
-        params.push(("creativeId", self._creative_id.to_string()));
-        for &field in ["alt", "ownerName", "creativeId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta1/{+ownerName}/creatives/{creativeId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+ownerName}", "ownerName"), ("{creativeId}", "creativeId")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["creativeId", "ownerName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Name of the owner (bidder or account) of the creative to be deleted.
-    /// For example:
-    /// 
-    /// - For an account-level creative for the buyer account representing bidder
-    ///   123: `bidders/123/accounts/123`
-    /// 
-    /// - For an account-level creative for the child seat buyer account 456
-    ///   whose bidder is 123: `bidders/123/accounts/456`
-    ///
-    /// Sets the *owner name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn owner_name(mut self, new_value: &str) -> BidderAccountCreativeDeleteCall<'a, C, A> {
-        self._owner_name = new_value.to_string();
-        self
-    }
-    /// The ID of the creative to delete.
-    ///
-    /// Sets the *creative id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> BidderAccountCreativeDeleteCall<'a, C, A> {
-        self._creative_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BidderAccountCreativeDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountCreativeDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AdexchangeBuyer`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountCreativeDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// List all reasons that caused a bid request not to be sent for an
 /// impression, with the number of bid requests not sent for each reason.
 ///
@@ -7279,8 +6946,8 @@ impl<'a, C, A> BidderAccountCreativeDeleteCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_filtered_bid_requests_list("filterSetName")
-///              .page_token("ipsum")
-///              .page_size(-5)
+///              .page_token("et")
+///              .page_size(-41)
 ///              .doit();
 /// # }
 /// ```
@@ -7566,9 +7233,9 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidRequestListCall<'a, C, A> where 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().filter_sets_filtered_bids_creatives_list("filterSetName", -70)
-///              .page_token("aliquyam")
-///              .page_size(-9)
+/// let result = hub.bidders().filter_sets_filtered_bids_creatives_list("filterSetName", -5)
+///              .page_token("et")
+///              .page_size(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -8128,8 +7795,8 @@ impl<'a, C, A> BidderFilterSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_list("ownerName")
-///              .page_token("erat")
-///              .page_size(-95)
+///              .page_token("Lorem")
+///              .page_size(-75)
 ///              .doit();
 /// # }
 /// ```
@@ -8416,8 +8083,8 @@ impl<'a, C, A> BidderAccountFilterSetListCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_bid_response_errors_list("filterSetName")
-///              .page_token("eirmod")
-///              .page_size(-43)
+///              .page_token("sadipscing")
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -8962,8 +8629,8 @@ impl<'a, C, A> BidderFilterSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_impression_metrics_list("filterSetName")
-///              .page_token("labore")
-///              .page_size(-39)
+///              .page_token("amet")
+///              .page_size(-60)
 ///              .doit();
 /// # }
 /// ```
@@ -9250,8 +8917,8 @@ impl<'a, C, A> BidderAccountFilterSetImpressionMetricListCall<'a, C, A> where C:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_losing_bids_list("filterSetName")
-///              .page_token("invidunt")
-///              .page_size(-82)
+///              .page_token("eirmod")
+///              .page_size(-33)
 ///              .doit();
 /// # }
 /// ```
@@ -9537,9 +9204,9 @@ impl<'a, C, A> BidderFilterSetLosingBidListCall<'a, C, A> where C: BorrowMut<hyp
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().accounts_filter_sets_filtered_bids_details_list("filterSetName", -56)
-///              .page_token("sea")
-///              .page_size(-21)
+/// let result = hub.bidders().accounts_filter_sets_filtered_bids_details_list("filterSetName", -82)
+///              .page_token("accusam")
+///              .page_size(-56)
 ///              .doit();
 /// # }
 /// ```
@@ -9842,7 +9509,7 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidDetailListCall<'a, C, A> where C
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_filtered_bids_list("filterSetName")
 ///              .page_token("et")
-///              .page_size(-40)
+///              .page_size(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -10129,8 +9796,8 @@ impl<'a, C, A> BidderAccountFilterSetFilteredBidListCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_filtered_bid_requests_list("filterSetName")
-///              .page_token("et")
-///              .page_size(-46)
+///              .page_token("eirmod")
+///              .page_size(-58)
 ///              .doit();
 /// # }
 /// ```
@@ -10417,8 +10084,8 @@ impl<'a, C, A> BidderFilterSetFilteredBidRequestListCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_bid_responses_without_bids_list("filterSetName")
-///              .page_token("consetetur")
-///              .page_size(-36)
+///              .page_token("amet")
+///              .page_size(-23)
 ///              .doit();
 /// # }
 /// ```
@@ -10705,8 +10372,8 @@ impl<'a, C, A> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, C, A> wh
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_losing_bids_list("filterSetName")
-///              .page_token("sed")
-///              .page_size(-3)
+///              .page_token("ut")
+///              .page_size(-16)
 ///              .doit();
 /// # }
 /// ```
@@ -10994,7 +10661,7 @@ impl<'a, C, A> BidderAccountFilterSetLosingBidListCall<'a, C, A> where C: Borrow
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_non_billable_winning_bids_list("filterSetName")
 ///              .page_token("dolor")
-///              .page_size(-23)
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -11280,8 +10947,8 @@ impl<'a, C, A> BidderFilterSetNonBillableWinningBidListCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_impression_metrics_list("filterSetName")
-///              .page_token("amet.")
-///              .page_size(-27)
+///              .page_token("et")
+///              .page_size(-96)
 ///              .doit();
 /// # }
 /// ```
@@ -11567,9 +11234,9 @@ impl<'a, C, A> BidderFilterSetImpressionMetricListCall<'a, C, A> where C: Borrow
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.bidders().filter_sets_filtered_bids_details_list("filterSetName", -11)
-///              .page_token("justo")
-///              .page_size(-52)
+/// let result = hub.bidders().filter_sets_filtered_bids_details_list("filterSetName", -27)
+///              .page_token("Lorem")
+///              .page_size(-11)
 ///              .doit();
 /// # }
 /// ```
@@ -11871,8 +11538,8 @@ impl<'a, C, A> BidderFilterSetFilteredBidDetailListCall<'a, C, A> where C: Borro
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_bid_response_errors_list("filterSetName")
-///              .page_token("diam")
-///              .page_size(-66)
+///              .page_token("sit")
+///              .page_size(-26)
 ///              .doit();
 /// # }
 /// ```
@@ -12159,8 +11826,8 @@ impl<'a, C, A> BidderFilterSetBidResponseErrorListCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().accounts_filter_sets_non_billable_winning_bids_list("filterSetName")
-///              .page_token("sadipscing")
-///              .page_size(-76)
+///              .page_token("rebum.")
+///              .page_size(-45)
 ///              .doit();
 /// # }
 /// ```
@@ -12446,8 +12113,8 @@ impl<'a, C, A> BidderAccountFilterSetNonBillableWinningBidListCall<'a, C, A> whe
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_bid_metrics_list("filterSetName")
-///              .page_token("invidunt")
-///              .page_size(-96)
+///              .page_token("vero")
+///              .page_size(-95)
 ///              .doit();
 /// # }
 /// ```
@@ -12734,8 +12401,8 @@ impl<'a, C, A> BidderFilterSetBidMetricListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_bid_responses_without_bids_list("filterSetName")
-///              .page_token("duo")
-///              .page_size(-82)
+///              .page_token("consetetur")
+///              .page_size(-84)
 ///              .doit();
 /// # }
 /// ```
@@ -13027,7 +12694,7 @@ impl<'a, C, A> BidderFilterSetBidResponsesWithoutBidListCall<'a, C, A> where C: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bidders().filter_sets_create(req, "ownerName")
-///              .is_transient(true)
+///              .is_transient(false)
 ///              .doit();
 /// # }
 /// ```
@@ -14197,9 +13864,9 @@ impl<'a, C, A> AccountCreativeDealAssociationAddCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().creatives_list("accountId")
-///              .query("At")
-///              .page_token("labore")
-///              .page_size(-37)
+///              .query("sanctus")
+///              .page_token("takimata")
+///              .page_size(-27)
 ///              .doit();
 /// # }
 /// ```
@@ -15370,9 +15037,9 @@ impl<'a, C, A> AccountClientUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().products_list("accountId")
-///              .page_token("sit")
-///              .page_size(-40)
-///              .filter("consetetur")
+///              .page_token("sed")
+///              .page_size(-82)
+///              .filter("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -15656,9 +15323,9 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().clients_list("accountId")
-///              .partner_client_id("sed")
-///              .page_token("ea")
-///              .page_size(-62)
+///              .partner_client_id("consetetur")
+///              .page_token("labore")
+///              .page_size(-30)
 ///              .doit();
 /// # }
 /// ```
@@ -15905,6 +15572,305 @@ impl<'a, C, A> AccountClientListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// List finalized proposals, regardless if a proposal is being renegotiated.
+/// A filter expression (PQL query) may be specified to filter the results.
+/// The notes will not be returned.
+///
+/// A builder for the *finalizedProposals.list* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().finalized_proposals_list("accountId")
+///              .page_token("gubergren")
+///              .page_size(-82)
+///              .filter_syntax("eos")
+///              .filter("tempor")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountFinalizedProposalListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AdExchangeBuyerII<C, A>,
+    _account_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter_syntax: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountFinalizedProposalListCall<'a, C, A> {}
+
+impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListProposalsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.finalizedProposals.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        params.push(("accountId", self._account_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter_syntax {
+            params.push(("filterSyntax", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "accountId", "pageToken", "pageSize", "filterSyntax", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/finalizedProposals";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["accountId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Account ID of the buyer.
+    ///
+    /// Sets the *account id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
+        self._account_id = new_value.to_string();
+        self
+    }
+    /// The page token as returned from ListProposalsResponse.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Requested page size. The server may return fewer results than requested.
+    /// If unspecified, the server will pick an appropriate default.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AccountFinalizedProposalListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Syntax the filter is written in. Current implementation defaults to PQL
+    /// but in the future it will be LIST_FILTER.
+    ///
+    /// Sets the *filter syntax* query property to the given value.
+    pub fn filter_syntax(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
+        self._filter_syntax = Some(new_value.to_string());
+        self
+    }
+    /// An optional PQL filter query used to query for proposals.
+    /// 
+    /// Nested repeated fields, such as proposal.deals.targetingCriterion,
+    /// cannot be filtered.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountFinalizedProposalListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AdexchangeBuyer`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountFinalizedProposalListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17358,7 +17324,7 @@ impl<'a, C, A> AccountClientInvitationCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().creatives_create(req, "accountId")
-///              .duplicate_id_mode("amet")
+///              .duplicate_id_mode("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -18504,305 +18470,6 @@ impl<'a, C, A> AccountClientUserUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// List finalized proposals, regardless if a proposal is being renegotiated.
-/// A filter expression (PQL query) may be specified to filter the results.
-/// The notes will not be returned.
-///
-/// A builder for the *finalizedProposals.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_adexchangebuyer2_v2_beta1 as adexchangebuyer2_v2_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use adexchangebuyer2_v2_beta1::AdExchangeBuyerII;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().finalized_proposals_list("accountId")
-///              .page_token("dolores")
-///              .page_size(-24)
-///              .filter_syntax("voluptua.")
-///              .filter("duo")
-///              .doit();
-/// # }
-/// ```
-pub struct AccountFinalizedProposalListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AdExchangeBuyerII<C, A>,
-    _account_id: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _filter_syntax: Option<String>,
-    _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccountFinalizedProposalListCall<'a, C, A> {}
-
-impl<'a, C, A> AccountFinalizedProposalListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListProposalsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "adexchangebuyer2.accounts.finalizedProposals.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter_syntax {
-            params.push(("filterSyntax", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        for &field in ["alt", "accountId", "pageToken", "pageSize", "filterSyntax", "filter"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta1/accounts/{accountId}/finalizedProposals";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AdexchangeBuyer.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["accountId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Account ID of the buyer.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// The page token as returned from ListProposalsResponse.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Requested page size. The server may return fewer results than requested.
-    /// If unspecified, the server will pick an appropriate default.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountFinalizedProposalListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// Syntax the filter is written in. Current implementation defaults to PQL
-    /// but in the future it will be LIST_FILTER.
-    ///
-    /// Sets the *filter syntax* query property to the given value.
-    pub fn filter_syntax(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
-        self._filter_syntax = Some(new_value.to_string());
-        self
-    }
-    /// An optional PQL filter query used to query for proposals.
-    /// 
-    /// Nested repeated fields, such as proposal.deals.targetingCriterion,
-    /// cannot be filtered.
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, C, A> {
-        self._filter = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountFinalizedProposalListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AdexchangeBuyer`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountFinalizedProposalListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Gets a creative.
 ///
 /// A builder for the *creatives.get* method supported by a *account* resource.
@@ -19088,8 +18755,8 @@ impl<'a, C, A> AccountCreativeGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().clients_users_list("accountId", "clientAccountId")
-///              .page_token("et")
-///              .page_size(-48)
+///              .page_token("ea")
+///              .page_size(-17)
 ///              .doit();
 /// # }
 /// ```
@@ -19272,7 +18939,8 @@ impl<'a, C, A> AccountClientUserListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Typically, this is the value of
     /// ListClientUsersResponse.nextPageToken
     /// returned from the previous call to the
-    /// accounts.clients.users.list method.
+    /// accounts.clients.users.list
+    /// method.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountClientUserListCall<'a, C, A> {
@@ -19378,8 +19046,8 @@ impl<'a, C, A> AccountClientUserListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().publisher_profiles_list("accountId")
-///              .page_token("kasd")
-///              .page_size(-87)
+///              .page_token("dolor")
+///              .page_size(-41)
 ///              .doit();
 /// # }
 /// ```
@@ -20966,9 +20634,9 @@ impl<'a, C, A> AccountClientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().creatives_deal_associations_list("accountId", "creativeId")
-///              .query("takimata")
-///              .page_token("elitr")
-///              .page_size(-91)
+///              .query("sed")
+///              .page_token("sit")
+///              .page_size(-8)
 ///              .doit();
 /// # }
 /// ```
@@ -22155,10 +21823,10 @@ impl<'a, C, A> AccountProposalPauseCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().proposals_list("accountId")
-///              .page_token("ipsum")
-///              .page_size(-87)
-///              .filter_syntax("dolor")
-///              .filter("sea")
+///              .page_token("ut")
+///              .page_size(-51)
+///              .filter_syntax("ipsum")
+///              .filter("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -22453,8 +22121,8 @@ impl<'a, C, A> AccountProposalListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().clients_invitations_list("accountId", "clientAccountId")
-///              .page_token("sanctus")
-///              .page_size(-27)
+///              .page_token("ut")
+///              .page_size(-39)
 ///              .doit();
 /// # }
 /// ```

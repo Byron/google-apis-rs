@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AlertCenter* crate version *1.0.8+20190329*, where *20190329* is the exact revision of the *alertcenter:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *AlertCenter* crate version *1.0.9+20190628*, where *20190628* is the exact revision of the *alertcenter:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *AlertCenter* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/alertcenter/).
@@ -225,9 +225,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -338,7 +336,7 @@ impl<'a, C, A> AlertCenter<C, A>
         AlertCenter {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://alertcenter.googleapis.com/".to_string(),
             _root_url: "https://alertcenter.googleapis.com/".to_string(),
         }
@@ -352,7 +350,7 @@ impl<'a, C, A> AlertCenter<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -380,27 +378,6 @@ impl<'a, C, A> AlertCenter<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A request to undelete a specific alert that was marked for deletion.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [undelete alerts](struct.AlertUndeleteCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UndeleteAlertRequest {
-    /// Optional. The unique identifier of the G Suite organization account of the
-    /// customer the alert is associated with.
-    /// Inferred from the caller identity if not provided.
-    #[serde(rename="customerId")]
-    pub customer_id: Option<String>,
-}
-
-impl RequestValue for UndeleteAlertRequest {}
-
-
 /// Response message for an alert listing request.
 /// 
 /// # Activities
@@ -576,6 +553,9 @@ impl ResponseResult for Settings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Alert {
+    /// Output only. The time this alert was last updated.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
     /// Output only. The unique identifier for the alert.
     #[serde(rename="alertId")]
     pub alert_id: Option<String>,
@@ -626,6 +606,27 @@ pub struct Alert {
 
 impl Resource for Alert {}
 impl ResponseResult for Alert {}
+
+
+/// A request to undelete a specific alert that was marked for deletion.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [undelete alerts](struct.AlertUndeleteCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UndeleteAlertRequest {
+    /// Optional. The unique identifier of the G Suite organization account of the
+    /// customer the alert is associated with.
+    /// Inferred from the caller identity if not provided.
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
+}
+
+impl RequestValue for UndeleteAlertRequest {}
 
 
 
@@ -1872,7 +1873,8 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// If not specified results may be returned in arbitrary order.
     /// You can sort the results in descending order based on the creation
     /// timestamp using `order_by="create_time desc"`.
-    /// Currently, only sorting by `create_time desc` is supported.
+    /// Currently, supported sorting are `create_time asc`, `create_time desc`,
+    /// `update_time desc`
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> AlertListCall<'a, C, A> {

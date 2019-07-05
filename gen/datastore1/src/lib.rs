@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *1.0.8+20190105*, where *20190105* is the exact revision of the *datastore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *datastore* crate version *1.0.9+20190421*, where *20190421* is the exact revision of the *datastore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *datastore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/datastore/).
@@ -219,9 +219,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -337,7 +335,7 @@ impl<'a, C, A> Datastore<C, A>
         Datastore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://datastore.googleapis.com/".to_string(),
             _root_url: "https://datastore.googleapis.com/".to_string(),
         }
@@ -348,7 +346,7 @@ impl<'a, C, A> Datastore<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -661,17 +659,17 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -858,7 +856,8 @@ pub struct BeginTransactionRequest {
 impl RequestValue for BeginTransactionRequest {}
 
 
-/// A [GQL query](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
+/// A [GQL
+/// query](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1584,7 +1583,8 @@ impl Part for PathElement {}
 pub struct Query {
     /// A starting point for the query results. Query cursors are
     /// returned in query result batches and
-    /// [can only be used to continue the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
+    /// [can only be used to continue the same
+    /// query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
     #[serde(rename="startCursor")]
     pub start_cursor: Option<String>,
     /// The kinds to query (if empty, returns entities of all kinds).
@@ -1609,7 +1609,8 @@ pub struct Query {
     pub offset: Option<i32>,
     /// An ending point for the query results. Query cursors are
     /// returned in query result batches and
-    /// [can only be used to limit the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
+    /// [can only be used to limit the same
+    /// query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
     #[serde(rename="endCursor")]
     pub end_cursor: Option<String>,
     /// The order to apply to the query results (if empty, order is unspecified).

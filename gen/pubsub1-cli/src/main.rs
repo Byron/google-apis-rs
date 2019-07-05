@@ -1640,8 +1640,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message-storage-policy.allowed-persistence-regions" => Some(("messageStoragePolicy.allowedPersistenceRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-persistence-regions", "kms-key-name", "labels", "message-storage-policy", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1941,9 +1943,11 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "topic.labels" => Some(("topic.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "topic.name" => Some(("topic.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic.message-storage-policy.allowed-persistence-regions" => Some(("topic.messageStoragePolicy.allowedPersistenceRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "topic.kms-key-name" => Some(("topic.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "name", "topic", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-persistence-regions", "kms-key-name", "labels", "message-storage-policy", "name", "topic", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2586,9 +2590,10 @@ fn main() {
         the request, the server will assign a random
         name for this snapshot on the same project as the subscription, conforming
         to the
-        [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
-        The generated name is populated in the returned Snapshot object. Note that
-        for REST API requests, you must specify a name in the request."##),
+        [resource name
+        format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+        generated name is populated in the returned Snapshot object. Note that for
+        REST API requests, you must specify a name in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-create",
                   vec![
                     (Some(r##"name"##),
@@ -2876,9 +2881,10 @@ fn main() {
         If the name is not provided in the request, the server will assign a random
         name for this subscription on the same project as the topic, conforming
         to the
-        [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
-        The generated name is populated in the returned Subscription object.
-        Note that for REST API requests, you must specify a name in the request."##),
+        [resource name
+        format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+        generated name is populated in the returned Subscription object. Note that
+        for REST API requests, you must specify a name in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-create",
                   vec![
                     (Some(r##"name"##),
@@ -3559,7 +3565,7 @@ fn main() {
     
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190314")
+           .version("1.0.9+20190625")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")

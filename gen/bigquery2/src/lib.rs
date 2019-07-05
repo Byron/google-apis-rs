@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *1.0.8+20190314*, where *20190314* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *bigquery* crate version *1.0.9+20190630*, where *20190630* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -19,6 +19,8 @@
 //!  * [*delete*](struct.ModelDeleteCall.html), [*get*](struct.ModelGetCall.html), [*list*](struct.ModelListCall.html) and [*patch*](struct.ModelPatchCall.html)
 //! * projects
 //!  * [*get service account*](struct.ProjectGetServiceAccountCall.html) and [*list*](struct.ProjectListCall.html)
+//! * [routines](struct.Routine.html)
+//!  * [*delete*](struct.RoutineDeleteCall.html), [*get*](struct.RoutineGetCall.html), [*insert*](struct.RoutineInsertCall.html), [*list*](struct.RoutineListCall.html) and [*update*](struct.RoutineUpdateCall.html)
 //! * tabledata
 //!  * [*insert all*](struct.TabledataInsertAllCall.html) and [*list*](struct.TabledataListCall.html)
 //! * [tables](struct.Table.html)
@@ -236,9 +238,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -374,9 +374,9 @@ impl<'a, C, A> Bigquery<C, A>
         Bigquery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
-            _base_url: "https://www.googleapis.com/bigquery/v2/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
+            _base_url: "https://bigquery.googleapis.com/bigquery/v2/".to_string(),
+            _root_url: "https://bigquery.googleapis.com/".to_string(),
         }
     }
 
@@ -392,6 +392,9 @@ impl<'a, C, A> Bigquery<C, A>
     pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
+    pub fn routines(&'a self) -> RoutineMethods<'a, C, A> {
+        RoutineMethods { hub: &self }
+    }
     pub fn tabledata(&'a self) -> TabledataMethods<'a, C, A> {
         TabledataMethods { hub: &self }
     }
@@ -400,7 +403,7 @@ impl<'a, C, A> Bigquery<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -408,7 +411,7 @@ impl<'a, C, A> Bigquery<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/bigquery/v2/`.
+    /// It defaults to `https://bigquery.googleapis.com/bigquery/v2/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -416,7 +419,7 @@ impl<'a, C, A> Bigquery<C, A>
     }
 
     /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
+    /// It defaults to `https://bigquery.googleapis.com/`.
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
@@ -492,7 +495,7 @@ pub struct JobStatistics2 {
     pub total_slot_ms: Option<String>,
     /// [Output-only] [Beta] Describes a timeline of job execution.
     pub timeline: Option<Vec<QueryTimelineSample>>,
-    /// The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... . "DROP_TABLE": DROP TABLE query. "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... . "DROP_VIEW": DROP VIEW query. "CREATE_FUNCTION": CREATE FUNCTION query. "DROP_FUNCTION" : DROP FUNCTION query. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW": ALTER VIEW query.
+    /// The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW": ALTER VIEW query. "CREATE_FUNCTION": CREATE FUNCTION query. "CREATE_MODEL": CREATE [OR REPLACE] MODEL ... AS SELECT ... . "CREATE_PROCEDURE": CREATE PROCEDURE query. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... . "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... . "DROP_FUNCTION" : DROP FUNCTION query. "DROP_PROCEDURE": DROP PROCEDURE query. "DROP_TABLE": DROP TABLE query. "DROP_VIEW": DROP VIEW query.
     #[serde(rename="statementType")]
     pub statement_type: Option<String>,
     /// [Output-only] Job resource usage breakdown by reservation.
@@ -601,24 +604,23 @@ impl Part for ModelDefinition {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DestinationTableProperties {
-    /// [Optional] The friendly name for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current friendly name is provided, the job will fail.
-    #[serde(rename="friendlyName")]
-    pub friendly_name: Option<String>,
-    /// [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
-    pub labels: Option<HashMap<String, String>>,
-    /// [Optional] The description for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current description is provided, the job will fail.
-    pub description: Option<String>,
+pub struct HivePartitioningOptions {
+    /// [Optional, Trusted Tester] When hive partition detection is requested, a common prefix for all source uris should be supplied. The prefix must end immediately before the partition key encoding begins. For example, consider files following this data layout. gs://bucket/path_to_table/dt=2019-01-01/country=BR/id=7/file.avro gs://bucket/path_to_table/dt=2018-12-31/country=CA/id=3/file.avro When hive partitioning is requested with either AUTO or STRINGS detection, the common prefix can be either of gs://bucket/path_to_table or gs://bucket/path_to_table/ (trailing slash does not matter).
+    #[serde(rename="sourceUriPrefix")]
+    pub source_uri_prefix: Option<String>,
+    /// [Optional, Trusted Tester] When set, what mode of hive partitioning to use when reading data. Two modes are supported. (1) AUTO: automatically infer partition key name(s) and type(s). (2) STRINGS: automatically infer partition key name(s). All types are interpreted as strings. Not all storage formats support hive partitioning. Requesting hive partitioning on an unsupported format will lead to an error. Currently supported types include: AVRO, CSV, JSON, ORC and Parquet.
+    pub mode: Option<String>,
 }
 
-impl Part for DestinationTableProperties {}
+impl Part for HivePartitioningOptions {}
 
 
-/// Aggregate metrics for classification models. For multi-class models,
-/// the metrics are either macro-averaged: metrics are calculated for each
-/// label and then an unweighted average is taken of those values or
-/// micro-averaged: the metric is calculated globally by counting the total
-/// number of correctly predicted rows.
+/// Aggregate metrics for classification/classifier models. For multi-class
+/// models, the metrics are either macro-averaged or micro-averaged. When
+/// macro-averaged, the metrics are calculated for each label and then an
+/// unweighted average is taken of those values. When micro-averaged, the
+/// metric is calculated globally by counting the total number of correctly
+/// predicted rows.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -742,6 +744,25 @@ pub struct QueryRequest {
 impl RequestValue for QueryRequest {}
 
 
+/// A single entry in the confusion matrix.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Entry {
+    /// The predicted label. For confidence_threshold > 0, we will
+    /// also add an entry indicating the number of items under the
+    /// confidence threshold.
+    #[serde(rename="predictedLabel")]
+    pub predicted_label: Option<String>,
+    /// Number of items being predicted as this label.
+    #[serde(rename="itemCount")]
+    pub item_count: Option<i64>,
+}
+
+impl Part for Entry {}
+
+
 /// Evaluation metrics for clustering models.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -813,25 +834,32 @@ impl Part for IterationResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BinaryConfusionMatrix {
-    /// Number of false samples predicted as false.
-    #[serde(rename="falseNegatives")]
-    pub false_negatives: Option<String>,
-    /// Number of false samples predicted as true.
-    #[serde(rename="falsePositives")]
-    pub false_positives: Option<String>,
     /// Number of true samples predicted as true.
     #[serde(rename="truePositives")]
     pub true_positives: Option<String>,
+    /// The fraction of actual positive labels that were given a positive
+    /// prediction.
+    pub recall: Option<f64>,
+    /// The fraction of actual positive predictions that had positive actual
+    /// labels.
+    pub precision: Option<f64>,
+    /// Number of false samples predicted as false.
+    #[serde(rename="falseNegatives")]
+    pub false_negatives: Option<String>,
     /// Number of true samples predicted as false.
     #[serde(rename="trueNegatives")]
     pub true_negatives: Option<String>,
-    /// Aggregate recall.
-    pub recall: Option<f64>,
-    /// Aggregate precision.
-    pub precision: Option<f64>,
+    /// Number of false samples predicted as true.
+    #[serde(rename="falsePositives")]
+    pub false_positives: Option<String>,
+    /// The equally weighted average of recall and precision.
+    #[serde(rename="f1Score")]
+    pub f1_score: Option<f64>,
     /// Threshold value used when computing each of the following metric.
     #[serde(rename="positiveClassThreshold")]
     pub positive_class_threshold: Option<f64>,
+    /// The fraction of predictions given the correct label.
+    pub accuracy: Option<f64>,
 }
 
 impl Part for BinaryConfusionMatrix {}
@@ -842,18 +870,25 @@ impl Part for BinaryConfusionMatrix {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobReference {
-    /// [Required] The ID of the project containing this job.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The geographic location of the job. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
-    pub location: Option<String>,
-    /// [Required] The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.
-    #[serde(rename="jobId")]
-    pub job_id: Option<String>,
+pub struct QueryTimelineSample {
+    /// Cumulative slot-ms consumed by the query.
+    #[serde(rename="totalSlotMs")]
+    pub total_slot_ms: Option<String>,
+    /// Total number of units currently being processed by workers. This does not correspond directly to slot usage. This is the largest value observed since the last sample.
+    #[serde(rename="activeUnits")]
+    pub active_units: Option<String>,
+    /// Milliseconds elapsed since the start of query execution.
+    #[serde(rename="elapsedMs")]
+    pub elapsed_ms: Option<String>,
+    /// Total parallel units of work remaining for the active stages.
+    #[serde(rename="pendingUnits")]
+    pub pending_units: Option<String>,
+    /// Total parallel units of work completed by this query.
+    #[serde(rename="completedUnits")]
+    pub completed_units: Option<String>,
 }
 
-impl Part for JobReference {}
+impl Part for QueryTimelineSample {}
 
 
 /// There is no detailed description.
@@ -1021,14 +1056,40 @@ pub struct TableList {
 impl ResponseResult for TableList {}
 
 
-/// Represents a single JSON object.
+/// [TrustedTester] [Required] Defines the ranges for range partitioning.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JsonObject(Option<HashMap<String, JsonValue>>);
+pub struct RangePartitioningRange {
+    /// [TrustedTester] [Required] The start of range partitioning, inclusive.
+    pub start: Option<String>,
+    /// [TrustedTester] [Required] The width of each interval.
+    pub interval: Option<String>,
+    /// [TrustedTester] [Required] The end of range partitioning, exclusive.
+    pub end: Option<String>,
+}
 
-impl Part for JsonObject {}
+impl NestedType for RangePartitioningRange {}
+impl Part for RangePartitioningRange {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DestinationTableProperties {
+    /// [Optional] The friendly name for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current friendly name is provided, the job will fail.
+    #[serde(rename="friendlyName")]
+    pub friendly_name: Option<String>,
+    /// [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
+    pub labels: Option<HashMap<String, String>>,
+    /// [Optional] The description for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current description is provided, the job will fail.
+    pub description: Option<String>,
+}
+
+impl Part for DestinationTableProperties {}
 
 
 /// [Optional] The categories attached to this field, used for field-level access control.
@@ -1050,86 +1111,28 @@ impl Part for TableFieldSchemaCategories {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobConfigurationLoad {
-    /// [Optional] If sourceFormat is set to "AVRO", indicates whether to enable interpreting logical types into their corresponding types (ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER).
-    #[serde(rename="useAvroLogicalTypes")]
-    pub use_avro_logical_types: Option<bool>,
+pub struct JobConfigurationTableCopy {
+    /// [Pick one] Source tables to copy.
+    #[serde(rename="sourceTables")]
+    pub source_tables: Option<Vec<TableReference>>,
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="writeDisposition")]
+    pub write_disposition: Option<String>,
     /// Custom encryption configuration (e.g., Cloud KMS keys).
     #[serde(rename="destinationEncryptionConfiguration")]
     pub destination_encryption_configuration: Option<EncryptionConfiguration>,
-    /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
-    pub encoding: Option<String>,
-    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
-    #[serde(rename="skipLeadingRows")]
-    pub skip_leading_rows: Option<i32>,
-    /// [Optional] Indicates if we should automatically infer the options and schema for CSV and JSON sources.
-    pub autodetect: Option<bool>,
-    /// [Required] The destination table to load the data into.
-    #[serde(rename="destinationTable")]
-    pub destination_table: Option<TableReference>,
-    /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups: Exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
-    #[serde(rename="sourceUris")]
-    pub source_uris: Option<Vec<String>>,
-    /// [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
-    #[serde(rename="nullMarker")]
-    pub null_marker: Option<String>,
-    /// Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
-    #[serde(rename="timePartitioning")]
-    pub time_partitioning: Option<TimePartitioning>,
-    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
-    #[serde(rename="allowQuotedNewlines")]
-    pub allow_quoted_newlines: Option<bool>,
-    /// If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
-    #[serde(rename="projectionFields")]
-    pub projection_fields: Option<Vec<String>>,
-    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
-    pub clustering: Option<Clustering>,
-    /// [Optional] The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character. To use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
-    #[serde(rename="fieldDelimiter")]
-    pub field_delimiter: Option<String>,
-    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
-    #[serde(rename="allowJaggedRows")]
-    pub allow_jagged_rows: Option<bool>,
-    /// [Beta] [Optional] Properties with which to create the destination table if it is new.
-    #[serde(rename="destinationTableProperties")]
-    pub destination_table_properties: Option<DestinationTableProperties>,
-    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO". For parquet, specify "PARQUET". For orc, specify "ORC". The default value is CSV.
-    #[serde(rename="sourceFormat")]
-    pub source_format: Option<String>,
-    /// [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
-    #[serde(rename="rangePartitioning")]
-    pub range_partitioning: Option<RangePartitioning>,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="writeDisposition")]
-    pub write_disposition: Option<String>,
-    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV and JSON. The default value is 0, which requires that all records are valid.
-    #[serde(rename="maxBadRecords")]
-    pub max_bad_records: Option<i32>,
-    /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
-    #[serde(rename="schemaUpdateOptions")]
-    pub schema_update_options: Option<Vec<String>>,
-    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
-    #[serde(rename="ignoreUnknownValues")]
-    pub ignore_unknown_values: Option<bool>,
-    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
-    pub quote: Option<String>,
-    /// [Optional, Experimental] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error.
-    #[serde(rename="hivePartitioningMode")]
-    pub hive_partitioning_mode: Option<String>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="createDisposition")]
     pub create_disposition: Option<String>,
-    /// [Deprecated] The format of the schemaInline property.
-    #[serde(rename="schemaInlineFormat")]
-    pub schema_inline_format: Option<String>,
-    /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".
-    #[serde(rename="schemaInline")]
-    pub schema_inline: Option<String>,
-    /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists, or if you're loading data from Google Cloud Datastore.
-    pub schema: Option<TableSchema>,
+    /// [Required] The destination table
+    #[serde(rename="destinationTable")]
+    pub destination_table: Option<TableReference>,
+    /// [Pick one] Source table to copy.
+    #[serde(rename="sourceTable")]
+    pub source_table: Option<TableReference>,
 }
 
-impl Part for JobConfigurationLoad {}
+impl Part for JobConfigurationTableCopy {}
 
 
 /// There is no detailed description.
@@ -1137,37 +1140,30 @@ impl Part for JobConfigurationLoad {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BigQueryModelTraining {
-    /// [Output-only, Beta] Index of current ML training iteration. Updated during create model query job to show job progress.
-    #[serde(rename="currentIteration")]
-    pub current_iteration: Option<i32>,
-    /// [Output-only, Beta] Expected number of iterations for the create model query job specified as num_iterations in the input query. The actual total number of iterations may be less than this number due to early stop.
-    #[serde(rename="expectedTotalIterations")]
-    pub expected_total_iterations: Option<String>,
+pub struct JobConfigurationExtract {
+    /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.
+    #[serde(rename="destinationUri")]
+    pub destination_uri: Option<String>,
+    /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
+    #[serde(rename="destinationFormat")]
+    pub destination_format: Option<String>,
+    /// [Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro.
+    pub compression: Option<String>,
+    /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.
+    #[serde(rename="destinationUris")]
+    pub destination_uris: Option<Vec<String>>,
+    /// [Optional] Whether to print out a header row in the results. Default is true.
+    #[serde(rename="printHeader")]
+    pub print_header: Option<bool>,
+    /// [Optional] Delimiter to use between fields in the exported data. Default is ','
+    #[serde(rename="fieldDelimiter")]
+    pub field_delimiter: Option<String>,
+    /// [Required] A reference to the table being exported.
+    #[serde(rename="sourceTable")]
+    pub source_table: Option<TableReference>,
 }
 
-impl Part for BigQueryModelTraining {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert all tabledata](struct.TabledataInsertAllCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableDataInsertAllResponse {
-    /// The resource type of the response.
-    pub kind: Option<String>,
-    /// An array of errors for rows that were not inserted.
-    #[serde(rename="insertErrors")]
-    pub insert_errors: Option<Vec<TableDataInsertAllResponseInsertErrors>>,
-}
-
-impl ResponseResult for TableDataInsertAllResponse {}
+impl Part for JobConfigurationExtract {}
 
 
 /// Evaluation metrics for regression models.
@@ -1366,21 +1362,34 @@ pub struct ViewDefinition {
 impl Part for ViewDefinition {}
 
 
-/// Evaluation metrics for binary classification models.
+/// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BinaryClassificationMetrics {
-    /// Aggregate classification metrics.
-    #[serde(rename="aggregateClassificationMetrics")]
-    pub aggregate_classification_metrics: Option<AggregateClassificationMetrics>,
-    /// Binary confusion matrix at multiple thresholds.
-    #[serde(rename="binaryConfusionMatrixList")]
-    pub binary_confusion_matrix_list: Option<Vec<BinaryConfusionMatrix>>,
+pub struct DatasetAccess {
+    /// [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com". Maps to IAM policy member "domain:DOMAIN".
+    pub domain: Option<String>,
+    /// [Required] An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: OWNER  roles/bigquery.dataOwner WRITER  roles/bigquery.dataEditor READER  roles/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
+    pub role: Option<String>,
+    /// [Pick one] An email address of a user to grant access to. For example: fred@example.com. Maps to IAM policy member "user:EMAIL" or "serviceAccount:EMAIL".
+    #[serde(rename="userByEmail")]
+    pub user_by_email: Option<String>,
+    /// [Pick one] Some other type of member that appears in the IAM Policy but isn't a user, group, domain, or special group.
+    #[serde(rename="iamMember")]
+    pub iam_member: Option<String>,
+    /// [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users. Maps to similarly-named IAM members.
+    #[serde(rename="specialGroup")]
+    pub special_group: Option<String>,
+    /// [Pick one] An email address of a Google Group to grant access to. Maps to IAM policy member "group:GROUP".
+    #[serde(rename="groupByEmail")]
+    pub group_by_email: Option<String>,
+    /// [Pick one] A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation.
+    pub view: Option<TableReference>,
 }
 
-impl Part for BinaryClassificationMetrics {}
+impl NestedType for DatasetAccess {}
+impl Part for DatasetAccess {}
 
 
 /// The type of a variable, e.g., a function argument.
@@ -1494,6 +1503,8 @@ pub struct JobStatistics {
     /// [TrustedTester] [Output-only] Job progress (0.0 -> 1.0) for LOAD and EXTRACT jobs.
     #[serde(rename="completionRatio")]
     pub completion_ratio: Option<f64>,
+    /// [Output-only] Statistics for an extract job.
+    pub extract: Option<JobStatistics4>,
     /// [Output-only] Job resource usage breakdown by reservation.
     #[serde(rename="reservationUsage")]
     pub reservation_usage: Option<Vec<JobStatisticsReservationUsage>>,
@@ -1514,37 +1525,11 @@ pub struct JobStatistics {
     /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// [Output-only] Statistics for an extract job.
-    pub extract: Option<JobStatistics4>,
+    /// [Output-only] Name of the primary reservation assigned to this job. Note that this could be different than reservations reported in the reservation usage field if parent reservations were used to execute this job.
+    pub reservation_id: Option<String>,
 }
 
 impl Part for JobStatistics {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QueryTimelineSample {
-    /// Cumulative slot-ms consumed by the query.
-    #[serde(rename="totalSlotMs")]
-    pub total_slot_ms: Option<String>,
-    /// Total number of units currently being processed by workers. This does not correspond directly to slot usage. This is the largest value observed since the last sample.
-    #[serde(rename="activeUnits")]
-    pub active_units: Option<String>,
-    /// Milliseconds elapsed since the start of query execution.
-    #[serde(rename="elapsedMs")]
-    pub elapsed_ms: Option<String>,
-    /// Total parallel units of work remaining for the active stages.
-    #[serde(rename="pendingUnits")]
-    pub pending_units: Option<String>,
-    /// Total parallel units of work completed by this query.
-    #[serde(rename="completedUnits")]
-    pub completed_units: Option<String>,
-}
-
-impl Part for QueryTimelineSample {}
 
 
 /// List of jobs that were requested.
@@ -1581,22 +1566,21 @@ impl Part for JobListJobs {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancel jobs](struct.JobCancelCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobCancelResponse {
-    /// The final state of the job.
-    pub job: Option<Job>,
-    /// The resource type of the response.
-    pub kind: Option<String>,
+pub struct QueryParameterValue {
+    /// [Optional] The struct field values, in order of the struct type's declaration.
+    #[serde(rename="structValues")]
+    pub struct_values: Option<HashMap<String, QueryParameterValue>>,
+    /// [Optional] The array values, if this is an array type.
+    #[serde(rename="arrayValues")]
+    pub array_values: Option<Vec<QueryParameterValue>>,
+    /// [Optional] The value of this value, if a simple scalar type.
+    pub value: Option<String>,
 }
 
-impl ResponseResult for JobCancelResponse {}
+impl Part for QueryParameterValue {}
 
 
 /// Confusion matrix for multi-class classification models.
@@ -1722,33 +1706,23 @@ impl ResponseResult for GetServiceAccountResponse {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert all tabledata](struct.TabledataInsertAllCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobConfigurationExtract {
-    /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.
-    #[serde(rename="destinationUri")]
-    pub destination_uri: Option<String>,
-    /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
-    #[serde(rename="destinationFormat")]
-    pub destination_format: Option<String>,
-    /// [Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro.
-    pub compression: Option<String>,
-    /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.
-    #[serde(rename="destinationUris")]
-    pub destination_uris: Option<Vec<String>>,
-    /// [Optional] Whether to print out a header row in the results. Default is true.
-    #[serde(rename="printHeader")]
-    pub print_header: Option<bool>,
-    /// [Optional] Delimiter to use between fields in the exported data. Default is ','
-    #[serde(rename="fieldDelimiter")]
-    pub field_delimiter: Option<String>,
-    /// [Required] A reference to the table being exported.
-    #[serde(rename="sourceTable")]
-    pub source_table: Option<TableReference>,
+pub struct TableDataInsertAllResponse {
+    /// The resource type of the response.
+    pub kind: Option<String>,
+    /// An array of errors for rows that were not inserted.
+    #[serde(rename="insertErrors")]
+    pub insert_errors: Option<Vec<TableDataInsertAllResponseInsertErrors>>,
 }
 
-impl Part for JobConfigurationExtract {}
+impl ResponseResult for TableDataInsertAllResponse {}
 
 
 /// Projects to which you have at least READ access.
@@ -1791,21 +1765,22 @@ impl Part for Clustering {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancel jobs](struct.JobCancelCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QueryParameterValue {
-    /// [Optional] The struct field values, in order of the struct type's declaration.
-    #[serde(rename="structValues")]
-    pub struct_values: Option<HashMap<String, QueryParameterValue>>,
-    /// [Optional] The array values, if this is an array type.
-    #[serde(rename="arrayValues")]
-    pub array_values: Option<Vec<QueryParameterValue>>,
-    /// [Optional] The value of this value, if a simple scalar type.
-    pub value: Option<String>,
+pub struct JobCancelResponse {
+    /// The final state of the job.
+    pub job: Option<Job>,
+    /// The resource type of the response.
+    pub kind: Option<String>,
 }
 
-impl Part for QueryParameterValue {}
+impl ResponseResult for JobCancelResponse {}
 
 
 /// An array of errors for rows that were not inserted.
@@ -1844,6 +1819,48 @@ pub struct ModelReference {
 }
 
 impl Part for ModelReference {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list routines](struct.RoutineListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListRoutinesResponse {
+    /// A token to request the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Routines in the requested dataset. Only the following fields are populated:
+    /// etag, project_id, dataset_id, routine_id, routine_type, creation_time,
+    /// last_modified_time, language.
+    pub routines: Option<Vec<Routine>>,
+}
+
+impl ResponseResult for ListRoutinesResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryParameter {
+    /// [Required] The type of this parameter.
+    #[serde(rename="parameterType")]
+    pub parameter_type: Option<QueryParameterType>,
+    /// [Required] The value of this parameter.
+    #[serde(rename="parameterValue")]
+    pub parameter_value: Option<QueryParameterValue>,
+    /// [Optional] If unset, this is a positional parameter. Otherwise, should be unique within a query.
+    pub name: Option<String>,
+}
+
+impl Part for QueryParameter {}
 
 
 /// There is no detailed description.
@@ -1903,18 +1920,184 @@ impl Part for TableFieldSchema {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QueryParameter {
-    /// [Required] The type of this parameter.
-    #[serde(rename="parameterType")]
-    pub parameter_type: Option<QueryParameterType>,
-    /// [Required] The value of this parameter.
-    #[serde(rename="parameterValue")]
-    pub parameter_value: Option<QueryParameterValue>,
-    /// [Optional] If unset, this is a positional parameter. Otherwise, should be unique within a query.
-    pub name: Option<String>,
+pub struct JobConfigurationLoad {
+    /// [Optional] If sourceFormat is set to "AVRO", indicates whether to enable interpreting logical types into their corresponding types (ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER).
+    #[serde(rename="useAvroLogicalTypes")]
+    pub use_avro_logical_types: Option<bool>,
+    /// Custom encryption configuration (e.g., Cloud KMS keys).
+    #[serde(rename="destinationEncryptionConfiguration")]
+    pub destination_encryption_configuration: Option<EncryptionConfiguration>,
+    /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
+    pub encoding: Option<String>,
+    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
+    pub quote: Option<String>,
+    /// [Optional] Indicates if we should automatically infer the options and schema for CSV and JSON sources.
+    pub autodetect: Option<bool>,
+    /// [Required] The destination table to load the data into.
+    #[serde(rename="destinationTable")]
+    pub destination_table: Option<TableReference>,
+    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
+    #[serde(rename="skipLeadingRows")]
+    pub skip_leading_rows: Option<i32>,
+    /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups: Exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
+    #[serde(rename="sourceUris")]
+    pub source_uris: Option<Vec<String>>,
+    /// [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
+    #[serde(rename="nullMarker")]
+    pub null_marker: Option<String>,
+    /// Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
+    #[serde(rename="timePartitioning")]
+    pub time_partitioning: Option<TimePartitioning>,
+    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
+    #[serde(rename="allowQuotedNewlines")]
+    pub allow_quoted_newlines: Option<bool>,
+    /// If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
+    #[serde(rename="projectionFields")]
+    pub projection_fields: Option<Vec<String>>,
+    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
+    pub clustering: Option<Clustering>,
+    /// [Optional] The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character. To use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
+    #[serde(rename="fieldDelimiter")]
+    pub field_delimiter: Option<String>,
+    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
+    #[serde(rename="allowJaggedRows")]
+    pub allow_jagged_rows: Option<bool>,
+    /// [Beta] [Optional] Properties with which to create the destination table if it is new.
+    #[serde(rename="destinationTableProperties")]
+    pub destination_table_properties: Option<DestinationTableProperties>,
+    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO". For parquet, specify "PARQUET". For orc, specify "ORC". The default value is CSV.
+    #[serde(rename="sourceFormat")]
+    pub source_format: Option<String>,
+    /// [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
+    #[serde(rename="rangePartitioning")]
+    pub range_partitioning: Option<RangePartitioning>,
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV and JSON. The default value is 0, which requires that all records are valid.
+    #[serde(rename="maxBadRecords")]
+    pub max_bad_records: Option<i32>,
+    /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    #[serde(rename="schemaUpdateOptions")]
+    pub schema_update_options: Option<Vec<String>>,
+    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
+    #[serde(rename="ignoreUnknownValues")]
+    pub ignore_unknown_values: Option<bool>,
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="writeDisposition")]
+    pub write_disposition: Option<String>,
+    /// [Optional, Trusted Tester] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error.
+    #[serde(rename="hivePartitioningMode")]
+    pub hive_partitioning_mode: Option<String>,
+    /// [Optional, Trusted Tester] Options to configure hive partitioning support.
+    #[serde(rename="hivePartitioningOptions")]
+    pub hive_partitioning_options: Option<HivePartitioningOptions>,
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="createDisposition")]
+    pub create_disposition: Option<String>,
+    /// [Deprecated] The format of the schemaInline property.
+    #[serde(rename="schemaInlineFormat")]
+    pub schema_inline_format: Option<String>,
+    /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".
+    #[serde(rename="schemaInline")]
+    pub schema_inline: Option<String>,
+    /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists, or if you're loading data from Google Cloud Datastore.
+    pub schema: Option<TableSchema>,
 }
 
-impl Part for QueryParameter {}
+impl Part for JobConfigurationLoad {}
+
+
+/// A user-defined function or a stored procedure.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update routines](struct.RoutineUpdateCall.html) (request|response)
+/// * [list routines](struct.RoutineListCall.html) (none)
+/// * [delete routines](struct.RoutineDeleteCall.html) (none)
+/// * [insert routines](struct.RoutineInsertCall.html) (request|response)
+/// * [get routines](struct.RoutineGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Routine {
+    /// Required.
+    #[serde(rename="routineType")]
+    pub routine_type: Option<String>,
+    /// Optional. Defaults to "SQL".
+    pub language: Option<String>,
+    /// Output only. The time when this routine was created, in milliseconds since
+    /// the epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// Optional. If language = "JAVASCRIPT", this field stores the path of the
+    /// imported JAVASCRIPT libraries.
+    #[serde(rename="importedLibraries")]
+    pub imported_libraries: Option<Vec<String>>,
+    /// Required. Reference describing the ID of this routine.
+    #[serde(rename="routineReference")]
+    pub routine_reference: Option<RoutineReference>,
+    /// Output only. A hash of this resource.
+    pub etag: Option<String>,
+    /// Optional.
+    pub arguments: Option<Vec<Argument>>,
+    /// Optional if language = "SQL"; required otherwise.
+    /// 
+    /// If absent, the return type is inferred from definition_body at query time
+    /// in each query that references this routine. If present, then the evaluated
+    /// result will be cast to the specified returned type at query time.
+    /// 
+    /// For example, for the functions created with the following statements:
+    /// 
+    /// * `CREATE FUNCTION Add(x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x + y);`
+    /// 
+    /// * `CREATE FUNCTION Increment(x FLOAT64) AS (Add(x, 1));`
+    /// 
+    /// * `CREATE FUNCTION Decrement(x FLOAT64) RETURNS FLOAT64 AS (Add(x, -1));`
+    /// 
+    /// The return_type is `{type_kind: "FLOAT64"}` for `Add` and `Decrement`, and
+    /// is absent for `Increment` (inferred as FLOAT64 at query time).
+    /// 
+    /// Suppose the function `Add` is replaced by
+    ///   `CREATE OR REPLACE FUNCTION Add(x INT64, y INT64) AS (x + y);`
+    /// 
+    /// Then the inferred return type of `Increment` is automatically changed to
+    /// INT64 at query time, while the return type of `Decrement` remains FLOAT64.
+    #[serde(rename="returnType")]
+    pub return_type: Option<StandardSqlDataType>,
+    /// Output only. The time when this routine was last modified, in milliseconds
+    /// since the epoch.
+    #[serde(rename="lastModifiedTime")]
+    pub last_modified_time: Option<String>,
+    /// Required. The body of the routine.
+    /// 
+    /// For functions, this is the expression in the AS clause.
+    /// 
+    /// If language=SQL, it is the substring inside (but excluding) the
+    /// parentheses. For example, for the function created with the following
+    /// statement:
+    /// 
+    /// `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))`
+    /// 
+    /// The definition_body is `concat(x, "\n", y)` (\n is not replaced with
+    /// linebreak).
+    /// 
+    /// If language=JAVASCRIPT, it is the evaluated string in the AS clause.
+    /// For example, for the function created with the following statement:
+    /// 
+    /// `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'`
+    /// 
+    /// The definition_body is
+    /// 
+    /// `return "\n";\n`
+    /// 
+    /// Note that both \n are replaced with linebreaks.
+    #[serde(rename="definitionBody")]
+    pub definition_body: Option<String>,
+}
+
+impl RequestValue for Routine {}
+impl Resource for Routine {}
+impl ResponseResult for Routine {}
 
 
 /// Additional details for a view.
@@ -2026,9 +2209,9 @@ pub struct QueryParameterType {
 impl Part for QueryParameterType {}
 
 
-/// Evaluation metrics of a model. These are either computed on all
-/// training data or just the eval data based on whether eval data was used
-/// during training.
+/// Evaluation metrics of a model. These are either computed on all training
+/// data or just the eval data based on whether eval data was used during
+/// training. These are not present for imported models.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2040,10 +2223,10 @@ pub struct EvaluationMetrics {
     /// Populated for regression models.
     #[serde(rename="regressionMetrics")]
     pub regression_metrics: Option<RegressionMetrics>,
-    /// Populated for binary classification models.
+    /// Populated for binary classification/classifier models.
     #[serde(rename="binaryClassificationMetrics")]
     pub binary_classification_metrics: Option<BinaryClassificationMetrics>,
-    /// Populated for multi-class classification models.
+    /// Populated for multi-class classification/classifier models.
     #[serde(rename="multiClassClassificationMetrics")]
     pub multi_class_classification_metrics: Option<MultiClassClassificationMetrics>,
 }
@@ -2152,14 +2335,20 @@ impl Part for ProjectReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TrainingOptions {
-    /// The maximum number of iterations in training.
+    /// Optimization strategy for training linear regression models.
+    #[serde(rename="optimizationStrategy")]
+    pub optimization_strategy: Option<String>,
+    /// The maximum number of iterations in training. Used only for iterative
+    /// training algorithms.
     #[serde(rename="maxIterations")]
     pub max_iterations: Option<String>,
     /// Whether to stop early when the loss doesn't improve significantly
-    /// any more (compared to min_relative_progress).
+    /// any more (compared to min_relative_progress). Used only for iterative
+    /// training algorithms.
     #[serde(rename="earlyStop")]
     pub early_stop: Option<bool>,
-    /// Specifies the initial learning rate for line search to start at.
+    /// Specifies the initial learning rate for the line search learn rate
+    /// strategy.
     #[serde(rename="initialLearnRate")]
     pub initial_learn_rate: Option<f64>,
     /// The column to split data with. This column won't be used as a
@@ -2186,7 +2375,7 @@ pub struct TrainingOptions {
     /// Type of loss function used during training run.
     #[serde(rename="lossType")]
     pub loss_type: Option<String>,
-    /// The strategy to determine learning rate.
+    /// The strategy to determine learn rate for the current iteration.
     #[serde(rename="learnRateStrategy")]
     pub learn_rate_strategy: Option<String>,
     /// The fraction of evaluation data over the whole input data. The rest
@@ -2202,22 +2391,27 @@ pub struct TrainingOptions {
     #[serde(rename="distanceType")]
     pub distance_type: Option<String>,
     /// Weights associated with each label class, for rebalancing the
-    /// training data.
+    /// training data. Only applicable for classification models.
     #[serde(rename="labelClassWeights")]
     pub label_class_weights: Option<HashMap<String, f64>>,
-    /// Learning rate in training.
-    #[serde(rename="learnRate")]
-    pub learn_rate: Option<f64>,
-    /// L2 regularization coefficient.
-    #[serde(rename="l2Regularization")]
-    pub l2_regularization: Option<f64>,
-    /// When early_stop is true, stops training when accuracy improvement is
-    /// less than 'min_relative_progress'.
-    #[serde(rename="minRelativeProgress")]
-    pub min_relative_progress: Option<f64>,
     /// L1 regularization coefficient.
     #[serde(rename="l1Regularization")]
     pub l1_regularization: Option<f64>,
+    /// L2 regularization coefficient.
+    #[serde(rename="l2Regularization")]
+    pub l2_regularization: Option<f64>,
+    /// [Beta] Google Cloud Storage URI from which the model was imported. Only
+    /// applicable for imported models.
+    #[serde(rename="modelUri")]
+    pub model_uri: Option<String>,
+    /// When early_stop is true, stops training when accuracy improvement is
+    /// less than 'min_relative_progress'. Used only for iterative training
+    /// algorithms.
+    #[serde(rename="minRelativeProgress")]
+    pub min_relative_progress: Option<f64>,
+    /// Learning rate in training. Used only for iterative training algorithms.
+    #[serde(rename="learnRate")]
+    pub learn_rate: Option<f64>,
 }
 
 impl Part for TrainingOptions {}
@@ -2321,6 +2515,23 @@ impl Part for TimePartitioning {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BigQueryModelTraining {
+    /// [Output-only, Beta] Index of current ML training iteration. Updated during create model query job to show job progress.
+    #[serde(rename="currentIteration")]
+    pub current_iteration: Option<i32>,
+    /// [Output-only, Beta] Expected number of iterations for the create model query job specified as num_iterations in the input query. The actual total number of iterations may be less than this number due to early stop.
+    #[serde(rename="expectedTotalIterations")]
+    pub expected_total_iterations: Option<String>,
+}
+
+impl Part for BigQueryModelTraining {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BigtableColumnFamily {
     /// [Optional] The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it.
     pub encoding: Option<String>,
@@ -2351,7 +2562,7 @@ pub struct ExternalDataConfiguration {
     /// Additional properties to set if sourceFormat is set to CSV.
     #[serde(rename="csvOptions")]
     pub csv_options: Option<CsvOptions>,
-    /// [Optional, Experimental] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error.
+    /// [Optional, Trusted Tester] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error. Note: this setting is in the process of being deprecated in favor of hivePartitioningOptions.
     #[serde(rename="hivePartitioningMode")]
     pub hive_partitioning_mode: Option<String>,
     /// Try to detect schema and format options automatically. Any option specified explicitly will be honored.
@@ -2365,6 +2576,9 @@ pub struct ExternalDataConfiguration {
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
     #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
+    /// [Optional, Trusted Tester] Options to configure hive partitioning support.
+    #[serde(rename="hivePartitioningOptions")]
+    pub hive_partitioning_options: Option<HivePartitioningOptions>,
     /// [Optional] Additional options if sourceFormat is set to BIGTABLE.
     #[serde(rename="bigtableOptions")]
     pub bigtable_options: Option<BigtableOptions>,
@@ -2477,23 +2691,23 @@ impl NestedType for JobStatisticsReservationUsage {}
 impl Part for JobStatisticsReservationUsage {}
 
 
-/// A single entry in the confusion matrix.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Entry {
-    /// The predicted label. For confidence_threshold > 0, we will
-    /// also add an entry indicating the number of items under the
-    /// confidence threshold.
-    #[serde(rename="predictedLabel")]
-    pub predicted_label: Option<String>,
-    /// Number of items being predicted as this label.
-    #[serde(rename="itemCount")]
-    pub item_count: Option<i64>,
+pub struct JobReference {
+    /// [Required] The ID of the project containing this job.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The geographic location of the job. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+    pub location: Option<String>,
+    /// [Required] The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.
+    #[serde(rename="jobId")]
+    pub job_id: Option<String>,
 }
 
-impl Part for Entry {}
+impl Part for JobReference {}
 
 
 /// There is no detailed description.
@@ -2516,10 +2730,8 @@ pub struct Model {
     /// characters, underscores and dashes. International characters are allowed.
     /// Label values are optional. Label keys must start with a letter and each
     /// label in the list must have a different key.
-    /// @mutable bigquery.models.patch
     pub labels: Option<HashMap<String, String>>,
     /// [Optional] A user-friendly description of this model.
-    /// @mutable bigquery.models.patch
     pub description: Option<String>,
     /// Required. Unique identifier for this model.
     #[serde(rename="modelReference")]
@@ -2528,7 +2740,7 @@ pub struct Model {
     #[serde(rename="featureColumns")]
     pub feature_columns: Option<Vec<StandardSqlField>>,
     /// Output only. Label columns that were used to train this model.
-    /// The output of the model will have a “predicted_” prefix to these columns.
+    /// The output of the model will have a "predicted_" prefix to these columns.
     #[serde(rename="labelColumns")]
     pub label_columns: Option<Vec<StandardSqlField>>,
     /// Output only. The time when this model was created, in millisecs since the
@@ -2548,7 +2760,6 @@ pub struct Model {
     /// is inherited from the dataset.
     pub location: Option<String>,
     /// [Optional] A descriptive name for this model.
-    /// @mutable bigquery.models.patch
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
     /// [Optional] The time when this model expires, in milliseconds since the
@@ -2556,7 +2767,6 @@ pub struct Model {
     /// will be deleted and their storage reclaimed.  The defaultTableExpirationMs
     /// property of the encapsulating dataset can be used to set a default
     /// expirationTime on newly created models.
-    /// @mutable bigquery.models.patch
     #[serde(rename="expirationTime")]
     pub expiration_time: Option<String>,
     /// Output only. The time when this model was last modified, in millisecs
@@ -2583,7 +2793,7 @@ pub struct TableSchema {
 impl Part for TableSchema {}
 
 
-/// Evaluation metrics for multi-class classification models.
+/// Evaluation metrics for multi-class classification/classifier models.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2776,22 +2986,37 @@ pub struct JobConfiguration {
 impl Part for JobConfiguration {}
 
 
-/// [TrustedTester] [Required] Defines the ranges for range partitioning.
+/// Represents a single JSON object.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RangePartitioningRange {
-    /// [TrustedTester] [Required] The start of range partitioning, inclusive.
-    pub start: Option<String>,
-    /// [TrustedTester] [Required] The width of each interval.
-    pub interval: Option<String>,
-    /// [TrustedTester] [Required] The end of range partitioning, exclusive.
-    pub end: Option<String>,
+pub struct JsonObject(Option<HashMap<String, JsonValue>>);
+
+impl Part for JsonObject {}
+
+
+/// Input/output argument of a function or a stored procedure.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Argument {
+    /// Required unless argument_kind = ANY_TYPE.
+    #[serde(rename="dataType")]
+    pub data_type: Option<StandardSqlDataType>,
+    /// Optional. Defaults to FIXED_TYPE.
+    #[serde(rename="argumentKind")]
+    pub argument_kind: Option<String>,
+    /// Optional. Specifies whether the argument is input or output.
+    /// Can be set for procedures only.
+    pub mode: Option<String>,
+    /// Optional. The name of this argument. Can be absent for function return
+    /// argument.
+    pub name: Option<String>,
 }
 
-impl NestedType for RangePartitioningRange {}
-impl Part for RangePartitioningRange {}
+impl Part for Argument {}
 
 
 /// There is no detailed description.
@@ -2829,14 +3054,17 @@ pub struct Dataset {
     pub default_table_expiration_ms: Option<String>,
     /// [Output-only] A hash of the resource.
     pub etag: Option<String>,
-    /// [Optional] The default partition expiration for all partitioned tables in the dataset, in milliseconds. Once this property is set, all newly-created partitioned tables in the dataset will have an expirationMs property in the timePartitioning settings set to this value, and changing the value will only affect new tables, not existing ones. The storage in a partition will have an expiration time of its partition time plus this value. Setting this property overrides the use of defaultTableExpirationMs for partitioned tables: only one of defaultTableExpirationMs and defaultPartitionExpirationMs will be used for any new partitioned table. If you provide an explicit timePartitioning.expirationMs when creating or updating a partitioned table, that value takes precedence over the default partition expiration time indicated by this property.
-    #[serde(rename="defaultPartitionExpirationMs")]
-    pub default_partition_expiration_ms: Option<String>,
+    /// no description provided
+    #[serde(rename="defaultEncryptionConfiguration")]
+    pub default_encryption_configuration: Option<EncryptionConfiguration>,
     /// The geographic location where the dataset should reside. The default value is US. See details at https://cloud.google.com/bigquery/docs/locations.
     pub location: Option<String>,
     /// [Optional] A descriptive name for the dataset.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
+    /// [Optional] The default partition expiration for all partitioned tables in the dataset, in milliseconds. Once this property is set, all newly-created partitioned tables in the dataset will have an expirationMs property in the timePartitioning settings set to this value, and changing the value will only affect new tables, not existing ones. The storage in a partition will have an expiration time of its partition time plus this value. Setting this property overrides the use of defaultTableExpirationMs for partitioned tables: only one of defaultTableExpirationMs and defaultPartitionExpirationMs will be used for any new partitioned table. If you provide an explicit timePartitioning.expirationMs when creating or updating a partitioned table, that value takes precedence over the default partition expiration time indicated by this property.
+    #[serde(rename="defaultPartitionExpirationMs")]
+    pub default_partition_expiration_ms: Option<String>,
     /// [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
     #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
@@ -2850,36 +3078,6 @@ pub struct Dataset {
 impl RequestValue for Dataset {}
 impl Resource for Dataset {}
 impl ResponseResult for Dataset {}
-
-
-/// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DatasetAccess {
-    /// [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com". Maps to IAM policy member "domain:DOMAIN".
-    pub domain: Option<String>,
-    /// [Required] An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: OWNER  roles/bigquery.dataOwner WRITER  roles/bigquery.dataEditor READER  roles/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
-    pub role: Option<String>,
-    /// [Pick one] An email address of a user to grant access to. For example: fred@example.com. Maps to IAM policy member "user:EMAIL" or "serviceAccount:EMAIL".
-    #[serde(rename="userByEmail")]
-    pub user_by_email: Option<String>,
-    /// [Pick one] Some other type of member that appears in the IAM Policy but isn't a user, group, domain, or special group.
-    #[serde(rename="iamMember")]
-    pub iam_member: Option<String>,
-    /// [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users. Maps to similarly-named IAM members.
-    #[serde(rename="specialGroup")]
-    pub special_group: Option<String>,
-    /// [Pick one] An email address of a Google Group to grant access to. Maps to IAM policy member "group:GROUP".
-    #[serde(rename="groupByEmail")]
-    pub group_by_email: Option<String>,
-    /// [Pick one] A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation.
-    pub view: Option<TableReference>,
-}
-
-impl NestedType for DatasetAccess {}
-impl Part for DatasetAccess {}
 
 
 /// There is no detailed description.
@@ -3049,33 +3247,27 @@ pub struct QueryResponse {
 impl ResponseResult for QueryResponse {}
 
 
-/// There is no detailed description.
+/// Evaluation metrics for binary classification/classifier models.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobConfigurationTableCopy {
-    /// [Pick one] Source tables to copy.
-    #[serde(rename="sourceTables")]
-    pub source_tables: Option<Vec<TableReference>>,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="writeDisposition")]
-    pub write_disposition: Option<String>,
-    /// Custom encryption configuration (e.g., Cloud KMS keys).
-    #[serde(rename="destinationEncryptionConfiguration")]
-    pub destination_encryption_configuration: Option<EncryptionConfiguration>,
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="createDisposition")]
-    pub create_disposition: Option<String>,
-    /// [Required] The destination table
-    #[serde(rename="destinationTable")]
-    pub destination_table: Option<TableReference>,
-    /// [Pick one] Source table to copy.
-    #[serde(rename="sourceTable")]
-    pub source_table: Option<TableReference>,
+pub struct BinaryClassificationMetrics {
+    /// Label representing the negative class.
+    #[serde(rename="negativeLabel")]
+    pub negative_label: Option<String>,
+    /// Aggregate classification metrics.
+    #[serde(rename="aggregateClassificationMetrics")]
+    pub aggregate_classification_metrics: Option<AggregateClassificationMetrics>,
+    /// Label representing the positive class.
+    #[serde(rename="positiveLabel")]
+    pub positive_label: Option<String>,
+    /// Binary confusion matrix at multiple thresholds.
+    #[serde(rename="binaryConfusionMatrixList")]
+    pub binary_confusion_matrix_list: Option<Vec<BinaryConfusionMatrix>>,
 }
 
-impl Part for JobConfigurationTableCopy {}
+impl Part for BinaryClassificationMetrics {}
 
 
 /// There is no detailed description.
@@ -3739,6 +3931,158 @@ impl<'a, C, A> ModelMethods<'a, C, A> {
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
             _model_id: model_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *routine* resources.
+/// It is not used directly, but through the `Bigquery` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_bigquery2 as bigquery2;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use bigquery2::Bigquery;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
+/// // to build up your call.
+/// let rb = hub.routines();
+/// # }
+/// ```
+pub struct RoutineMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for RoutineMethods<'a, C, A> {}
+
+impl<'a, C, A> RoutineMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates information in an existing routine. The update method replaces the
+    /// entire Routine resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the routine to update
+    /// * `datasetId` - Dataset ID of the routine to update
+    /// * `routineId` - Routine ID of the routine to update
+    pub fn update(&self, request: Routine, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineUpdateCall<'a, C, A> {
+        RoutineUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _routine_id: routine_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all routines in the specified dataset. Requires the READER dataset
+    /// role.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the routines to list
+    /// * `datasetId` - Dataset ID of the routines to list
+    pub fn list(&self, project_id: &str, dataset_id: &str) -> RoutineListCall<'a, C, A> {
+        RoutineListCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new routine in the dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the new routine
+    /// * `datasetId` - Dataset ID of the new routine
+    pub fn insert(&self, request: Routine, project_id: &str, dataset_id: &str) -> RoutineInsertCall<'a, C, A> {
+        RoutineInsertCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the routine specified by routineId from the dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the routine to delete
+    /// * `datasetId` - Dataset ID of the routine to delete
+    /// * `routineId` - Routine ID of the routine to delete
+    pub fn delete(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineDeleteCall<'a, C, A> {
+        RoutineDeleteCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _routine_id: routine_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the specified routine resource by routine ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the requested routine
+    /// * `datasetId` - Dataset ID of the requested routine
+    /// * `routineId` - Routine ID of the requested routine
+    pub fn get(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineGetCall<'a, C, A> {
+        RoutineGetCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _routine_id: routine_id.to_string(),
+            _field_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -9517,7 +9861,8 @@ impl<'a, C, A> ModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of results per page.
+    /// The maximum number of results to return in a single response page.
+    /// Leverage the page tokens to iterate through the entire collection.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ModelListCall<'a, C, A> {
@@ -10150,6 +10495,1414 @@ impl<'a, C, A> ModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
+/// Updates information in an existing routine. The update method replaces the
+/// entire Routine resource.
+///
+/// A builder for the *update* method supported by a *routine* resource.
+/// It is not used directly, but through a `RoutineMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::Routine;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Routine::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.routines().update(req, "projectId", "datasetId", "routineId")
+///              .doit();
+/// # }
+/// ```
+pub struct RoutineUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _request: Routine,
+    _project_id: String,
+    _dataset_id: String,
+    _routine_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RoutineUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> RoutineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Routine)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.routines.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("datasetId", self._dataset_id.to_string()));
+        params.push(("routineId", self._routine_id.to_string()));
+        for &field in ["alt", "projectId", "datasetId", "routineId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines/{+routineId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId"), ("{+routineId}", "routineId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["routineId", "datasetId", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Routine) -> RoutineUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Project ID of the routine to update
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RoutineUpdateCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Dataset ID of the routine to update
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineUpdateCall<'a, C, A> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Routine ID of the routine to update
+    ///
+    /// Sets the *routine id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn routine_id(mut self, new_value: &str) -> RoutineUpdateCall<'a, C, A> {
+        self._routine_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoutineUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists all routines in the specified dataset. Requires the READER dataset
+/// role.
+///
+/// A builder for the *list* method supported by a *routine* resource.
+/// It is not used directly, but through a `RoutineMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.routines().list("projectId", "datasetId")
+///              .page_token("Lorem")
+///              .max_results(84)
+///              .doit();
+/// # }
+/// ```
+pub struct RoutineListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _project_id: String,
+    _dataset_id: String,
+    _page_token: Option<String>,
+    _max_results: Option<u32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RoutineListCall<'a, C, A> {}
+
+impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListRoutinesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.routines.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("datasetId", self._dataset_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "datasetId", "pageToken", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["datasetId", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Project ID of the routines to list
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RoutineListCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Dataset ID of the routines to list
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineListCall<'a, C, A> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Page token, returned by a previous call, to request the next page of
+    /// results
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> RoutineListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of results to return in a single response page.
+    /// Leverage the page tokens to iterate through the entire collection.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> RoutineListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoutineListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a new routine in the dataset.
+///
+/// A builder for the *insert* method supported by a *routine* resource.
+/// It is not used directly, but through a `RoutineMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::Routine;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Routine::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.routines().insert(req, "projectId", "datasetId")
+///              .doit();
+/// # }
+/// ```
+pub struct RoutineInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _request: Routine,
+    _project_id: String,
+    _dataset_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RoutineInsertCall<'a, C, A> {}
+
+impl<'a, C, A> RoutineInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Routine)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.routines.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("datasetId", self._dataset_id.to_string()));
+        for &field in ["alt", "projectId", "datasetId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["datasetId", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Routine) -> RoutineInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Project ID of the new routine
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RoutineInsertCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Dataset ID of the new routine
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineInsertCall<'a, C, A> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoutineInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the routine specified by routineId from the dataset.
+///
+/// A builder for the *delete* method supported by a *routine* resource.
+/// It is not used directly, but through a `RoutineMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.routines().delete("projectId", "datasetId", "routineId")
+///              .doit();
+/// # }
+/// ```
+pub struct RoutineDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _project_id: String,
+    _dataset_id: String,
+    _routine_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RoutineDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> RoutineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.routines.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("datasetId", self._dataset_id.to_string()));
+        params.push(("routineId", self._routine_id.to_string()));
+        for &field in ["projectId", "datasetId", "routineId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines/{+routineId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId"), ("{+routineId}", "routineId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["routineId", "datasetId", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Project ID of the routine to delete
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RoutineDeleteCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Dataset ID of the routine to delete
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineDeleteCall<'a, C, A> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Routine ID of the routine to delete
+    ///
+    /// Sets the *routine id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn routine_id(mut self, new_value: &str) -> RoutineDeleteCall<'a, C, A> {
+        self._routine_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoutineDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the specified routine resource by routine ID.
+///
+/// A builder for the *get* method supported by a *routine* resource.
+/// It is not used directly, but through a `RoutineMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.routines().get("projectId", "datasetId", "routineId")
+///              .field_mask("labore")
+///              .doit();
+/// # }
+/// ```
+pub struct RoutineGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _project_id: String,
+    _dataset_id: String,
+    _routine_id: String,
+    _field_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RoutineGetCall<'a, C, A> {}
+
+impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Routine)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.routines.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("datasetId", self._dataset_id.to_string()));
+        params.push(("routineId", self._routine_id.to_string()));
+        if let Some(value) = self._field_mask {
+            params.push(("fieldMask", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "datasetId", "routineId", "fieldMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines/{+routineId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId"), ("{+routineId}", "routineId")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["routineId", "datasetId", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Project ID of the requested routine
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RoutineGetCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Dataset ID of the requested routine
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineGetCall<'a, C, A> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Routine ID of the requested routine
+    ///
+    /// Sets the *routine id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn routine_id(mut self, new_value: &str) -> RoutineGetCall<'a, C, A> {
+        self._routine_id = new_value.to_string();
+        self
+    }
+    /// If set, only the Routine fields in the field mask are returned in the
+    /// response. If unset, all Routine fields are returned.
+    ///
+    /// Sets the *field mask* query property to the given value.
+    pub fn field_mask(mut self, new_value: &str) -> RoutineGetCall<'a, C, A> {
+        self._field_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoutineGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Retrieves table data from a specified set of rows. Requires the READER dataset role.
 ///
 /// A builder for the *list* method supported by a *tabledata* resource.
@@ -10178,10 +11931,10 @@ impl<'a, C, A> ModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tabledata().list("projectId", "datasetId", "tableId")
-///              .start_index("duo")
-///              .selected_fields("aliquyam")
-///              .page_token("Lorem")
-///              .max_results(84)
+///              .start_index("rebum.")
+///              .selected_fields("dolore")
+///              .page_token("nonumy")
+///              .max_results(72)
 ///              .doit();
 /// # }
 /// ```
@@ -11025,8 +12778,8 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("kasd")
-///              .max_results(94)
+///              .page_token("labore")
+///              .max_results(71)
 ///              .doit();
 /// # }
 /// ```

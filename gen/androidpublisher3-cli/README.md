@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20190402*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Android Publisher* API at revision *20190702*. The CLI is at version *1.0.9*.
 
 ```bash
 androidpublisher3 [options]
@@ -72,10 +72,15 @@ androidpublisher3 [options]
                 list <package-name> [-p <v>]... [-o <out>]
                 patch <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
+        internalappsharingartifacts
+                uploadapk <package-name> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                uploadbundle <package-name> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         orders
                 refund <package-name> <order-id> [-p <v>]...
         purchases
+                products-acknowledge <package-name> <product-id> <token> (-r <kv>)... [-p <v>]...
                 products-get <package-name> <product-id> <token> [-p <v>]... [-o <out>]
+                subscriptions-acknowledge <package-name> <subscription-id> <token> (-r <kv>)... [-p <v>]...
                 subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>]...
                 subscriptions-defer <package-name> <subscription-id> <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-get <package-name> <subscription-id> <token> [-p <v>]... [-o <out>]

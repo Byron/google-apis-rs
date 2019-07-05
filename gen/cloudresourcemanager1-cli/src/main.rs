@@ -1122,8 +1122,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2267,8 +2268,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4259,13 +4261,22 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists Projects that are visible to the user and satisfy the
-        specified filter. This method returns Projects in an unspecified order.
+                    Some(r##"Lists Projects that the caller has the `resourcemanager.projects.get`
+        permission on and satisfy the specified filter.
+        
+        This method returns Projects in an unspecified order.
         This method is eventually consistent with project mutations; this means
         that a newly created project may not appear in the results or recent
         updates to an existing project may not be reflected in the results. To
         retrieve the latest state of a project, use the
-        GetProject method."##),
+        GetProject method.
+        
+        NOTE: If the request filter contains a `parent.type` and `parent.id` and
+        the caller has the `resourcemanager.projects.list` permission on the
+        parent, the results will be drawn from an alternate index which provides
+        more consistent results. In future versions of this API, this List method
+        will be split into List and Search to properly capture the behavorial
+        difference."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_list",
                   vec![
                     (Some(r##"v"##),
@@ -4547,7 +4558,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190401")
+           .version("1.0.9+20190701")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")

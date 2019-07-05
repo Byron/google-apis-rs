@@ -750,7 +750,7 @@ fn main() {
     
     let mut app = App::new("iamcredentials1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190329")
+           .version("1.0.9+20190620")
            .about("Creates short-lived, limited-privilege credentials for IAM service accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iamcredentials1_cli")
            .arg(Arg::with_name("url")

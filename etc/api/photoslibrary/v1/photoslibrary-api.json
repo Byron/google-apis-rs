@@ -148,6 +148,64 @@
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
                 }, 
+                "batchAddMediaItems": {
+                    "description": "Adds one or more media items in a user's Google Photos library to\nan album. The media items and albums must have been created by the\ndeveloper via the API.\n\nMedia items are added to the end of the album. If multiple media items are\ngiven, they are added in the order specified in this call.\n\nEach album can contain up to 20,000 media items.\n\nOnly media items that are in the user's library can be added to an\nalbum. For albums that are shared, the album must either be owned by the\nuser or the user must have joined the album as a collaborator.\n\nPartial success is not supported. The entire request will fail if an\ninvalid media item or album is specified.", 
+                    "flatPath": "v1/albums/{albumsId}:batchAddMediaItems", 
+                    "httpMethod": "POST", 
+                    "id": "photoslibrary.albums.batchAddMediaItems", 
+                    "parameterOrder": [
+                        "albumId"
+                    ], 
+                    "parameters": {
+                        "albumId": {
+                            "description": "Identifier of the Album that the\nmedia items are added to.", 
+                            "location": "path", 
+                            "pattern": "^[^/]+$", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1/albums/{+albumId}:batchAddMediaItems", 
+                    "request": {
+                        "$ref": "BatchAddMediaItemsToAlbumRequest"
+                    }, 
+                    "response": {
+                        "$ref": "BatchAddMediaItemsToAlbumResponse"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/photoslibrary", 
+                        "https://www.googleapis.com/auth/photoslibrary.appendonly", 
+                        "https://www.googleapis.com/auth/photoslibrary.sharing"
+                    ]
+                }, 
+                "batchRemoveMediaItems": {
+                    "description": "Removes one or more media items from a specified album. The media items and\nthe album must have been created by the developer via the API.\n\nFor albums that are shared, this action is only supported for media items\nthat were added to the album by this user, or for all media items if the\nalbum was created by this user.\n\nPartial success is not supported. The entire request will fail and no\naction will be performed on the album if an invalid media item or album is\nspecified.", 
+                    "flatPath": "v1/albums/{albumsId}:batchRemoveMediaItems", 
+                    "httpMethod": "POST", 
+                    "id": "photoslibrary.albums.batchRemoveMediaItems", 
+                    "parameterOrder": [
+                        "albumId"
+                    ], 
+                    "parameters": {
+                        "albumId": {
+                            "description": "Identifier of the Album that the media\nitems are to be removed from.", 
+                            "location": "path", 
+                            "pattern": "^[^/]+$", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1/albums/{+albumId}:batchRemoveMediaItems", 
+                    "request": {
+                        "$ref": "BatchRemoveMediaItemsFromAlbumRequest"
+                    }, 
+                    "response": {
+                        "$ref": "BatchRemoveMediaItemsFromAlbumResponse"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/photoslibrary"
+                    ]
+                }, 
                 "create": {
                     "description": "Creates an album in a user's Google Photos library.", 
                     "flatPath": "v1/albums", 
@@ -290,7 +348,7 @@
         "mediaItems": {
             "methods": {
                 "batchCreate": {
-                    "description": "Creates one or more media items in a user's Google Photos library.\n\nThis is the second step for creating a media item. For details regarding\nStep 1, uploading the raw bytes to a Google Server, see\n<a href=\"/photos/library/guides/upload-media\">Uploading media</a>.\n\nThis call adds the media item to the library. If an album `id` is\nspecified, the call adds the media item to the album too. By default, the\nmedia item will be added to the end of the library or album.\n\nIf an album `id` and position are both defined, the media item is\nadded to the album at the specified position.\n\nIf the call contains multiple media items, they're added at the specified\nposition.\nIf you are creating a media item in a shared album where you are not the\nowner, you are not allowed to position the media item. Doing so will result\nin a `BAD REQUEST` error.", 
+                    "description": "Creates one or more media items in a user's Google Photos library.\n\nThis is the second step for creating a media item. For details regarding\nStep 1, uploading the raw bytes to a Google Server, see\n<a href=\"/photos/library/guides/upload-media\">Uploading media</a>.\n\nThis call adds the media item to the library. If an album `id` is\nspecified, the call adds the media item to the album too. Each album can\ncontain up to 20,000 media items. By default, the media item will be added\nto the end of the library or album.\n\nIf an album `id` and position are both defined, the media item is\nadded to the album at the specified position.\n\nIf the call contains multiple media items, they're added at the specified\nposition.\nIf you are creating a media item in a shared album where you are not the\nowner, you are not allowed to position the media item. Doing so will result\nin a `BAD REQUEST` error.", 
                     "flatPath": "v1/mediaItems:batchCreate", 
                     "httpMethod": "POST", 
                     "id": "photoslibrary.mediaItems.batchCreate", 
@@ -511,7 +569,7 @@
             }
         }
     }, 
-    "revision": "20190402", 
+    "revision": "20190702", 
     "rootUrl": "https://photoslibrary.googleapis.com/", 
     "schemas": {
         "AddEnrichmentToAlbumRequest": {
@@ -535,7 +593,7 @@
             "properties": {
                 "enrichmentItem": {
                     "$ref": "EnrichmentItem", 
-                    "description": "[Output only] Enrichment which was added."
+                    "description": "Output only. Enrichment which was added."
                 }
             }, 
             "type": "object"
@@ -545,7 +603,7 @@
             "id": "Album", 
             "properties": {
                 "coverPhotoBaseUrl": {
-                    "description": "[Output only] A URL to the cover photo's bytes. This shouldn't be used as\nis. Parameters should be appended to this URL before use. For example,\n`'=w2048-h1024'` sets the dimensions of\nthe cover photo to have a width of 2048 px and height of 1024 px.", 
+                    "description": "[Output only] A URL to the cover photo's bytes. This shouldn't be used as\nis. Parameters should be appended to this URL before use. See the\n[developer\ndocumentation](https://developers.google.com/photos/library/guides/access-media-items#base-urls)\nfor a complete list of supported parameters. For example,\n`'=w2048-h1024'` sets the dimensions of the cover photo to have a width of\n2048 px and height of 1024 px.", 
                     "type": "string"
                 }, 
                 "coverPhotoMediaItemId": {
@@ -613,6 +671,26 @@
             }, 
             "type": "object"
         }, 
+        "BatchAddMediaItemsToAlbumRequest": {
+            "description": "Request to add media items to an album.", 
+            "id": "BatchAddMediaItemsToAlbumRequest", 
+            "properties": {
+                "mediaItemIds": {
+                    "description": "Identifiers of the MediaItems to be\nadded.\nThe maximum number of media items that can be added in one call is 50.", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "BatchAddMediaItemsToAlbumResponse": {
+            "description": "Response for adding media items to an album.", 
+            "id": "BatchAddMediaItemsToAlbumResponse", 
+            "properties": {}, 
+            "type": "object"
+        }, 
         "BatchCreateMediaItemsRequest": {
             "description": "Request to create one or more media items in a user's Google Photos library.\nIf an `albumid` is specified, the media items are also added to that album.\n`albumPosition` is optional and can only be specified if an `albumId` is set.", 
             "id": "BatchCreateMediaItemsRequest", 
@@ -640,7 +718,7 @@
             "id": "BatchCreateMediaItemsResponse", 
             "properties": {
                 "newMediaItemResults": {
-                    "description": "[Output only] List of media items created.", 
+                    "description": "Output only. List of media items created.", 
                     "items": {
                         "$ref": "NewMediaItemResult"
                     }, 
@@ -654,13 +732,33 @@
             "id": "BatchGetMediaItemsResponse", 
             "properties": {
                 "mediaItemResults": {
-                    "description": "[Output only] List of media items retrieved.\nNote that even if the call to BatchGetMediaItems succeeds, there may have\nbeen failures for some media items in the batch. These failures are\nindicated in each\nMediaItemResult.status.", 
+                    "description": "Output only. List of media items retrieved.\nNote that even if the call to BatchGetMediaItems succeeds, there may have\nbeen failures for some media items in the batch. These failures are\nindicated in each\nMediaItemResult.status.", 
                     "items": {
                         "$ref": "MediaItemResult"
                     }, 
                     "type": "array"
                 }
             }, 
+            "type": "object"
+        }, 
+        "BatchRemoveMediaItemsFromAlbumRequest": {
+            "description": "Request to remove a list of media items from an album.", 
+            "id": "BatchRemoveMediaItemsFromAlbumRequest", 
+            "properties": {
+                "mediaItemIds": {
+                    "description": "Identifiers of the MediaItems to be\nremoved.\n\nMust not contain repeated identifiers and cannot be empty. The maximum\nnumber of media items that can be removed in one call is 50.", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "BatchRemoveMediaItemsFromAlbumResponse": {
+            "description": "Response for successfully removing all specified media items from the album.", 
+            "id": "BatchRemoveMediaItemsFromAlbumResponse", 
+            "properties": {}, 
             "type": "object"
         }, 
         "ContentFilter": {
@@ -689,7 +787,14 @@
                         "Media items from performances.", 
                         "Media items containing whiteboards.", 
                         "Media items that are screenshots.", 
-                        "Media items that are considered to be utility. These include, but aren't\nlimited to documents, screenshots, whiteboards etc."
+                        "Media items that are considered to be utility. These include, but aren't\nlimited to documents, screenshots, whiteboards etc.", 
+                        "Media items containing art.", 
+                        "Media items containing crafts.", 
+                        "Media items related to fashion.", 
+                        "Media items containing houses.", 
+                        "Media items containing gardens.", 
+                        "Media items containing flowers.", 
+                        "Media items taken of holidays."
                     ], 
                     "items": {
                         "enum": [
@@ -712,7 +817,14 @@
                             "PERFORMANCES", 
                             "WHITEBOARDS", 
                             "SCREENSHOTS", 
-                            "UTILITY"
+                            "UTILITY", 
+                            "ARTS", 
+                            "CRAFTS", 
+                            "FASHION", 
+                            "HOUSES", 
+                            "GARDENS", 
+                            "FLOWERS", 
+                            "HOLIDAYS"
                         ], 
                         "type": "string"
                     }, 
@@ -740,7 +852,14 @@
                         "Media items from performances.", 
                         "Media items containing whiteboards.", 
                         "Media items that are screenshots.", 
-                        "Media items that are considered to be utility. These include, but aren't\nlimited to documents, screenshots, whiteboards etc."
+                        "Media items that are considered to be utility. These include, but aren't\nlimited to documents, screenshots, whiteboards etc.", 
+                        "Media items containing art.", 
+                        "Media items containing crafts.", 
+                        "Media items related to fashion.", 
+                        "Media items containing houses.", 
+                        "Media items containing gardens.", 
+                        "Media items containing flowers.", 
+                        "Media items taken of holidays."
                     ], 
                     "items": {
                         "enum": [
@@ -763,7 +882,14 @@
                             "PERFORMANCES", 
                             "WHITEBOARDS", 
                             "SCREENSHOTS", 
-                            "UTILITY"
+                            "UTILITY", 
+                            "ARTS", 
+                            "CRAFTS", 
+                            "FASHION", 
+                            "HOUSES", 
+                            "GARDENS", 
+                            "FLOWERS", 
+                            "HOLIDAYS"
                         ], 
                         "type": "string"
                     }, 
@@ -867,6 +993,28 @@
             }, 
             "type": "object"
         }, 
+        "FeatureFilter": {
+            "description": "This filter defines the features that the media items should have.", 
+            "id": "FeatureFilter", 
+            "properties": {
+                "includedFeatures": {
+                    "description": "The set of features to be included in the media item search results.\nThe items in the set are ORed and may match any of the specified features.", 
+                    "enumDescriptions": [
+                        "Treated as if no filters are applied. All features are included.", 
+                        "Media items that the user has marked as favorites in the Google Photos\napp."
+                    ], 
+                    "items": {
+                        "enum": [
+                            "NONE", 
+                            "FAVORITES"
+                        ], 
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
         "Filters": {
             "description": "Filters that can be applied to a media item search.\nIf multiple filter options are specified, they're treated as AND with each\nother.", 
             "id": "Filters", 
@@ -882,6 +1030,10 @@
                 "excludeNonAppCreatedData": {
                     "description": "If set, the results exclude media items that were not created by this app.\nDefaults to false (all media items are returned). This field is ignored if\nthe photoslibrary.readonly.appcreateddata scope is used.", 
                     "type": "boolean"
+                }, 
+                "featureFilter": {
+                    "$ref": "FeatureFilter", 
+                    "description": "Filters the media items based on their features."
                 }, 
                 "includeArchivedMedia": {
                     "description": "If set, the results include media items that the user has archived.\nDefaults to false (archived media items aren't included).", 
@@ -955,14 +1107,14 @@
             "id": "ListAlbumsResponse", 
             "properties": {
                 "albums": {
-                    "description": "[Output only] List of albums shown in the Albums tab of the user's Google\nPhotos app.", 
+                    "description": "Output only. List of albums shown in the Albums tab of the user's Google\nPhotos app.", 
                     "items": {
                         "$ref": "Album"
                     }, 
                     "type": "array"
                 }, 
                 "nextPageToken": {
-                    "description": "[Output only] Token to use to get the next set of albums. Populated if\nthere are more albums to retrieve for this request.", 
+                    "description": "Output only. Token to use to get the next set of albums. Populated if\nthere are more albums to retrieve for this request.", 
                     "type": "string"
                 }
             }, 
@@ -973,14 +1125,14 @@
             "id": "ListMediaItemsResponse", 
             "properties": {
                 "mediaItems": {
-                    "description": "[Output only] List of media items in the user's library.", 
+                    "description": "Output only. List of media items in the user's library.", 
                     "items": {
                         "$ref": "MediaItem"
                     }, 
                     "type": "array"
                 }, 
                 "nextPageToken": {
-                    "description": "[Output only] Token to use to get the next set of media items. Its presence\nis the only reliable indicator of more media items being available in the\nnext request.", 
+                    "description": "Output only. Token to use to get the next set of media items. Its presence\nis the only reliable indicator of more media items being available in the\nnext request.", 
                     "type": "string"
                 }
             }, 
@@ -991,11 +1143,11 @@
             "id": "ListSharedAlbumsResponse", 
             "properties": {
                 "nextPageToken": {
-                    "description": "[Output only] Token to use to get the next set of shared albums. Populated\nif there are more shared albums to retrieve for this request.", 
+                    "description": "Output only. Token to use to get the next set of shared albums. Populated\nif there are more shared albums to retrieve for this request.", 
                     "type": "string"
                 }, 
                 "sharedAlbums": {
-                    "description": "[Output only] List of shared albums.", 
+                    "description": "Output only. List of shared albums.", 
                     "items": {
                         "$ref": "Album"
                     }, 
@@ -1050,7 +1202,7 @@
             "id": "MediaItem", 
             "properties": {
                 "baseUrl": {
-                    "description": "A URL to the media item's bytes. This shouldn't be used directly to access\nthe media item. For example, `'=w2048-h1024'` will set the dimensions of a\nmedia item of type photo to have a width of 2048 px and height of 1024 px.", 
+                    "description": "A URL to the media item's bytes. This shouldn't be used as is. Parameters\nshould be appended to this URL before use. See the [developer\ndocumentation](https://developers.google.com/photos/library/guides/access-media-items#base-urls)\nfor a complete list of supported parameters. For example, `'=w2048-h1024'`\nwill set the dimensions of a media item of type photo to have a width of\n2048 px and height of 1024 px.", 
                     "type": "string"
                 }, 
                 "contributorInfo": {
@@ -1270,14 +1422,14 @@
             "id": "SearchMediaItemsResponse", 
             "properties": {
                 "mediaItems": {
-                    "description": "[Output only] List of media items that match the search parameters.", 
+                    "description": "Output only. List of media items that match the search parameters.", 
                     "items": {
                         "$ref": "MediaItem"
                     }, 
                     "type": "array"
                 }, 
                 "nextPageToken": {
-                    "description": "[Output only] Use this token to get the next set of media items. Its\npresence is the only reliable indicator of more media items being available\nin the next request.", 
+                    "description": "Output only. Use this token to get the next set of media items. Its\npresence is the only reliable indicator of more media items being available\nin the next request.", 
                     "type": "string"
                 }
             }, 
@@ -1300,7 +1452,7 @@
             "properties": {
                 "shareInfo": {
                     "$ref": "ShareInfo", 
-                    "description": "[Output only] Information about the shared album."
+                    "description": "Output only. Information about the shared album."
                 }
             }, 
             "type": "object"
@@ -1355,7 +1507,7 @@
             "type": "object"
         }, 
         "Status": {
-            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security/privacy reasons.", 
+            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).", 
             "id": "Status", 
             "properties": {
                 "code": {

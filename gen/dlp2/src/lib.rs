@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DLP* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *DLP* crate version *1.0.9+20190629*, where *20190629* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *DLP* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/dlp/docs/).
@@ -16,7 +16,7 @@
 //! * organizations
 //!  * [*deidentify templates create*](struct.OrganizationDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](struct.OrganizationDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](struct.OrganizationDeidentifyTemplateGetCall.html), [*deidentify templates list*](struct.OrganizationDeidentifyTemplateListCall.html), [*deidentify templates patch*](struct.OrganizationDeidentifyTemplatePatchCall.html), [*inspect templates create*](struct.OrganizationInspectTemplateCreateCall.html), [*inspect templates delete*](struct.OrganizationInspectTemplateDeleteCall.html), [*inspect templates get*](struct.OrganizationInspectTemplateGetCall.html), [*inspect templates list*](struct.OrganizationInspectTemplateListCall.html), [*inspect templates patch*](struct.OrganizationInspectTemplatePatchCall.html), [*stored info types create*](struct.OrganizationStoredInfoTypeCreateCall.html), [*stored info types delete*](struct.OrganizationStoredInfoTypeDeleteCall.html), [*stored info types get*](struct.OrganizationStoredInfoTypeGetCall.html), [*stored info types list*](struct.OrganizationStoredInfoTypeListCall.html) and [*stored info types patch*](struct.OrganizationStoredInfoTypePatchCall.html)
 //! * projects
-//!  * [*content deidentify*](struct.ProjectContentDeidentifyCall.html), [*content inspect*](struct.ProjectContentInspectCall.html), [*content reidentify*](struct.ProjectContentReidentifyCall.html), [*deidentify templates create*](struct.ProjectDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](struct.ProjectDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](struct.ProjectDeidentifyTemplateGetCall.html), [*deidentify templates list*](struct.ProjectDeidentifyTemplateListCall.html), [*deidentify templates patch*](struct.ProjectDeidentifyTemplatePatchCall.html), [*dlp jobs cancel*](struct.ProjectDlpJobCancelCall.html), [*dlp jobs create*](struct.ProjectDlpJobCreateCall.html), [*dlp jobs delete*](struct.ProjectDlpJobDeleteCall.html), [*dlp jobs get*](struct.ProjectDlpJobGetCall.html), [*dlp jobs list*](struct.ProjectDlpJobListCall.html), [*image redact*](struct.ProjectImageRedactCall.html), [*inspect templates create*](struct.ProjectInspectTemplateCreateCall.html), [*inspect templates delete*](struct.ProjectInspectTemplateDeleteCall.html), [*inspect templates get*](struct.ProjectInspectTemplateGetCall.html), [*inspect templates list*](struct.ProjectInspectTemplateListCall.html), [*inspect templates patch*](struct.ProjectInspectTemplatePatchCall.html), [*job triggers activate*](struct.ProjectJobTriggerActivateCall.html), [*job triggers create*](struct.ProjectJobTriggerCreateCall.html), [*job triggers delete*](struct.ProjectJobTriggerDeleteCall.html), [*job triggers get*](struct.ProjectJobTriggerGetCall.html), [*job triggers list*](struct.ProjectJobTriggerListCall.html), [*job triggers patch*](struct.ProjectJobTriggerPatchCall.html), [*stored info types create*](struct.ProjectStoredInfoTypeCreateCall.html), [*stored info types delete*](struct.ProjectStoredInfoTypeDeleteCall.html), [*stored info types get*](struct.ProjectStoredInfoTypeGetCall.html), [*stored info types list*](struct.ProjectStoredInfoTypeListCall.html) and [*stored info types patch*](struct.ProjectStoredInfoTypePatchCall.html)
+//!  * [*content deidentify*](struct.ProjectContentDeidentifyCall.html), [*content inspect*](struct.ProjectContentInspectCall.html), [*content reidentify*](struct.ProjectContentReidentifyCall.html), [*deidentify templates create*](struct.ProjectDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](struct.ProjectDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](struct.ProjectDeidentifyTemplateGetCall.html), [*deidentify templates list*](struct.ProjectDeidentifyTemplateListCall.html), [*deidentify templates patch*](struct.ProjectDeidentifyTemplatePatchCall.html), [*dlp jobs cancel*](struct.ProjectDlpJobCancelCall.html), [*dlp jobs create*](struct.ProjectDlpJobCreateCall.html), [*dlp jobs delete*](struct.ProjectDlpJobDeleteCall.html), [*dlp jobs get*](struct.ProjectDlpJobGetCall.html), [*dlp jobs list*](struct.ProjectDlpJobListCall.html), [*image redact*](struct.ProjectImageRedactCall.html), [*inspect templates create*](struct.ProjectInspectTemplateCreateCall.html), [*inspect templates delete*](struct.ProjectInspectTemplateDeleteCall.html), [*inspect templates get*](struct.ProjectInspectTemplateGetCall.html), [*inspect templates list*](struct.ProjectInspectTemplateListCall.html), [*inspect templates patch*](struct.ProjectInspectTemplatePatchCall.html), [*job triggers activate*](struct.ProjectJobTriggerActivateCall.html), [*job triggers create*](struct.ProjectJobTriggerCreateCall.html), [*job triggers delete*](struct.ProjectJobTriggerDeleteCall.html), [*job triggers get*](struct.ProjectJobTriggerGetCall.html), [*job triggers list*](struct.ProjectJobTriggerListCall.html), [*job triggers patch*](struct.ProjectJobTriggerPatchCall.html), [*locations content deidentify*](struct.ProjectLocationContentDeidentifyCall.html), [*stored info types create*](struct.ProjectStoredInfoTypeCreateCall.html), [*stored info types delete*](struct.ProjectStoredInfoTypeDeleteCall.html), [*stored info types get*](struct.ProjectStoredInfoTypeGetCall.html), [*stored info types list*](struct.ProjectStoredInfoTypeListCall.html) and [*stored info types patch*](struct.ProjectStoredInfoTypePatchCall.html)
 //! 
 //! 
 //! 
@@ -229,9 +229,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -343,7 +341,7 @@ impl<'a, C, A> DLP<C, A>
         DLP {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://dlp.googleapis.com/".to_string(),
             _root_url: "https://dlp.googleapis.com/".to_string(),
         }
@@ -360,7 +358,7 @@ impl<'a, C, A> DLP<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -405,8 +403,7 @@ pub struct GooglePrivacyDlpV2InspectJobConfig {
     /// The data to scan.
     #[serde(rename="storageConfig")]
     pub storage_config: Option<GooglePrivacyDlpV2StorageConfig>,
-    /// Actions to execute at the completion of the job. Are executed in the order
-    /// provided.
+    /// Actions to execute at the completion of the job.
     pub actions: Option<Vec<GooglePrivacyDlpV2Action>>,
 }
 
@@ -493,22 +490,28 @@ pub struct GooglePrivacyDlpV2DeidentifyConfig {
 impl Part for GooglePrivacyDlpV2DeidentifyConfig {}
 
 
-/// Message for specifying a window around a finding to apply a detection
-/// rule.
+/// Response message for ListStoredInfoTypes.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [stored info types list organizations](struct.OrganizationStoredInfoTypeListCall.html) (response)
+/// * [stored info types list projects](struct.ProjectStoredInfoTypeListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2Proximity {
-    /// Number of characters after the finding to consider.
-    #[serde(rename="windowAfter")]
-    pub window_after: Option<i32>,
-    /// Number of characters before the finding to consider.
-    #[serde(rename="windowBefore")]
-    pub window_before: Option<i32>,
+pub struct GooglePrivacyDlpV2ListStoredInfoTypesResponse {
+    /// If the next page is available then the next page token to be used
+    /// in following ListStoredInfoTypes request.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of storedInfoTypes, up to page_size in ListStoredInfoTypesRequest.
+    #[serde(rename="storedInfoTypes")]
+    pub stored_info_types: Option<Vec<GooglePrivacyDlpV2StoredInfoType>>,
 }
 
-impl Part for GooglePrivacyDlpV2Proximity {}
+impl ResponseResult for GooglePrivacyDlpV2ListStoredInfoTypesResponse {}
 
 
 /// Max findings configuration per infoType, per content item or long
@@ -826,6 +829,28 @@ pub struct GooglePrivacyDlpV2CryptoDeterministicConfig {
 impl Part for GooglePrivacyDlpV2CryptoDeterministicConfig {}
 
 
+/// This is a data encryption key (DEK) (as opposed to
+/// a key encryption key (KEK) stored by KMS).
+/// When using KMS to wrap/unwrap DEKs, be sure to set an appropriate
+/// IAM policy on the KMS CryptoKey (KEK) to ensure an attacker cannot
+/// unwrap the data crypto key.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2CryptoKey {
+    /// no description provided
+    #[serde(rename="kmsWrapped")]
+    pub kms_wrapped: Option<GooglePrivacyDlpV2KmsWrappedCryptoKey>,
+    /// no description provided
+    pub unwrapped: Option<GooglePrivacyDlpV2UnwrappedCryptoKey>,
+    /// no description provided
+    pub transient: Option<GooglePrivacyDlpV2TransientCryptoKey>,
+}
+
+impl Part for GooglePrivacyDlpV2CryptoKey {}
+
+
 /// Response message for ListInspectTemplates.
 /// 
 /// # Activities
@@ -928,7 +953,10 @@ pub struct GooglePrivacyDlpV2ActivateJobTriggerRequest { _never_set: Option<bool
 impl RequestValue for GooglePrivacyDlpV2ActivateJobTriggerRequest {}
 
 
-/// Publish the results of a DlpJob to a pub sub channel.
+/// Publish a message into given Pub/Sub topic when DlpJob has completed. The
+/// message contains a single field, `DlpJobName`, which is equal to the
+/// finished job's
+/// [`DlpJob.name`](/dlp/docs/reference/rest/v2/projects.dlpJobs#DlpJob).
 /// Compatible with: Inspect, Risk
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -964,28 +992,22 @@ pub struct GooglePrivacyDlpV2ListInfoTypesResponse {
 impl ResponseResult for GooglePrivacyDlpV2ListInfoTypesResponse {}
 
 
-/// Response message for ListStoredInfoTypes.
+/// Message for specifying a window around a finding to apply a detection
+/// rule.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [stored info types list organizations](struct.OrganizationStoredInfoTypeListCall.html) (response)
-/// * [stored info types list projects](struct.ProjectStoredInfoTypeListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2ListStoredInfoTypesResponse {
-    /// If the next page is available then the next page token to be used
-    /// in following ListStoredInfoTypes request.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of storedInfoTypes, up to page_size in ListStoredInfoTypesRequest.
-    #[serde(rename="storedInfoTypes")]
-    pub stored_info_types: Option<Vec<GooglePrivacyDlpV2StoredInfoType>>,
+pub struct GooglePrivacyDlpV2Proximity {
+    /// Number of characters after the finding to consider.
+    #[serde(rename="windowAfter")]
+    pub window_after: Option<i32>,
+    /// Number of characters before the finding to consider.
+    #[serde(rename="windowBefore")]
+    pub window_before: Option<i32>,
 }
 
-impl ResponseResult for GooglePrivacyDlpV2ListStoredInfoTypesResponse {}
+impl Part for GooglePrivacyDlpV2Proximity {}
 
 
 /// Location of a finding within a row or record.
@@ -1388,16 +1410,10 @@ impl Part for GooglePrivacyDlpV2ExcludeInfoTypes {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [content deidentify projects](struct.ProjectContentDeidentifyCall.html) (request)
+/// * [locations content deidentify projects](struct.ProjectLocationContentDeidentifyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2DeidentifyContentRequest {
-    /// Optional template to use. Any configuration directly specified in
-    /// deidentify_config will override those set in the template. Singular fields
-    /// that are set in this request will replace their corresponding fields in the
-    /// template. Repeated fields are appended. Singular sub-messages and groups
-    /// are recursively merged.
-    #[serde(rename="deidentifyTemplateName")]
-    pub deidentify_template_name: Option<String>,
     /// The item to de-identify. Will be treated as text.
     pub item: Option<GooglePrivacyDlpV2ContentItem>,
     /// Configuration for the de-identification of the content item.
@@ -1405,6 +1421,21 @@ pub struct GooglePrivacyDlpV2DeidentifyContentRequest {
     /// deidentify_template_name argument.
     #[serde(rename="deidentifyConfig")]
     pub deidentify_config: Option<GooglePrivacyDlpV2DeidentifyConfig>,
+    /// The geographic location to process de-identification. Reserved for future
+    /// extensions.
+    pub location: Option<String>,
+    /// Optional template to use. Any configuration directly specified in
+    /// deidentify_config will override those set in the template. Singular fields
+    /// that are set in this request will replace their corresponding fields in the
+    /// template. Repeated fields are appended. Singular sub-messages and groups
+    /// are recursively merged.
+    #[serde(rename="deidentifyTemplateName")]
+    pub deidentify_template_name: Option<String>,
+    /// Configuration for the inspector.
+    /// Items specified here will override the template referenced by the
+    /// inspect_template_name argument.
+    #[serde(rename="inspectConfig")]
+    pub inspect_config: Option<GooglePrivacyDlpV2InspectConfig>,
     /// Optional template to use. Any configuration directly specified in
     /// inspect_config will override those set in the template. Singular fields
     /// that are set in this request will replace their corresponding fields in the
@@ -1412,11 +1443,6 @@ pub struct GooglePrivacyDlpV2DeidentifyContentRequest {
     /// are recursively merged.
     #[serde(rename="inspectTemplateName")]
     pub inspect_template_name: Option<String>,
-    /// Configuration for the inspector.
-    /// Items specified here will override the template referenced by the
-    /// inspect_template_name argument.
-    #[serde(rename="inspectConfig")]
-    pub inspect_config: Option<GooglePrivacyDlpV2InspectConfig>,
 }
 
 impl RequestValue for GooglePrivacyDlpV2DeidentifyContentRequest {}
@@ -1816,26 +1842,23 @@ pub struct GooglePrivacyDlpV2RedactConfig { _never_set: Option<bool> }
 impl Part for GooglePrivacyDlpV2RedactConfig {}
 
 
-/// This is a data encryption key (DEK) (as opposed to
-/// a key encryption key (KEK) stored by KMS).
-/// When using KMS to wrap/unwrap DEKs, be sure to set an appropriate
-/// IAM policy on the KMS CryptoKey (KEK) to ensure an attacker cannot
-/// unwrap the data crypto key.
+/// Publish findings of a DlpJob to Cloud Data Catalog. Labels summarizing the
+/// results of the DlpJob will be applied to the entry for the resource scanned
+/// in Cloud Data Catalog. Any labels previously written by another DlpJob will
+/// be deleted. InfoType naming patterns are strictly enforced when using this
+/// feature. Note that the findings will be persisted in Cloud Data Catalog
+/// storage and are governed by Data Catalog service-specific policy, see
+/// https://cloud.google.com/terms/service-terms
+/// Only a single instance of this action can be specified and only allowed if
+/// all resources being scanned are BigQuery tables.
+/// Compatible with: Inspect
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2CryptoKey {
-    /// no description provided
-    #[serde(rename="kmsWrapped")]
-    pub kms_wrapped: Option<GooglePrivacyDlpV2KmsWrappedCryptoKey>,
-    /// no description provided
-    pub unwrapped: Option<GooglePrivacyDlpV2UnwrappedCryptoKey>,
-    /// no description provided
-    pub transient: Option<GooglePrivacyDlpV2TransientCryptoKey>,
-}
+pub struct GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog { _never_set: Option<bool> }
 
-impl Part for GooglePrivacyDlpV2CryptoKey {}
+impl Part for GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog {}
 
 
 /// There is no detailed description.
@@ -2052,9 +2075,10 @@ pub struct GooglePrivacyDlpV2UpdateStoredInfoTypeRequest {
 impl RequestValue for GooglePrivacyDlpV2UpdateStoredInfoTypeRequest {}
 
 
-/// Rule for modifying a CustomInfoType to alter behavior under certain
-/// circumstances, depending on the specific details of the rule. Not supported
-/// for the `surrogate_type` custom info type.
+/// Deprecated; use `InspectionRuleSet` instead. Rule for modifying a
+/// `CustomInfoType` to alter behavior under certain circumstances, depending
+/// on the specific details of the rule. Not supported for the `surrogate_type`
+/// custom infoType.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2316,6 +2340,9 @@ pub struct GooglePrivacyDlpV2Action {
     /// Publish summary to Cloud Security Command Center (Alpha).
     #[serde(rename="publishSummaryToCscc")]
     pub publish_summary_to_cscc: Option<GooglePrivacyDlpV2PublishSummaryToCscc>,
+    /// Publish findings to Cloud Datahub.
+    #[serde(rename="publishFindingsToCloudDataCatalog")]
+    pub publish_findings_to_cloud_data_catalog: Option<GooglePrivacyDlpV2PublishFindingsToCloudDataCatalog>,
     /// Publish a notification to a pubsub topic.
     #[serde(rename="pubSub")]
     pub pub_sub: Option<GooglePrivacyDlpV2PublishToPubSub>,
@@ -3044,6 +3071,20 @@ pub struct GooglePrivacyDlpV2KmsWrappedCryptoKey {
 impl Part for GooglePrivacyDlpV2KmsWrappedCryptoKey {}
 
 
+/// Summary statistics of a custom dictionary.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2LargeCustomDictionaryStats {
+    /// Approximate number of distinct phrases in the dictionary.
+    #[serde(rename="approxNumPhrases")]
+    pub approx_num_phrases: Option<String>,
+}
+
+impl Part for GooglePrivacyDlpV2LargeCustomDictionaryStats {}
+
+
 /// Location of the finding within an image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3084,6 +3125,20 @@ pub struct GooglePrivacyDlpV2WordList {
 }
 
 impl Part for GooglePrivacyDlpV2WordList {}
+
+
+/// Statistics for a StoredInfoType.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2StoredInfoTypeStats {
+    /// StoredInfoType where findings are defined by a dictionary of phrases.
+    #[serde(rename="largeCustomDictionary")]
+    pub large_custom_dictionary: Option<GooglePrivacyDlpV2LargeCustomDictionaryStats>,
+}
+
+impl Part for GooglePrivacyDlpV2StoredInfoTypeStats {}
 
 
 /// There is no detailed description.
@@ -3475,6 +3530,8 @@ impl Part for GooglePrivacyDlpV2DeltaPresenceEstimationConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2StoredInfoTypeVersion {
+    /// StoredInfoType configuration.
+    pub config: Option<GooglePrivacyDlpV2StoredInfoTypeConfig>,
     /// Stored info type version state. Read-only, updated by the system
     /// during dictionary creation.
     pub state: Option<String>,
@@ -3490,8 +3547,8 @@ pub struct GooglePrivacyDlpV2StoredInfoTypeVersion {
     /// storedInfoType to continue using it, reusing the same `config` if it was
     /// not the source of the error.
     pub errors: Option<Vec<GooglePrivacyDlpV2Error>>,
-    /// StoredInfoType configuration.
-    pub config: Option<GooglePrivacyDlpV2StoredInfoTypeConfig>,
+    /// Statistics about this storedInfoType version.
+    pub stats: Option<GooglePrivacyDlpV2StoredInfoTypeStats>,
     /// Create timestamp of the version. Read-only, determined by the system
     /// when the version is created.
     #[serde(rename="createTime")]
@@ -3540,6 +3597,7 @@ impl Part for GooglePrivacyDlpV2KMapEstimationConfig {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [content deidentify projects](struct.ProjectContentDeidentifyCall.html) (response)
+/// * [locations content deidentify projects](struct.ProjectLocationContentDeidentifyCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2DeidentifyContentResponse {
@@ -3921,56 +3979,11 @@ impl Part for GooglePrivacyDlpV2LargeCustomDictionaryConfig {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -5069,7 +5082,7 @@ impl<'a, C, A> InfoTypeMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = DLP::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `content_deidentify(...)`, `content_inspect(...)`, `content_reidentify(...)`, `deidentify_templates_create(...)`, `deidentify_templates_delete(...)`, `deidentify_templates_get(...)`, `deidentify_templates_list(...)`, `deidentify_templates_patch(...)`, `dlp_jobs_cancel(...)`, `dlp_jobs_create(...)`, `dlp_jobs_delete(...)`, `dlp_jobs_get(...)`, `dlp_jobs_list(...)`, `image_redact(...)`, `inspect_templates_create(...)`, `inspect_templates_delete(...)`, `inspect_templates_get(...)`, `inspect_templates_list(...)`, `inspect_templates_patch(...)`, `job_triggers_activate(...)`, `job_triggers_create(...)`, `job_triggers_delete(...)`, `job_triggers_get(...)`, `job_triggers_list(...)`, `job_triggers_patch(...)`, `stored_info_types_create(...)`, `stored_info_types_delete(...)`, `stored_info_types_get(...)`, `stored_info_types_list(...)` and `stored_info_types_patch(...)`
+/// // like `content_deidentify(...)`, `content_inspect(...)`, `content_reidentify(...)`, `deidentify_templates_create(...)`, `deidentify_templates_delete(...)`, `deidentify_templates_get(...)`, `deidentify_templates_list(...)`, `deidentify_templates_patch(...)`, `dlp_jobs_cancel(...)`, `dlp_jobs_create(...)`, `dlp_jobs_delete(...)`, `dlp_jobs_get(...)`, `dlp_jobs_list(...)`, `image_redact(...)`, `inspect_templates_create(...)`, `inspect_templates_delete(...)`, `inspect_templates_get(...)`, `inspect_templates_list(...)`, `inspect_templates_patch(...)`, `job_triggers_activate(...)`, `job_triggers_create(...)`, `job_triggers_delete(...)`, `job_triggers_get(...)`, `job_triggers_list(...)`, `job_triggers_patch(...)`, `locations_content_deidentify(...)`, `stored_info_types_create(...)`, `stored_info_types_delete(...)`, `stored_info_types_get(...)`, `stored_info_types_list(...)` and `stored_info_types_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -5183,6 +5196,35 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// De-identifies potentially sensitive info from a ContentItem.
+    /// This method has limits on input size and output size.
+    /// See https://cloud.google.com/dlp/docs/deidentify-sensitive-data to
+    /// learn more.
+    /// 
+    /// When no InfoTypes or CustomInfoTypes are specified in this request, the
+    /// system will automatically choose what detectors to run. By default this may
+    /// be all types, but may change over time as detectors are updated.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The parent resource name, for example projects/my-project-id.
+    /// * `location` - The geographic location to process de-identification. Reserved for future
+    ///                extensions.
+    pub fn locations_content_deidentify(&self, request: GooglePrivacyDlpV2DeidentifyContentRequest, parent: &str, location: &str) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
+        ProjectLocationContentDeidentifyCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _location: location.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -11424,6 +11466,305 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
+/// De-identifies potentially sensitive info from a ContentItem.
+/// This method has limits on input size and output size.
+/// See https://cloud.google.com/dlp/docs/deidentify-sensitive-data to
+/// learn more.
+/// 
+/// When no InfoTypes or CustomInfoTypes are specified in this request, the
+/// system will automatically choose what detectors to run. By default this may
+/// be all types, but may change over time as detectors are updated.
+///
+/// A builder for the *locations.content.deidentify* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dlp2 as dlp2;
+/// use dlp2::GooglePrivacyDlpV2DeidentifyContentRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dlp2::DLP;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DLP::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GooglePrivacyDlpV2DeidentifyContentRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_content_deidentify(req, "parent", "location")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationContentDeidentifyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DLP<C, A>,
+    _request: GooglePrivacyDlpV2DeidentifyContentRequest,
+    _parent: String,
+    _location: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationContentDeidentifyCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GooglePrivacyDlpV2DeidentifyContentResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dlp.projects.locations.content.deidentify",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        params.push(("location", self._location.to_string()));
+        for &field in ["alt", "parent", "location"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{location}/content:deidentify";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent"), ("{location}", "location")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["location", "parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2DeidentifyContentRequest) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The parent resource name, for example projects/my-project-id.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The geographic location to process de-identification. Reserved for future
+    /// extensions.
+    ///
+    /// Sets the *location* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn location(mut self, new_value: &str) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
+        self._location = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationContentDeidentifyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationContentDeidentifyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Finds potentially sensitive info in content.
 /// This method has limits on input size, processing time, and output size.
 /// 
@@ -14192,10 +14533,10 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().dlp_jobs_list("parent")
-///              .type_("aliquyam")
-///              .page_token("accusam")
-///              .page_size(-56)
-///              .order_by("sea")
+///              .type_("Lorem")
+///              .page_token("sea")
+///              .page_size(-21)
+///              .order_by("duo")
 ///              .filter("et")
 ///              .doit();
 /// # }
@@ -14426,8 +14767,12 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///     - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED
     ///     - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
     ///     - `trigger_name` - The resource name of the trigger that created job.
+    ///     - 'end_time` - Corresponds to time the job finished.
+    ///     - 'start_time` - Corresponds to time the job finished.
     /// * Supported fields for risk analysis jobs:
     ///     - `state` - RUNNING|CANCELED|FINISHED|FAILED
+    ///     - 'end_time` - Corresponds to time the job finished.
+    ///     - 'start_time` - Corresponds to time the job finished.
     /// * The operator must be `=` or `!=`.
     /// 
     /// Examples:
@@ -14435,6 +14780,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * inspected_storage = cloud_storage AND state = done
     /// * inspected_storage = cloud_storage OR inspected_storage = bigquery
     /// * inspected_storage = cloud_storage AND (state = done OR state = canceled)
+    /// * end_time > \"2017-12-12T00:00:00+00:00\"
     /// 
     /// The length of this field should be no more than 500 characters.
     ///
@@ -14536,9 +14882,9 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().deidentify_templates_list("parent")
-///              .page_token("et")
-///              .page_size(-40)
-///              .order_by("sanctus")
+///              .page_token("sanctus")
+///              .page_size(-22)
+///              .order_by("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -15119,9 +15465,9 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().inspect_templates_list("parent")
-///              .page_token("et")
-///              .page_size(-45)
-///              .order_by("ut")
+///              .page_token("ut")
+///              .page_size(-16)
+///              .order_by("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -17302,10 +17648,10 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().job_triggers_list("parent")
-///              .page_token("voluptua.")
-///              .page_size(-56)
-///              .order_by("gubergren")
-///              .filter("justo")
+///              .page_token("gubergren")
+///              .page_size(-20)
+///              .order_by("sit")
+///              .filter("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -18177,8 +18523,8 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().stored_info_types_list("parent")
-///              .page_token("rebum.")
-///              .page_size(-45)
+///              .page_token("sadipscing")
+///              .page_size(-76)
 ///              .order_by("sadipscing")
 ///              .doit();
 /// # }

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-containeranalysis1_beta1-cli"
-version = "1.0.8+20190401"
+version = "1.0.9+20190625"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container Analysis (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/containeranalysis1_beta1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-containeranalysis1_beta1]
 path = "../containeranalysis1_beta1"
-version = "1.0.8+20190401"
+version = "1.0.9+20190625"

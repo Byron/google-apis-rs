@@ -15,7 +15,7 @@
     "description": "API for viewing and managing your reports in DoubleClick Bid Manager.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/bid-manager/", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/vSggj-z-qW3M62EdSOFmciWBPcE\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/EksXu9fzLlIS4f_irK3G9BKBZK8\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -257,7 +257,7 @@
             }
         }
     }, 
-    "revision": "20190125", 
+    "revision": "20190618", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "DownloadLineItemsRequest": {
@@ -325,7 +325,7 @@
             "id": "DownloadRequest", 
             "properties": {
                 "fileTypes": {
-                    "description": "File types that will be returned.\n\nAcceptable values are:  \n- \"AD\" \n- \"AD_GROUP\" \n- \"CAMPAIGN\" \n- \"INSERTION_ORDER\" \n- \"LINE_ITEM\" \n- \"INVENTORY_SOURCE\"", 
+                    "description": "File types that will be returned. If INVENTORY_SOURCE is requested, no other file types may be requested.\n\nAcceptable values are:  \n- \"AD\" \n- \"AD_GROUP\" \n- \"CAMPAIGN\" \n- \"INSERTION_ORDER\" \n- \"INVENTORY_SOURCE\" \n- \"LINE_ITEM\"", 
                     "items": {
                         "enum": [
                             "AD", 
@@ -356,7 +356,7 @@
                     "type": "array"
                 }, 
                 "filterType": {
-                    "description": "Filter type used to filter entities to fetch.", 
+                    "description": "Filter type used to filter entities to fetch. PARTNER_ID and INVENTORY_SOURCE_ID may only be used when downloading inventory sources.", 
                     "enum": [
                         "ADVERTISER_ID", 
                         "CAMPAIGN_ID", 
@@ -462,6 +462,7 @@
                         "FILTER_INVENTORY_FORMAT", 
                         "FILTER_INVENTORY_RATE_TYPE", 
                         "FILTER_INVENTORY_SOURCE", 
+                        "FILTER_INVENTORY_SOURCE_EXTERNAL_ID", 
                         "FILTER_INVENTORY_SOURCE_TYPE", 
                         "FILTER_KEYWORD", 
                         "FILTER_LINE_ITEM", 
@@ -549,6 +550,7 @@
                         "FILTER_ZIP_CODE"
                     ], 
                     "enumDescriptions": [
+                        "", 
                         "", 
                         "", 
                         "", 
@@ -783,6 +785,7 @@
                             "FILTER_INVENTORY_FORMAT", 
                             "FILTER_INVENTORY_RATE_TYPE", 
                             "FILTER_INVENTORY_SOURCE", 
+                            "FILTER_INVENTORY_SOURCE_EXTERNAL_ID", 
                             "FILTER_INVENTORY_SOURCE_TYPE", 
                             "FILTER_KEYWORD", 
                             "FILTER_LINE_ITEM", 
@@ -997,6 +1000,7 @@
                             "", 
                             "", 
                             "", 
+                            "", 
                             ""
                         ], 
                         "type": "string"
@@ -1004,7 +1008,7 @@
                     "type": "array"
                 }, 
                 "includeInviteData": {
-                    "description": "Whether to include data from Invite Media.", 
+                    "description": "Deprecated. This field is no longer in use.", 
                     "type": "boolean"
                 }, 
                 "metrics": {
@@ -1039,6 +1043,7 @@
                             "METRIC_BILLABLE_COST_ADVERTISER", 
                             "METRIC_BILLABLE_COST_PARTNER", 
                             "METRIC_BILLABLE_COST_USD", 
+                            "METRIC_BILLABLE_IMPRESSIONS", 
                             "METRIC_CLICKS", 
                             "METRIC_CLICK_TO_POST_CLICK_CONVERSION_RATE", 
                             "METRIC_CM_POST_CLICK_REVENUE", 
@@ -1248,7 +1253,6 @@
                             "METRIC_RICH_MEDIA_VIDEO_THIRD_QUARTILE_COMPLETES", 
                             "METRIC_TEA_TRUEVIEW_IMPRESSIONS", 
                             "METRIC_TEA_TRUEVIEW_UNIQUE_COOKIES", 
-                            "METRIC_TEA_TRUEVIEW_UNIQUE_PEOPLE", 
                             "METRIC_TOTAL_CONVERSIONS", 
                             "METRIC_TOTAL_MEDIA_COST_ADVERTISER", 
                             "METRIC_TOTAL_MEDIA_COST_ECPAPC_ADVERTISER", 

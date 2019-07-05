@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.9+20190702*, where *20190702* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -269,9 +269,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -384,7 +382,7 @@ impl<'a, C, A> ShoppingContent<C, A>
         ShoppingContent {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/content/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -440,7 +438,7 @@ impl<'a, C, A> ShoppingContent<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -918,7 +916,7 @@ impl Part for OrdersCustomBatchRequestEntryReturnLineItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderCustomerMarketingRightsInfo {
-    /// Last known user selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty.
+    /// Last known customer selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty. If a customer selected granted in their most recent order, they can be subscribed to marketing emails. Customers who have chosen denied must not be subscribed, or must be unsubscribed if already opted-in.
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<String>,
     /// Timestamp when last time marketing preference was updated. Could be empty, if user wasn't offered a selection yet.
@@ -2555,7 +2553,7 @@ pub struct OrderCustomer {
     pub full_name: Option<String>,
     /// Deprecated.
     pub email: Option<String>,
-    /// Customer's marketing preferences.
+    /// Customer's marketing preferences. Contains the marketing opt-in information that is current at the time that the merchant call. User preference selections can change from one order to the next so preferences must be checked with every order.
     #[serde(rename="marketingRightsInfo")]
     pub marketing_rights_info: Option<OrderCustomerMarketingRightsInfo>,
 }
@@ -3619,7 +3617,7 @@ pub struct Order {
     pub shipping_option: Option<String>,
     /// The status of the order.
     pub status: Option<String>,
-    /// The details for the delivery.
+    /// Delivery details for shipments.
     #[serde(rename="deliveryDetails")]
     pub delivery_details: Option<OrderDeliveryDetails>,
     /// The date when the order was placed, in ISO 8601 format.
@@ -4442,16 +4440,19 @@ pub struct ProductsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The product to insert. Only required if the method is insert.
-    pub product: Option<Product>,
-    /// The ID of the managing account.
-    #[serde(rename="merchantId")]
-    pub merchant_id: Option<String>,
     /// no description provided
     pub method: Option<String>,
+    /// The product to insert. Only required if the method is insert.
+    pub product: Option<Product>,
     /// The ID of the product to get or delete. Only defined if the method is get or delete.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
+    /// The ContentAPI feed id.
+    #[serde(rename="feedId")]
+    pub feed_id: Option<String>,
+    /// The ID of the managing account.
+    #[serde(rename="merchantId")]
+    pub merchant_id: Option<String>,
 }
 
 impl Part for ProductsCustomBatchRequestEntry {}
@@ -5114,6 +5115,20 @@ impl Part for OrdersCustomBatchRequestEntryReturnRefundLineItem {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BusinessDayConfig {
+    /// Regular business days. May not be empty.
+    #[serde(rename="businessDays")]
+    pub business_days: Option<Vec<String>>,
+}
+
+impl Part for BusinessDayConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Row {
     /// The list of cells that constitute the row. Must have the same length as columnHeaders for two-dimensional tables, a length of 1 for one-dimensional tables. Required.
     pub cells: Option<Vec<Value>>,
@@ -5150,24 +5165,30 @@ pub struct DeliveryTime {
     /// Minimum number of business days spent before an order is shipped. 0 means same day shipped, 1 means next day shipped.
     #[serde(rename="minHandlingTimeInDays")]
     pub min_handling_time_in_days: Option<u32>,
+    /// The business days during which orders can be handled. If not provided, Monday to Friday business days will be assumed.
+    #[serde(rename="handlingBusinessDayConfig")]
+    pub handling_business_day_config: Option<BusinessDayConfig>,
+    /// Maximum number of business days spent before an order is shipped. 0 means same day shipped, 1 means next day shipped. Must be greater than or equal to minHandlingTimeInDays.
+    #[serde(rename="maxHandlingTimeInDays")]
+    pub max_handling_time_in_days: Option<u32>,
+    /// Transit time table, number of business days spent in transit based on row and column dimensions. Either {min,max}TransitTimeInDays or transitTimeTable can be set, but not both.
+    #[serde(rename="transitTimeTable")]
+    pub transit_time_table: Option<TransitTable>,
+    /// The business days during which orders can be in-transit. If not provided, Monday to Friday business days will be assumed.
+    #[serde(rename="transitBusinessDayConfig")]
+    pub transit_business_day_config: Option<BusinessDayConfig>,
     /// Business days cutoff time definition. If not configured the cutoff time will be defaulted to 8AM PST.
     #[serde(rename="cutoffTime")]
     pub cutoff_time: Option<CutoffTime>,
     /// Maximum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Must be greater than or equal to minTransitTimeInDays.
     #[serde(rename="maxTransitTimeInDays")]
     pub max_transit_time_in_days: Option<u32>,
-    /// Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Either {min,max}transitTimeInDays or transitTimeTable must be set, but not both.
+    /// Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Either {min,max}TransitTimeInDays or transitTimeTable must be set, but not both.
     #[serde(rename="minTransitTimeInDays")]
     pub min_transit_time_in_days: Option<u32>,
-    /// Maximum number of business days spent before an order is shipped. 0 means same day shipped, 1 means next day shipped. Must be greater than or equal to minHandlingTimeInDays.
-    #[serde(rename="maxHandlingTimeInDays")]
-    pub max_handling_time_in_days: Option<u32>,
     /// Holiday cutoff definitions. If configured, they specify order cutoff times for holiday-specific shipping.
     #[serde(rename="holidayCutoffs")]
     pub holiday_cutoffs: Option<Vec<HolidayCutoff>>,
-    /// Transit time table, number of business days spent in transit based on row and column dimensions. Either {min,max}transitTimeInDays or transitTimeTable can be set, but not both.
-    #[serde(rename="transitTimeTable")]
-    pub transit_time_table: Option<TransitTable>,
 }
 
 impl Part for DeliveryTime {}
@@ -6126,11 +6147,15 @@ pub struct OrderShipment {
     /// - "dynamex" 
     /// - "lasership" 
     /// - "mpx" 
-    /// - "uds"  
+    /// - "uds" 
+    /// - "efw"  
     /// 
     /// Acceptable values for FR are:  
     /// - "colissimo" 
-    /// - "chronopost"
+    /// - "chronopost" 
+    /// - "gls" 
+    /// - "dpd" 
+    /// - "bpost"
     pub carrier: Option<String>,
     /// The tracking ID for the shipment.
     #[serde(rename="trackingId")]
@@ -6387,6 +6412,8 @@ pub struct TestOrderLineItemProduct {
     pub gtin: Option<String>,
     /// Condition or state of the item.
     pub condition: Option<String>,
+    /// Fees for the item. Optional.
+    pub fees: Option<Vec<OrderLineItemProductFee>>,
     /// The price for the product. Tax is automatically calculated for MFL orders. For non-MFL orders, tax settings from Merchant Center are applied.
     pub price: Option<Price>,
     /// Deprecated.
@@ -6857,7 +6884,7 @@ pub struct Product {
     pub custom_label4: Option<String>,
     /// The source of the offer, i.e., how the offer was created.
     pub source: Option<String>,
-    /// Additional categories of the item (formatted as in products feed specification).
+    /// Additional categories of the item (formatted as in products data specification).
     #[serde(rename="additionalProductTypes")]
     pub additional_product_types: Option<Vec<String>>,
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
@@ -6882,7 +6909,7 @@ pub struct Product {
     pub content_language: Option<String>,
     /// Manufacturer Part Number (MPN) of the item.
     pub mpn: Option<String>,
-    /// Date range during which the item is on sale (see products feed specification).
+    /// Date range during which the item is on sale (see products data specification).
     #[serde(rename="salePriceEffectiveDate")]
     pub sale_price_effective_date: Option<String>,
     /// Brand of the item.
@@ -6934,7 +6961,7 @@ pub struct Product {
     /// Advertised sale price of the item.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
-    /// Your category of the item (formatted as in products feed specification).
+    /// Your category of the item (formatted as in products data specification).
     #[serde(rename="productType")]
     pub product_type: Option<String>,
     /// Advertiser-specified recommendations.
@@ -8439,7 +8466,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Performs an action on a link between a Merchant Center account and another account.
+    /// Performs an action on a link between two Merchant Center accounts, namely accountId and linkedAccountId.
     /// 
     /// # Arguments
     ///
@@ -9707,7 +9734,7 @@ impl<'a, C, A> OrderinvoiceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a refund invoice for one or more shipment groups, and triggers a refund for non-facilitated payment orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
+    /// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
     /// 
     /// # Arguments
     ///
@@ -9728,7 +9755,7 @@ impl<'a, C, A> OrderinvoiceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a charge invoice for a shipment group, and triggers a charge capture for non-facilitated payment orders.
+    /// Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders.
     /// 
     /// # Arguments
     ///
@@ -22187,7 +22214,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Performs an action on a link between a Merchant Center account and another account.
+/// Performs an action on a link between two Merchant Center accounts, namely accountId and linkedAccountId.
 ///
 /// A builder for the *link* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -31315,7 +31342,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._merchant_id = new_value.to_string();
         self
     }
-    /// Obtains orders that match any of the specified statuses. Multiple values can be specified with comma separation. Additionally, please note that active is a shortcut for pendingShipment and partiallyShipped, and completed is a shortcut for shipped , partiallyDelivered, delivered, partiallyReturned, returned, and canceled.
+    /// Obtains orders that match any of the specified statuses. Please note that active is a shortcut for pendingShipment and partiallyShipped, and completed is a shortcut for shipped, partiallyDelivered, delivered, partiallyReturned, returned, and canceled.
     ///
     /// Append the given value to the *statuses* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -31344,7 +31371,11 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The ordering of the returned list. The only supported value are placedDate desc and placedDate asc for now, which returns orders sorted by placement date. "placedDate desc" stands for listing orders by placement date, from oldest to most recent. "placedDate asc" stands for listing orders by placement date, from most recent to oldest. In future releases we'll support other sorting criteria.
+    /// Order results by placement date in descending or ascending order.
+    /// 
+    /// Acceptable values are:
+    /// - placedDateAsc
+    /// - placedDateDesc
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> OrderListCall<'a, C, A> {
@@ -31352,7 +31383,6 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self
     }
     /// The maximum number of orders to return in the response, used for paging. The default value is 25 orders per page, and the maximum allowed value is 250 orders per page.
-    /// Known issue: All List calls will return all Orders without limit regardless of the value of this field.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> OrderListCall<'a, C, A> {
@@ -35250,7 +35280,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Creates a refund invoice for one or more shipment groups, and triggers a refund for non-facilitated payment orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
+/// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
 ///
 /// A builder for the *createrefundinvoice* method supported by a *orderinvoice* resource.
 /// It is not used directly, but through a `OrderinvoiceMethods` instance.
@@ -35533,7 +35563,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Creates a charge invoice for a shipment group, and triggers a charge capture for non-facilitated payment orders.
+/// Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders.
 ///
 /// A builder for the *createchargeinvoice* method supported by a *orderinvoice* resource.
 /// It is not used directly, but through a `OrderinvoiceMethods` instance.

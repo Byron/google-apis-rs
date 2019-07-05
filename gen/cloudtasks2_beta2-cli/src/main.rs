@@ -1968,8 +1968,9 @@ fn main() {
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-        before using this method."##),
+        [Overview of Queue Management and
+        queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+        this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2014,8 +2015,9 @@ fn main() {
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-        before using this method."##),
+        [Overview of Queue Management and
+        queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+        this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2141,8 +2143,9 @@ fn main() {
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-        before using this method."##),
+        [Overview of Queue Management and
+        queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+        this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-patch",
                   vec![
                     (Some(r##"name"##),
@@ -2272,7 +2275,8 @@ fn main() {
         WARNING: Resuming many high-QPS queues at the same time can
         lead to target overloading. If you are resuming high-QPS
         queues, follow the 500/50/5 pattern described in
-        [Managing Cloud Tasks Scaling Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling)."##),
+        [Managing Cloud Tasks Scaling
+        Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-resume",
                   vec![
                     (Some(r##"name"##),
@@ -2731,7 +2735,7 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190326")
+           .version("1.0.9+20190618")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli")
            .arg(Arg::with_name("url")

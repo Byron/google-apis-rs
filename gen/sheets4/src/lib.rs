@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Sheets* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *sheets:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Sheets* crate version *1.0.9+20190625*, where *20190625* is the exact revision of the *sheets:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Sheets* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/sheets/).
@@ -238,9 +238,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -373,7 +371,7 @@ impl<'a, C, A> Sheets<C, A>
         Sheets {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://sheets.googleapis.com/".to_string(),
             _root_url: "https://sheets.googleapis.com/".to_string(),
         }
@@ -384,7 +382,7 @@ impl<'a, C, A> Sheets<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1695,7 +1693,7 @@ pub struct AddChartRequest {
     /// The chart that should be added to the spreadsheet, including the position
     /// where it should be placed. The chartId
     /// field is optional; if one is not set, an id will be randomly generated. (It
-    /// is an error to specify the ID of a chart that already exists.)
+    /// is an error to specify the ID of an embedded object that already exists.)
     pub chart: Option<EmbeddedChart>,
 }
 

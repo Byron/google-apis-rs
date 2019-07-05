@@ -1517,7 +1517,7 @@ fn main() {
         [self service
         tools](https://console.cloud.google.com/talent-solution/overview).
         [Learn
-        more](https://cloud.google.com/talent-solution/job-search/docs/management-tools)
+        more](https://cloud.google.com/talent-solution/docs/management-tools)
         about self service tools."##),
                     "Details at http://byron.github.io/google-apis-rs/google_jobs3_cli/projects_client-events-create",
                   vec![
@@ -2003,7 +2003,7 @@ fn main() {
     
     let mut app = App::new("jobs3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190322")
+           .version("1.0.9+20190702")
            .about("Cloud Talent Solution provides the capability to create, read, update, and delete job postings, as well as search jobs based on keywords and filters.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_jobs3_cli")

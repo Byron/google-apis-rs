@@ -1,4 +1,4 @@
-site_name: Cloud Source Repositories v1.0.8+20190221
+site_name: Cloud Source Repositories v1.0.9+20190611
 site_url: http://byron.github.io/google-apis-rs/google-sourcerepo1-cli
 site_description: A complete library to interact with Cloud Source Repositories (protocol v1)
 
@@ -17,10 +17,11 @@ pages:
 - ['projects_repos-list.md', 'Projects', 'Repos List']
 - ['projects_repos-patch.md', 'Projects', 'Repos Patch']
 - ['projects_repos-set-iam-policy.md', 'Projects', 'Repos Set Iam Policy']
+- ['projects_repos-sync.md', 'Projects', 'Repos Sync']
 - ['projects_repos-test-iam-permissions.md', 'Projects', 'Repos Test Iam Permissions']
 - ['projects_update-config.md', 'Projects', 'Update Config']
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

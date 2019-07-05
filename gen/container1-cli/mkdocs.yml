@@ -1,4 +1,4 @@
-site_name: Container v1.0.8+20190316
+site_name: Container v1.0.9+20190610
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: A complete library to interact with Container (protocol v1)
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_aggregated-usable-subnetworks-list.md', 'Projects', 'Aggregated Usable Subnetworks List']
 - ['projects_locations-clusters-complete-ip-rotation.md', 'Projects', 'Locations Clusters Complete Ip Rotation']
 - ['projects_locations-clusters-create.md', 'Projects', 'Locations Clusters Create']
 - ['projects_locations-clusters-delete.md', 'Projects', 'Locations Clusters Delete']
@@ -74,5 +75,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

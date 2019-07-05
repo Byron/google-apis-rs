@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container* crate version *1.0.8+20190316*, where *20190316* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Container* crate version *1.0.9+20190610*, where *20190610* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Container* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Container.html) ... 
 //! 
 //! * projects
-//!  * [*locations clusters complete ip rotation*](struct.ProjectLocationClusterCompleteIpRotationCall.html), [*locations clusters create*](struct.ProjectLocationClusterCreateCall.html), [*locations clusters delete*](struct.ProjectLocationClusterDeleteCall.html), [*locations clusters get*](struct.ProjectLocationClusterGetCall.html), [*locations clusters get jwks*](struct.ProjectLocationClusterGetJwkCall.html), [*locations clusters list*](struct.ProjectLocationClusterListCall.html), [*locations clusters node pools create*](struct.ProjectLocationClusterNodePoolCreateCall.html), [*locations clusters node pools delete*](struct.ProjectLocationClusterNodePoolDeleteCall.html), [*locations clusters node pools get*](struct.ProjectLocationClusterNodePoolGetCall.html), [*locations clusters node pools list*](struct.ProjectLocationClusterNodePoolListCall.html), [*locations clusters node pools rollback*](struct.ProjectLocationClusterNodePoolRollbackCall.html), [*locations clusters node pools set autoscaling*](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html), [*locations clusters node pools set management*](struct.ProjectLocationClusterNodePoolSetManagementCall.html), [*locations clusters node pools set size*](struct.ProjectLocationClusterNodePoolSetSizeCall.html), [*locations clusters node pools update*](struct.ProjectLocationClusterNodePoolUpdateCall.html), [*locations clusters set addons*](struct.ProjectLocationClusterSetAddonCall.html), [*locations clusters set legacy abac*](struct.ProjectLocationClusterSetLegacyAbacCall.html), [*locations clusters set locations*](struct.ProjectLocationClusterSetLocationCall.html), [*locations clusters set logging*](struct.ProjectLocationClusterSetLoggingCall.html), [*locations clusters set maintenance policy*](struct.ProjectLocationClusterSetMaintenancePolicyCall.html), [*locations clusters set master auth*](struct.ProjectLocationClusterSetMasterAuthCall.html), [*locations clusters set monitoring*](struct.ProjectLocationClusterSetMonitoringCall.html), [*locations clusters set network policy*](struct.ProjectLocationClusterSetNetworkPolicyCall.html), [*locations clusters set resource labels*](struct.ProjectLocationClusterSetResourceLabelCall.html), [*locations clusters start ip rotation*](struct.ProjectLocationClusterStartIpRotationCall.html), [*locations clusters update*](struct.ProjectLocationClusterUpdateCall.html), [*locations clusters update master*](struct.ProjectLocationClusterUpdateMasterCall.html), [*locations clusters well-known get openid-configuration*](struct.ProjectLocationClusterWell-knownGetOpenid-configurationCall.html), [*locations get server config*](struct.ProjectLocationGetServerConfigCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*zones clusters addons*](struct.ProjectZoneClusterAddonCall.html), [*zones clusters complete ip rotation*](struct.ProjectZoneClusterCompleteIpRotationCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters legacy abac*](struct.ProjectZoneClusterLegacyAbacCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones clusters locations*](struct.ProjectZoneClusterLocationCall.html), [*zones clusters logging*](struct.ProjectZoneClusterLoggingCall.html), [*zones clusters master*](struct.ProjectZoneClusterMasterCall.html), [*zones clusters monitoring*](struct.ProjectZoneClusterMonitoringCall.html), [*zones clusters node pools autoscaling*](struct.ProjectZoneClusterNodePoolAutoscalingCall.html), [*zones clusters node pools create*](struct.ProjectZoneClusterNodePoolCreateCall.html), [*zones clusters node pools delete*](struct.ProjectZoneClusterNodePoolDeleteCall.html), [*zones clusters node pools get*](struct.ProjectZoneClusterNodePoolGetCall.html), [*zones clusters node pools list*](struct.ProjectZoneClusterNodePoolListCall.html), [*zones clusters node pools rollback*](struct.ProjectZoneClusterNodePoolRollbackCall.html), [*zones clusters node pools set management*](struct.ProjectZoneClusterNodePoolSetManagementCall.html), [*zones clusters node pools set size*](struct.ProjectZoneClusterNodePoolSetSizeCall.html), [*zones clusters node pools update*](struct.ProjectZoneClusterNodePoolUpdateCall.html), [*zones clusters resource labels*](struct.ProjectZoneClusterResourceLabelCall.html), [*zones clusters set maintenance policy*](struct.ProjectZoneClusterSetMaintenancePolicyCall.html), [*zones clusters set master auth*](struct.ProjectZoneClusterSetMasterAuthCall.html), [*zones clusters set network policy*](struct.ProjectZoneClusterSetNetworkPolicyCall.html), [*zones clusters start ip rotation*](struct.ProjectZoneClusterStartIpRotationCall.html), [*zones clusters update*](struct.ProjectZoneClusterUpdateCall.html), [*zones get serverconfig*](struct.ProjectZoneGetServerconfigCall.html), [*zones operations cancel*](struct.ProjectZoneOperationCancelCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
+//!  * [*aggregated usable subnetworks list*](struct.ProjectAggregatedUsableSubnetworkListCall.html), [*locations clusters complete ip rotation*](struct.ProjectLocationClusterCompleteIpRotationCall.html), [*locations clusters create*](struct.ProjectLocationClusterCreateCall.html), [*locations clusters delete*](struct.ProjectLocationClusterDeleteCall.html), [*locations clusters get*](struct.ProjectLocationClusterGetCall.html), [*locations clusters get jwks*](struct.ProjectLocationClusterGetJwkCall.html), [*locations clusters list*](struct.ProjectLocationClusterListCall.html), [*locations clusters node pools create*](struct.ProjectLocationClusterNodePoolCreateCall.html), [*locations clusters node pools delete*](struct.ProjectLocationClusterNodePoolDeleteCall.html), [*locations clusters node pools get*](struct.ProjectLocationClusterNodePoolGetCall.html), [*locations clusters node pools list*](struct.ProjectLocationClusterNodePoolListCall.html), [*locations clusters node pools rollback*](struct.ProjectLocationClusterNodePoolRollbackCall.html), [*locations clusters node pools set autoscaling*](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html), [*locations clusters node pools set management*](struct.ProjectLocationClusterNodePoolSetManagementCall.html), [*locations clusters node pools set size*](struct.ProjectLocationClusterNodePoolSetSizeCall.html), [*locations clusters node pools update*](struct.ProjectLocationClusterNodePoolUpdateCall.html), [*locations clusters set addons*](struct.ProjectLocationClusterSetAddonCall.html), [*locations clusters set legacy abac*](struct.ProjectLocationClusterSetLegacyAbacCall.html), [*locations clusters set locations*](struct.ProjectLocationClusterSetLocationCall.html), [*locations clusters set logging*](struct.ProjectLocationClusterSetLoggingCall.html), [*locations clusters set maintenance policy*](struct.ProjectLocationClusterSetMaintenancePolicyCall.html), [*locations clusters set master auth*](struct.ProjectLocationClusterSetMasterAuthCall.html), [*locations clusters set monitoring*](struct.ProjectLocationClusterSetMonitoringCall.html), [*locations clusters set network policy*](struct.ProjectLocationClusterSetNetworkPolicyCall.html), [*locations clusters set resource labels*](struct.ProjectLocationClusterSetResourceLabelCall.html), [*locations clusters start ip rotation*](struct.ProjectLocationClusterStartIpRotationCall.html), [*locations clusters update*](struct.ProjectLocationClusterUpdateCall.html), [*locations clusters update master*](struct.ProjectLocationClusterUpdateMasterCall.html), [*locations clusters well-known get openid-configuration*](struct.ProjectLocationClusterWellKnownGetOpenidConfigurationCall.html), [*locations get server config*](struct.ProjectLocationGetServerConfigCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*zones clusters addons*](struct.ProjectZoneClusterAddonCall.html), [*zones clusters complete ip rotation*](struct.ProjectZoneClusterCompleteIpRotationCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters legacy abac*](struct.ProjectZoneClusterLegacyAbacCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones clusters locations*](struct.ProjectZoneClusterLocationCall.html), [*zones clusters logging*](struct.ProjectZoneClusterLoggingCall.html), [*zones clusters master*](struct.ProjectZoneClusterMasterCall.html), [*zones clusters monitoring*](struct.ProjectZoneClusterMonitoringCall.html), [*zones clusters node pools autoscaling*](struct.ProjectZoneClusterNodePoolAutoscalingCall.html), [*zones clusters node pools create*](struct.ProjectZoneClusterNodePoolCreateCall.html), [*zones clusters node pools delete*](struct.ProjectZoneClusterNodePoolDeleteCall.html), [*zones clusters node pools get*](struct.ProjectZoneClusterNodePoolGetCall.html), [*zones clusters node pools list*](struct.ProjectZoneClusterNodePoolListCall.html), [*zones clusters node pools rollback*](struct.ProjectZoneClusterNodePoolRollbackCall.html), [*zones clusters node pools set management*](struct.ProjectZoneClusterNodePoolSetManagementCall.html), [*zones clusters node pools set size*](struct.ProjectZoneClusterNodePoolSetSizeCall.html), [*zones clusters node pools update*](struct.ProjectZoneClusterNodePoolUpdateCall.html), [*zones clusters resource labels*](struct.ProjectZoneClusterResourceLabelCall.html), [*zones clusters set maintenance policy*](struct.ProjectZoneClusterSetMaintenancePolicyCall.html), [*zones clusters set master auth*](struct.ProjectZoneClusterSetMasterAuthCall.html), [*zones clusters set network policy*](struct.ProjectZoneClusterSetNetworkPolicyCall.html), [*zones clusters start ip rotation*](struct.ProjectZoneClusterStartIpRotationCall.html), [*zones clusters update*](struct.ProjectZoneClusterUpdateCall.html), [*zones get serverconfig*](struct.ProjectZoneGetServerconfigCall.html), [*zones operations cancel*](struct.ProjectZoneOperationCancelCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
 //! 
 //! 
 //! 
@@ -262,9 +262,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -376,7 +374,7 @@ impl<'a, C, A> Container<C, A>
         Container {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://container.googleapis.com/".to_string(),
             _root_url: "https://container.googleapis.com/".to_string(),
         }
@@ -387,7 +385,7 @@ impl<'a, C, A> Container<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -451,49 +449,653 @@ pub struct SetMaintenancePolicyRequest {
 impl RequestValue for SetMaintenancePolicyRequest {}
 
 
-/// ClusterUpdate describes an update to the cluster. Exactly one update can
-/// be applied to a cluster with each request, so at most one field can be
-/// provided.
+/// AcceleratorConfig represents a Hardware Accelerator request.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClusterUpdate {
-    /// The desired configuration options for master authorized networks feature.
-    #[serde(rename="desiredMasterAuthorizedNetworksConfig")]
-    pub desired_master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
-    /// The desired list of Google Compute Engine
-    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
-    /// should be located. Changing the locations a cluster is in will result
-    /// in nodes being either created or removed from the cluster, depending on
-    /// whether locations are being added or removed.
-    /// 
-    /// This list must always include the cluster's primary zone.
-    #[serde(rename="desiredLocations")]
-    pub desired_locations: Option<Vec<String>>,
-    /// Configurations for the various addons available to run in the cluster.
-    #[serde(rename="desiredAddonsConfig")]
-    pub desired_addons_config: Option<AddonsConfig>,
+pub struct AcceleratorConfig {
+    /// The number of the accelerator cards exposed to an instance.
+    #[serde(rename="acceleratorCount")]
+    pub accelerator_count: Option<i64>,
+    /// The accelerator type resource name. List of supported accelerators
+    /// [here](/compute/docs/gpus/#Introduction)
+    #[serde(rename="acceleratorType")]
+    pub accelerator_type: Option<String>,
+}
+
+impl Part for AcceleratorConfig {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones operations cancel projects](struct.ProjectZoneOperationCancelCall.html) (response)
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// SetNodePoolAutoscalingRequest sets the autoscaler settings of a node pool.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools autoscaling projects](struct.ProjectZoneClusterNodePoolAutoscalingCall.html) (request)
+/// * [locations clusters node pools set autoscaling projects](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetNodePoolAutoscalingRequest {
+    /// The name (project, location, cluster, node pool) of the node pool to set
+    /// autoscaler settings. Specified in the format
+    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the name field.
+    pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Autoscaling configuration for the node pool.
+    pub autoscaling: Option<NodePoolAutoscaling>,
+    /// Deprecated. The name of the cluster to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// Deprecated. The name of the node pool to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="nodePoolId")]
+    pub node_pool_id: Option<String>,
+}
+
+impl RequestValue for SetNodePoolAutoscalingRequest {}
+
+
+/// Parameters for using BigQuery as the destination of resource usage export.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BigQueryDestination {
+    /// The ID of a BigQuery Dataset.
+    #[serde(rename="datasetId")]
+    pub dataset_id: Option<String>,
+}
+
+impl Part for BigQueryDestination {}
+
+
+/// CreateClusterRequest creates a cluster.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters create projects](struct.ProjectLocationClusterCreateCall.html) (request)
+/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateClusterRequest {
+    /// A [cluster
+    /// resource](/container-engine/reference/rest/v1/projects.zones.clusters)
+    pub cluster: Option<Cluster>,
+    /// The parent (project and location) where the cluster will be created.
+    /// Specified in the format 'projects/*/locations/*'.
+    pub parent: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the parent field.
+    pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the parent field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+}
+
+impl RequestValue for CreateClusterRequest {}
+
+
+/// GetOpenIDConfigResponse is an OIDC discovery document for the cluster.
+/// See the OpenID Connect Discovery 1.0 specification for details.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters well-known get openid-configuration projects](struct.ProjectLocationClusterWellKnownGetOpenidConfigurationCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetOpenIDConfigResponse {
+    /// supported ID Token signing Algorithms.
+    pub id_token_signing_alg_values_supported: Option<Vec<String>>,
+    /// Supported claims.
+    pub claims_supported: Option<Vec<String>>,
+    /// Supported response types.
+    pub response_types_supported: Option<Vec<String>>,
+    /// JSON Web Key uri.
+    pub jwks_uri: Option<String>,
+    /// Supported grant types.
+    pub grant_types: Option<Vec<String>>,
+    /// Supported subject types.
+    pub subject_types_supported: Option<Vec<String>>,
+    /// OIDC Issuer.
+    pub issuer: Option<String>,
+}
+
+impl ResponseResult for GetOpenIDConfigResponse {}
+
+
+/// Configuration options for the master authorized networks feature. Enabled
+/// master authorized networks will disallow all external traffic to access
+/// Kubernetes master through HTTPS except traffic from the given CIDR blocks,
+/// Google Compute Engine Public IPs and Google Prod IPs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MasterAuthorizedNetworksConfig {
+    /// Whether or not master authorized networks is enabled.
+    pub enabled: Option<bool>,
+    /// cidr_blocks define up to 50 external networks that could access
+    /// Kubernetes master through HTTPS.
+    #[serde(rename="cidrBlocks")]
+    pub cidr_blocks: Option<Vec<CidrBlock>>,
+}
+
+impl Part for MasterAuthorizedNetworksConfig {}
+
+
+/// Constraints applied to pods.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MaxPodsConstraint {
+    /// Constraint enforced on the max num of pods per node.
+    #[serde(rename="maxPodsPerNode")]
+    pub max_pods_per_node: Option<String>,
+}
+
+impl Part for MaxPodsConstraint {}
+
+
+/// SetAddonsConfigRequest sets the addons associated with the cluster.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters set addons projects](struct.ProjectLocationClusterSetAddonCall.html) (request)
+/// * [zones clusters addons projects](struct.ProjectZoneClusterAddonCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetAddonsConfigRequest {
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The desired configurations for the various addons available to run in the
+    /// cluster.
+    #[serde(rename="addonsConfig")]
+    pub addons_config: Option<AddonsConfig>,
+    /// Deprecated. The name of the cluster to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The name (project, location, cluster) of the cluster to set addons.
+    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the name field.
+    pub zone: Option<String>,
+}
+
+impl RequestValue for SetAddonsConfigRequest {}
+
+
+/// Time window specified for daily maintenance operations.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DailyMaintenanceWindow {
+    /// [Output only] Duration of the time window, automatically chosen to be
+    /// smallest possible in the given scenario.
+    /// Duration will be in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
+    /// format "PTnHnMnS".
+    pub duration: Option<String>,
+    /// Time within the maintenance window to start the maintenance operations.
+    /// Time format should be in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
+    /// format "HH:MM", where HH : [00-23] and MM : [00-59] GMT.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+}
+
+impl Part for DailyMaintenanceWindow {}
+
+
+/// UpdateMasterRequest updates the master of the cluster.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters master projects](struct.ProjectZoneClusterMasterCall.html) (request)
+/// * [locations clusters update master projects](struct.ProjectLocationClusterUpdateMasterCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateMasterRequest {
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
     /// The Kubernetes version to change the master to.
     /// 
-    /// Users may specify either explicit versions offered by
-    /// Kubernetes Engine or version aliases, which have the following behavior:
+    /// Users may specify either explicit versions offered by Kubernetes Engine or
+    /// version aliases, which have the following behavior:
     /// 
     /// - "latest": picks the highest valid Kubernetes version
     /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
     /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
     /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
     /// - "-": picks the default Kubernetes version
-    #[serde(rename="desiredMasterVersion")]
-    pub desired_master_version: Option<String>,
-    /// The node pool to be upgraded. This field is mandatory if
-    /// "desired_node_version", "desired_image_family" or
-    /// "desired_node_pool_autoscaling" is specified and there is more than one
-    /// node pool on the cluster.
-    #[serde(rename="desiredNodePoolId")]
-    pub desired_node_pool_id: Option<String>,
-    /// The Kubernetes version to change the nodes to (typically an
-    /// upgrade).
+    #[serde(rename="masterVersion")]
+    pub master_version: Option<String>,
+    /// Deprecated. The name of the cluster to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The name (project, location, cluster) of the cluster to update.
+    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the name field.
+    pub zone: Option<String>,
+}
+
+impl RequestValue for UpdateMasterRequest {}
+
+
+/// Configuration for client certificates on the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClientCertificateConfig {
+    /// Issue a client certificate.
+    #[serde(rename="issueClientCertificate")]
+    pub issue_client_certificate: Option<bool>,
+}
+
+impl Part for ClientCertificateConfig {}
+
+
+/// Configuration options for the HTTP (L7) load balancing controller addon,
+/// which makes it easy to set up HTTP load balancers for services in a cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HttpLoadBalancing {
+    /// Whether the HTTP Load Balancing controller is enabled in the cluster.
+    /// When enabled, it runs a small pod in the cluster that manages the load
+    /// balancers.
+    pub disabled: Option<bool>,
+}
+
+impl Part for HttpLoadBalancing {}
+
+
+/// NetworkConfig reports the relative names of network & subnetwork.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NetworkConfig {
+    /// Output only. The relative name of the Google Compute Engine
+    /// [subnetwork](/compute/docs/vpc) to which the cluster is connected.
+    /// Example: projects/my-project/regions/us-central1/subnetworks/my-subnet
+    pub subnetwork: Option<String>,
+    /// Output only. The relative name of the Google Compute Engine
+    /// network(/compute/docs/networks-and-firewalls#networks) to which
+    /// the cluster is connected.
+    /// Example: projects/my-project/global/networks/my-network
+    pub network: Option<String>,
+}
+
+impl Part for NetworkConfig {}
+
+
+/// CreateNodePoolRequest creates a node pool for a cluster.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools create projects](struct.ProjectZoneClusterNodePoolCreateCall.html) (request)
+/// * [locations clusters node pools create projects](struct.ProjectLocationClusterNodePoolCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateNodePoolRequest {
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://developers.google.com/console/help/new/#projectnumber).
+    /// This field has been deprecated and replaced by the parent field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Deprecated. The name of the cluster.
+    /// This field has been deprecated and replaced by the parent field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The parent (project, location, cluster id) where the node pool will be
+    /// created. Specified in the format
+    /// 'projects/*/locations/*/clusters/*'.
+    pub parent: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the parent field.
+    pub zone: Option<String>,
+    /// The node pool to create.
+    #[serde(rename="nodePool")]
+    pub node_pool: Option<NodePool>,
+}
+
+impl RequestValue for CreateNodePoolRequest {}
+
+
+/// MaintenanceWindow defines the maintenance window to be used for the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MaintenanceWindow {
+    /// DailyMaintenanceWindow specifies a daily maintenance operation window.
+    #[serde(rename="dailyMaintenanceWindow")]
+    pub daily_maintenance_window: Option<DailyMaintenanceWindow>,
+}
+
+impl Part for MaintenanceWindow {}
+
+
+/// NodePool contains the name and configuration for a cluster's node pool.
+/// Node pools are a set of nodes (i.e. VM's), with a common configuration and
+/// specification, under the control of the cluster master. They may have a set
+/// of Kubernetes labels applied to them, which may be used to reference them
+/// during pod scheduling. They may also be resized up or down, to accommodate
+/// the workload.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters node pools get projects](struct.ProjectLocationClusterNodePoolGetCall.html) (response)
+/// * [zones clusters node pools get projects](struct.ProjectZoneClusterNodePoolGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NodePool {
+    /// [Output only] The status of the nodes in this pool instance.
+    pub status: Option<String>,
+    /// [Output only] Server-defined URL for the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// NodeManagement configuration for this NodePool.
+    pub management: Option<NodeManagement>,
+    /// The name of the node pool.
+    pub name: Option<String>,
+    /// [Output only] The resource URLs of the [managed instance
+    /// groups](/compute/docs/instance-groups/creating-groups-of-managed-instances)
+    /// associated with this node pool.
+    #[serde(rename="instanceGroupUrls")]
+    pub instance_group_urls: Option<Vec<String>>,
+    /// Autoscaler configuration for this NodePool. Autoscaler is enabled
+    /// only if a valid configuration is present.
+    pub autoscaling: Option<NodePoolAutoscaling>,
+    /// The constraint on the maximum number of pods that can be run
+    /// simultaneously on a node in the node pool.
+    #[serde(rename="maxPodsConstraint")]
+    pub max_pods_constraint: Option<MaxPodsConstraint>,
+    /// The version of the Kubernetes of this node.
+    pub version: Option<String>,
+    /// The initial node count for the pool. You must ensure that your
+    /// Compute Engine <a href="/compute/docs/resource-quotas">resource quota</a>
+    /// is sufficient for this number of instances. You must also have available
+    /// firewall and routes quota.
+    #[serde(rename="initialNodeCount")]
+    pub initial_node_count: Option<i32>,
+    /// [Output only] The pod CIDR block size per node in this node pool.
+    #[serde(rename="podIpv4CidrSize")]
+    pub pod_ipv4_cidr_size: Option<i32>,
+    /// The node configuration of the pool.
+    pub config: Option<NodeConfig>,
+    /// Which conditions caused the current node pool state.
+    pub conditions: Option<Vec<StatusCondition>>,
+    /// [Output only] Additional information about the current status of this
+    /// node pool instance, if available.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
+}
+
+impl ResponseResult for NodePool {}
+
+
+/// A Google Kubernetes Engine cluster.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters get projects](struct.ProjectZoneClusterGetCall.html) (response)
+/// * [locations clusters get projects](struct.ProjectLocationClusterGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Cluster {
+    /// [Output only] The size of the address space on each node for hosting
+    /// containers. This is provisioned from within the `container_ipv4_cidr`
+    /// range. This field will only be set when cluster is in route-based network
+    /// mode.
+    #[serde(rename="nodeIpv4CidrSize")]
+    pub node_ipv4_cidr_size: Option<i32>,
+    /// Configure the maintenance policy for this cluster.
+    #[serde(rename="maintenancePolicy")]
+    pub maintenance_policy: Option<MaintenancePolicy>,
+    /// Configuration options for the NetworkPolicy feature.
+    #[serde(rename="networkPolicy")]
+    pub network_policy: Option<NetworkPolicy>,
+    /// The configuration options for master authorized networks feature.
+    #[serde(rename="masterAuthorizedNetworksConfig")]
+    pub master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
+    /// Configurations for the various addons available to run in the cluster.
+    #[serde(rename="addonsConfig")]
+    pub addons_config: Option<AddonsConfig>,
+    /// The list of Google Compute Engine
+    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
+    /// should be located.
+    pub locations: Option<Vec<String>>,
+    /// Kubernetes alpha features are enabled on this cluster. This includes alpha
+    /// API groups (e.g. v1alpha1) and features that may not be production ready in
+    /// the kubernetes version of the master and nodes.
+    /// The cluster has no SLA for uptime and master/node upgrades are disabled.
+    /// Alpha enabled clusters are automatically deleted thirty days after
+    /// creation.
+    #[serde(rename="enableKubernetesAlpha")]
+    pub enable_kubernetes_alpha: Option<bool>,
+    /// The default constraint on the maximum number of pods that can be run
+    /// simultaneously on a node in the node pool of this cluster. Only honored
+    /// if cluster created with IP Alias support.
+    #[serde(rename="defaultMaxPodsConstraint")]
+    pub default_max_pods_constraint: Option<MaxPodsConstraint>,
+    /// The resource labels for the cluster to use to annotate any related
+    /// Google Compute Engine resources.
+    #[serde(rename="resourceLabels")]
+    pub resource_labels: Option<HashMap<String, String>>,
+    /// The name of the Google Compute Engine
+    /// [network](/compute/docs/networks-and-firewalls#networks) to which the
+    /// cluster is connected. If left unspecified, the `default` network
+    /// will be used.
+    pub network: Option<String>,
+    /// The logging service the cluster should use to write logs.
+    /// Currently available options:
+    /// 
+    /// * "logging.googleapis.com/kubernetes" - the Google Cloud Logging
+    /// service with Kubernetes-native resource model in Stackdriver
+    /// * `logging.googleapis.com` - the Google Cloud Logging service.
+    /// * `none` - no logs will be exported from the cluster.
+    /// * if left as an empty string,`logging.googleapis.com` will be used.
+    #[serde(rename="loggingService")]
+    pub logging_service: Option<String>,
+    /// Deprecated. Use node_pools.instance_group_urls.
+    #[serde(rename="instanceGroupUrls")]
+    pub instance_group_urls: Option<Vec<String>>,
+    /// Configuration for cluster networking.
+    #[serde(rename="networkConfig")]
+    pub network_config: Option<NetworkConfig>,
+    /// The name of this cluster. The name must be unique within this project
+    /// and zone, and can be up to 40 characters with the following restrictions:
+    /// 
+    /// * Lowercase letters, numbers, and hyphens only.
+    /// * Must start with a letter.
+    /// * Must end with a number or a letter.
+    pub name: Option<String>,
+    /// [Output only] The name of the Google Compute Engine
+    /// [zone](/compute/docs/regions-zones/regions-zones#available) or
+    /// [region](/compute/docs/regions-zones/regions-zones#available) in which
+    /// the cluster resides.
+    pub location: Option<String>,
+    /// Configuration for exporting resource usages. Resource usage export is
+    /// disabled when this config is unspecified.
+    #[serde(rename="resourceUsageExportConfig")]
+    pub resource_usage_export_config: Option<ResourceUsageExportConfig>,
+    /// Enable the ability to use Cloud TPUs in this cluster.
+    #[serde(rename="enableTpu")]
+    pub enable_tpu: Option<bool>,
+    /// Which conditions caused the current cluster state.
+    pub conditions: Option<Vec<StatusCondition>>,
+    /// [Output only] Additional information about the current status of this
+    /// cluster, if available.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
+    /// Configuration for cluster IP allocation.
+    #[serde(rename="ipAllocationPolicy")]
+    pub ip_allocation_policy: Option<IPAllocationPolicy>,
+    /// [Output only] The current status of this cluster.
+    pub status: Option<String>,
+    /// An optional description of this cluster.
+    pub description: Option<String>,
+    /// [Output only] Deprecated, use
+    /// [NodePools.version](/kubernetes-engine/docs/reference/rest/v1/projects.zones.clusters.nodePools)
+    /// instead. The current version of the node software components. If they are
+    /// currently at multiple versions because they're in the process of being
+    /// upgraded, this reflects the minimum version of all nodes.
+    #[serde(rename="currentNodeVersion")]
+    pub current_node_version: Option<String>,
+    /// The fingerprint of the set of labels for this cluster.
+    #[serde(rename="labelFingerprint")]
+    pub label_fingerprint: Option<String>,
+    /// [Output only] The current software version of the master endpoint.
+    #[serde(rename="currentMasterVersion")]
+    pub current_master_version: Option<String>,
+    /// The authentication information for accessing the master endpoint.
+    /// If unspecified, the defaults are used:
+    /// For clusters before v1.12, if master_auth is unspecified, `username` will
+    /// be set to "admin", a random password will be generated, and a client
+    /// certificate will be issued.
+    #[serde(rename="masterAuth")]
+    pub master_auth: Option<MasterAuth>,
+    /// [Output only] The time the cluster will be automatically
+    /// deleted in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
+    /// The number of nodes to create in this cluster. You must ensure that your
+    /// Compute Engine <a href="/compute/docs/resource-quotas">resource quota</a>
+    /// is sufficient for this number of instances. You must also have available
+    /// firewall and routes quota.
+    /// For requests, this field should only be used in lieu of a
+    /// "node_pool" object, since this configuration (along with the
+    /// "node_config") will be used to create a "NodePool" object with an
+    /// auto-generated name. Do not use this and a node_pool at the same time.
+    /// 
+    /// This field is deprecated, use node_pool.initial_node_count instead.
+    #[serde(rename="initialNodeCount")]
+    pub initial_node_count: Option<i32>,
+    /// The node pools associated with this cluster.
+    /// This field should not be set if "node_config" or "initial_node_count" are
+    /// specified.
+    #[serde(rename="nodePools")]
+    pub node_pools: Option<Vec<NodePool>>,
+    /// The monitoring service the cluster should use to write metrics.
+    /// Currently available options:
+    /// 
+    /// * `monitoring.googleapis.com` - the Google Cloud Monitoring service.
+    /// * `none` - no metrics will be exported from the cluster.
+    /// * if left as an empty string, `monitoring.googleapis.com` will be used.
+    #[serde(rename="monitoringService")]
+    pub monitoring_service: Option<String>,
+    /// [Output only] The time the cluster was created, in
+    /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Configuration for private cluster.
+    #[serde(rename="privateClusterConfig")]
+    pub private_cluster_config: Option<PrivateClusterConfig>,
+    /// [Output only] The IP address of this cluster's master endpoint.
+    /// The endpoint can be accessed from the internet at
+    /// `https://username:password@endpoint/`.
+    /// 
+    /// See the `masterAuth` property of this resource for username and
+    /// password information.
+    pub endpoint: Option<String>,
+    /// [Output only]  The number of nodes currently in the cluster. Deprecated.
+    /// Call Kubernetes API directly to retrieve node information.
+    #[serde(rename="currentNodeCount")]
+    pub current_node_count: Option<i32>,
+    /// [Output only] The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field is deprecated, use location instead.
+    pub zone: Option<String>,
+    /// Configuration for the legacy ABAC authorization mode.
+    #[serde(rename="legacyAbac")]
+    pub legacy_abac: Option<LegacyAbac>,
+    /// The initial Kubernetes version for this cluster.  Valid versions are those
+    /// found in validMasterVersions returned by getServerConfig.  The version can
+    /// be upgraded over time; such upgrades are reflected in
+    /// currentMasterVersion and currentNodeVersion.
     /// 
     /// Users may specify either explicit versions offered by
     /// Kubernetes Engine or version aliases, which have the following behavior:
@@ -502,29 +1104,187 @@ pub struct ClusterUpdate {
     /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
     /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
     /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
-    /// - "-": picks the Kubernetes master version
-    #[serde(rename="desiredNodeVersion")]
-    pub desired_node_version: Option<String>,
-    /// The desired image type for the node pool.
-    /// NOTE: Set the "desired_node_pool" field as well.
-    #[serde(rename="desiredImageType")]
-    pub desired_image_type: Option<String>,
-    /// Autoscaler configuration for the node pool specified in
-    /// desired_node_pool_id. If there is only one pool in the
-    /// cluster and desired_node_pool_id is not provided then
-    /// the change applies to that single node pool.
-    #[serde(rename="desiredNodePoolAutoscaling")]
-    pub desired_node_pool_autoscaling: Option<NodePoolAutoscaling>,
-    /// The monitoring service the cluster should use to write metrics.
-    /// Currently available options:
+    /// - "","-": picks the default Kubernetes version
+    #[serde(rename="initialClusterVersion")]
+    pub initial_cluster_version: Option<String>,
+    /// Parameters used in creating the cluster's nodes.
+    /// For requests, this field should only be used in lieu of a
+    /// "node_pool" object, since this configuration (along with the
+    /// "initial_node_count") will be used to create a "NodePool" object with an
+    /// auto-generated name. Do not use this and a node_pool at the same time.
+    /// For responses, this field will be populated with the node configuration of
+    /// the first node pool. (For configuration of each node pool, see
+    /// `node_pool.config`)
     /// 
-    /// * "monitoring.googleapis.com" - the Google Cloud Monitoring service
-    /// * "none" - no metrics will be exported from the cluster
-    #[serde(rename="desiredMonitoringService")]
-    pub desired_monitoring_service: Option<String>,
+    /// If unspecified, the defaults are used.
+    /// This field is deprecated, use node_pool.config instead.
+    #[serde(rename="nodeConfig")]
+    pub node_config: Option<NodeConfig>,
+    /// The IP address range of the container pods in this cluster, in
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`). Leave blank to have
+    /// one automatically chosen or specify a `/14` block in `10.0.0.0/8`.
+    #[serde(rename="clusterIpv4Cidr")]
+    pub cluster_ipv4_cidr: Option<String>,
+    /// The name of the Google Compute Engine
+    /// [subnetwork](/compute/docs/subnetworks) to which the
+    /// cluster is connected.
+    pub subnetwork: Option<String>,
+    /// [Output only] The IP address range of the Kubernetes services in
+    /// this cluster, in
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `1.2.3.4/29`). Service addresses are
+    /// typically put in the last `/16` from the container CIDR.
+    #[serde(rename="servicesIpv4Cidr")]
+    pub services_ipv4_cidr: Option<String>,
+    /// [Output only] Server-defined URL for the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// [Output only] The IP address range of the Cloud TPUs in this cluster, in
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `1.2.3.4/29`).
+    #[serde(rename="tpuIpv4CidrBlock")]
+    pub tpu_ipv4_cidr_block: Option<String>,
 }
 
-impl Part for ClusterUpdate {}
+impl ResponseResult for Cluster {}
+
+
+/// Configuration for controlling how IPs are allocated in the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IPAllocationPolicy {
+    /// The IP address range of the services IPs in this cluster. If blank, a range
+    /// will be automatically chosen with the default size.
+    /// 
+    /// This field is only applicable when `use_ip_aliases` is true.
+    /// 
+    /// Set to blank to have a range chosen with the default size.
+    /// 
+    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
+    /// netmask.
+    /// 
+    /// Set to a
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
+    /// to use.
+    #[serde(rename="servicesIpv4CidrBlock")]
+    pub services_ipv4_cidr_block: Option<String>,
+    /// Whether alias IPs will be used for pod IPs in the cluster.
+    #[serde(rename="useIpAliases")]
+    pub use_ip_aliases: Option<bool>,
+    /// This field is deprecated, use node_ipv4_cidr_block.
+    #[serde(rename="nodeIpv4Cidr")]
+    pub node_ipv4_cidr: Option<String>,
+    /// The IP address range for the cluster pod IPs. If this field is set, then
+    /// `cluster.cluster_ipv4_cidr` must be left blank.
+    /// 
+    /// This field is only applicable when `use_ip_aliases` is true.
+    /// 
+    /// Set to blank to have a range chosen with the default size.
+    /// 
+    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
+    /// netmask.
+    /// 
+    /// Set to a
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
+    /// to use.
+    #[serde(rename="clusterIpv4CidrBlock")]
+    pub cluster_ipv4_cidr_block: Option<String>,
+    /// The name of the secondary range to be used for the cluster CIDR
+    /// block.  The secondary range will be used for pod IP
+    /// addresses. This must be an existing secondary range associated
+    /// with the cluster subnetwork.
+    /// 
+    /// This field is only applicable with use_ip_aliases is true and
+    /// create_subnetwork is false.
+    #[serde(rename="clusterSecondaryRangeName")]
+    pub cluster_secondary_range_name: Option<String>,
+    /// Whether a new subnetwork will be created automatically for the cluster.
+    /// 
+    /// This field is only applicable when `use_ip_aliases` is true.
+    #[serde(rename="createSubnetwork")]
+    pub create_subnetwork: Option<bool>,
+    /// The IP address range of the instance IPs in this cluster.
+    /// 
+    /// This is applicable only if `create_subnetwork` is true.
+    /// 
+    /// Set to blank to have a range chosen with the default size.
+    /// 
+    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
+    /// netmask.
+    /// 
+    /// Set to a
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
+    /// to use.
+    #[serde(rename="nodeIpv4CidrBlock")]
+    pub node_ipv4_cidr_block: Option<String>,
+    /// The IP address range of the Cloud TPUs in this cluster. If unspecified, a
+    /// range will be automatically chosen with the default size.
+    /// 
+    /// This field is only applicable when `use_ip_aliases` is true.
+    /// 
+    /// If unspecified, the range will use the default size.
+    /// 
+    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
+    /// netmask.
+    /// 
+    /// Set to a
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
+    /// to use.
+    #[serde(rename="tpuIpv4CidrBlock")]
+    pub tpu_ipv4_cidr_block: Option<String>,
+    /// This field is deprecated, use cluster_ipv4_cidr_block.
+    #[serde(rename="clusterIpv4Cidr")]
+    pub cluster_ipv4_cidr: Option<String>,
+    /// This field is deprecated, use services_ipv4_cidr_block.
+    #[serde(rename="servicesIpv4Cidr")]
+    pub services_ipv4_cidr: Option<String>,
+    /// The name of the secondary range to be used as for the services
+    /// CIDR block.  The secondary range will be used for service
+    /// ClusterIPs. This must be an existing secondary range associated
+    /// with the cluster subnetwork.
+    /// 
+    /// This field is only applicable with use_ip_aliases is true and
+    /// create_subnetwork is false.
+    #[serde(rename="servicesSecondaryRangeName")]
+    pub services_secondary_range_name: Option<String>,
+    /// A custom subnetwork name to be used if `create_subnetwork` is true.  If
+    /// this field is empty, then an automatic name will be chosen for the new
+    /// subnetwork.
+    #[serde(rename="subnetworkName")]
+    pub subnetwork_name: Option<String>,
+}
+
+impl Part for IPAllocationPolicy {}
+
+
+/// GetJSONWebKeysResponse is a valid JSON Web Key Set as specififed in rfc 7517
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters get jwks projects](struct.ProjectLocationClusterGetJwkCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetJSONWebKeysResponse {
+    /// The public component of the keys used by the cluster to sign token
+    /// requests.
+    pub keys: Option<Vec<Jwk>>,
+}
+
+impl ResponseResult for GetJSONWebKeysResponse {}
 
 
 /// This operation resource represents operations that may have happened or are
@@ -629,6 +1389,144 @@ pub struct Operation {
 }
 
 impl ResponseResult for Operation {}
+
+
+/// Configuration options for private clusters.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PrivateClusterConfig {
+    /// Whether the master's internal IP address is used as the cluster endpoint.
+    #[serde(rename="enablePrivateEndpoint")]
+    pub enable_private_endpoint: Option<bool>,
+    /// The IP range in CIDR notation to use for the hosted master network. This
+    /// range will be used for assigning internal IP addresses to the master or
+    /// set of masters, as well as the ILB VIP. This range must not overlap with
+    /// any other ranges in use within the cluster's network.
+    #[serde(rename="masterIpv4CidrBlock")]
+    pub master_ipv4_cidr_block: Option<String>,
+    /// Output only. The internal IP address of this cluster's master endpoint.
+    #[serde(rename="privateEndpoint")]
+    pub private_endpoint: Option<String>,
+    /// Output only. The external IP address of this cluster's master endpoint.
+    #[serde(rename="publicEndpoint")]
+    pub public_endpoint: Option<String>,
+    /// Whether nodes have internal IP addresses only. If enabled, all nodes are
+    /// given only RFC 1918 private addresses and communicate with the master via
+    /// private networking.
+    #[serde(rename="enablePrivateNodes")]
+    pub enable_private_nodes: Option<bool>,
+}
+
+impl Part for PrivateClusterConfig {}
+
+
+/// ClusterUpdate describes an update to the cluster. Exactly one update can
+/// be applied to a cluster with each request, so at most one field can be
+/// provided.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClusterUpdate {
+    /// The logging service the cluster should use to write logs.
+    /// Currently available options:
+    /// 
+    /// * "logging.googleapis.com/kubernetes" - the Google Cloud Logging
+    /// service with Kubernetes-native resource model in Stackdriver
+    /// * "logging.googleapis.com" - the Google Cloud Logging service
+    /// * "none" - no logs will be exported from the cluster
+    #[serde(rename="desiredLoggingService")]
+    pub desired_logging_service: Option<String>,
+    /// The desired configuration options for master authorized networks feature.
+    #[serde(rename="desiredMasterAuthorizedNetworksConfig")]
+    pub desired_master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
+    /// The desired list of Google Compute Engine
+    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
+    /// should be located. Changing the locations a cluster is in will result
+    /// in nodes being either created or removed from the cluster, depending on
+    /// whether locations are being added or removed.
+    /// 
+    /// This list must always include the cluster's primary zone.
+    #[serde(rename="desiredLocations")]
+    pub desired_locations: Option<Vec<String>>,
+    /// Configurations for the various addons available to run in the cluster.
+    #[serde(rename="desiredAddonsConfig")]
+    pub desired_addons_config: Option<AddonsConfig>,
+    /// The Kubernetes version to change the master to.
+    /// 
+    /// Users may specify either explicit versions offered by
+    /// Kubernetes Engine or version aliases, which have the following behavior:
+    /// 
+    /// - "latest": picks the highest valid Kubernetes version
+    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
+    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
+    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
+    /// - "-": picks the default Kubernetes version
+    #[serde(rename="desiredMasterVersion")]
+    pub desired_master_version: Option<String>,
+    /// The node pool to be upgraded. This field is mandatory if
+    /// "desired_node_version", "desired_image_family" or
+    /// "desired_node_pool_autoscaling" is specified and there is more than one
+    /// node pool on the cluster.
+    #[serde(rename="desiredNodePoolId")]
+    pub desired_node_pool_id: Option<String>,
+    /// The Kubernetes version to change the nodes to (typically an
+    /// upgrade).
+    /// 
+    /// Users may specify either explicit versions offered by
+    /// Kubernetes Engine or version aliases, which have the following behavior:
+    /// 
+    /// - "latest": picks the highest valid Kubernetes version
+    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
+    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
+    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
+    /// - "-": picks the Kubernetes master version
+    #[serde(rename="desiredNodeVersion")]
+    pub desired_node_version: Option<String>,
+    /// The desired image type for the node pool.
+    /// NOTE: Set the "desired_node_pool" field as well.
+    #[serde(rename="desiredImageType")]
+    pub desired_image_type: Option<String>,
+    /// The desired configuration for exporting resource usage.
+    #[serde(rename="desiredResourceUsageExportConfig")]
+    pub desired_resource_usage_export_config: Option<ResourceUsageExportConfig>,
+    /// Autoscaler configuration for the node pool specified in
+    /// desired_node_pool_id. If there is only one pool in the
+    /// cluster and desired_node_pool_id is not provided then
+    /// the change applies to that single node pool.
+    #[serde(rename="desiredNodePoolAutoscaling")]
+    pub desired_node_pool_autoscaling: Option<NodePoolAutoscaling>,
+    /// The monitoring service the cluster should use to write metrics.
+    /// Currently available options:
+    /// 
+    /// * "monitoring.googleapis.com/kubernetes" - the Google Cloud Monitoring
+    /// service with Kubernetes-native resource model in Stackdriver
+    /// * "monitoring.googleapis.com" - the Google Cloud Monitoring service
+    /// * "none" - no metrics will be exported from the cluster
+    #[serde(rename="desiredMonitoringService")]
+    pub desired_monitoring_service: Option<String>,
+}
+
+impl Part for ClusterUpdate {}
+
+
+/// Configuration options for the horizontal pod autoscaling feature, which
+/// increases or decreases the number of replica pods a replication controller
+/// has based on the resource usage of the existing pods.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HorizontalPodAutoscaling {
+    /// Whether the Horizontal Pod Autoscaling feature is enabled in the cluster.
+    /// When enabled, it ensures that a Heapster pod is running in the cluster,
+    /// which is also used by the Cloud Monitoring service.
+    pub disabled: Option<bool>,
+}
+
+impl Part for HorizontalPodAutoscaling {}
 
 
 /// Kubernetes Engine service configuration.
@@ -774,6 +1672,13 @@ pub struct NodeConfig {
     ///  "kube-env"
     ///  "startup-script"
     ///  "user-data"
+    ///  "disable-address-manager"
+    ///  "windows-startup-script-ps1"
+    ///  "common-psm1"
+    ///  "k8s-node-setup-psm1"
+    ///  "install-ssh-psm1"
+    ///  "user-profile-psm1"
+    ///  "serial-port-logging-enable"
     /// 
     /// Values are free-form strings, and only have meaning as interpreted by
     /// the image running in the instance. The only restriction placed on them is
@@ -826,6 +1731,8 @@ pub struct SetMonitoringServiceRequest {
     /// The monitoring service the cluster should use to write metrics.
     /// Currently available options:
     /// 
+    /// * "monitoring.googleapis.com/kubernetes" - the Google Cloud Monitoring
+    /// service with Kubernetes-native resource model in Stackdriver
     /// * "monitoring.googleapis.com" - the Google Cloud Monitoring service
     /// * "none" - no metrics will be exported from the cluster
     #[serde(rename="monitoringService")]
@@ -845,30 +1752,6 @@ pub struct SetMonitoringServiceRequest {
 }
 
 impl RequestValue for SetMonitoringServiceRequest {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones operations cancel projects](struct.ProjectZoneOperationCancelCall.html) (response)
-/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
 
 
 /// RollbackNodePoolUpgradeRequest rollbacks the previously Aborted or Failed
@@ -912,47 +1795,6 @@ pub struct RollbackNodePoolUpgradeRequest {
 impl RequestValue for RollbackNodePoolUpgradeRequest {}
 
 
-/// SetNodePoolAutoscalingRequest sets the autoscaler settings of a node pool.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones clusters node pools autoscaling projects](struct.ProjectZoneClusterNodePoolAutoscalingCall.html) (request)
-/// * [locations clusters node pools set autoscaling projects](struct.ProjectLocationClusterNodePoolSetAutoscalingCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetNodePoolAutoscalingRequest {
-    /// The name (project, location, cluster, node pool) of the node pool to set
-    /// autoscaler settings. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Autoscaling configuration for the node pool.
-    pub autoscaling: Option<NodePoolAutoscaling>,
-    /// Deprecated. The name of the cluster to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// Deprecated. The name of the node pool to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="nodePoolId")]
-    pub node_pool_id: Option<String>,
-}
-
-impl RequestValue for SetNodePoolAutoscalingRequest {}
-
-
 /// Configuration for NetworkPolicy. This only tracks whether the addon
 /// is enabled or not on the Master, it does not track whether network policy
 /// is enabled for the nodes.
@@ -981,37 +1823,20 @@ pub struct MaintenancePolicy {
 impl Part for MaintenancePolicy {}
 
 
-/// CreateClusterRequest creates a cluster.
+/// Configuration options for the NetworkPolicy feature.
+/// https://kubernetes.io/docs/concepts/services-networking/networkpolicies/
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters create projects](struct.ProjectLocationClusterCreateCall.html) (request)
-/// * [zones clusters create projects](struct.ProjectZoneClusterCreateCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateClusterRequest {
-    /// A [cluster
-    /// resource](/container-engine/reference/rest/v1/projects.zones.clusters)
-    pub cluster: Option<Cluster>,
-    /// The parent (project and location) where the cluster will be created.
-    /// Specified in the format 'projects/*/locations/*'.
-    pub parent: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
-    pub zone: Option<String>,
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the parent field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
+pub struct NetworkPolicy {
+    /// Whether network policy is enabled on the cluster.
+    pub enabled: Option<bool>,
+    /// The selected network policy provider.
+    pub provider: Option<String>,
 }
 
-impl RequestValue for CreateClusterRequest {}
+impl Part for NetworkPolicy {}
 
 
 /// SetNodePoolManagementRequest sets the node management properties of a node
@@ -1056,57 +1881,6 @@ pub struct SetNodePoolManagementRequest {
 impl RequestValue for SetNodePoolManagementRequest {}
 
 
-/// GetOpenIDConfigResponse is an OIDC discovery document for the cluster.
-/// See the OpenID Connect Discovery 1.0 specification for details.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters well-known get openid-configuration projects](struct.ProjectLocationClusterWell-knownGetOpenid-configurationCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetOpenIDConfigResponse {
-    /// NOLINT
-    pub id_token_signing_alg_values_supported: Option<Vec<String>>,
-    /// NOLINT
-    pub claims_supported: Option<Vec<String>>,
-    /// NOLINT
-    pub response_types_supported: Option<Vec<String>>,
-    /// NOLINT
-    pub jwks_uri: Option<String>,
-    /// NOLINT
-    pub grant_types: Option<Vec<String>>,
-    /// NOLINT
-    pub subject_types_supported: Option<Vec<String>>,
-    /// NOLINT
-    pub issuer: Option<String>,
-}
-
-impl ResponseResult for GetOpenIDConfigResponse {}
-
-
-/// Configuration options for the master authorized networks feature. Enabled
-/// master authorized networks will disallow all external traffic to access
-/// Kubernetes master through HTTPS except traffic from the given CIDR blocks,
-/// Google Compute Engine Public IPs and Google Prod IPs.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MasterAuthorizedNetworksConfig {
-    /// Whether or not master authorized networks is enabled.
-    pub enabled: Option<bool>,
-    /// cidr_blocks define up to 10 external networks that could access
-    /// Kubernetes master through HTTPS.
-    #[serde(rename="cidrBlocks")]
-    pub cidr_blocks: Option<Vec<CidrBlock>>,
-}
-
-impl Part for MasterAuthorizedNetworksConfig {}
-
-
 /// Configuration for the addons that can be automatically spun up in the
 /// cluster, enabling additional functionality.
 /// 
@@ -1124,6 +1898,10 @@ pub struct AddonsConfig {
     #[serde(rename="networkPolicyConfig")]
     pub network_policy_config: Option<NetworkPolicyConfig>,
     /// Configuration for the Kubernetes Dashboard.
+    /// This addon is deprecated, and will be disabled in 1.15. It is recommended
+    /// to use the Cloud Console to manage and monitor your Kubernetes clusters,
+    /// workloads and applications. For more information, see:
+    /// https://cloud.google.com/kubernetes-engine/docs/concepts/dashboards
     #[serde(rename="kubernetesDashboard")]
     pub kubernetes_dashboard: Option<KubernetesDashboard>,
     /// Configuration for the horizontal pod autoscaling feature, which
@@ -1134,60 +1912,6 @@ pub struct AddonsConfig {
 }
 
 impl Part for AddonsConfig {}
-
-
-/// SetAddonsConfigRequest sets the addons associated with the cluster.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters set addons projects](struct.ProjectLocationClusterSetAddonCall.html) (request)
-/// * [zones clusters addons projects](struct.ProjectZoneClusterAddonCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetAddonsConfigRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The desired configurations for the various addons available to run in the
-    /// cluster.
-    #[serde(rename="addonsConfig")]
-    pub addons_config: Option<AddonsConfig>,
-    /// Deprecated. The name of the cluster to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The name (project, location, cluster) of the cluster to set addons.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-}
-
-impl RequestValue for SetAddonsConfigRequest {}
-
-
-/// Configuration options for the HTTP (L7) load balancing controller addon,
-/// which makes it easy to set up HTTP load balancers for services in a cluster.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HttpLoadBalancing {
-    /// Whether the HTTP Load Balancing controller is enabled in the cluster.
-    /// When enabled, it runs a small pod in the cluster that manages the load
-    /// balancers.
-    pub disabled: Option<bool>,
-}
-
-impl Part for HttpLoadBalancing {}
 
 
 /// Configuration for the legacy Attribute Based Access Control authorization
@@ -1275,27 +1999,6 @@ pub struct SetLocationsRequest {
 impl RequestValue for SetLocationsRequest {}
 
 
-/// Time window specified for daily maintenance operations.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DailyMaintenanceWindow {
-    /// [Output only] Duration of the time window, automatically chosen to be
-    /// smallest possible in the given scenario.
-    /// Duration will be in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
-    /// format "PTnHnMnS".
-    pub duration: Option<String>,
-    /// Time within the maintenance window to start the maintenance operations.
-    /// Time format should be in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
-    /// format "HH:MM”, where HH : [00-23] and MM : [00-59] GMT.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-}
-
-impl Part for DailyMaintenanceWindow {}
-
-
 /// Configuration for the Kubernetes Dashboard.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1345,53 +2048,6 @@ pub struct StartIPRotationRequest {
 }
 
 impl RequestValue for StartIPRotationRequest {}
-
-
-/// Configuration for client certificates on the cluster.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClientCertificateConfig {
-    /// Issue a client certificate.
-    #[serde(rename="issueClientCertificate")]
-    pub issue_client_certificate: Option<bool>,
-}
-
-impl Part for ClientCertificateConfig {}
-
-
-/// CancelOperationRequest cancels a single operation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones operations cancel projects](struct.ProjectZoneOperationCancelCall.html) (request)
-/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The name (project, location, operation id) of the operation to cancel.
-    /// Specified in the format 'projects/*/locations/*/operations/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the operation resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-    /// Deprecated. The server-assigned `name` of the operation.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
-}
-
-impl RequestValue for CancelOperationRequest {}
 
 
 /// CompleteIPRotationRequest moves the cluster master back into single-IP mode.
@@ -1499,41 +2155,24 @@ pub struct ListClustersResponse {
 impl ResponseResult for ListClustersResponse {}
 
 
-/// NetworkConfig reports the relative names of network & subnetwork.
+/// Secondary IP range of a usable subnetwork.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NetworkConfig {
-    /// Output only. The relative name of the Google Compute Engine
-    /// [subnetwork](/compute/docs/vpc) to which the cluster is connected.
-    /// Example: projects/my-project/regions/us-central1/subnetworks/my-subnet
-    pub subnetwork: Option<String>,
-    /// Output only. The relative name of the Google Compute Engine
-    /// network(/compute/docs/networks-and-firewalls#networks) to which
-    /// the cluster is connected.
-    /// Example: projects/my-project/global/networks/my-network
-    pub network: Option<String>,
+pub struct UsableSubnetworkSecondaryRange {
+    /// This field is to determine the status of the secondary range programmably.
+    pub status: Option<String>,
+    /// The range of IP addresses belonging to this subnetwork secondary range.
+    #[serde(rename="ipCidrRange")]
+    pub ip_cidr_range: Option<String>,
+    /// The name associated with this subnetwork secondary range, used when adding
+    /// an alias IP range to a VM instance.
+    #[serde(rename="rangeName")]
+    pub range_name: Option<String>,
 }
 
-impl Part for NetworkConfig {}
-
-
-/// Configuration options for the horizontal pod autoscaling feature, which
-/// increases or decreases the number of replica pods a replication controller
-/// has based on the resource usage of the existing pods.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HorizontalPodAutoscaling {
-    /// Whether the Horizontal Pod Autoscaling feature is enabled in the cluster.
-    /// When enabled, it ensures that a Heapster pod is running in the cluster,
-    /// which is also used by the Cloud Monitoring service.
-    pub disabled: Option<bool>,
-}
-
-impl Part for HorizontalPodAutoscaling {}
+impl Part for UsableSubnetworkSecondaryRange {}
 
 
 /// Jwk is a JSON Web Key as specified in RFC 7517
@@ -1542,68 +2181,28 @@ impl Part for HorizontalPodAutoscaling {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Jwk {
-    /// NOLINT
+    /// Permitted uses for the public keys.
     #[serde(rename="use")]
     pub use_: Option<String>,
-    /// NOLINT
+    /// Used for ECDSA keys.
     pub crv: Option<String>,
-    /// NOLINT
+    /// Key Type.
     pub kty: Option<String>,
-    /// NOLINT
+    /// Algorithm.
     pub alg: Option<String>,
-    /// Fields for RSA keys.
-    /// NOLINT
+    /// Used for RSA keys.
     pub n: Option<String>,
-    /// NOLINT
+    /// Used for ECDSA keys.
     pub y: Option<String>,
-    /// Fields for ECDSA keys.
-    /// NOLINT
+    /// Used for ECDSA keys.
     pub x: Option<String>,
-    /// NOLINT
+    /// Used for RSA keys.
     pub e: Option<String>,
-    /// NOLINT
+    /// Key ID.
     pub kid: Option<String>,
 }
 
 impl Part for Jwk {}
-
-
-/// CreateNodePoolRequest creates a node pool for a cluster.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones clusters node pools create projects](struct.ProjectZoneClusterNodePoolCreateCall.html) (request)
-/// * [locations clusters node pools create projects](struct.ProjectLocationClusterNodePoolCreateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateNodePoolRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://developers.google.com/console/help/new/#projectnumber).
-    /// This field has been deprecated and replaced by the parent field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Deprecated. The name of the cluster.
-    /// This field has been deprecated and replaced by the parent field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The parent (project, location, cluster id) where the node pool will be
-    /// created. Specified in the format
-    /// 'projects/*/locations/*/clusters/*'.
-    pub parent: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
-    pub zone: Option<String>,
-    /// The node pool to create.
-    #[serde(rename="nodePool")]
-    pub node_pool: Option<NodePool>,
-}
-
-impl RequestValue for CreateNodePoolRequest {}
 
 
 /// Kubernetes taint is comprised of three fields: key, value, and effect. Effect
@@ -1625,6 +2224,52 @@ pub struct NodeTaint {
 }
 
 impl Part for NodeTaint {}
+
+
+/// ListUsableSubnetworksResponse is the response of
+/// ListUsableSubnetworksRequest.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [aggregated usable subnetworks list projects](struct.ProjectAggregatedUsableSubnetworkListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListUsableSubnetworksResponse {
+    /// This token allows you to get the next page of results for list requests.
+    /// If the number of results is larger than `page_size`, use the
+    /// `next_page_token` as a value for the query parameter `page_token` in the
+    /// next request. The value will become empty when there are no more pages.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of usable subnetworks in the specified network project.
+    pub subnetworks: Option<Vec<UsableSubnetwork>>,
+}
+
+impl ResponseResult for ListUsableSubnetworksResponse {}
+
+
+/// Configuration for exporting cluster resource usages.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceUsageExportConfig {
+    /// Configuration to use BigQuery as usage export destination.
+    #[serde(rename="bigqueryDestination")]
+    pub bigquery_destination: Option<BigQueryDestination>,
+    /// Whether to enable network egress metering for this cluster. If enabled, a
+    /// daemonset will be created in the cluster to meter network egress traffic.
+    #[serde(rename="enableNetworkEgressMetering")]
+    pub enable_network_egress_metering: Option<bool>,
+    /// Configuration to enable resource consumption metering.
+    #[serde(rename="consumptionMeteringConfig")]
+    pub consumption_metering_config: Option<ConsumptionMeteringConfig>,
+}
+
+impl Part for ResourceUsageExportConfig {}
 
 
 /// SetLoggingServiceRequest sets the logging service of a cluster.
@@ -1668,20 +2313,6 @@ pub struct SetLoggingServiceRequest {
 impl RequestValue for SetLoggingServiceRequest {}
 
 
-/// MaintenanceWindow defines the maintenance window to be used for the cluster.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MaintenanceWindow {
-    /// DailyMaintenanceWindow specifies a daily maintenance operation window.
-    #[serde(rename="dailyMaintenanceWindow")]
-    pub daily_maintenance_window: Option<DailyMaintenanceWindow>,
-}
-
-impl Part for MaintenanceWindow {}
-
-
 /// ListNodePoolsResponse is the result of ListNodePoolsRequest.
 /// 
 /// # Activities
@@ -1702,77 +2333,6 @@ pub struct ListNodePoolsResponse {
 impl ResponseResult for ListNodePoolsResponse {}
 
 
-/// NodePool contains the name and configuration for a cluster's node pool.
-/// Node pools are a set of nodes (i.e. VM's), with a common configuration and
-/// specification, under the control of the cluster master. They may have a set
-/// of Kubernetes labels applied to them, which may be used to reference them
-/// during pod scheduling. They may also be resized up or down, to accommodate
-/// the workload.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters node pools get projects](struct.ProjectLocationClusterNodePoolGetCall.html) (response)
-/// * [zones clusters node pools get projects](struct.ProjectZoneClusterNodePoolGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NodePool {
-    /// [Output only] The status of the nodes in this pool instance.
-    pub status: Option<String>,
-    /// [Output only] Server-defined URL for the resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-    /// NodeManagement configuration for this NodePool.
-    pub management: Option<NodeManagement>,
-    /// The name of the node pool.
-    pub name: Option<String>,
-    /// [Output only] The resource URLs of the [managed instance
-    /// groups](/compute/docs/instance-groups/creating-groups-of-managed-instances)
-    /// associated with this node pool.
-    #[serde(rename="instanceGroupUrls")]
-    pub instance_group_urls: Option<Vec<String>>,
-    /// Autoscaler configuration for this NodePool. Autoscaler is enabled
-    /// only if a valid configuration is present.
-    pub autoscaling: Option<NodePoolAutoscaling>,
-    /// The version of the Kubernetes of this node.
-    pub version: Option<String>,
-    /// The initial node count for the pool. You must ensure that your
-    /// Compute Engine <a href="/compute/docs/resource-quotas">resource quota</a>
-    /// is sufficient for this number of instances. You must also have available
-    /// firewall and routes quota.
-    #[serde(rename="initialNodeCount")]
-    pub initial_node_count: Option<i32>,
-    /// The node configuration of the pool.
-    pub config: Option<NodeConfig>,
-    /// Which conditions caused the current node pool state.
-    pub conditions: Option<Vec<StatusCondition>>,
-    /// [Output only] Additional information about the current status of this
-    /// node pool instance, if available.
-    #[serde(rename="statusMessage")]
-    pub status_message: Option<String>,
-}
-
-impl ResponseResult for NodePool {}
-
-
-/// Configuration options for the NetworkPolicy feature.
-/// https://kubernetes.io/docs/concepts/services-networking/networkpolicies/
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NetworkPolicy {
-    /// Whether network policy is enabled on the cluster.
-    pub enabled: Option<bool>,
-    /// The selected network policy provider.
-    pub provider: Option<String>,
-}
-
-impl Part for NetworkPolicy {}
-
-
 /// StatusCondition describes why a cluster or a node pool has a certain status
 /// (e.g., ERROR or DEGRADED).
 /// 
@@ -1787,52 +2347,6 @@ pub struct StatusCondition {
 }
 
 impl Part for StatusCondition {}
-
-
-/// UpdateMasterRequest updates the master of the cluster.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones clusters master projects](struct.ProjectZoneClusterMasterCall.html) (request)
-/// * [locations clusters update master projects](struct.ProjectLocationClusterUpdateMasterCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateMasterRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The Kubernetes version to change the master to.
-    /// 
-    /// Users may specify either explicit versions offered by Kubernetes Engine or
-    /// version aliases, which have the following behavior:
-    /// 
-    /// - "latest": picks the highest valid Kubernetes version
-    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
-    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
-    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
-    /// - "-": picks the default Kubernetes version
-    #[serde(rename="masterVersion")]
-    pub master_version: Option<String>,
-    /// Deprecated. The name of the cluster to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The name (project, location, cluster) of the cluster to update.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-}
-
-impl RequestValue for UpdateMasterRequest {}
 
 
 /// ListOperationsResponse is the result of ListOperationsRequest.
@@ -1893,24 +2407,6 @@ pub struct SetLegacyAbacRequest {
 }
 
 impl RequestValue for SetLegacyAbacRequest {}
-
-
-/// AcceleratorConfig represents a Hardware Accelerator request.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AcceleratorConfig {
-    /// The number of the accelerator cards exposed to an instance.
-    #[serde(rename="acceleratorCount")]
-    pub accelerator_count: Option<i64>,
-    /// The accelerator type resource name. List of supported accelerators
-    /// [here](/compute/docs/gpus/#Introduction)
-    #[serde(rename="acceleratorType")]
-    pub accelerator_type: Option<String>,
-}
-
-impl Part for AcceleratorConfig {}
 
 
 /// NodePoolAutoscaling contains information required by cluster autoscaler to
@@ -2010,228 +2506,6 @@ pub struct UpdateClusterRequest {
 impl RequestValue for UpdateClusterRequest {}
 
 
-/// A Google Kubernetes Engine cluster.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones clusters get projects](struct.ProjectZoneClusterGetCall.html) (response)
-/// * [locations clusters get projects](struct.ProjectLocationClusterGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Cluster {
-    /// [Output only] The size of the address space on each node for hosting
-    /// containers. This is provisioned from within the `container_ipv4_cidr`
-    /// range.
-    #[serde(rename="nodeIpv4CidrSize")]
-    pub node_ipv4_cidr_size: Option<i32>,
-    /// Configure the maintenance policy for this cluster.
-    #[serde(rename="maintenancePolicy")]
-    pub maintenance_policy: Option<MaintenancePolicy>,
-    /// Configuration options for the NetworkPolicy feature.
-    #[serde(rename="networkPolicy")]
-    pub network_policy: Option<NetworkPolicy>,
-    /// The configuration options for master authorized networks feature.
-    #[serde(rename="masterAuthorizedNetworksConfig")]
-    pub master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
-    /// Configurations for the various addons available to run in the cluster.
-    #[serde(rename="addonsConfig")]
-    pub addons_config: Option<AddonsConfig>,
-    /// The list of Google Compute Engine
-    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
-    /// should be located.
-    pub locations: Option<Vec<String>>,
-    /// Kubernetes alpha features are enabled on this cluster. This includes alpha
-    /// API groups (e.g. v1alpha1) and features that may not be production ready in
-    /// the kubernetes version of the master and nodes.
-    /// The cluster has no SLA for uptime and master/node upgrades are disabled.
-    /// Alpha enabled clusters are automatically deleted thirty days after
-    /// creation.
-    #[serde(rename="enableKubernetesAlpha")]
-    pub enable_kubernetes_alpha: Option<bool>,
-    /// The resource labels for the cluster to use to annotate any related
-    /// Google Compute Engine resources.
-    #[serde(rename="resourceLabels")]
-    pub resource_labels: Option<HashMap<String, String>>,
-    /// The name of the Google Compute Engine
-    /// [network](/compute/docs/networks-and-firewalls#networks) to which the
-    /// cluster is connected. If left unspecified, the `default` network
-    /// will be used.
-    pub network: Option<String>,
-    /// The logging service the cluster should use to write logs.
-    /// Currently available options:
-    /// 
-    /// * `logging.googleapis.com` - the Google Cloud Logging service.
-    /// * `none` - no logs will be exported from the cluster.
-    /// * if left as an empty string,`logging.googleapis.com` will be used.
-    #[serde(rename="loggingService")]
-    pub logging_service: Option<String>,
-    /// Deprecated. Use node_pools.instance_group_urls.
-    #[serde(rename="instanceGroupUrls")]
-    pub instance_group_urls: Option<Vec<String>>,
-    /// Configuration for cluster networking.
-    #[serde(rename="networkConfig")]
-    pub network_config: Option<NetworkConfig>,
-    /// The name of this cluster. The name must be unique within this project
-    /// and zone, and can be up to 40 characters with the following restrictions:
-    /// 
-    /// * Lowercase letters, numbers, and hyphens only.
-    /// * Must start with a letter.
-    /// * Must end with a number or a letter.
-    pub name: Option<String>,
-    /// [Output only] The name of the Google Compute Engine
-    /// [zone](/compute/docs/regions-zones/regions-zones#available) or
-    /// [region](/compute/docs/regions-zones/regions-zones#available) in which
-    /// the cluster resides.
-    pub location: Option<String>,
-    /// Enable the ability to use Cloud TPUs in this cluster.
-    #[serde(rename="enableTpu")]
-    pub enable_tpu: Option<bool>,
-    /// Which conditions caused the current cluster state.
-    pub conditions: Option<Vec<StatusCondition>>,
-    /// [Output only] Additional information about the current status of this
-    /// cluster, if available.
-    #[serde(rename="statusMessage")]
-    pub status_message: Option<String>,
-    /// Configuration for cluster IP allocation.
-    #[serde(rename="ipAllocationPolicy")]
-    pub ip_allocation_policy: Option<IPAllocationPolicy>,
-    /// [Output only] The current status of this cluster.
-    pub status: Option<String>,
-    /// An optional description of this cluster.
-    pub description: Option<String>,
-    /// [Output only] Deprecated, use
-    /// [NodePool.version](/kubernetes-engine/docs/reference/rest/v1/projects.zones.clusters.nodePool)
-    /// instead. The current version of the node software components. If they are
-    /// currently at multiple versions because they're in the process of being
-    /// upgraded, this reflects the minimum version of all nodes.
-    #[serde(rename="currentNodeVersion")]
-    pub current_node_version: Option<String>,
-    /// The fingerprint of the set of labels for this cluster.
-    #[serde(rename="labelFingerprint")]
-    pub label_fingerprint: Option<String>,
-    /// [Output only] The current software version of the master endpoint.
-    #[serde(rename="currentMasterVersion")]
-    pub current_master_version: Option<String>,
-    /// The authentication information for accessing the master endpoint.
-    /// If unspecified, the defaults are used:
-    /// For clusters before v1.12, if master_auth is unspecified, `username` will
-    /// be set to "admin", a random password will be generated, and a client
-    /// certificate will be issued.
-    #[serde(rename="masterAuth")]
-    pub master_auth: Option<MasterAuth>,
-    /// [Output only] The time the cluster will be automatically
-    /// deleted in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
-    #[serde(rename="expireTime")]
-    pub expire_time: Option<String>,
-    /// The number of nodes to create in this cluster. You must ensure that your
-    /// Compute Engine <a href="/compute/docs/resource-quotas">resource quota</a>
-    /// is sufficient for this number of instances. You must also have available
-    /// firewall and routes quota.
-    /// For requests, this field should only be used in lieu of a
-    /// "node_pool" object, since this configuration (along with the
-    /// "node_config") will be used to create a "NodePool" object with an
-    /// auto-generated name. Do not use this and a node_pool at the same time.
-    #[serde(rename="initialNodeCount")]
-    pub initial_node_count: Option<i32>,
-    /// The node pools associated with this cluster.
-    /// This field should not be set if "node_config" or "initial_node_count" are
-    /// specified.
-    #[serde(rename="nodePools")]
-    pub node_pools: Option<Vec<NodePool>>,
-    /// The monitoring service the cluster should use to write metrics.
-    /// Currently available options:
-    /// 
-    /// * `monitoring.googleapis.com` - the Google Cloud Monitoring service.
-    /// * `none` - no metrics will be exported from the cluster.
-    /// * if left as an empty string, `monitoring.googleapis.com` will be used.
-    #[serde(rename="monitoringService")]
-    pub monitoring_service: Option<String>,
-    /// [Output only] The time the cluster was created, in
-    /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Configuration for private cluster.
-    #[serde(rename="privateClusterConfig")]
-    pub private_cluster_config: Option<PrivateClusterConfig>,
-    /// [Output only] The IP address of this cluster's master endpoint.
-    /// The endpoint can be accessed from the internet at
-    /// `https://username:password@endpoint/`.
-    /// 
-    /// See the `masterAuth` property of this resource for username and
-    /// password information.
-    pub endpoint: Option<String>,
-    /// [Output only]  The number of nodes currently in the cluster. Deprecated.
-    /// Call Kubernetes API directly to retrieve node information.
-    #[serde(rename="currentNodeCount")]
-    pub current_node_count: Option<i32>,
-    /// [Output only] The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field is deprecated, use location instead.
-    pub zone: Option<String>,
-    /// Configuration for the legacy ABAC authorization mode.
-    #[serde(rename="legacyAbac")]
-    pub legacy_abac: Option<LegacyAbac>,
-    /// The initial Kubernetes version for this cluster.  Valid versions are those
-    /// found in validMasterVersions returned by getServerConfig.  The version can
-    /// be upgraded over time; such upgrades are reflected in
-    /// currentMasterVersion and currentNodeVersion.
-    /// 
-    /// Users may specify either explicit versions offered by
-    /// Kubernetes Engine or version aliases, which have the following behavior:
-    /// 
-    /// - "latest": picks the highest valid Kubernetes version
-    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
-    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
-    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
-    /// - "","-": picks the default Kubernetes version
-    #[serde(rename="initialClusterVersion")]
-    pub initial_cluster_version: Option<String>,
-    /// Parameters used in creating the cluster's nodes.
-    /// See `nodeConfig` for the description of its properties.
-    /// For requests, this field should only be used in lieu of a
-    /// "node_pool" object, since this configuration (along with the
-    /// "initial_node_count") will be used to create a "NodePool" object with an
-    /// auto-generated name. Do not use this and a node_pool at the same time.
-    /// For responses, this field will be populated with the node configuration of
-    /// the first node pool.
-    /// 
-    /// If unspecified, the defaults are used.
-    #[serde(rename="nodeConfig")]
-    pub node_config: Option<NodeConfig>,
-    /// The IP address range of the container pods in this cluster, in
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `10.96.0.0/14`). Leave blank to have
-    /// one automatically chosen or specify a `/14` block in `10.0.0.0/8`.
-    #[serde(rename="clusterIpv4Cidr")]
-    pub cluster_ipv4_cidr: Option<String>,
-    /// The name of the Google Compute Engine
-    /// [subnetwork](/compute/docs/subnetworks) to which the
-    /// cluster is connected.
-    pub subnetwork: Option<String>,
-    /// [Output only] The IP address range of the Kubernetes services in
-    /// this cluster, in
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `1.2.3.4/29`). Service addresses are
-    /// typically put in the last `/16` from the container CIDR.
-    #[serde(rename="servicesIpv4Cidr")]
-    pub services_ipv4_cidr: Option<String>,
-    /// [Output only] Server-defined URL for the resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-    /// [Output only] The IP address range of the Cloud TPUs in this cluster, in
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `1.2.3.4/29`).
-    #[serde(rename="tpuIpv4CidrBlock")]
-    pub tpu_ipv4_cidr_block: Option<String>,
-}
-
-impl ResponseResult for Cluster {}
-
-
 /// SetMasterAuthRequest updates the admin password of a cluster.
 /// 
 /// # Activities
@@ -2307,141 +2581,67 @@ pub struct SetNetworkPolicyRequest {
 impl RequestValue for SetNetworkPolicyRequest {}
 
 
-/// Configuration for controlling how IPs are allocated in the cluster.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IPAllocationPolicy {
-    /// The IP address range of the services IPs in this cluster. If blank, a range
-    /// will be automatically chosen with the default size.
-    /// 
-    /// This field is only applicable when `use_ip_aliases` is true.
-    /// 
-    /// Set to blank to have a range chosen with the default size.
-    /// 
-    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
-    /// netmask.
-    /// 
-    /// Set to a
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
-    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
-    /// to use.
-    #[serde(rename="servicesIpv4CidrBlock")]
-    pub services_ipv4_cidr_block: Option<String>,
-    /// Whether alias IPs will be used for pod IPs in the cluster.
-    #[serde(rename="useIpAliases")]
-    pub use_ip_aliases: Option<bool>,
-    /// This field is deprecated, use node_ipv4_cidr_block.
-    #[serde(rename="nodeIpv4Cidr")]
-    pub node_ipv4_cidr: Option<String>,
-    /// The IP address range for the cluster pod IPs. If this field is set, then
-    /// `cluster.cluster_ipv4_cidr` must be left blank.
-    /// 
-    /// This field is only applicable when `use_ip_aliases` is true.
-    /// 
-    /// Set to blank to have a range chosen with the default size.
-    /// 
-    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
-    /// netmask.
-    /// 
-    /// Set to a
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
-    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
-    /// to use.
-    #[serde(rename="clusterIpv4CidrBlock")]
-    pub cluster_ipv4_cidr_block: Option<String>,
-    /// The name of the secondary range to be used for the cluster CIDR
-    /// block.  The secondary range will be used for pod IP
-    /// addresses. This must be an existing secondary range associated
-    /// with the cluster subnetwork.
-    /// 
-    /// This field is only applicable with use_ip_aliases is true and
-    /// create_subnetwork is false.
-    #[serde(rename="clusterSecondaryRangeName")]
-    pub cluster_secondary_range_name: Option<String>,
-    /// Whether a new subnetwork will be created automatically for the cluster.
-    /// 
-    /// This field is only applicable when `use_ip_aliases` is true.
-    #[serde(rename="createSubnetwork")]
-    pub create_subnetwork: Option<bool>,
-    /// The IP address range of the instance IPs in this cluster.
-    /// 
-    /// This is applicable only if `create_subnetwork` is true.
-    /// 
-    /// Set to blank to have a range chosen with the default size.
-    /// 
-    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
-    /// netmask.
-    /// 
-    /// Set to a
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
-    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
-    /// to use.
-    #[serde(rename="nodeIpv4CidrBlock")]
-    pub node_ipv4_cidr_block: Option<String>,
-    /// The IP address range of the Cloud TPUs in this cluster. If unspecified, a
-    /// range will be automatically chosen with the default size.
-    /// 
-    /// This field is only applicable when `use_ip_aliases` is true.
-    /// 
-    /// If unspecified, the range will use the default size.
-    /// 
-    /// Set to /netmask (e.g. `/14`) to have a range chosen with a specific
-    /// netmask.
-    /// 
-    /// Set to a
-    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
-    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
-    /// to use.
-    #[serde(rename="tpuIpv4CidrBlock")]
-    pub tpu_ipv4_cidr_block: Option<String>,
-    /// This field is deprecated, use cluster_ipv4_cidr_block.
-    #[serde(rename="clusterIpv4Cidr")]
-    pub cluster_ipv4_cidr: Option<String>,
-    /// This field is deprecated, use services_ipv4_cidr_block.
-    #[serde(rename="servicesIpv4Cidr")]
-    pub services_ipv4_cidr: Option<String>,
-    /// The name of the secondary range to be used as for the services
-    /// CIDR block.  The secondary range will be used for service
-    /// ClusterIPs. This must be an existing secondary range associated
-    /// with the cluster subnetwork.
-    /// 
-    /// This field is only applicable with use_ip_aliases is true and
-    /// create_subnetwork is false.
-    #[serde(rename="servicesSecondaryRangeName")]
-    pub services_secondary_range_name: Option<String>,
-    /// A custom subnetwork name to be used if `create_subnetwork` is true.  If
-    /// this field is empty, then an automatic name will be chosen for the new
-    /// subnetwork.
-    #[serde(rename="subnetworkName")]
-    pub subnetwork_name: Option<String>,
-}
-
-impl Part for IPAllocationPolicy {}
-
-
-/// GetJSONWebKeysResponse is a valid JSON Web Key Set as specififed in rfc 7517
+/// CancelOperationRequest cancels a single operation.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations clusters get jwks projects](struct.ProjectLocationClusterGetJwkCall.html) (response)
+/// * [zones operations cancel projects](struct.ProjectZoneOperationCancelCall.html) (request)
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetJSONWebKeysResponse {
-    /// The public component of the keys used by the cluster to sign token
-    /// requests.
-    pub keys: Option<Vec<Jwk>>,
+pub struct CancelOperationRequest {
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The name (project, location, operation id) of the operation to cancel.
+    /// Specified in the format 'projects/*/locations/*/operations/*'.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the operation resides.
+    /// This field has been deprecated and replaced by the name field.
+    pub zone: Option<String>,
+    /// Deprecated. The server-assigned `name` of the operation.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
 }
 
-impl ResponseResult for GetJSONWebKeysResponse {}
+impl RequestValue for CancelOperationRequest {}
+
+
+/// UsableSubnetwork resource returns the subnetwork name, its associated network
+/// and the primary CIDR range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsableSubnetwork {
+    /// Secondary IP ranges.
+    #[serde(rename="secondaryIpRanges")]
+    pub secondary_ip_ranges: Option<Vec<UsableSubnetworkSecondaryRange>>,
+    /// The range of internal addresses that are owned by this subnetwork.
+    #[serde(rename="ipCidrRange")]
+    pub ip_cidr_range: Option<String>,
+    /// Subnetwork Name.
+    /// Example: projects/my-project/regions/us-central1/subnetworks/my-subnet
+    pub subnetwork: Option<String>,
+    /// A human readable status message representing the reasons for cases where
+    /// the caller cannot use the secondary ranges under the subnet. For example if
+    /// the secondary_ip_ranges is empty due to a permission issue, an insufficient
+    /// permission message will be given by status_message.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
+    /// Network Name.
+    /// Example: projects/my-project/global/networks/my-network
+    pub network: Option<String>,
+}
+
+impl Part for UsableSubnetwork {}
 
 
 /// SetNodePoolSizeRequest sets the size a node
@@ -2487,35 +2687,19 @@ pub struct SetNodePoolSizeRequest {
 impl RequestValue for SetNodePoolSizeRequest {}
 
 
-/// Configuration options for private clusters.
+/// Parameters for controlling consumption metering.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PrivateClusterConfig {
-    /// Whether the master's internal IP address is used as the cluster endpoint.
-    #[serde(rename="enablePrivateEndpoint")]
-    pub enable_private_endpoint: Option<bool>,
-    /// The IP range in CIDR notation to use for the hosted master network. This
-    /// range will be used for assigning internal IP addresses to the master or
-    /// set of masters, as well as the ILB VIP. This range must not overlap with
-    /// any other ranges in use within the cluster's network.
-    #[serde(rename="masterIpv4CidrBlock")]
-    pub master_ipv4_cidr_block: Option<String>,
-    /// Output only. The internal IP address of this cluster's master endpoint.
-    #[serde(rename="privateEndpoint")]
-    pub private_endpoint: Option<String>,
-    /// Output only. The external IP address of this cluster's master endpoint.
-    #[serde(rename="publicEndpoint")]
-    pub public_endpoint: Option<String>,
-    /// Whether nodes have internal IP addresses only. If enabled, all nodes are
-    /// given only RFC 1918 private addresses and communicate with the master via
-    /// private networking.
-    #[serde(rename="enablePrivateNodes")]
-    pub enable_private_nodes: Option<bool>,
+pub struct ConsumptionMeteringConfig {
+    /// Whether to enable consumption metering for this cluster. If enabled, a
+    /// second BigQuery table will be created to hold resource consumption
+    /// records.
+    pub enabled: Option<bool>,
 }
 
-impl Part for PrivateClusterConfig {}
+impl Part for ConsumptionMeteringConfig {}
 
 
 /// CidrBlock contains an optional name and one CIDR block.
@@ -2619,7 +2803,7 @@ impl RequestValue for UpdateNodePoolRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Container::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
+/// // like `aggregated_usable_subnetworks_list(...)`, `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2664,7 +2848,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the autoscaling settings for a specific node pool.
+    /// Sets the autoscaling settings for the specified node pool.
     /// 
     /// # Arguments
     ///
@@ -2743,7 +2927,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the node pool requested.
+    /// Retrieves the requested node pool.
     /// 
     /// # Arguments
     ///
@@ -2772,9 +2956,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Firewalls and routes that were configured during cluster creation
     /// are also deleted.
     /// 
-    /// Other Google Compute Engine resources that might be in use by the cluster
-    /// (e.g. load balancer resources) will not be deleted if they weren't present
-    /// at the initial create time.
+    /// Other Google Compute Engine resources that might be in use by the cluster,
+    /// such as load balancer resources, are not deleted if they weren't present
+    /// when the cluster was initially created.
     /// 
     /// # Arguments
     ///
@@ -2795,8 +2979,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Roll back the previously Aborted or Failed NodePool upgrade.
-    /// This will be an no-op if the last upgrade successfully completed.
+    /// Rolls back a previously Aborted or Failed NodePool upgrade.
+    /// This makes no changes if the last upgrade successfully completed.
     /// 
     /// # Arguments
     ///
@@ -2834,9 +3018,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Firewalls and routes that were configured during cluster creation
     /// are also deleted.
     /// 
-    /// Other Google Compute Engine resources that might be in use by the cluster
-    /// (e.g. load balancer resources) will not be deleted if they weren't present
-    /// at the initial create time.
+    /// Other Google Compute Engine resources that might be in use by the cluster,
+    /// such as load balancer resources, are not deleted if they weren't present
+    /// when the cluster was initially created.
     /// 
     /// # Arguments
     ///
@@ -2864,7 +3048,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns configuration info about the Kubernetes Engine service.
+    /// Returns configuration info about the Google Kubernetes Engine service.
     /// 
     /// # Arguments
     ///
@@ -2888,7 +3072,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// GetJSONWebKeys gets the public component of the cluster signing keys in
+    /// Gets the public component of the cluster signing keys in
     /// JSON Web Key format.
     /// This API is not yet intended for general use, and is not available for all
     /// clusters.
@@ -2902,7 +3086,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _parent: parent.to_string(),
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -2967,9 +3150,32 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// GetOpenIDConfig gets the OIDC discovery document for the cluster.
-    /// See the OpenID Connect Discovery 1.0 specification for details.
-    /// https://openid.net/specs/openid-connect-discovery-1_0.html
+    /// Sets the size for a specific node pool.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name (project, location, cluster, node pool id) of the node pool to set
+    ///            size.
+    ///            Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    pub fn locations_clusters_node_pools_set_size(&self, request: SetNodePoolSizeRequest, name: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
+        ProjectLocationClusterNodePoolSetSizeCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the OIDC discovery document for the cluster.
+    /// See the
+    /// [OpenID Connect Discovery 1.0
+    /// specification](https://openid.net/specs/openid-connect-discovery-1_0.html)
+    /// for details.
     /// This API is not yet intended for general use, and is not available for all
     /// clusters.
     /// 
@@ -2977,12 +3183,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `parent` - The cluster (project, location, cluster id) to get the discovery document
     ///              for. Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub fn locations_clusters_well_known_get_openid_configuration(&self, parent: &str) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {
-        ProjectLocationClusterWell-knownGetOpenid-configurationCall {
+    pub fn locations_clusters_well_known_get_openid_configuration(&self, parent: &str) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A> {
+        ProjectLocationClusterWellKnownGetOpenidConfigurationCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -3032,7 +3237,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Start master IP rotation.
+    /// Starts master IP rotation.
     /// 
     /// # Arguments
     ///
@@ -3089,12 +3294,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// [default network](/compute/docs/networks-and-firewalls#networks).
     /// 
     /// One firewall is added for the cluster. After cluster creation,
-    /// the cluster creates routes for each node to allow the containers
+    /// the Kubelet creates routes for each node to allow the containers
     /// on that node to communicate with all other instances in the
     /// cluster.
     /// 
     /// Finally, an entry is added to the project's global metadata indicating
-    /// which CIDR range is being used by the cluster.
+    /// which CIDR range the cluster is using.
     /// 
     /// # Arguments
     ///
@@ -3161,7 +3366,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns configuration info about the Kubernetes Engine service.
+    /// Returns configuration info about the Google Kubernetes Engine service.
     /// 
     /// # Arguments
     ///
@@ -3209,7 +3414,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the version and/or image type for a specific node pool.
+    /// Updates the version and/or image type for the specified node pool.
     /// 
     /// # Arguments
     ///
@@ -3230,19 +3435,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the size for a specific node pool.
+    /// Lists subnetworks that are usable for creating clusters in a project.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - The name (project, location, cluster, node pool id) of the node pool to set
-    ///            size.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
-    pub fn locations_clusters_node_pools_set_size(&self, request: SetNodePoolSizeRequest, name: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
-        ProjectLocationClusterNodePoolSetSizeCall {
+    /// * `parent` - The parent project where subnetworks are usable.
+    ///              Specified in the format 'projects/*'.
+    pub fn aggregated_usable_subnetworks_list(&self, parent: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {
+        ProjectAggregatedUsableSubnetworkListCall {
             hub: self.hub,
-            _request: request,
-            _name: name.to_string(),
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3251,7 +3456,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enables/Disables Network Policy for a cluster.
+    /// Enables or disables Network Policy for a cluster.
     /// 
     /// # Arguments
     ///
@@ -3455,7 +3660,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the autoscaling settings for a specific node pool.
+    /// Sets the autoscaling settings for the specified node pool.
     /// 
     /// # Arguments
     ///
@@ -3546,12 +3751,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// [default network](/compute/docs/networks-and-firewalls#networks).
     /// 
     /// One firewall is added for the cluster. After cluster creation,
-    /// the cluster creates routes for each node to allow the containers
+    /// the Kubelet creates routes for each node to allow the containers
     /// on that node to communicate with all other instances in the
     /// cluster.
     /// 
     /// Finally, an entry is added to the project's global metadata indicating
-    /// which CIDR range is being used by the cluster.
+    /// which CIDR range the cluster is using.
     /// 
     /// # Arguments
     ///
@@ -3660,8 +3865,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Roll back the previously Aborted or Failed NodePool upgrade.
-    /// This will be an no-op if the last upgrade successfully completed.
+    /// Rolls back a previously Aborted or Failed NodePool upgrade.
+    /// This makes no changes if the last upgrade successfully completed.
     /// 
     /// # Arguments
     ///
@@ -3762,7 +3967,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Start master IP rotation.
+    /// Starts master IP rotation.
     /// 
     /// # Arguments
     ///
@@ -3901,7 +4106,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the version and/or image type for a specific node pool.
+    /// Updates the version and/or image type for the specified node pool.
     /// 
     /// # Arguments
     ///
@@ -3933,7 +4138,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enables/Disables Network Policy for a cluster.
+    /// Enables or disables Network Policy for a cluster.
     /// 
     /// # Arguments
     ///
@@ -3983,7 +4188,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the node pool requested.
+    /// Retrieves the requested node pool.
     /// 
     /// # Arguments
     ///
@@ -4014,9 +4219,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Used to set master auth materials. Currently supports :-
-    /// Changing the admin password for a specific cluster.
-    /// This can be either via password generation or explicitly set the password.
+    /// Sets master auth materials. Currently supports changing the admin password
+    /// or a specific cluster, either via password generation or explicitly setting
+    /// the password.
     /// 
     /// # Arguments
     ///
@@ -4045,9 +4250,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Used to set master auth materials. Currently supports :-
-    /// Changing the admin password for a specific cluster.
-    /// This can be either via password generation or explicitly set the password.
+    /// Sets master auth materials. Currently supports changing the admin password
+    /// or a specific cluster, either via password generation or explicitly setting
+    /// the password.
     /// 
     /// # Arguments
     ///
@@ -4521,7 +4726,7 @@ impl<'a, C, A> ProjectZoneOperationCancelCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Sets the autoscaling settings for a specific node pool.
+/// Sets the autoscaling settings for the specified node pool.
 ///
 /// A builder for the *locations.clusters.nodePools.setAutoscaling* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5412,7 +5617,7 @@ impl<'a, C, A> ProjectZoneClusterMonitoringCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Retrieves the node pool requested.
+/// Retrieves the requested node pool.
 ///
 /// A builder for the *locations.clusters.nodePools.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5723,9 +5928,9 @@ impl<'a, C, A> ProjectLocationClusterNodePoolGetCall<'a, C, A> where C: BorrowMu
 /// Firewalls and routes that were configured during cluster creation
 /// are also deleted.
 /// 
-/// Other Google Compute Engine resources that might be in use by the cluster
-/// (e.g. load balancer resources) will not be deleted if they weren't present
-/// at the initial create time.
+/// Other Google Compute Engine resources that might be in use by the cluster,
+/// such as load balancer resources, are not deleted if they weren't present
+/// when the cluster was initially created.
 ///
 /// A builder for the *locations.clusters.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6016,8 +6221,8 @@ impl<'a, C, A> ProjectLocationClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Roll back the previously Aborted or Failed NodePool upgrade.
-/// This will be an no-op if the last upgrade successfully completed.
+/// Rolls back a previously Aborted or Failed NodePool upgrade.
+/// This makes no changes if the last upgrade successfully completed.
 ///
 /// A builder for the *zones.clusters.nodePools.rollback* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6341,9 +6546,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolRollbackCall<'a, C, A> where C: BorrowM
 /// Firewalls and routes that were configured during cluster creation
 /// are also deleted.
 /// 
-/// Other Google Compute Engine resources that might be in use by the cluster
-/// (e.g. load balancer resources) will not be deleted if they weren't present
-/// at the initial create time.
+/// Other Google Compute Engine resources that might be in use by the cluster,
+/// such as load balancer resources, are not deleted if they weren't present
+/// when the cluster was initially created.
 ///
 /// A builder for the *zones.clusters.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6630,7 +6835,7 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Returns configuration info about the Kubernetes Engine service.
+/// Returns configuration info about the Google Kubernetes Engine service.
 ///
 /// A builder for the *zones.getServerconfig* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6903,7 +7108,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// GetJSONWebKeys gets the public component of the cluster signing keys in
+/// Gets the public component of the cluster signing keys in
 /// JSON Web Key format.
 /// This API is not yet intended for general use, and is not available for all
 /// clusters.
@@ -6944,7 +7149,6 @@ pub struct ProjectLocationClusterGetJwkCall<'a, C, A>
     _parent: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for ProjectLocationClusterGetJwkCall<'a, C, A> {}
@@ -6979,8 +7183,17 @@ impl<'a, C, A> ProjectLocationClusterGetJwkCall<'a, C, A> where C: BorrowMut<hyp
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/jwks";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -7013,24 +7226,10 @@ impl<'a, C, A> ProjectLocationClusterGetJwkCall<'a, C, A> where C: BorrowMut<hyp
 
 
         loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -7129,29 +7328,6 @@ impl<'a, C, A> ProjectLocationClusterGetJwkCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterGetJwkCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
 }
 
 
@@ -7765,9 +7941,292 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// GetOpenIDConfig gets the OIDC discovery document for the cluster.
-/// See the OpenID Connect Discovery 1.0 specification for details.
-/// https://openid.net/specs/openid-connect-discovery-1_0.html
+/// Sets the size for a specific node pool.
+///
+/// A builder for the *locations.clusters.nodePools.setSize* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_container1 as container1;
+/// use container1::SetNodePoolSizeRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use container1::Container;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Container::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SetNodePoolSizeRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_clusters_node_pools_set_size(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationClusterNodePoolSetSizeCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Container<C, A>,
+    _request: SetNodePoolSizeRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "container.projects.locations.clusters.nodePools.setSize",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:setSize";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SetNodePoolSizeRequest) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name (project, location, cluster, node pool id) of the node pool to set
+    /// size.
+    /// Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the OIDC discovery document for the cluster.
+/// See the
+/// [OpenID Connect Discovery 1.0
+/// specification](https://openid.net/specs/openid-connect-discovery-1_0.html)
+/// for details.
 /// This API is not yet intended for general use, and is not available for all
 /// clusters.
 ///
@@ -7800,19 +8259,18 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A>
+pub struct ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Container<C, A>,
     _parent: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7842,8 +8300,17 @@ impl<'a, C, A> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/.well-known/openid-configuration";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -7876,24 +8343,10 @@ impl<'a, C, A> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C
 
 
         loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -7951,7 +8404,7 @@ impl<'a, C, A> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A> {
         self._parent = new_value.to_string();
         self
     }
@@ -7961,7 +8414,7 @@ impl<'a, C, A> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7986,35 +8439,12 @@ impl<'a, C, A> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterWell-knownGetOpenid-configurationCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
 }
 
 
@@ -8326,10 +8756,10 @@ impl<'a, C, A> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_node_pools_delete("name")
-///              .zone("eirmod")
-///              .project_id("sanctus")
-///              .node_pool_id("et")
-///              .cluster_id("amet")
+///              .zone("sanctus")
+///              .project_id("et")
+///              .node_pool_id("amet")
+///              .cluster_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -8603,7 +9033,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> where C: Borro
 }
 
 
-/// Start master IP rotation.
+/// Starts master IP rotation.
 ///
 /// A builder for the *zones.clusters.startIpRotation* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8936,7 +9366,7 @@ impl<'a, C, A> ProjectZoneClusterStartIpRotationCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_get("name")
-///              .zone("sed")
+///              .zone("dolor")
 ///              .project_id("dolor")
 ///              .cluster_id("dolor")
 ///              .doit();
@@ -9206,12 +9636,12 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
 /// [default network](/compute/docs/networks-and-firewalls#networks).
 /// 
 /// One firewall is added for the cluster. After cluster creation,
-/// the cluster creates routes for each node to allow the containers
+/// the Kubelet creates routes for each node to allow the containers
 /// on that node to communicate with all other instances in the
 /// cluster.
 /// 
 /// Finally, an entry is added to the project's global metadata indicating
-/// which CIDR range is being used by the cluster.
+/// which CIDR range the cluster is using.
 ///
 /// A builder for the *zones.clusters.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9811,9 +10241,9 @@ impl<'a, C, A> ProjectLocationClusterSetAddonCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_node_pools_list("parent")
-///              .zone("voluptua.")
-///              .project_id("Lorem")
-///              .cluster_id("gubergren")
+///              .zone("Lorem")
+///              .project_id("gubergren")
+///              .cluster_id("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -10074,7 +10504,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Returns configuration info about the Kubernetes Engine service.
+/// Returns configuration info about the Google Kubernetes Engine service.
 ///
 /// A builder for the *locations.getServerConfig* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10102,8 +10532,8 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_get_server_config("name")
-///              .zone("sit")
-///              .project_id("vero")
+///              .zone("vero")
+///              .project_id("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -10379,7 +10809,7 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_list("projectId", "zone", "clusterId")
-///              .parent("sadipscing")
+///              .parent("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -10638,7 +11068,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolListCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Updates the version and/or image type for a specific node pool.
+/// Updates the version and/or image type for the specified node pool.
 ///
 /// A builder for the *locations.clusters.nodePools.update* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10919,9 +11349,9 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
 }
 
 
-/// Sets the size for a specific node pool.
+/// Lists subnetworks that are usable for creating clusters in a project.
 ///
-/// A builder for the *locations.clusters.nodePools.setSize* method supported by a *project* resource.
+/// A builder for the *aggregated.usableSubnetworks.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -10933,7 +11363,6 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_container1 as container1;
-/// use container1::SetNodePoolSizeRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10944,36 +11373,36 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Container::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SetNodePoolSizeRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_clusters_node_pools_set_size(req, "name")
+/// let result = hub.projects().aggregated_usable_subnetworks_list("parent")
+///              .page_token("consetetur")
+///              .page_size(-84)
+///              .filter("duo")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolSetSizeCall<'a, C, A>
+pub struct ProjectAggregatedUsableSubnetworkListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Container<C, A>,
-    _request: SetNodePoolSizeRequest,
-    _name: String,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListUsableSubnetworksResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -10982,11 +11411,20 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "container.projects.locations.clusters.nodePools.setSize",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        dlg.begin(MethodInfo { id: "container.projects.aggregated.usableSubnetworks.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10998,12 +11436,12 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}:setSize";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/aggregated/usableSubnetworks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -11018,7 +11456,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -11030,17 +11468,6 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -11057,15 +11484,11 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -11116,25 +11539,43 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
     }
 
 
+    /// The parent project where subnetworks are usable.
+    /// Specified in the format 'projects/*'.
     ///
-    /// Sets the *request* property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNodePoolSizeRequest) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
-        self._request = new_value;
+    pub fn parent(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
-    /// The name (project, location, cluster, node pool id) of the node pool to set
-    /// size.
-    /// Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// Specifies a page token to use. Set this to the nextPageToken returned by
+    /// previous list requests to get the next page of results.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The max number of results per page that should be returned. If the number
+    /// of available results is larger than `page_size`, a `next_page_token` is
+    /// returned which can be used to get the next page of results in subsequent
+    /// requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
     ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
-        self._name = new_value.to_string();
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Filtering currently only supports equality on the networkProjectId and must
+    /// be in the form: "networkProjectId=[PROJECTID]", where `networkProjectId`
+    /// is the project which owns the listed subnetworks. This defaults to the
+    /// parent project ID.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11143,7 +11584,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11168,7 +11609,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11188,7 +11629,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11200,7 +11641,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
 }
 
 
-/// Enables/Disables Network Policy for a cluster.
+/// Enables or disables Network Policy for a cluster.
 ///
 /// A builder for the *locations.clusters.setNetworkPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11826,7 +12267,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetManagementCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_get("projectId", "zone", "operationId")
-///              .name("consetetur")
+///              .name("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -13284,7 +13725,7 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_list("projectId", "zone")
-///              .parent("rebum.")
+///              .parent("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -13531,7 +13972,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Sets the autoscaling settings for a specific node pool.
+/// Sets the autoscaling settings for the specified node pool.
 ///
 /// A builder for the *zones.clusters.nodePools.autoscaling* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -14454,12 +14895,12 @@ impl<'a, C, A> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> where C: Borrow
 /// [default network](/compute/docs/networks-and-firewalls#networks).
 /// 
 /// One firewall is added for the cluster. After cluster creation,
-/// the cluster creates routes for each node to allow the containers
+/// the Kubelet creates routes for each node to allow the containers
 /// on that node to communicate with all other instances in the
 /// cluster.
 /// 
 /// Finally, an entry is added to the project's global metadata indicating
-/// which CIDR range is being used by the cluster.
+/// which CIDR range the cluster is using.
 ///
 /// A builder for the *locations.clusters.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -15049,8 +15490,8 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_list("parent")
-///              .zone("eos")
-///              .project_id("tempor")
+///              .zone("ipsum")
+///              .project_id("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -15882,8 +16323,8 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
 }
 
 
-/// Roll back the previously Aborted or Failed NodePool upgrade.
-/// This will be an no-op if the last upgrade successfully completed.
+/// Rolls back a previously Aborted or Failed NodePool upgrade.
+/// This makes no changes if the last upgrade successfully completed.
 ///
 /// A builder for the *locations.clusters.nodePools.rollback* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -16472,7 +16913,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_delete("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("amet")
+///              .name("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -17050,7 +17491,7 @@ impl<'a, C, A> ProjectZoneClusterLocationCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Start master IP rotation.
+/// Starts master IP rotation.
 ///
 /// A builder for the *locations.clusters.startIpRotation* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -17358,8 +17799,8 @@ impl<'a, C, A> ProjectLocationClusterStartIpRotationCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("parent")
-///              .zone("clita")
-///              .project_id("invidunt")
+///              .zone("eos")
+///              .project_id("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -18197,7 +18638,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolCreateCall<'a, C, A> where C: Borro
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_get("projectId", "zone", "clusterId")
-///              .name("sed")
+///              .name("et")
 ///              .doit();
 /// # }
 /// ```
@@ -18761,7 +19202,7 @@ impl<'a, C, A> ProjectZoneClusterMasterCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Updates the version and/or image type for a specific node pool.
+/// Updates the version and/or image type for the specified node pool.
 ///
 /// A builder for the *zones.clusters.nodePools.update* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -19079,7 +19520,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolUpdateCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Enables/Disables Network Policy for a cluster.
+/// Enables or disables Network Policy for a cluster.
 ///
 /// A builder for the *zones.clusters.setNetworkPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -19665,7 +20106,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
 }
 
 
-/// Retrieves the node pool requested.
+/// Retrieves the requested node pool.
 ///
 /// A builder for the *zones.clusters.nodePools.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -19693,7 +20134,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_get("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("et")
+///              .name("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -19966,9 +20407,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolGetCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Used to set master auth materials. Currently supports :-
-/// Changing the admin password for a specific cluster.
-/// This can be either via password generation or explicitly set the password.
+/// Sets master auth materials. Currently supports changing the admin password
+/// or a specific cluster, either via password generation or explicitly setting
+/// the password.
 ///
 /// A builder for the *zones.clusters.setMasterAuth* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -20273,9 +20714,9 @@ impl<'a, C, A> ProjectZoneClusterSetMasterAuthCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Used to set master auth materials. Currently supports :-
-/// Changing the admin password for a specific cluster.
-/// This can be either via password generation or explicitly set the password.
+/// Sets master auth materials. Currently supports changing the admin password
+/// or a specific cluster, either via password generation or explicitly setting
+/// the password.
 ///
 /// A builder for the *locations.clusters.setMasterAuth* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -21473,7 +21914,7 @@ impl<'a, C, A> ProjectLocationClusterSetLoggingCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_list("projectId", "zone")
-///              .parent("ut")
+///              .parent("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -22027,9 +22468,9 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_get("name")
-///              .zone("ut")
-///              .project_id("eirmod")
-///              .operation_id("sanctus")
+///              .zone("dolor")
+///              .project_id("et")
+///              .operation_id("et")
 ///              .doit();
 /// # }
 /// ```

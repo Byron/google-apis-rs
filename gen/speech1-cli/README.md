@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Speech* API at revision *20190321*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Speech* API at revision *20190627*. The CLI is at version *1.0.9*.
 
 ```bash
 speech1 [options]
@@ -35,7 +35,6 @@ speech1 [options]
         projects
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
-                operations-manual-recognition-tasks-get <name> [-p <v>]... [-o <out>]
         speech
                 longrunningrecognize (-r <kv>)... [-p <v>]... [-o <out>]
                 recognize (-r <kv>)... [-p <v>]... [-o <out>]

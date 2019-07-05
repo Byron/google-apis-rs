@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Control* crate version *1.0.8+20190323*, where *20190323* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Service Control* crate version *1.0.9+20190622*, where *20190622* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Service Control* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/service-control/).
@@ -217,9 +217,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -335,7 +333,7 @@ impl<'a, C, A> ServiceControl<C, A>
         ServiceControl {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://servicecontrol.googleapis.com/".to_string(),
             _root_url: "https://servicecontrol.googleapis.com/".to_string(),
         }
@@ -346,7 +344,7 @@ impl<'a, C, A> ServiceControl<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -597,12 +595,6 @@ impl Part for QuotaInfo {}
 pub struct Distribution {
     /// The total number of samples in the distribution. Must be >= 0.
     pub count: Option<String>,
-    /// The sum of squared deviations from the mean:
-    ///   Sum[i=1..count]((x_i - mean)^2)
-    /// where each x_i is a sample values. If `count` is zero then this field
-    /// must be zero, otherwise validation of the request fails.
-    #[serde(rename="sumOfSquaredDeviation")]
-    pub sum_of_squared_deviation: Option<f64>,
     /// The number of samples in each histogram bucket. `bucket_counts` are
     /// optional. If present, they must sum to the `count` value.
     /// 
@@ -619,10 +611,18 @@ pub struct Distribution {
     /// Buckets with exponentially growing width.
     #[serde(rename="exponentialBuckets")]
     pub exponential_buckets: Option<ExponentialBuckets>,
-    /// The maximum of the population of values. Ignored if `count` is zero.
-    pub maximum: Option<f64>,
     /// The minimum of the population of values. Ignored if `count` is zero.
     pub minimum: Option<f64>,
+    /// The maximum of the population of values. Ignored if `count` is zero.
+    pub maximum: Option<f64>,
+    /// Example points. Must be in increasing order of `value` field.
+    pub exemplars: Option<Vec<Exemplar>>,
+    /// The sum of squared deviations from the mean:
+    ///   Sum[i=1..count]((x_i - mean)^2)
+    /// where each x_i is a sample values. If `count` is zero then this field
+    /// must be zero, otherwise validation of the request fails.
+    #[serde(rename="sumOfSquaredDeviation")]
+    pub sum_of_squared_deviation: Option<f64>,
     /// Buckets with constant width.
     #[serde(rename="linearBuckets")]
     pub linear_buckets: Option<LinearBuckets>,
@@ -808,6 +808,9 @@ pub struct ReportResponse {
     /// The actual config id used to process the request.
     #[serde(rename="serviceConfigId")]
     pub service_config_id: Option<String>,
+    /// Unimplemented. The current service rollout id used to process the request.
+    #[serde(rename="serviceRolloutId")]
+    pub service_rollout_id: Option<String>,
 }
 
 impl ResponseResult for ReportResponse {}
@@ -939,7 +942,8 @@ pub struct ConsumerInfo {
     /// consumer number is found.
     #[serde(rename="consumerNumber")]
     pub consumer_number: Option<String>,
-    /// no description provided
+    /// The type of the consumer which should have been defined in
+    /// [Google Resource Manager](https://cloud.google.com/resource-manager/).
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The Google cloud project number, e.g. 1234567890. A value of 0 indicates
@@ -965,10 +969,6 @@ impl Part for ConsumerInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CheckResponse {
-    /// The same operation_id value used in the CheckRequest.
-    /// Used for logging and diagnostics purposes.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
     /// The actual config id used to process the request.
     #[serde(rename="serviceConfigId")]
     pub service_config_id: Option<String>,
@@ -986,6 +986,13 @@ pub struct CheckResponse {
     /// 
     #[serde(rename="quotaInfo")]
     pub quota_info: Option<QuotaInfo>,
+    /// The same operation_id value used in the CheckRequest.
+    /// Used for logging and diagnostics purposes.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+    /// Unimplemented. The current service rollout id used to process the request.
+    #[serde(rename="serviceRolloutId")]
+    pub service_rollout_id: Option<String>,
 }
 
 impl ResponseResult for CheckResponse {}
@@ -993,56 +1000,11 @@ impl ResponseResult for CheckResponse {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1103,27 +1065,36 @@ pub struct AllocateInfo {
 impl Part for AllocateInfo {}
 
 
-/// Additional information about a potentially long-running operation with which
-/// a log entry is associated.
+/// Exemplars are example points that may be used to annotate aggregated
+/// distribution values. They are metadata that gives information about a
+/// particular value added to a Distribution bucket, such as a trace ID that
+/// was active when a value was added. They may contain further information,
+/// such as a example values and timestamps, origin, etc.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LogEntryOperation {
-    /// Optional. Set this to True if this is the last log entry in the operation.
-    pub last: Option<bool>,
-    /// Optional. An arbitrary operation identifier. Log entries with the
-    /// same identifier are assumed to be part of the same operation.
-    pub id: Option<String>,
-    /// Optional. An arbitrary producer identifier. The combination of
-    /// `id` and `producer` must be globally unique.  Examples for `producer`:
-    /// `"MyDivision.MyBigCompany.com"`, `"github.com/MyProject/MyApplication"`.
-    pub producer: Option<String>,
-    /// Optional. Set this to True if this is the first log entry in the operation.
-    pub first: Option<bool>,
+pub struct Exemplar {
+    /// The observation (sampling) time of the above value.
+    pub timestamp: Option<String>,
+    /// Contextual information about the example value. Examples are:
+    /// 
+    ///   Trace: type.googleapis.com/google.monitoring.v3.SpanContext
+    /// 
+    ///   Literal string: type.googleapis.com/google.protobuf.StringValue
+    /// 
+    ///   Labels dropped during aggregation:
+    ///     type.googleapis.com/google.monitoring.v3.DroppedLabels
+    /// 
+    /// There may be only a single attachment of any given message type in a
+    /// single exemplar, and this is enforced by the system.
+    pub attachments: Option<Vec<HashMap<String, String>>>,
+    /// Value of the exemplar point. This value determines to which bucket the
+    /// exemplar belongs.
+    pub value: Option<f64>,
 }
 
-impl Part for LogEntryOperation {}
+impl Part for Exemplar {}
 
 
 /// Response message for the AllocateQuota method.
@@ -1282,6 +1253,29 @@ pub struct QuotaProperties {
 }
 
 impl Part for QuotaProperties {}
+
+
+/// Additional information about a potentially long-running operation with which
+/// a log entry is associated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LogEntryOperation {
+    /// Optional. Set this to True if this is the last log entry in the operation.
+    pub last: Option<bool>,
+    /// Optional. An arbitrary operation identifier. Log entries with the
+    /// same identifier are assumed to be part of the same operation.
+    pub id: Option<String>,
+    /// Optional. An arbitrary producer identifier. The combination of
+    /// `id` and `producer` must be globally unique.  Examples for `producer`:
+    /// `"MyDivision.MyBigCompany.com"`, `"github.com/MyProject/MyApplication"`.
+    pub producer: Option<String>,
+    /// Optional. Set this to True if this is the first log entry in the operation.
+    pub first: Option<bool>,
+}
+
+impl Part for LogEntryOperation {}
 
 
 /// Represents information regarding an operation.

@@ -768,9 +768,6 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "impression-tracking-urls" => Some(("impressionTrackingUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filtering-stats.date.year" => Some(("filteringStats.date.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filtering-stats.date.day" => Some(("filteringStats.date.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filtering-stats.date.month" => Some(("filteringStats.date.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "detected-languages" => Some(("detectedLanguages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "advertiser-name" => Some(("advertiserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "click-through-urls" => Some(("clickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -808,13 +805,15 @@ impl<'n> Engine<'n> {
                     "api-update-time" => Some(("apiUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-product-categories" => Some(("detectedProductCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "ad-technology-providers.has-unidentified-provider" => Some(("adTechnologyProviders.hasUnidentifiedProvider", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "ad-technology-providers.detected-provider-ids" => Some(("adTechnologyProviders.detectedProviderIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "detected-domains" => Some(("detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deals-status" => Some(("dealsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "declared-click-through-urls" => Some(("declaredClickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attributes" => Some(("attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "date", "day", "deals-status", "declared-click-through-urls", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-sensitive-categories", "filtering-stats", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "month", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "video-vast-xml", "width", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "ad-technology-providers", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "deals-status", "declared-click-through-urls", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-provider-ids", "detected-sensitive-categories", "has-unidentified-provider", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "video-vast-xml", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1337,9 +1336,6 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "impression-tracking-urls" => Some(("impressionTrackingUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filtering-stats.date.year" => Some(("filteringStats.date.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filtering-stats.date.day" => Some(("filteringStats.date.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filtering-stats.date.month" => Some(("filteringStats.date.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "detected-languages" => Some(("detectedLanguages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "advertiser-name" => Some(("advertiserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "click-through-urls" => Some(("clickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1377,13 +1373,15 @@ impl<'n> Engine<'n> {
                     "api-update-time" => Some(("apiUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-product-categories" => Some(("detectedProductCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "ad-technology-providers.has-unidentified-provider" => Some(("adTechnologyProviders.hasUnidentifiedProvider", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "ad-technology-providers.detected-provider-ids" => Some(("adTechnologyProviders.detectedProviderIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "detected-domains" => Some(("detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deals-status" => Some(("dealsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "declared-click-through-urls" => Some(("declaredClickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attributes" => Some(("attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "date", "day", "deals-status", "declared-click-through-urls", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-sensitive-categories", "filtering-stats", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "month", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "video-vast-xml", "width", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "ad-technology-providers", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "deals-status", "declared-click-through-urls", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-provider-ids", "detected-sensitive-categories", "has-unidentified-provider", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "video-vast-xml", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2611,58 +2609,6 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _bidders_accounts_creatives_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.bidders().accounts_creatives_delete(opt.value_of("owner-name").unwrap_or(""), opt.value_of("creative-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4537,9 +4483,6 @@ impl<'n> Engine<'n> {
             },
             ("bidders", Some(opt)) => {
                 match opt.subcommand() {
-                    ("accounts-creatives-delete", Some(opt)) => {
-                        call_result = self._bidders_accounts_creatives_delete(opt, dry_run, &mut err);
-                    },
                     ("accounts-filter-sets-bid-metrics-list", Some(opt)) => {
                         call_result = self._bidders_accounts_filter_sets_bid_metrics_list(opt, dry_run, &mut err);
                     },
@@ -5833,46 +5776,7 @@ fn main() {
                   ]),
             ]),
         
-        ("bidders", "methods: 'accounts-creatives-delete', 'accounts-filter-sets-bid-metrics-list', 'accounts-filter-sets-bid-response-errors-list', 'accounts-filter-sets-bid-responses-without-bids-list', 'accounts-filter-sets-create', 'accounts-filter-sets-delete', 'accounts-filter-sets-filtered-bid-requests-list', 'accounts-filter-sets-filtered-bids-creatives-list', 'accounts-filter-sets-filtered-bids-details-list', 'accounts-filter-sets-filtered-bids-list', 'accounts-filter-sets-get', 'accounts-filter-sets-impression-metrics-list', 'accounts-filter-sets-list', 'accounts-filter-sets-losing-bids-list', 'accounts-filter-sets-non-billable-winning-bids-list', 'filter-sets-bid-metrics-list', 'filter-sets-bid-response-errors-list', 'filter-sets-bid-responses-without-bids-list', 'filter-sets-create', 'filter-sets-delete', 'filter-sets-filtered-bid-requests-list', 'filter-sets-filtered-bids-creatives-list', 'filter-sets-filtered-bids-details-list', 'filter-sets-filtered-bids-list', 'filter-sets-get', 'filter-sets-impression-metrics-list', 'filter-sets-list', 'filter-sets-losing-bids-list' and 'filter-sets-non-billable-winning-bids-list'", vec![
-            ("accounts-creatives-delete",
-                    Some(r##"Deletes a single creative.
-        
-        A creative is deactivated upon deletion and does not count against active
-        snippet quota. A deleted creative should not be used in bidding (all bids
-        with that creative will be rejected)."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/bidders_accounts-creatives-delete",
-                  vec![
-                    (Some(r##"owner-name"##),
-                     None,
-                     Some(r##"Name of the owner (bidder or account) of the creative to be deleted.
-        For example:
-        
-        - For an account-level creative for the buyer account representing bidder
-          123: `bidders/123/accounts/123`
-        
-        - For an account-level creative for the child seat buyer account 456
-          whose bidder is 123: `bidders/123/accounts/456`"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"creative-id"##),
-                     None,
-                     Some(r##"The ID of the creative to delete."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
+        ("bidders", "methods: 'accounts-filter-sets-bid-metrics-list', 'accounts-filter-sets-bid-response-errors-list', 'accounts-filter-sets-bid-responses-without-bids-list', 'accounts-filter-sets-create', 'accounts-filter-sets-delete', 'accounts-filter-sets-filtered-bid-requests-list', 'accounts-filter-sets-filtered-bids-creatives-list', 'accounts-filter-sets-filtered-bids-details-list', 'accounts-filter-sets-filtered-bids-list', 'accounts-filter-sets-get', 'accounts-filter-sets-impression-metrics-list', 'accounts-filter-sets-list', 'accounts-filter-sets-losing-bids-list', 'accounts-filter-sets-non-billable-winning-bids-list', 'filter-sets-bid-metrics-list', 'filter-sets-bid-response-errors-list', 'filter-sets-bid-responses-without-bids-list', 'filter-sets-create', 'filter-sets-delete', 'filter-sets-filtered-bid-requests-list', 'filter-sets-filtered-bids-creatives-list', 'filter-sets-filtered-bids-details-list', 'filter-sets-filtered-bids-list', 'filter-sets-get', 'filter-sets-impression-metrics-list', 'filter-sets-list', 'filter-sets-losing-bids-list' and 'filter-sets-non-billable-winning-bids-list'", vec![
             ("accounts-filter-sets-bid-metrics-list",
                     Some(r##"Lists all metrics that are measured in terms of number of bids."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/bidders_accounts-filter-sets-bid-metrics-list",
@@ -6839,7 +6743,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer2-v2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190403")
+           .version("1.0.9+20190701")
            .about("Accesses the latest features for managing Authorized Buyers accounts, Real-Time Bidding configurations and auction metrics, and Marketplace programmatic deals.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli")
            .arg(Arg::with_name("url")

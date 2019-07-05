@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *1.0.8+20180823*, where *20180823* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *1.0.9+20190614*, where *20190614* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -232,9 +232,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -346,7 +344,7 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
         AdExchangeBuyer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/adexchangebuyer/v1.3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -375,7 +373,7 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -459,6 +457,9 @@ pub struct Creative {
     /// The agency id for this creative.
     #[serde(rename="agencyId")]
     pub agency_id: Option<String>,
+    /// no description provided
+    #[serde(rename="adTechnologyProviders")]
+    pub ad_technology_providers: Option<CreativeAdTechnologyProviders>,
     /// All attributes for the ads that may be shown from this snippet.
     pub attribute: Option<Vec<i32>>,
     /// All restricted categories for the ads that may be shown from this snippet.
@@ -630,6 +631,24 @@ pub struct AccountsList {
 }
 
 impl ResponseResult for AccountsList {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeAdTechnologyProviders {
+    /// no description provided
+    #[serde(rename="hasUnidentifiedProvider")]
+    pub has_unidentified_provider: Option<bool>,
+    /// no description provided
+    #[serde(rename="detectedProviderIds")]
+    pub detected_provider_ids: Option<Vec<String>>,
+}
+
+impl NestedType for CreativeAdTechnologyProviders {}
+impl Part for CreativeAdTechnologyProviders {}
 
 
 /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
@@ -1155,13 +1174,11 @@ pub struct CreativeNativeAd {
     pub app_icon: Option<CreativeNativeAdAppIcon>,
     /// A smaller image, for the advertiser logo.
     pub logo: Option<CreativeNativeAdLogo>,
+    /// The price of the promoted app including the currency info.
+    pub price: Option<String>,
     /// The URLs are called when the impression is rendered.
     #[serde(rename="impressionTrackingUrl")]
     pub impression_tracking_url: Option<Vec<String>>,
-    /// The price of the promoted app including the currency info.
-    pub price: Option<String>,
-    /// The URL to the app store to purchase/download the promoted app.
-    pub store: Option<String>,
 }
 
 impl NestedType for CreativeNativeAd {}

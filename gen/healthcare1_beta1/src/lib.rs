@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Healthcare* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *healthcare:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Healthcare* crate version *1.0.9+20190628*, where *20190628* is the exact revision of the *healthcare:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Healthcare* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/healthcare).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudHealthcare.html) ... 
 //! 
 //! * projects
-//!  * [*locations datasets create*](struct.ProjectLocationDatasetCreateCall.html), [*locations datasets deidentify*](struct.ProjectLocationDatasetDeidentifyCall.html), [*locations datasets delete*](struct.ProjectLocationDatasetDeleteCall.html), [*locations datasets dicom stores create*](struct.ProjectLocationDatasetDicomStoreCreateCall.html), [*locations datasets dicom stores delete*](struct.ProjectLocationDatasetDicomStoreDeleteCall.html), [*locations datasets dicom stores export*](struct.ProjectLocationDatasetDicomStoreExportCall.html), [*locations datasets dicom stores get*](struct.ProjectLocationDatasetDicomStoreGetCall.html), [*locations datasets dicom stores get iam policy*](struct.ProjectLocationDatasetDicomStoreGetIamPolicyCall.html), [*locations datasets dicom stores import*](struct.ProjectLocationDatasetDicomStoreImportCall.html), [*locations datasets dicom stores list*](struct.ProjectLocationDatasetDicomStoreListCall.html), [*locations datasets dicom stores patch*](struct.ProjectLocationDatasetDicomStorePatchCall.html), [*locations datasets dicom stores search for instances*](struct.ProjectLocationDatasetDicomStoreSearchForInstanceCall.html), [*locations datasets dicom stores search for series*](struct.ProjectLocationDatasetDicomStoreSearchForSeryCall.html), [*locations datasets dicom stores search for studies*](struct.ProjectLocationDatasetDicomStoreSearchForStudyCall.html), [*locations datasets dicom stores set iam policy*](struct.ProjectLocationDatasetDicomStoreSetIamPolicyCall.html), [*locations datasets dicom stores store instances*](struct.ProjectLocationDatasetDicomStoreStoreInstanceCall.html), [*locations datasets dicom stores studies delete*](struct.ProjectLocationDatasetDicomStoreStudyDeleteCall.html), [*locations datasets dicom stores studies retrieve metadata*](struct.ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall.html), [*locations datasets dicom stores studies retrieve study*](struct.ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall.html), [*locations datasets dicom stores studies search for instances*](struct.ProjectLocationDatasetDicomStoreStudySearchForInstanceCall.html), [*locations datasets dicom stores studies search for series*](struct.ProjectLocationDatasetDicomStoreStudySearchForSeryCall.html), [*locations datasets dicom stores studies series delete*](struct.ProjectLocationDatasetDicomStoreStudySeryDeleteCall.html), [*locations datasets dicom stores studies series instances delete*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall.html), [*locations datasets dicom stores studies series instances frames retrieve frames*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall.html), [*locations datasets dicom stores studies series instances frames retrieve rendered*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall.html), [*locations datasets dicom stores studies series instances retrieve instance*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall.html), [*locations datasets dicom stores studies series instances retrieve metadata*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall.html), [*locations datasets dicom stores studies series instances retrieve rendered*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall.html), [*locations datasets dicom stores studies series retrieve metadata*](struct.ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall.html), [*locations datasets dicom stores studies series retrieve series*](struct.ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall.html), [*locations datasets dicom stores studies series search for instances*](struct.ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall.html), [*locations datasets dicom stores studies store instances*](struct.ProjectLocationDatasetDicomStoreStudyStoreInstanceCall.html), [*locations datasets dicom stores test iam permissions*](struct.ProjectLocationDatasetDicomStoreTestIamPermissionCall.html), [*locations datasets fhir stores create*](struct.ProjectLocationDatasetFhirStoreCreateCall.html), [*locations datasets fhir stores delete*](struct.ProjectLocationDatasetFhirStoreDeleteCall.html), [*locations datasets fhir stores execute bundle*](struct.ProjectLocationDatasetFhirStoreExecuteBundleCall.html), [*locations datasets fhir stores export*](struct.ProjectLocationDatasetFhirStoreExportCall.html), [*locations datasets fhir stores fhir  observation get$lastn*](struct.ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall.html), [*locations datasets fhir stores fhir  patient get$everything*](struct.ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall.html), [*locations datasets fhir stores fhir _history get*](struct.ProjectLocationDatasetFhirStoreFhirHistoryGetCall.html), [*locations datasets fhir stores fhir _history list*](struct.ProjectLocationDatasetFhirStoreFhirHistoryListCall.html), [*locations datasets fhir stores fhir _search*](struct.ProjectLocationDatasetFhirStoreFhirSearchCall.html), [*locations datasets fhir stores fhir conditional delete resource*](struct.ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall.html), [*locations datasets fhir stores fhir conditional patch resource*](struct.ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall.html), [*locations datasets fhir stores fhir conditional update resource*](struct.ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall.html), [*locations datasets fhir stores fhir create resource*](struct.ProjectLocationDatasetFhirStoreFhirCreateResourceCall.html), [*locations datasets fhir stores fhir delete*](struct.ProjectLocationDatasetFhirStoreFhirDeleteCall.html), [*locations datasets fhir stores fhir delete$purge*](struct.ProjectLocationDatasetFhirStoreFhirDelete$purgeCall.html), [*locations datasets fhir stores fhir get*](struct.ProjectLocationDatasetFhirStoreFhirGetCall.html), [*locations datasets fhir stores fhir get metadata*](struct.ProjectLocationDatasetFhirStoreFhirGetMetadataCall.html), [*locations datasets fhir stores fhir patch*](struct.ProjectLocationDatasetFhirStoreFhirPatchCall.html), [*locations datasets fhir stores fhir search resources*](struct.ProjectLocationDatasetFhirStoreFhirSearchResourceCall.html), [*locations datasets fhir stores fhir update*](struct.ProjectLocationDatasetFhirStoreFhirUpdateCall.html), [*locations datasets fhir stores get*](struct.ProjectLocationDatasetFhirStoreGetCall.html), [*locations datasets fhir stores get iam policy*](struct.ProjectLocationDatasetFhirStoreGetIamPolicyCall.html), [*locations datasets fhir stores import*](struct.ProjectLocationDatasetFhirStoreImportCall.html), [*locations datasets fhir stores list*](struct.ProjectLocationDatasetFhirStoreListCall.html), [*locations datasets fhir stores patch*](struct.ProjectLocationDatasetFhirStorePatchCall.html), [*locations datasets fhir stores set iam policy*](struct.ProjectLocationDatasetFhirStoreSetIamPolicyCall.html), [*locations datasets fhir stores test iam permissions*](struct.ProjectLocationDatasetFhirStoreTestIamPermissionCall.html), [*locations datasets get*](struct.ProjectLocationDatasetGetCall.html), [*locations datasets get iam policy*](struct.ProjectLocationDatasetGetIamPolicyCall.html), [*locations datasets hl7 v2 stores create*](struct.ProjectLocationDatasetHl7V2StoreCreateCall.html), [*locations datasets hl7 v2 stores delete*](struct.ProjectLocationDatasetHl7V2StoreDeleteCall.html), [*locations datasets hl7 v2 stores get*](struct.ProjectLocationDatasetHl7V2StoreGetCall.html), [*locations datasets hl7 v2 stores get iam policy*](struct.ProjectLocationDatasetHl7V2StoreGetIamPolicyCall.html), [*locations datasets hl7 v2 stores list*](struct.ProjectLocationDatasetHl7V2StoreListCall.html), [*locations datasets hl7 v2 stores messages create*](struct.ProjectLocationDatasetHl7V2StoreMessageCreateCall.html), [*locations datasets hl7 v2 stores messages delete*](struct.ProjectLocationDatasetHl7V2StoreMessageDeleteCall.html), [*locations datasets hl7 v2 stores messages get*](struct.ProjectLocationDatasetHl7V2StoreMessageGetCall.html), [*locations datasets hl7 v2 stores messages ingest*](struct.ProjectLocationDatasetHl7V2StoreMessageIngestCall.html), [*locations datasets hl7 v2 stores messages list*](struct.ProjectLocationDatasetHl7V2StoreMessageListCall.html), [*locations datasets hl7 v2 stores messages patch*](struct.ProjectLocationDatasetHl7V2StoreMessagePatchCall.html), [*locations datasets hl7 v2 stores patch*](struct.ProjectLocationDatasetHl7V2StorePatchCall.html), [*locations datasets hl7 v2 stores set iam policy*](struct.ProjectLocationDatasetHl7V2StoreSetIamPolicyCall.html), [*locations datasets hl7 v2 stores test iam permissions*](struct.ProjectLocationDatasetHl7V2StoreTestIamPermissionCall.html), [*locations datasets list*](struct.ProjectLocationDatasetListCall.html), [*locations datasets operations get*](struct.ProjectLocationDatasetOperationGetCall.html), [*locations datasets operations list*](struct.ProjectLocationDatasetOperationListCall.html), [*locations datasets patch*](struct.ProjectLocationDatasetPatchCall.html), [*locations datasets set iam policy*](struct.ProjectLocationDatasetSetIamPolicyCall.html), [*locations datasets test iam permissions*](struct.ProjectLocationDatasetTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html) and [*locations list*](struct.ProjectLocationListCall.html)
+//!  * [*locations datasets create*](struct.ProjectLocationDatasetCreateCall.html), [*locations datasets deidentify*](struct.ProjectLocationDatasetDeidentifyCall.html), [*locations datasets delete*](struct.ProjectLocationDatasetDeleteCall.html), [*locations datasets dicom stores create*](struct.ProjectLocationDatasetDicomStoreCreateCall.html), [*locations datasets dicom stores delete*](struct.ProjectLocationDatasetDicomStoreDeleteCall.html), [*locations datasets dicom stores export*](struct.ProjectLocationDatasetDicomStoreExportCall.html), [*locations datasets dicom stores get*](struct.ProjectLocationDatasetDicomStoreGetCall.html), [*locations datasets dicom stores get iam policy*](struct.ProjectLocationDatasetDicomStoreGetIamPolicyCall.html), [*locations datasets dicom stores import*](struct.ProjectLocationDatasetDicomStoreImportCall.html), [*locations datasets dicom stores list*](struct.ProjectLocationDatasetDicomStoreListCall.html), [*locations datasets dicom stores patch*](struct.ProjectLocationDatasetDicomStorePatchCall.html), [*locations datasets dicom stores search for instances*](struct.ProjectLocationDatasetDicomStoreSearchForInstanceCall.html), [*locations datasets dicom stores search for series*](struct.ProjectLocationDatasetDicomStoreSearchForSeryCall.html), [*locations datasets dicom stores search for studies*](struct.ProjectLocationDatasetDicomStoreSearchForStudyCall.html), [*locations datasets dicom stores set iam policy*](struct.ProjectLocationDatasetDicomStoreSetIamPolicyCall.html), [*locations datasets dicom stores store instances*](struct.ProjectLocationDatasetDicomStoreStoreInstanceCall.html), [*locations datasets dicom stores studies delete*](struct.ProjectLocationDatasetDicomStoreStudyDeleteCall.html), [*locations datasets dicom stores studies retrieve metadata*](struct.ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall.html), [*locations datasets dicom stores studies retrieve study*](struct.ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall.html), [*locations datasets dicom stores studies search for instances*](struct.ProjectLocationDatasetDicomStoreStudySearchForInstanceCall.html), [*locations datasets dicom stores studies search for series*](struct.ProjectLocationDatasetDicomStoreStudySearchForSeryCall.html), [*locations datasets dicom stores studies series delete*](struct.ProjectLocationDatasetDicomStoreStudySeryDeleteCall.html), [*locations datasets dicom stores studies series instances delete*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall.html), [*locations datasets dicom stores studies series instances frames retrieve frames*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall.html), [*locations datasets dicom stores studies series instances frames retrieve rendered*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall.html), [*locations datasets dicom stores studies series instances retrieve instance*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall.html), [*locations datasets dicom stores studies series instances retrieve metadata*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall.html), [*locations datasets dicom stores studies series instances retrieve rendered*](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall.html), [*locations datasets dicom stores studies series retrieve metadata*](struct.ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall.html), [*locations datasets dicom stores studies series retrieve series*](struct.ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall.html), [*locations datasets dicom stores studies series search for instances*](struct.ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall.html), [*locations datasets dicom stores studies store instances*](struct.ProjectLocationDatasetDicomStoreStudyStoreInstanceCall.html), [*locations datasets dicom stores test iam permissions*](struct.ProjectLocationDatasetDicomStoreTestIamPermissionCall.html), [*locations datasets fhir stores create*](struct.ProjectLocationDatasetFhirStoreCreateCall.html), [*locations datasets fhir stores delete*](struct.ProjectLocationDatasetFhirStoreDeleteCall.html), [*locations datasets fhir stores export*](struct.ProjectLocationDatasetFhirStoreExportCall.html), [*locations datasets fhir stores fhir  observation-lastn*](struct.ProjectLocationDatasetFhirStoreFhirObservationLastnCall.html), [*locations datasets fhir stores fhir  patient-everything*](struct.ProjectLocationDatasetFhirStoreFhirPatientEverythingCall.html), [*locations datasets fhir stores fhir  resource-purge*](struct.ProjectLocationDatasetFhirStoreFhirResourcePurgeCall.html), [*locations datasets fhir stores fhir capabilities*](struct.ProjectLocationDatasetFhirStoreFhirCapabilityCall.html), [*locations datasets fhir stores fhir conditional delete*](struct.ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall.html), [*locations datasets fhir stores fhir conditional patch*](struct.ProjectLocationDatasetFhirStoreFhirConditionalPatchCall.html), [*locations datasets fhir stores fhir conditional update*](struct.ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall.html), [*locations datasets fhir stores fhir create*](struct.ProjectLocationDatasetFhirStoreFhirCreateCall.html), [*locations datasets fhir stores fhir delete*](struct.ProjectLocationDatasetFhirStoreFhirDeleteCall.html), [*locations datasets fhir stores fhir execute bundle*](struct.ProjectLocationDatasetFhirStoreFhirExecuteBundleCall.html), [*locations datasets fhir stores fhir history*](struct.ProjectLocationDatasetFhirStoreFhirHistoryCall.html), [*locations datasets fhir stores fhir patch*](struct.ProjectLocationDatasetFhirStoreFhirPatchCall.html), [*locations datasets fhir stores fhir read*](struct.ProjectLocationDatasetFhirStoreFhirReadCall.html), [*locations datasets fhir stores fhir search*](struct.ProjectLocationDatasetFhirStoreFhirSearchCall.html), [*locations datasets fhir stores fhir update*](struct.ProjectLocationDatasetFhirStoreFhirUpdateCall.html), [*locations datasets fhir stores fhir vread*](struct.ProjectLocationDatasetFhirStoreFhirVreadCall.html), [*locations datasets fhir stores get*](struct.ProjectLocationDatasetFhirStoreGetCall.html), [*locations datasets fhir stores get iam policy*](struct.ProjectLocationDatasetFhirStoreGetIamPolicyCall.html), [*locations datasets fhir stores import*](struct.ProjectLocationDatasetFhirStoreImportCall.html), [*locations datasets fhir stores list*](struct.ProjectLocationDatasetFhirStoreListCall.html), [*locations datasets fhir stores patch*](struct.ProjectLocationDatasetFhirStorePatchCall.html), [*locations datasets fhir stores set iam policy*](struct.ProjectLocationDatasetFhirStoreSetIamPolicyCall.html), [*locations datasets fhir stores test iam permissions*](struct.ProjectLocationDatasetFhirStoreTestIamPermissionCall.html), [*locations datasets get*](struct.ProjectLocationDatasetGetCall.html), [*locations datasets get iam policy*](struct.ProjectLocationDatasetGetIamPolicyCall.html), [*locations datasets hl7 v2 stores create*](struct.ProjectLocationDatasetHl7V2StoreCreateCall.html), [*locations datasets hl7 v2 stores delete*](struct.ProjectLocationDatasetHl7V2StoreDeleteCall.html), [*locations datasets hl7 v2 stores get*](struct.ProjectLocationDatasetHl7V2StoreGetCall.html), [*locations datasets hl7 v2 stores get iam policy*](struct.ProjectLocationDatasetHl7V2StoreGetIamPolicyCall.html), [*locations datasets hl7 v2 stores list*](struct.ProjectLocationDatasetHl7V2StoreListCall.html), [*locations datasets hl7 v2 stores messages create*](struct.ProjectLocationDatasetHl7V2StoreMessageCreateCall.html), [*locations datasets hl7 v2 stores messages delete*](struct.ProjectLocationDatasetHl7V2StoreMessageDeleteCall.html), [*locations datasets hl7 v2 stores messages get*](struct.ProjectLocationDatasetHl7V2StoreMessageGetCall.html), [*locations datasets hl7 v2 stores messages ingest*](struct.ProjectLocationDatasetHl7V2StoreMessageIngestCall.html), [*locations datasets hl7 v2 stores messages list*](struct.ProjectLocationDatasetHl7V2StoreMessageListCall.html), [*locations datasets hl7 v2 stores messages patch*](struct.ProjectLocationDatasetHl7V2StoreMessagePatchCall.html), [*locations datasets hl7 v2 stores patch*](struct.ProjectLocationDatasetHl7V2StorePatchCall.html), [*locations datasets hl7 v2 stores set iam policy*](struct.ProjectLocationDatasetHl7V2StoreSetIamPolicyCall.html), [*locations datasets hl7 v2 stores test iam permissions*](struct.ProjectLocationDatasetHl7V2StoreTestIamPermissionCall.html), [*locations datasets list*](struct.ProjectLocationDatasetListCall.html), [*locations datasets operations get*](struct.ProjectLocationDatasetOperationGetCall.html), [*locations datasets operations list*](struct.ProjectLocationDatasetOperationListCall.html), [*locations datasets patch*](struct.ProjectLocationDatasetPatchCall.html), [*locations datasets set iam policy*](struct.ProjectLocationDatasetSetIamPolicyCall.html), [*locations datasets test iam permissions*](struct.ProjectLocationDatasetTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html) and [*locations list*](struct.ProjectLocationListCall.html)
 //! 
 //! 
 //! 
@@ -47,38 +47,37 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir__search(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir_get_metadata(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_history(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_search(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_search_for_studies(...).doit()
 //! let r = hub.projects().locations_datasets_fhir_stores_fhir_delete(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir_search_resources(...).doit()
 //! let r = hub.projects().locations_datasets_fhir_stores_fhir_patch(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_search_for_instances(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_instances_retrieve_rendered(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_rendered(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_conditional_update(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_retrieve_metadata(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_execute_bundle(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir__patient_everything(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_frames(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_search_for_series(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir__observation_getlastn(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir_conditional_update_resource(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir_create_resource(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_retrieve_study(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir_update(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_store_instances(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir_conditional_patch_resource(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir__history_list(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir__history_get(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir_get(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_conditional_patch(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_update(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_search_for_instances(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_search_for_series(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir__observation_lastn(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_vread(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_instances_retrieve_metadata(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_search_for_instances(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_instances_retrieve_instance(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_retrieve_metadata(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_studies_series_retrieve_series(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_create(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_read(...).doit()
+//! let r = hub.projects().locations_datasets_fhir_stores_fhir_capabilities(...).doit()
 //! let r = hub.projects().locations_datasets_dicom_stores_store_instances(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_execute_bundle(...).doit()
-//! let r = hub.projects().locations_datasets_fhir_stores_fhir__patient_geteverything(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -133,7 +132,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_datasets_fhir_stores_fhir__history_list("name")
+//! let result = hub.projects().locations_datasets_fhir_stores_fhir_history("name")
 //!              .since("kasd")
 //!              .page("accusam")
 //!              .count(-8)
@@ -246,9 +245,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -316,7 +313,7 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir__history_list("name")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_history("name")
 ///              .since("erat")
 ///              .page("labore")
 ///              .count(-9)
@@ -358,7 +355,7 @@ impl<'a, C, A> CloudHealthcare<C, A>
         CloudHealthcare {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://healthcare.googleapis.com/".to_string(),
             _root_url: "https://healthcare.googleapis.com/".to_string(),
         }
@@ -369,7 +366,7 @@ impl<'a, C, A> CloudHealthcare<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -556,13 +553,13 @@ impl Part for ReplaceWithInfoTypeConfig {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations datasets dicom stores studies series delete projects](struct.ProjectLocationDatasetDicomStoreStudySeryDeleteCall.html) (response)
-/// * [locations datasets fhir stores fhir delete$purge projects](struct.ProjectLocationDatasetFhirStoreFhirDelete$purgeCall.html) (response)
+/// * [locations datasets fhir stores fhir  resource-purge projects](struct.ProjectLocationDatasetFhirStoreFhirResourcePurgeCall.html) (response)
 /// * [locations datasets delete projects](struct.ProjectLocationDatasetDeleteCall.html) (response)
+/// * [locations datasets fhir stores fhir conditional delete projects](struct.ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall.html) (response)
 /// * [locations datasets dicom stores studies series instances delete projects](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall.html) (response)
 /// * [locations datasets dicom stores studies delete projects](struct.ProjectLocationDatasetDicomStoreStudyDeleteCall.html) (response)
 /// * [locations datasets dicom stores delete projects](struct.ProjectLocationDatasetDicomStoreDeleteCall.html) (response)
 /// * [locations datasets hl7 v2 stores messages delete projects](struct.ProjectLocationDatasetHl7V2StoreMessageDeleteCall.html) (response)
-/// * [locations datasets fhir stores fhir conditional delete resource projects](struct.ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall.html) (response)
 /// * [locations datasets fhir stores delete projects](struct.ProjectLocationDatasetFhirStoreDeleteCall.html) (response)
 /// * [locations datasets hl7 v2 stores delete projects](struct.ProjectLocationDatasetHl7V2StoreDeleteCall.html) (response)
 /// 
@@ -574,56 +571,11 @@ impl ResponseResult for Empty {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -720,8 +672,8 @@ impl Part for GoogleCloudHealthcareV1beta1DicomBigQueryDestination {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportResourcesRequest {
-    /// The content structure in the source location. The default is
-    /// BUNDLE.
+    /// The content structure in the source location. If not specified, the server
+    /// treats the input source files as BUNDLE.
     #[serde(rename="contentStructure")]
     pub content_structure: Option<String>,
     /// Cloud Storage source data location and import configuration.
@@ -729,13 +681,8 @@ pub struct ImportResourcesRequest {
     /// The Cloud Storage location requires the `roles/storage.objectViewer`
     /// Cloud IAM role.
     /// 
-    /// Each Cloud Storage object should be a text file that contains newline
-    /// delimited JSON structures conforming to FHIR standard.
-    /// 
-    /// To improve performance, use multiple Cloud Storage objects where each
-    /// object contains a subset of all of the newline-delimited JSON structures.
-    /// You can select all of the objects using the uri as the
-    /// prefix. The maximum number of objects is 1,000.
+    /// Each Cloud Storage object should be a text file that contains the format
+    /// specified in ContentStructure.
     #[serde(rename="gcsSource")]
     pub gcs_source: Option<GoogleCloudHealthcareV1beta1FhirRestGcsSource>,
 }
@@ -750,11 +697,13 @@ impl RequestValue for ImportResourcesRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations datasets fhir stores fhir _search projects](struct.ProjectLocationDatasetFhirStoreFhirSearchCall.html) (request)
+/// * [locations datasets fhir stores fhir search projects](struct.ProjectLocationDatasetFhirStoreFhirSearchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchResourcesRequest {
-    /// The type of the resource to search.
+    /// The FHIR resource type to search, such as Patient or Observation. For a
+    /// complete list, see the [FHIR Resource
+    /// Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
     #[serde(rename="resourceType")]
     pub resource_type: Option<String>,
 }
@@ -927,7 +876,8 @@ impl Part for DeidentifyConfig {}
 pub struct ExportDicomDataRequest {
     /// The BigQuery output destination.
     /// 
-    /// For now, only exporting to a dataset in the current project is supported
+    /// You can only export to a BigQuery dataset that's in the same project as
+    /// the DICOM store you're exporting from.
     /// 
     /// The BigQuery location requires two IAM roles:
     /// `roles/bigquery.dataEditor` and `roles/bigquery.jobUser`.
@@ -976,7 +926,7 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -1061,7 +1011,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -1147,7 +1097,8 @@ impl RequestValue for SetIamPolicyRequest {}
 /// 
 ///     service ResourceService {
 ///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
-///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
+///       rpc UpdateResource(google.api.HttpBody) returns
+///       (google.protobuf.Empty);
 ///     }
 /// 
 /// Example with streaming methods:
@@ -1167,38 +1118,37 @@ impl RequestValue for SetIamPolicyRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations datasets fhir stores fhir _search projects](struct.ProjectLocationDatasetFhirStoreFhirSearchCall.html) (response)
-/// * [locations datasets fhir stores fhir get metadata projects](struct.ProjectLocationDatasetFhirStoreFhirGetMetadataCall.html) (response)
+/// * [locations datasets fhir stores fhir history projects](struct.ProjectLocationDatasetFhirStoreFhirHistoryCall.html) (response)
+/// * [locations datasets fhir stores fhir search projects](struct.ProjectLocationDatasetFhirStoreFhirSearchCall.html) (response)
 /// * [locations datasets dicom stores search for studies projects](struct.ProjectLocationDatasetDicomStoreSearchForStudyCall.html) (response)
 /// * [locations datasets fhir stores fhir delete projects](struct.ProjectLocationDatasetFhirStoreFhirDeleteCall.html) (response)
-/// * [locations datasets fhir stores fhir search resources projects](struct.ProjectLocationDatasetFhirStoreFhirSearchResourceCall.html) (response)
 /// * [locations datasets fhir stores fhir patch projects](struct.ProjectLocationDatasetFhirStoreFhirPatchCall.html) (request|response)
 /// * [locations datasets dicom stores studies series search for instances projects](struct.ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall.html) (response)
 /// * [locations datasets dicom stores studies series instances retrieve rendered projects](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall.html) (response)
 /// * [locations datasets dicom stores studies series instances frames retrieve rendered projects](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall.html) (response)
+/// * [locations datasets fhir stores fhir conditional update projects](struct.ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall.html) (request|response)
 /// * [locations datasets dicom stores studies series retrieve metadata projects](struct.ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall.html) (response)
+/// * [locations datasets fhir stores fhir execute bundle projects](struct.ProjectLocationDatasetFhirStoreFhirExecuteBundleCall.html) (request|response)
+/// * [locations datasets fhir stores fhir  patient-everything projects](struct.ProjectLocationDatasetFhirStoreFhirPatientEverythingCall.html) (response)
 /// * [locations datasets dicom stores studies series instances frames retrieve frames projects](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall.html) (response)
 /// * [locations datasets dicom stores search for series projects](struct.ProjectLocationDatasetDicomStoreSearchForSeryCall.html) (response)
-/// * [locations datasets fhir stores fhir  observation get$lastn projects](struct.ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall.html) (response)
-/// * [locations datasets fhir stores fhir conditional update resource projects](struct.ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall.html) (request|response)
-/// * [locations datasets fhir stores fhir create resource projects](struct.ProjectLocationDatasetFhirStoreFhirCreateResourceCall.html) (request|response)
 /// * [locations datasets dicom stores studies retrieve study projects](struct.ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall.html) (response)
-/// * [locations datasets fhir stores fhir update projects](struct.ProjectLocationDatasetFhirStoreFhirUpdateCall.html) (request|response)
 /// * [locations datasets dicom stores studies store instances projects](struct.ProjectLocationDatasetDicomStoreStudyStoreInstanceCall.html) (request|response)
-/// * [locations datasets fhir stores fhir conditional patch resource projects](struct.ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall.html) (request|response)
-/// * [locations datasets fhir stores fhir _history list projects](struct.ProjectLocationDatasetFhirStoreFhirHistoryListCall.html) (response)
-/// * [locations datasets fhir stores fhir _history get projects](struct.ProjectLocationDatasetFhirStoreFhirHistoryGetCall.html) (response)
-/// * [locations datasets fhir stores fhir get projects](struct.ProjectLocationDatasetFhirStoreFhirGetCall.html) (response)
+/// * [locations datasets fhir stores fhir conditional patch projects](struct.ProjectLocationDatasetFhirStoreFhirConditionalPatchCall.html) (request|response)
+/// * [locations datasets fhir stores fhir update projects](struct.ProjectLocationDatasetFhirStoreFhirUpdateCall.html) (request|response)
 /// * [locations datasets dicom stores studies search for instances projects](struct.ProjectLocationDatasetDicomStoreStudySearchForInstanceCall.html) (response)
 /// * [locations datasets dicom stores studies search for series projects](struct.ProjectLocationDatasetDicomStoreStudySearchForSeryCall.html) (response)
+/// * [locations datasets fhir stores fhir  observation-lastn projects](struct.ProjectLocationDatasetFhirStoreFhirObservationLastnCall.html) (response)
+/// * [locations datasets fhir stores fhir vread projects](struct.ProjectLocationDatasetFhirStoreFhirVreadCall.html) (response)
 /// * [locations datasets dicom stores studies series instances retrieve metadata projects](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall.html) (response)
 /// * [locations datasets dicom stores search for instances projects](struct.ProjectLocationDatasetDicomStoreSearchForInstanceCall.html) (response)
 /// * [locations datasets dicom stores studies series instances retrieve instance projects](struct.ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall.html) (response)
 /// * [locations datasets dicom stores studies retrieve metadata projects](struct.ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall.html) (response)
 /// * [locations datasets dicom stores studies series retrieve series projects](struct.ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall.html) (response)
+/// * [locations datasets fhir stores fhir create projects](struct.ProjectLocationDatasetFhirStoreFhirCreateCall.html) (request|response)
+/// * [locations datasets fhir stores fhir read projects](struct.ProjectLocationDatasetFhirStoreFhirReadCall.html) (response)
+/// * [locations datasets fhir stores fhir capabilities projects](struct.ProjectLocationDatasetFhirStoreFhirCapabilityCall.html) (response)
 /// * [locations datasets dicom stores store instances projects](struct.ProjectLocationDatasetDicomStoreStoreInstanceCall.html) (request|response)
-/// * [locations datasets fhir stores execute bundle projects](struct.ProjectLocationDatasetFhirStoreExecuteBundleCall.html) (request|response)
-/// * [locations datasets fhir stores fhir  patient get$everything projects](struct.ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HttpBody {
@@ -1696,7 +1646,7 @@ pub struct TagFilterList {
     /// Elements, or Directory Structuring Elements, as defined at:
     /// http://dicom.nema.org/medical/dicom/current/output/html/part06.html#table_6-1,.
     /// They may be provided by "Keyword" or "Tag". For example "PatientID",
-    /// "0010,0010".
+    /// "00100010".
     pub tags: Option<Vec<String>>,
 }
 
@@ -2128,7 +2078,7 @@ impl Part for DateShiftConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Message {
-    /// The parsed version of the raw message data.
+    /// Output only. The parsed version of the raw message data.
     #[serde(rename="parsedData")]
     pub parsed_data: Option<ParsedData>,
     /// Resource name of the Message, of the form
@@ -2151,7 +2101,7 @@ pub struct Message {
     /// The message type and trigger event for this message. MSH-9.
     #[serde(rename="messageType")]
     pub message_type: Option<String>,
-    /// The datetime when the message was created. Set by the server.
+    /// Output only. The datetime when the message was created. Set by the server.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
     /// All patient IDs listed in the PID-2, PID-3, and PID-4 segments of this
@@ -2201,7 +2151,7 @@ impl ResponseResult for Message {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_datasets_create(...)`, `locations_datasets_deidentify(...)`, `locations_datasets_delete(...)`, `locations_datasets_dicom_stores_create(...)`, `locations_datasets_dicom_stores_delete(...)`, `locations_datasets_dicom_stores_export(...)`, `locations_datasets_dicom_stores_get(...)`, `locations_datasets_dicom_stores_get_iam_policy(...)`, `locations_datasets_dicom_stores_import(...)`, `locations_datasets_dicom_stores_list(...)`, `locations_datasets_dicom_stores_patch(...)`, `locations_datasets_dicom_stores_search_for_instances(...)`, `locations_datasets_dicom_stores_search_for_series(...)`, `locations_datasets_dicom_stores_search_for_studies(...)`, `locations_datasets_dicom_stores_set_iam_policy(...)`, `locations_datasets_dicom_stores_store_instances(...)`, `locations_datasets_dicom_stores_studies_delete(...)`, `locations_datasets_dicom_stores_studies_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_retrieve_study(...)`, `locations_datasets_dicom_stores_studies_search_for_instances(...)`, `locations_datasets_dicom_stores_studies_search_for_series(...)`, `locations_datasets_dicom_stores_studies_series_delete(...)`, `locations_datasets_dicom_stores_studies_series_instances_delete(...)`, `locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_frames(...)`, `locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_rendered(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_instance(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_rendered(...)`, `locations_datasets_dicom_stores_studies_series_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_series_retrieve_series(...)`, `locations_datasets_dicom_stores_studies_series_search_for_instances(...)`, `locations_datasets_dicom_stores_studies_store_instances(...)`, `locations_datasets_dicom_stores_test_iam_permissions(...)`, `locations_datasets_fhir_stores_create(...)`, `locations_datasets_fhir_stores_delete(...)`, `locations_datasets_fhir_stores_execute_bundle(...)`, `locations_datasets_fhir_stores_export(...)`, `locations_datasets_fhir_stores_fhir__history_get(...)`, `locations_datasets_fhir_stores_fhir__history_list(...)`, `locations_datasets_fhir_stores_fhir__observation_getlastn(...)`, `locations_datasets_fhir_stores_fhir__patient_geteverything(...)`, `locations_datasets_fhir_stores_fhir__search(...)`, `locations_datasets_fhir_stores_fhir_conditional_delete_resource(...)`, `locations_datasets_fhir_stores_fhir_conditional_patch_resource(...)`, `locations_datasets_fhir_stores_fhir_conditional_update_resource(...)`, `locations_datasets_fhir_stores_fhir_create_resource(...)`, `locations_datasets_fhir_stores_fhir_delete(...)`, `locations_datasets_fhir_stores_fhir_deletepurge(...)`, `locations_datasets_fhir_stores_fhir_get(...)`, `locations_datasets_fhir_stores_fhir_get_metadata(...)`, `locations_datasets_fhir_stores_fhir_patch(...)`, `locations_datasets_fhir_stores_fhir_search_resources(...)`, `locations_datasets_fhir_stores_fhir_update(...)`, `locations_datasets_fhir_stores_get(...)`, `locations_datasets_fhir_stores_get_iam_policy(...)`, `locations_datasets_fhir_stores_import(...)`, `locations_datasets_fhir_stores_list(...)`, `locations_datasets_fhir_stores_patch(...)`, `locations_datasets_fhir_stores_set_iam_policy(...)`, `locations_datasets_fhir_stores_test_iam_permissions(...)`, `locations_datasets_get(...)`, `locations_datasets_get_iam_policy(...)`, `locations_datasets_hl7_v2_stores_create(...)`, `locations_datasets_hl7_v2_stores_delete(...)`, `locations_datasets_hl7_v2_stores_get(...)`, `locations_datasets_hl7_v2_stores_get_iam_policy(...)`, `locations_datasets_hl7_v2_stores_list(...)`, `locations_datasets_hl7_v2_stores_messages_create(...)`, `locations_datasets_hl7_v2_stores_messages_delete(...)`, `locations_datasets_hl7_v2_stores_messages_get(...)`, `locations_datasets_hl7_v2_stores_messages_ingest(...)`, `locations_datasets_hl7_v2_stores_messages_list(...)`, `locations_datasets_hl7_v2_stores_messages_patch(...)`, `locations_datasets_hl7_v2_stores_patch(...)`, `locations_datasets_hl7_v2_stores_set_iam_policy(...)`, `locations_datasets_hl7_v2_stores_test_iam_permissions(...)`, `locations_datasets_list(...)`, `locations_datasets_operations_get(...)`, `locations_datasets_operations_list(...)`, `locations_datasets_patch(...)`, `locations_datasets_set_iam_policy(...)`, `locations_datasets_test_iam_permissions(...)`, `locations_get(...)` and `locations_list(...)`
+/// // like `locations_datasets_create(...)`, `locations_datasets_deidentify(...)`, `locations_datasets_delete(...)`, `locations_datasets_dicom_stores_create(...)`, `locations_datasets_dicom_stores_delete(...)`, `locations_datasets_dicom_stores_export(...)`, `locations_datasets_dicom_stores_get(...)`, `locations_datasets_dicom_stores_get_iam_policy(...)`, `locations_datasets_dicom_stores_import(...)`, `locations_datasets_dicom_stores_list(...)`, `locations_datasets_dicom_stores_patch(...)`, `locations_datasets_dicom_stores_search_for_instances(...)`, `locations_datasets_dicom_stores_search_for_series(...)`, `locations_datasets_dicom_stores_search_for_studies(...)`, `locations_datasets_dicom_stores_set_iam_policy(...)`, `locations_datasets_dicom_stores_store_instances(...)`, `locations_datasets_dicom_stores_studies_delete(...)`, `locations_datasets_dicom_stores_studies_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_retrieve_study(...)`, `locations_datasets_dicom_stores_studies_search_for_instances(...)`, `locations_datasets_dicom_stores_studies_search_for_series(...)`, `locations_datasets_dicom_stores_studies_series_delete(...)`, `locations_datasets_dicom_stores_studies_series_instances_delete(...)`, `locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_frames(...)`, `locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_rendered(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_instance(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_rendered(...)`, `locations_datasets_dicom_stores_studies_series_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_series_retrieve_series(...)`, `locations_datasets_dicom_stores_studies_series_search_for_instances(...)`, `locations_datasets_dicom_stores_studies_store_instances(...)`, `locations_datasets_dicom_stores_test_iam_permissions(...)`, `locations_datasets_fhir_stores_create(...)`, `locations_datasets_fhir_stores_delete(...)`, `locations_datasets_fhir_stores_export(...)`, `locations_datasets_fhir_stores_fhir__observation_lastn(...)`, `locations_datasets_fhir_stores_fhir__patient_everything(...)`, `locations_datasets_fhir_stores_fhir__resource_purge(...)`, `locations_datasets_fhir_stores_fhir_capabilities(...)`, `locations_datasets_fhir_stores_fhir_conditional_delete(...)`, `locations_datasets_fhir_stores_fhir_conditional_patch(...)`, `locations_datasets_fhir_stores_fhir_conditional_update(...)`, `locations_datasets_fhir_stores_fhir_create(...)`, `locations_datasets_fhir_stores_fhir_delete(...)`, `locations_datasets_fhir_stores_fhir_execute_bundle(...)`, `locations_datasets_fhir_stores_fhir_history(...)`, `locations_datasets_fhir_stores_fhir_patch(...)`, `locations_datasets_fhir_stores_fhir_read(...)`, `locations_datasets_fhir_stores_fhir_search(...)`, `locations_datasets_fhir_stores_fhir_update(...)`, `locations_datasets_fhir_stores_fhir_vread(...)`, `locations_datasets_fhir_stores_get(...)`, `locations_datasets_fhir_stores_get_iam_policy(...)`, `locations_datasets_fhir_stores_import(...)`, `locations_datasets_fhir_stores_list(...)`, `locations_datasets_fhir_stores_patch(...)`, `locations_datasets_fhir_stores_set_iam_policy(...)`, `locations_datasets_fhir_stores_test_iam_permissions(...)`, `locations_datasets_get(...)`, `locations_datasets_get_iam_policy(...)`, `locations_datasets_hl7_v2_stores_create(...)`, `locations_datasets_hl7_v2_stores_delete(...)`, `locations_datasets_hl7_v2_stores_get(...)`, `locations_datasets_hl7_v2_stores_get_iam_policy(...)`, `locations_datasets_hl7_v2_stores_list(...)`, `locations_datasets_hl7_v2_stores_messages_create(...)`, `locations_datasets_hl7_v2_stores_messages_delete(...)`, `locations_datasets_hl7_v2_stores_messages_get(...)`, `locations_datasets_hl7_v2_stores_messages_ingest(...)`, `locations_datasets_hl7_v2_stores_messages_list(...)`, `locations_datasets_hl7_v2_stores_messages_patch(...)`, `locations_datasets_hl7_v2_stores_patch(...)`, `locations_datasets_hl7_v2_stores_set_iam_policy(...)`, `locations_datasets_hl7_v2_stores_test_iam_permissions(...)`, `locations_datasets_list(...)`, `locations_datasets_operations_get(...)`, `locations_datasets_operations_list(...)`, `locations_datasets_patch(...)`, `locations_datasets_set_iam_policy(...)`, `locations_datasets_test_iam_permissions(...)`, `locations_get(...)` and `locations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2218,39 +2168,31 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Searches resources in the given FHIR store.
+    /// Lists all the versions of a resource (including the current version and
+    /// deleted versions) from the FHIR store.
     /// 
-    /// # Search Parameters
+    /// Implements the per-resource form of the FHIR standard [history
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#history).
     /// 
-    /// The server's capability statement, retrieved through
-    /// GetCapabilityStatement, indicates which search
-    /// parameters are supported on each FHIR resource.
-    /// 
-    /// # Search Modifiers
-    /// 
-    /// Modifier   | Supported
-    /// ----------- | ---------
-    /// `:missing`  | Yes
-    /// `:exact`    | Yes
-    /// `:contains` | Yes
-    /// `:text`     | Yes
-    /// `:in`       | Yes
-    /// `:not-in`   | Yes
-    /// `:above`    | Yes
-    /// `:below`    | Yes
-    /// `:[type]`   | Yes
-    /// `:not`      | Yes
-    /// `:recurse`  | No
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of a `Bundle` resource of type `history`, containing the version history
+    /// sorted from most recent to oldest versions.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `parent` - Name of the FHIR store to retrieve resources from.
-    pub fn locations_datasets_fhir_stores_fhir__search(&self, request: SearchResourcesRequest, parent: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirSearchCall {
+    /// * `name` - The name of the resource to retrieve.
+    pub fn locations_datasets_fhir_stores_fhir_history(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirHistoryCall {
             hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
+            _name: name.to_string(),
+            _since: Default::default(),
+            _page: Default::default(),
+            _count: Default::default(),
+            _at: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2317,15 +2259,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// SearchForStudies returns a list of matching studies. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `studies`).
+    /// * `dicomWebPath` - The path of the SearchForStudies DICOMweb request (e.g., `studies`).
     pub fn locations_datasets_dicom_stores_search_for_studies(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreSearchForStudyCall {
             hub: self.hub,
@@ -2341,12 +2281,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Deletes a FHIR resource.
     /// 
-    /// Note: unless resource versioning is disabled by setting the
+    /// Implements the FHIR standard [delete
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#delete).
+    /// 
+    /// Note: Unless resource versioning is disabled by setting the
     /// disable_resource_versioning flag
     /// on the FHIR store, the deleted resources will be moved to a history
-    /// repository that can still be retrieved through GetResourceVersion and
-    /// related methods, unless they are removed by the DeleteResourceVersions
-    /// method.
+    /// repository that can still be retrieved through vread
+    /// and related methods, unless they are removed by the
+    /// purge method.
     /// 
     /// # Arguments
     ///
@@ -2363,49 +2306,21 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Searches resources in the given FHIR store.
+    /// Updates part of an existing resource by applying the operations specified
+    /// in a [JSON Patch](http://jsonpatch.com/) document.
     /// 
-    /// # Search Parameters
+    /// Implements the FHIR standard [patch
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
     /// 
-    /// The server's capability statement, retrieved through
-    /// GetCapabilityStatement, indicates which search
-    /// parameters are supported on each FHIR resource.
+    /// The request body must contain a JSON Patch document, and the request
+    /// headers must contain `Content-Type: application/json-patch+json`.
     /// 
-    /// # Search Modifiers
-    /// 
-    /// Modifier   | Supported
-    /// ----------- | ---------
-    /// `:missing`  | Yes
-    /// `:exact`    | Yes
-    /// `:contains` | Yes
-    /// `:text`     | Yes
-    /// `:in`       | Yes
-    /// `:not-in`   | Yes
-    /// `:above`    | Yes
-    /// `:below`    | Yes
-    /// `:[type]`   | Yes
-    /// `:not`      | Yes
-    /// `:recurse`  | No
-    /// 
-    /// # Arguments
-    ///
-    /// * `parent` - Name of the FHIR store to retrieve resources from.
-    /// * `resourceType` - The type of the resource to search.
-    pub fn locations_datasets_fhir_stores_fhir_search_resources(&self, parent: &str, resource_type: &str) -> ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirSearchResourceCall {
-            hub: self.hub,
-            _parent: parent.to_string(),
-            _resource_type: resource_type.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates part of an existing resource.
-    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of the updated resource, including the server-assigned version ID.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
     /// 
     /// # Arguments
     ///
@@ -2457,33 +2372,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the configuration of the specified FHIR store.
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The resource name of the FHIR store to get.
-    pub fn locations_datasets_fhir_stores_get(&self, name: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreGetCall {
-            hub: self.hub,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// SearchForInstances returns a list of matching instances. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `instances`).
+    /// * `dicomWebPath` - The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+    ///                    `instances` or `series/{series_uid}/instances` or
+    ///                    `studies/{study_uid}/instances`).
     pub fn locations_datasets_dicom_stores_studies_series_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall {
             hub: self.hub,
@@ -2499,15 +2397,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// RetrieveRenderedInstance returns instance associated with the given study,
     /// series, and SOP Instance UID in an acceptable Rendered Media Type. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.8.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `studies/{study_id}/series/{series_id}/instance/{instance_id}/rendered`).
+    /// * `dicomWebPath` - The path of the RetrieveRenderedInstance DICOMweb request (e.g.,
+    ///                    `studies/{study_id}/series/{series_id}/instances/{instance_id}/rendered`).
     pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_rendered(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall {
             hub: self.hub,
@@ -2533,6 +2430,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationDatasetDicomStoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2564,15 +2462,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// RetrieveRenderedFrames returns instances associated with the given study,
     /// series, SOP Instance UID and frame numbers in an acceptable Rendered Media
     /// Type. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.8.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `studies/{study_id}/series/{series_id}/instance/{instance_id}/frames/{frame_list}/rendered`).
+    /// * `dicomWebPath` - The path of the RetrieveRenderedFrames DICOMweb request (e.g.,
+    ///                    `studies/{study_id}/series/{series_id}/instances/{instance_id}/frames/{frame_list}/rendered`).
     pub fn locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_rendered(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall {
             hub: self.hub,
@@ -2596,6 +2493,57 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationDatasetHl7V2StoreDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// If a resource is found based on the search criteria specified in the query
+    /// parameters, updates the entire contents of that resource.
+    /// 
+    /// Implements the FHIR standard [conditional update
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cond-update).
+    /// 
+    /// Search terms are provided as query parameters following the same pattern as
+    /// the search method.
+    /// 
+    /// If the search criteria identify more than one match, the request will
+    /// return a `412 Precondition Failed` error.
+    /// If the search criteria identify zero matches, and the supplied resource
+    /// body contains an `id`, and the FHIR store has
+    /// enable_update_create set, creates the
+    /// resource with the client-specified ID. If the search criteria identify zero
+    /// matches, and the supplied resource body does not contain an `id`, the
+    /// resource will be created with a server-assigned ID as per the
+    /// create method.
+    /// 
+    /// The request body must contain a JSON-encoded FHIR resource, and the request
+    /// headers must contain `Content-Type: application/fhir+json`.
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of the updated resource, including the server-assigned version ID.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the FHIR store this resource belongs to.
+    /// * `type` - The FHIR resource type to update, such as Patient or Observation. For a
+    ///            complete list, see the [FHIR Resource
+    ///            Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    ///            Must match the resource type in the provided content.
+    pub fn locations_datasets_fhir_stores_fhir_conditional_update(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _type_: type_.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2630,17 +2578,103 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the FHIR capability statement for the store, which contains a
-    /// description of functionality supported by the server.
+    /// Searches for resources in the given FHIR store according to criteria
+    /// specified as query parameters.
     /// 
+    /// Implements the FHIR standard [search
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#search)
+    /// using the search semantics described in the [FHIR Search
+    /// specification](http://hl7.org/implement/standards/fhir/STU3/search.html).
+    /// 
+    /// Supports three methods of search defined by the specification:
+    /// 
+    /// *  `GET [base]?[parameters]` to search across all resources.
+    /// *  `GET [base]/[type]?[parameters]` to search resources of a specified
+    /// type.
+    /// *  `POST [base]/[type]/_search?[parameters]` as an alternate form having
+    /// the same semantics as the `GET` method.
+    /// 
+    /// The `GET` methods do not support compartment searches. The `POST` method
+    /// does not support `application/x-www-form-urlencoded` search parameters.
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of a `Bundle` resource of type `searchset`, containing the results of the
+    /// search.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
+    /// 
+    /// The server's capability statement, retrieved through
+    /// capabilities, indicates what search parameters
+    /// are supported on each FHIR resource. A list of all search parameters
+    /// defined by the specification can be found in the [FHIR Search Parameter
+    /// Registry](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html).
+    /// 
+    /// Supported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,
+    /// `:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.
+    /// 
+    /// Supported search result parameters: `_sort`, `_count`, `_include`,
+    /// `_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.
+    /// 
+    /// The maximum number of search results returned defaults to 100, which can
+    /// be overridden by the `_count` parameter up to a maximum limit of 1000. If
+    /// there are additional results, the returned `Bundle` will contain
+    /// pagination links.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Name of the FHIR store to retrieve the capabilities for.
-    pub fn locations_datasets_fhir_stores_fhir_get_metadata(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirGetMetadataCall {
+    /// * `request` - No description provided.
+    /// * `parent` - Name of the FHIR store to retrieve resources from.
+    pub fn locations_datasets_fhir_stores_fhir_search(&self, request: SearchResourcesRequest, parent: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirSearchCall {
             hub: self.hub,
-            _name: name.to_string(),
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// If a resource is found based on the search criteria specified in the query
+    /// parameters, updates part of that resource by applying the operations
+    /// specified in a [JSON Patch](http://jsonpatch.com/) document.
+    /// 
+    /// Implements the FHIR standard [conditional patch
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
+    /// 
+    /// Search terms are provided as query parameters following the same pattern as
+    /// the search method.
+    /// 
+    /// If the search criteria identify more than one match, the request will
+    /// return a `412 Precondition Failed` error.
+    /// 
+    /// The request body must contain a JSON Patch document, and the request
+    /// headers must contain `Content-Type: application/json-patch+json`.
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of the updated resource, including the server-assigned version ID.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the FHIR store this resource belongs to.
+    /// * `type` - The FHIR resource type to update, such as Patient or Observation. For a
+    ///            complete list, see the [FHIR Resource
+    ///            Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    pub fn locations_datasets_fhir_stores_fhir_conditional_patch(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirConditionalPatchCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _type_: type_.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2690,14 +2724,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// RetrieveSeriesMetadata returns instance associated with the given study and
     /// series, presented as metadata with the bulk data removed. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}/metadata`.
+    /// * `dicomWebPath` - The path of the RetrieveSeriesMetadata DICOMweb request (e.g.,
+    ///                    `studies/{study_id}/series/{series_id}/metadata`).
     pub fn locations_datasets_dicom_stores_studies_series_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall {
             hub: self.hub,
@@ -2757,6 +2791,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// `Operation.response` which contains a Dataset or
     /// `Operation.error`. The metadata
     /// field type is OperationMetadata.
+    /// A Google Cloud Platform project can contain up to 500 datasets across all
+    /// regions.
     /// 
     /// # Arguments
     ///
@@ -2769,6 +2805,37 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _request: request,
             _parent: parent.to_string(),
             _dataset_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves all the resources in the patient compartment for a `Patient`
+    /// resource.
+    /// 
+    /// Implements the FHIR extended operation
+    /// [Patient-everything](http://hl7.org/implement/standards/fhir/STU3/patient-operations.html#everything).
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of a `Bundle` resource of type `searchset`, containing the results of the
+    /// operation.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Name of the `Patient` resource for which the information is required.
+    pub fn locations_datasets_fhir_stores_fhir__patient_everything(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirPatientEverythingCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _start: Default::default(),
+            _end: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2797,17 +2864,33 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get N most recent observations for patient, grouped by code
-    /// that match given query parameters.
+    /// Deletes FHIR resources that match a search query.
     /// 
+    /// Implements the FHIR standard [conditional delete
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.13.1).
+    /// If multiple resources match, all of them will be deleted.
+    /// 
+    /// Search terms are provided as query parameters following the same pattern as
+    /// the search method.
+    /// 
+    /// Note: Unless resource versioning is disabled by setting the
+    /// disable_resource_versioning flag
+    /// on the FHIR store, the deleted resources will be moved to a history
+    /// repository that can still be retrieved through vread
+    /// and related methods, unless they are removed by the
+    /// purge method.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Name of the FHIR store to retrieve resources from.
-    pub fn locations_datasets_fhir_stores_fhir__observation_getlastn(&self, parent: &str) -> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall {
+    /// * `parent` - The name of the FHIR store this resource belongs to.
+    /// * `type` - The FHIR resource type to delete, such as Patient or Observation. For a
+    ///            complete list, see the [FHIR Resource
+    ///            Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    pub fn locations_datasets_fhir_stores_fhir_conditional_delete(&self, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _type_: type_.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2818,15 +2901,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// RetrieveFrames returns instances associated with the given study, series,
     /// SOP Instance UID and frame numbers. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.4.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `studies/{study_id}/series/{series_id}/instance/{instance_id}/frames/{frame_list}`).
+    /// * `dicomWebPath` - The path of the RetrieveFrames DICOMweb request (e.g.,
+    ///                    `studies/{study_id}/series/{series_id}/instances/{instance_id}/frames/{frame_list}`).
     pub fn locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_frames(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall {
             hub: self.hub,
@@ -2841,15 +2923,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// SearchForSeries returns a list of matching series. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `series`).
+    /// * `dicomWebPath` - The path of the SearchForSeries DICOMweb request(e.g., `series` or
+    ///                    `studies/{study_uid}/series`).
     pub fn locations_datasets_dicom_stores_search_for_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreSearchForSeryCall {
             hub: self.hub,
@@ -2863,26 +2944,24 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new dataset containing de-identified data from the source
-    /// dataset. The metadata field type
-    /// is OperationMetadata.
-    /// If the request is successful, the
-    /// response field type is
-    /// DeidentifySummary.
-    /// If errors occur,
-    /// details field type is
-    /// DeidentifyErrorDetails.
+    /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a NOT_FOUND error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `sourceDataset` - Source dataset resource name. (e.g.,
-    ///                     `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`).
-    pub fn locations_datasets_deidentify(&self, request: DeidentifyDatasetRequest, source_dataset: &str) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
-        ProjectLocationDatasetDeidentifyCall {
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn locations_datasets_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
+        ProjectLocationDatasetTestIamPermissionCall {
             hub: self.hub,
             _request: request,
-            _source_dataset: source_dataset.to_string(),
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2912,19 +2991,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the configuration of the specified FHIR store.
+    /// Lists information about the supported locations for this service.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - Output only. Resource name of the FHIR store, of the form
-    ///            `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
-    pub fn locations_datasets_fhir_stores_patch(&self, request: FhirStore, name: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
-        ProjectLocationDatasetFhirStorePatchCall {
+    /// * `name` - The resource that owns the locations collection, if applicable.
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, C, A> {
+        ProjectLocationListCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
-            _update_mask: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2945,29 +3023,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationDatasetFhirStoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates the entire resource if the resource exists based on the
-    /// search criteria specified via query parameters.
-    /// 
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - The name of the FHIR store this resource belongs to.
-    /// * `type` - The type of the resource to update.
-    pub fn locations_datasets_fhir_stores_fhir_conditional_update_resource(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _type_: type_.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2996,37 +3052,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a FHIR resource.
-    /// 
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - The name of the FHIR store this resource belongs to.
-    /// * `type` - The type of the resource to create.
-    pub fn locations_datasets_fhir_stores_fhir_create_resource(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirCreateResourceCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _type_: type_.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// RetrieveStudy returns all instances within the given study. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.1.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// * `dicomWebPath` - The path of the RetrieveStudy DICOMweb request (e.g.,
+    ///                    `studies/{study_id}`).
     pub fn locations_datasets_dicom_stores_studies_retrieve_study(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall {
             hub: self.hub,
@@ -3040,19 +3074,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the entire resource or creates a new resource with a client
-    /// specified ID if the resource does not exist and the FHIR store has
-    /// enable_update_create set.
-    /// 
+    /// Gets the configuration of the specified FHIR store.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - The name of the resource to update.
-    pub fn locations_datasets_fhir_stores_fhir_update(&self, request: HttpBody, name: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirUpdateCall {
+    /// * `name` - The resource name of the FHIR store to get.
+    pub fn locations_datasets_fhir_stores_get(&self, name: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreGetCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3074,6 +3103,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationDatasetGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3084,15 +3114,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// StoreInstances stores DICOM instances associated with study instance unique
     /// identifiers (SUID). See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.6.1.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// * `dicomWebPath` - The path of the StoreInstances DICOMweb request (e.g.,
+    ///                    `studies/[{study_id}]`). Note that the `study_uid` is optional.
     pub fn locations_datasets_dicom_stores_studies_store_instances(&self, request: HttpBody, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudyStoreInstanceCall {
             hub: self.hub,
@@ -3121,28 +3151,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _request: request,
             _name: name.to_string(),
             _update_mask: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates parts of a resource if the resource exists based on the
-    /// search criteria specified via query parameters.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - The name of the FHIR store this resource belongs to.
-    /// * `type` - The type of the resource to update.
-    pub fn locations_datasets_fhir_stores_fhir_conditional_patch_resource(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _type_: type_.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3184,13 +3192,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}`).
+    /// * `dicomWebPath` - The path of the DeleteSeries request (e.g.,
+    ///                    `studies/{study_id}/series/{series_id}`).
     pub fn locations_datasets_dicom_stores_studies_series_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _dicom_web_path: dicom_web_path.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified FHIR store and removes all resources within it.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The resource name of the FHIR store to delete.
+    pub fn locations_datasets_fhir_stores_delete(&self, name: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3248,16 +3273,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a version (current or historical) of FHIR resource by version id.
-    /// 
+    /// Creates a new dataset containing de-identified data from the source
+    /// dataset. The metadata field type
+    /// is OperationMetadata.
+    /// If the request is successful, the
+    /// response field type is
+    /// DeidentifySummary.
+    /// If errors occur,
+    /// details field type is
+    /// DeidentifyErrorDetails.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the resource version to retrieve.
-    pub fn locations_datasets_fhir_stores_fhir__history_get(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirHistoryGetCall {
+    /// * `request` - No description provided.
+    /// * `sourceDataset` - Source dataset resource name. (e.g.,
+    ///                     `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`).
+    pub fn locations_datasets_deidentify(&self, request: DeidentifyDatasetRequest, source_dataset: &str) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
+        ProjectLocationDatasetDeidentifyCall {
             hub: self.hub,
-            _name: name.to_string(),
+            _request: request,
+            _source_dataset: source_dataset.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3285,15 +3320,36 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a FHIR resource.
+    /// Updates the entire contents of a resource.
     /// 
+    /// Implements the FHIR standard [update
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#update).
+    /// 
+    /// If the specified resource does
+    /// not exist and the FHIR store has
+    /// enable_update_create set, creates the
+    /// resource with the client-specified ID.
+    /// 
+    /// The request body must contain a JSON-encoded FHIR resource, and the request
+    /// headers must contain `Content-Type: application/fhir+json`. The resource
+    /// must contain an `id` element having an identical value to the ID in the
+    /// REST path of the request.
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of the updated resource, including the server-assigned version ID.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the resource to retrieve.
-    pub fn locations_datasets_fhir_stores_fhir_get(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirGetCall {
+    /// * `request` - No description provided.
+    /// * `name` - The name of the resource to update.
+    pub fn locations_datasets_fhir_stores_fhir_update(&self, request: HttpBody, name: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirUpdateCall {
             hub: self.hub,
+            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3324,15 +3380,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// SearchForInstances returns a list of matching instances. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `instances`).
+    /// * `dicomWebPath` - The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+    ///                    `instances` or `series/{series_uid}/instances` or
+    ///                    `studies/{study_uid}/instances`).
     pub fn locations_datasets_dicom_stores_studies_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySearchForInstanceCall {
             hub: self.hub,
@@ -3368,20 +3424,51 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// SearchForSeries returns a list of matching series. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `series`).
+    /// * `dicomWebPath` - The path of the SearchForSeries DICOMweb request(e.g., `series` or
+    ///                    `studies/{study_uid}/series`).
     pub fn locations_datasets_dicom_stores_studies_search_for_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySearchForSeryCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _dicom_web_path: dicom_web_path.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the contents of a FHIR resource.
+    /// 
+    /// Implements the FHIR standard [read
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#read).
+    /// 
+    /// Also supports the FHIR standard [conditional read
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cread)
+    /// specified by supplying an `If-Modified-Since` header with a date/time value
+    /// or an `If-None-Match` header with an ETag value.
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of the resource.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the resource to retrieve.
+    pub fn locations_datasets_fhir_stores_fhir_read(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirReadCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3437,17 +3524,33 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all the historical versions of a resource (excluding current
-    /// version) from the FHIR store. To remove all versions of a resource, first
-    /// delete the current version and call this method.
+    /// Retrieves the N most recent `Observation` resources for a subject matching
+    /// search criteria specified as query parameters, grouped by
+    /// `Observation.code`, sorted from most recent to oldest.
+    /// 
+    /// Implements the FHIR extended operation
+    /// [Observation-lastn](http://hl7.org/implement/standards/fhir/STU3/observation-operations.html#lastn).
+    /// 
+    /// Search terms are provided as query parameters following the same pattern as
+    /// the search method. This operation accepts an additional
+    /// query parameter `max`, which specifies N, the maximum number of
+    /// Observations to return from each group, with a default of 1.
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of a `Bundle` resource of type `searchset`, containing the results of the
+    /// operation.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the resource to purge.
-    pub fn locations_datasets_fhir_stores_fhir_deletepurge(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirDelete$purgeCall {
+    /// * `parent` - Name of the FHIR store to retrieve resources from.
+    pub fn locations_datasets_fhir_stores_fhir__observation_lastn(&self, parent: &str) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirObservationLastnCall {
             hub: self.hub,
-            _name: name.to_string(),
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3474,45 +3577,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Import resources to the FHIR store by loading data from the specified
-    /// sources. Each resource must have a client-supplied ID, which is retained
-    /// by the server.
+    /// Gets the contents of a version (current or historical) of a FHIR resource
+    /// by version ID.
     /// 
-    /// The import operation is idempotent. Upon retry, the most recent data
-    /// (matching the client-supplied ID) is overwritten, without creating a new
-    /// resource version. If partial failures occur during the import, successful
-    /// changes are not rolled back.
+    /// Implements the FHIR standard [vread
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#vread).
     /// 
-    /// If history imports are enabled
-    /// (enable_history_import is set in the
-    /// FHIR store's configuration), you can import historical versions of a
-    /// resource by supplying a bundle of type `history`. The historical versions
-    /// in the bundle must have `lastUpdated` timestamps. If a current or
-    /// historical version with the supplied resource ID already exists, the
-    /// bundle is rejected.
-    /// 
-    /// This method returns an Operation that can
-    /// be used to track the status of the import by calling
-    /// GetOperation.
-    /// 
-    /// Immediate fatal errors appear in the
-    /// error field.
-    /// Otherwise, when the operation finishes, a detailed response of type
-    /// ImportResourcesResponse is returned in the
-    /// response field.
-    /// The metadata field type for this
-    /// operation is OperationMetadata.
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of the resource.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - The name of the FHIR store to import FHIR resources to. The name should be
-    ///            in the format of
-    ///            `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
-    pub fn locations_datasets_fhir_stores_import(&self, request: ImportResourcesRequest, name: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreImportCall {
+    /// * `name` - The name of the resource version to retrieve.
+    pub fn locations_datasets_fhir_stores_fhir_vread(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirVreadCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3525,14 +3608,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// RetrieveInstanceMetadata returns instance associated with the given study,
     /// series, and SOP Instance UID presented as metadata with the bulk data
     /// removed. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
+    /// * `dicomWebPath` - The path of the RetrieveInstanceMetadata DICOMweb request (e.g.,
     ///                    `studies/{study_id}/series/{series_id}/instances/{instance_id}/metadata`).
     pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall {
@@ -3548,15 +3630,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// SearchForInstances returns a list of matching instances. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `instances`).
+    /// * `dicomWebPath` - The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+    ///                    `instances` or `series/{series_uid}/instances` or
+    ///                    `studies/{study_uid}/instances`).
     pub fn locations_datasets_dicom_stores_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreSearchForInstanceCall {
             hub: self.hub,
@@ -3587,24 +3669,39 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns permissions that a caller has on the specified resource.
-    /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// Executes all the requests in the given Bundle.
     /// 
-    /// Note: This operation is designed to be used for building permission-aware
-    /// UIs and command-line tools, not for authorization checking. This operation
-    /// may "fail open" without warning.
+    /// Implements the FHIR standard [batch/transaction
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#transaction).
+    /// 
+    /// Supports all interactions within a bundle, except search. This method
+    /// accepts Bundles of type `batch` and `transaction`, processing them
+    /// according to the [batch processing
+    /// rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.1)
+    /// and [transaction processing
+    /// rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.2).
+    /// 
+    /// The request body must contain a JSON-encoded FHIR `Bundle` resource, and
+    /// the request headers must contain `Content-Type: application/fhir+json`.
+    /// 
+    /// For a batch bundle or a successful transaction the response body will
+    /// contain a JSON-encoded representation of a `Bundle` resource of type
+    /// `batch-response` or `transaction-response` containing one entry for each
+    /// entry in the request, with the outcome of processing the entry. In the
+    /// case of an error for a transaction bundle, the response body will contain
+    /// a JSON-encoded `OperationOutcome` resource describing the reason for the
+    /// error. If the request cannot be mapped to a valid API method on a FHIR
+    /// store, a generic GCP error might be returned instead.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
-    ///                See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
-        ProjectLocationDatasetTestIamPermissionCall {
+    /// * `parent` - Name of the FHIR store in which this bundle will be executed.
+    pub fn locations_datasets_fhir_stores_fhir_execute_bundle(&self, request: HttpBody, parent: &str) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirExecuteBundleCall {
             hub: self.hub,
             _request: request,
-            _resource: resource.to_string(),
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3615,15 +3712,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// RetrieveInstance returns instance associated with the given study, series,
     /// and SOP Instance UID. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.3.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
-    ///                    `studies/{study_id}/series/{series_id}/instance/{instance_id}`).
+    /// * `dicomWebPath` - The path of the RetrieveInstance DICOMweb request (e.g.,
+    ///                    `studies/{study_id}/series/{series_id}/instances/{instance_id}`).
     pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_instance(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall {
             hub: self.hub,
@@ -3639,14 +3735,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// RetrieveStudyMetadata returns instance associated with the given study
     /// presented as metadata with the bulk data removed. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}/metadata`.
+    /// * `dicomWebPath` - The path of the RetrieveStudyMetadata DICOMweb request (e.g.,
+    ///                    `studies/{study_id}/metadata`).
     pub fn locations_datasets_dicom_stores_studies_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall {
             hub: self.hub,
@@ -3661,14 +3757,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// RetrieveSeries returns all instances within the given study and series. See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.2.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
     /// 
     /// # Arguments
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}`).
+    /// * `dicomWebPath` - The path of the RetrieveSeries DICOMweb request (e.g.,
+    ///                    `studies/{study_id}/series/{series_id}`).
     pub fn locations_datasets_dicom_stores_studies_series_retrieve_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall {
             hub: self.hub,
@@ -3726,6 +3822,51 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a FHIR resource.
+    /// 
+    /// Implements the FHIR standard [create
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#create),
+    /// which creates a new resource with a server-assigned resource ID.
+    /// 
+    /// Also supports the FHIR standard [conditional create
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#ccreate),
+    /// specified by supplying an `If-None-Exist` header containing a FHIR search
+    /// query. If no resources match this search query, the server processes the
+    /// create operation as normal.
+    /// 
+    /// The request body must contain a JSON-encoded FHIR resource, and the request
+    /// headers must contain `Content-Type: application/fhir+json`.
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of the resource as it was created on the server, including the
+    /// server-assigned resource ID and version ID.
+    /// Errors generated by the FHIR store will contain a JSON-encoded
+    /// `OperationOutcome` resource describing the reason for the error. If the
+    /// request cannot be mapped to a valid API method on a FHIR store, a generic
+    /// GCP error might be returned instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the FHIR store this resource belongs to.
+    /// * `type` - The FHIR resource type to create, such as Patient or Observation. For a
+    ///            complete list, see the [FHIR Resource
+    ///            Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    ///            Must match the resource type in the provided content.
+    pub fn locations_datasets_fhir_stores_fhir_create(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _type_: type_.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the specified HL7v2 store.
     /// 
     /// # Arguments
@@ -3763,18 +3904,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists information about the supported locations for this service.
+    /// Deletes all the historical versions of a resource (excluding the current
+    /// version) from the FHIR store. To remove all versions of a resource, first
+    /// delete the current version and then call this method.
+    /// 
+    /// This is not a FHIR standard operation.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, C, A> {
-        ProjectLocationListCall {
+    /// * `name` - The name of the resource to purge.
+    pub fn locations_datasets_fhir_stores_fhir__resource_purge(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirResourcePurgeCall {
             hub: self.hub,
             _name: name.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3803,25 +3945,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Executes all the requests in the given Bundle.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - Name of the FHIR store in which this bundle will be executed.
-    pub fn locations_datasets_fhir_stores_execute_bundle(&self, request: HttpBody, parent: &str) -> ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreExecuteBundleCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// DeleteInstance deletes an instance associated with the given study, series,
     /// and SOP Instance UID. Delete requests are equivalent to the GET requests
     /// specified in the WADO-RS standard.
@@ -3830,8 +3953,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g.,
+    /// * `dicomWebPath` - The path of the DeleteInstance request (e.g.,
     ///                    `studies/{study_id}/series/{series_id}/instances/{instance_id}`).
     pub fn locations_datasets_dicom_stores_studies_series_instances_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall {
@@ -3853,8 +3975,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// * `dicomWebPath` - The path of the DeleteStudy request (e.g., `studies/{study_id}`).
     pub fn locations_datasets_dicom_stores_studies_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStudyDeleteCall {
             hub: self.hub,
@@ -3868,13 +3989,70 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified FHIR store and removes all resources within it.
+    /// Import resources to the FHIR store by loading data from the specified
+    /// sources. Each resource must have a client-supplied ID, which is retained
+    /// by the server.
+    /// 
+    /// The import operation is idempotent. Upon retry, the most recent data
+    /// (matching the client-supplied ID) is overwritten, without creating a new
+    /// resource version. If partial failures occur during the import, successful
+    /// changes are not rolled back.
+    /// 
+    /// If history imports are enabled
+    /// (enable_history_import is set in the
+    /// FHIR store's configuration), you can import historical versions of a
+    /// resource by supplying a bundle of type `history`. The historical versions
+    /// in the bundle must have `lastUpdated` timestamps. If a current or
+    /// historical version with the supplied resource ID already exists, the
+    /// bundle is rejected.
+    /// 
+    /// This method returns an Operation that can
+    /// be used to track the status of the import by calling
+    /// GetOperation.
+    /// 
+    /// Immediate fatal errors appear in the
+    /// error field.
+    /// Otherwise, when the operation finishes, a detailed response of type
+    /// ImportResourcesResponse is returned in the
+    /// response field.
+    /// The metadata field type for this
+    /// operation is OperationMetadata.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the FHIR store to delete.
-    pub fn locations_datasets_fhir_stores_delete(&self, name: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreDeleteCall {
+    /// * `request` - No description provided.
+    /// * `name` - The name of the FHIR store to import FHIR resources to. The name should be
+    ///            in the format of
+    ///            `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
+    pub fn locations_datasets_fhir_stores_import(&self, request: ImportResourcesRequest, name: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreImportCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the FHIR [capability
+    /// statement](http://hl7.org/implement/standards/fhir/STU3/capabilitystatement.html)
+    /// for the store, which contains a description of functionality supported by
+    /// the server.
+    /// 
+    /// Implements the FHIR standard [capabilities
+    /// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#capabilities).
+    /// 
+    /// On success, the response body will contain a JSON-encoded representation
+    /// of a `CapabilityStatement` resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Name of the FHIR store to retrieve the capabilities for.
+    pub fn locations_datasets_fhir_stores_fhir_capabilities(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> {
+        ProjectLocationDatasetFhirStoreFhirCapabilityCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -3906,72 +4084,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the versions of a resource (including the current version and
-    /// deleted versions) from the FHIR store.
-    /// 
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The name of the resource to retrieve.
-    pub fn locations_datasets_fhir_stores_fhir__history_list(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirHistoryListCall {
-            hub: self.hub,
-            _name: name.to_string(),
-            _since: Default::default(),
-            _page: Default::default(),
-            _count: Default::default(),
-            _at: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// StoreInstances stores DICOM instances associated with study instance unique
     /// identifiers (SUID). See
-    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.6.1.
+    /// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the DICOM store that is being accessed (e.g.,
     ///              `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).
-    /// * `dicomWebPath` - The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    ///                    QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// * `dicomWebPath` - The path of the StoreInstances DICOMweb request (e.g.,
+    ///                    `studies/[{study_id}]`). Note that the `study_uid` is optional.
     pub fn locations_datasets_dicom_stores_store_instances(&self, request: HttpBody, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> {
         ProjectLocationDatasetDicomStoreStoreInstanceCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _dicom_web_path: dicom_web_path.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes FHIR resources matching a search query.
-    /// 
-    /// Note: unless resource versioning is disabled by setting the
-    /// disable_resource_versioning flag
-    /// on the FHIR store, the deleted resources will be moved to a history
-    /// repository that can still be retrieved through GetResourceVersion and
-    /// related methods, unless they are removed by the DeleteResourceVersions
-    /// method.
-    /// 
-    /// # Arguments
-    ///
-    /// * `parent` - The name of the FHIR store this resource belongs to.
-    /// * `type` - The type of the resource to update.
-    pub fn locations_datasets_fhir_stores_fhir_conditional_delete_resource(&self, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall {
-            hub: self.hub,
-            _parent: parent.to_string(),
-            _type_: type_.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4013,6 +4142,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationDatasetHl7V2StoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4065,18 +4195,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets all the resources in the patient compartment.
-    /// 
+    /// Updates the configuration of the specified FHIR store.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Name of the patient for which the information is required.
-    pub fn locations_datasets_fhir_stores_fhir__patient_geteverything(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A> {
-        ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall {
+    /// * `request` - No description provided.
+    /// * `name` - Output only. Resource name of the FHIR store, of the form
+    ///            `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
+    pub fn locations_datasets_fhir_stores_patch(&self, request: FhirStore, name: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
+        ProjectLocationDatasetFhirStorePatchCall {
             hub: self.hub,
+            _request: request,
             _name: name.to_string(),
-            _start: Default::default(),
-            _end: Default::default(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4116,31 +4247,21 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Searches resources in the given FHIR store.
+/// Lists all the versions of a resource (including the current version and
+/// deleted versions) from the FHIR store.
 /// 
-/// # Search Parameters
+/// Implements the per-resource form of the FHIR standard [history
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#history).
 /// 
-/// The server's capability statement, retrieved through
-/// GetCapabilityStatement, indicates which search
-/// parameters are supported on each FHIR resource.
-/// 
-/// # Search Modifiers
-/// 
-/// Modifier   | Supported
-/// ----------- | ---------
-/// `:missing`  | Yes
-/// `:exact`    | Yes
-/// `:contains` | Yes
-/// `:text`     | Yes
-/// `:in`       | Yes
-/// `:not-in`   | Yes
-/// `:above`    | Yes
-/// `:below`    | Yes
-/// `:[type]`   | Yes
-/// `:not`      | Yes
-/// `:recurse`  | No
+/// On success, the response body will contain a JSON-encoded representation
+/// of a `Bundle` resource of type `history`, containing the version history
+/// sorted from most recent to oldest versions.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir._search* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.history* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -4152,7 +4273,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::SearchResourcesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4163,32 +4283,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SearchResourcesRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir__search(req, "parent")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_history("name")
+///              .since("gubergren")
+///              .page("sadipscing")
+///              .count(-31)
+///              .at("ea")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _request: SearchResourcesRequest,
-    _parent: String,
+    _name: String,
+    _since: Option<String>,
+    _page: Option<String>,
+    _count: Option<i32>,
+    _at: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4201,11 +4323,23 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir._search",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        for &field in ["alt", "parent"].iter() {
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.history",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._since {
+            params.push(("since", value.to_string()));
+        }
+        if let Some(value) = self._page {
+            params.push(("page", value.to_string()));
+        }
+        if let Some(value) = self._count {
+            params.push(("count", value.to_string()));
+        }
+        if let Some(value) = self._at {
+            params.push(("at", value.to_string()));
+        }
+        for &field in ["alt", "name", "since", "page", "count", "at"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4217,12 +4351,12 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/_search";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/_history";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -4237,7 +4371,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
+            for param_name in ["name"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -4249,17 +4383,6 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -4276,15 +4399,11 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -4335,23 +4454,60 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
     }
 
 
+    /// The name of the resource to retrieve.
     ///
-    /// Sets the *request* property to the given value.
+    /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchResourcesRequest) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
-        self._request = new_value;
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
+        self._name = new_value.to_string();
         self
     }
-    /// Name of the FHIR store to retrieve resources from.
+    /// Only include resource versions that were created at or after the given
+    /// instant in time. The instant in time uses the format
+    /// YYYY-MM-DDThh:mm:ss.sss+zz:zz (for example 2015-02-07T13:28:17.239+02:00 or
+    /// 2017-01-01T00:00:00Z). The time must be specified to the second and
+    /// include a time zone.
     ///
-    /// Sets the *parent* path property to the given value.
+    /// Sets the *since* query property to the given value.
+    pub fn since(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
+        self._since = Some(new_value.to_string());
+        self
+    }
+    /// Used to retrieve the first, previous, next, or last page of resource
+    /// versions when using pagination. Value should be set to the value of the
+    /// `link.url` field returned in the response to the previous request, where
+    /// `link.relation` is "first", "previous", "next" or "last".
+    /// 
+    /// Omit `page` if no previous request has been made.
     ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
-        self._parent = new_value.to_string();
+    /// Sets the *page* query property to the given value.
+    pub fn page(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
+        self._page = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of search results on a page. Defaults to 1000.
+    ///
+    /// Sets the *count* query property to the given value.
+    pub fn count(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
+        self._count = Some(new_value);
+        self
+    }
+    /// Only include resource versions that were current at some point during the
+    /// time period specified in the date time value. The date parameter format is
+    /// yyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm]
+    /// 
+    /// Clients may specify any of the following:
+    /// 
+    /// *  An entire year: `_at=2019`
+    /// *  An entire month: `_at=2019-01`
+    /// *  A specific day: `_at=2019-01-20`
+    /// *  A specific second: `_at=2018-12-31T23:59:58Z`
+    ///
+    /// Sets the *at* query property to the given value.
+    pub fn at(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
+        self._at = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4360,7 +4516,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4385,7 +4541,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4405,7 +4561,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5197,7 +5353,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// SearchForStudies returns a list of matching studies. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
 ///
 /// A builder for the *locations.datasets.dicomStores.searchForStudies* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5385,9 +5541,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> wher
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `studies`).
+    /// The path of the SearchForStudies DICOMweb request (e.g., `studies`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -5462,12 +5616,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> wher
 
 /// Deletes a FHIR resource.
 /// 
-/// Note: unless resource versioning is disabled by setting the
+/// Implements the FHIR standard [delete
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#delete).
+/// 
+/// Note: Unless resource versioning is disabled by setting the
 /// disable_resource_versioning flag
 /// on the FHIR store, the deleted resources will be moved to a history
-/// repository that can still be retrieved through GetResourceVersion and
-/// related methods, unless they are removed by the DeleteResourceVersions
-/// method.
+/// repository that can still be retrieved through vread
+/// and related methods, unless they are removed by the
+/// purge method.
 ///
 /// A builder for the *locations.datasets.fhirStores.fhir.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5715,290 +5872,21 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, C, A> where C: 
 }
 
 
-/// Searches resources in the given FHIR store.
+/// Updates part of an existing resource by applying the operations specified
+/// in a [JSON Patch](http://jsonpatch.com/) document.
 /// 
-/// # Search Parameters
+/// Implements the FHIR standard [patch
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
 /// 
-/// The server's capability statement, retrieved through
-/// GetCapabilityStatement, indicates which search
-/// parameters are supported on each FHIR resource.
+/// The request body must contain a JSON Patch document, and the request
+/// headers must contain `Content-Type: application/json-patch+json`.
 /// 
-/// # Search Modifiers
-/// 
-/// Modifier   | Supported
-/// ----------- | ---------
-/// `:missing`  | Yes
-/// `:exact`    | Yes
-/// `:contains` | Yes
-/// `:text`     | Yes
-/// `:in`       | Yes
-/// `:not-in`   | Yes
-/// `:above`    | Yes
-/// `:below`    | Yes
-/// `:[type]`   | Yes
-/// `:not`      | Yes
-/// `:recurse`  | No
-///
-/// A builder for the *locations.datasets.fhirStores.fhir.searchResources* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_search_resources("parent", "resourceType")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _parent: String,
-    _resource_type: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.searchResources",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        params.push(("resourceType", self._resource_type.to_string()));
-        for &field in ["alt", "parent", "resourceType"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+resourceType}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+resourceType}", "resourceType")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["resourceType", "parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Name of the FHIR store to retrieve resources from.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The type of the resource to search.
-    ///
-    /// Sets the *resource type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource_type(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A> {
-        self._resource_type = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirSearchResourceCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates part of an existing resource.
-/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of the updated resource, including the server-assigned version ID.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
 ///
 /// A builder for the *locations.datasets.fhirStores.fhir.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6570,256 +6458,8 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreExportCall<'a, C, A> where C: Borr
 }
 
 
-/// Gets the configuration of the specified FHIR store.
-///
-/// A builder for the *locations.datasets.fhirStores.get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_get("name")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, FhirStore)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The resource name of the FHIR store to get.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// SearchForInstances returns a list of matching instances. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.searchForInstances* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7007,9 +6647,9 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `instances`).
+    /// The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+    /// `instances` or `series/{series_uid}/instances` or
+    /// `studies/{study_uid}/instances`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -7084,7 +6724,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a
 
 /// RetrieveRenderedInstance returns instance associated with the given study,
 /// series, and SOP Instance UID in an acceptable Rendered Media Type. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.8.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.instances.retrieveRendered* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7272,9 +6912,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRendered
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `studies/{study_id}/series/{series_id}/instance/{instance_id}/rendered`).
+    /// The path of the RetrieveRenderedInstance DICOMweb request (e.g.,
+    /// `studies/{study_id}/series/{series_id}/instances/{instance_id}/rendered`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -7377,6 +7016,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRendered
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_dicom_stores_get_iam_policy("resource")
+///              .options_requested_policy_version(-75)
 ///              .doit();
 /// # }
 /// ```
@@ -7385,6 +7025,7 @@ pub struct ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7407,9 +7048,12 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> where 
         };
         dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.dicomStores.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7535,6 +7179,16 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> where 
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7632,7 +7286,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> where 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_create(req, "parent")
-///              .fhir_store_id("eos")
+///              .fhir_store_id("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -7893,7 +7547,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreCreateCall<'a, C, A> where C: Borr
 /// RetrieveRenderedFrames returns instances associated with the given study,
 /// series, SOP Instance UID and frame numbers in an acceptable Rendered Media
 /// Type. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.8.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.instances.frames.retrieveRendered* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8081,9 +7735,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRen
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `studies/{study_id}/series/{series_id}/instance/{instance_id}/frames/{frame_list}/rendered`).
+    /// The path of the RetrieveRenderedFrames DICOMweb request (e.g.,
+    /// `studies/{study_id}/series/{series_id}/instances/{instance_id}/frames/{frame_list}/rendered`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -8405,6 +8058,327 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, C, A> where C: Bor
 }
 
 
+/// If a resource is found based on the search criteria specified in the query
+/// parameters, updates the entire contents of that resource.
+/// 
+/// Implements the FHIR standard [conditional update
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cond-update).
+/// 
+/// Search terms are provided as query parameters following the same pattern as
+/// the search method.
+/// 
+/// If the search criteria identify more than one match, the request will
+/// return a `412 Precondition Failed` error.
+/// If the search criteria identify zero matches, and the supplied resource
+/// body contains an `id`, and the FHIR store has
+/// enable_update_create set, creates the
+/// resource with the client-specified ID. If the search criteria identify zero
+/// matches, and the supplied resource body does not contain an `id`, the
+/// resource will be created with a server-assigned ID as per the
+/// create method.
+/// 
+/// The request body must contain a JSON-encoded FHIR resource, and the request
+/// headers must contain `Content-Type: application/fhir+json`.
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of the updated resource, including the server-assigned version ID.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
+///
+/// A builder for the *locations.datasets.fhirStores.fhir.conditionalUpdate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::HttpBody;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use healthcare1_beta1::CloudHealthcare;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = HttpBody::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_conditional_update(req, "parent", "type")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudHealthcare<C, A>,
+    _request: HttpBody,
+    _parent: String,
+    _type_: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalUpdate",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        params.push(("type", self._type_.to_string()));
+        for &field in ["alt", "parent", "type"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["type", "parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the FHIR store this resource belongs to.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The FHIR resource type to update, such as Patient or Observation. For a
+    /// complete list, see the [FHIR Resource
+    /// Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    /// Must match the resource type in the provided content.
+    ///
+    /// Sets the *type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {
+        self._type_ = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
 /// permissions, not a NOT_FOUND error.
@@ -8691,11 +8665,51 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> wh
 }
 
 
-/// Gets the FHIR capability statement for the store, which contains a
-/// description of functionality supported by the server.
+/// Searches for resources in the given FHIR store according to criteria
+/// specified as query parameters.
 /// 
+/// Implements the FHIR standard [search
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#search)
+/// using the search semantics described in the [FHIR Search
+/// specification](http://hl7.org/implement/standards/fhir/STU3/search.html).
+/// 
+/// Supports three methods of search defined by the specification:
+/// 
+/// *  `GET [base]?[parameters]` to search across all resources.
+/// *  `GET [base]/[type]?[parameters]` to search resources of a specified
+/// type.
+/// *  `POST [base]/[type]/_search?[parameters]` as an alternate form having
+/// the same semantics as the `GET` method.
+/// 
+/// The `GET` methods do not support compartment searches. The `POST` method
+/// does not support `application/x-www-form-urlencoded` search parameters.
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of a `Bundle` resource of type `searchset`, containing the results of the
+/// search.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
+/// 
+/// The server's capability statement, retrieved through
+/// capabilities, indicates what search parameters
+/// are supported on each FHIR resource. A list of all search parameters
+/// defined by the specification can be found in the [FHIR Search Parameter
+/// Registry](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html).
+/// 
+/// Supported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,
+/// `:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.
+/// 
+/// Supported search result parameters: `_sort`, `_count`, `_include`,
+/// `_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.
+/// 
+/// The maximum number of search results returned defaults to 100, which can
+/// be overridden by the `_count` parameter up to a maximum limit of 1000. If
+/// there are additional results, the returned `Bundle` will contain
+/// pagination links.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir.getMetadata* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.search* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -8707,6 +8721,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> wh
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::SearchResourcesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8717,26 +8732,32 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> wh
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SearchResourcesRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_get_metadata("name")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_search(req, "parent")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _name: String,
+    _request: SearchResourcesRequest,
+    _parent: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8749,11 +8770,11 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.getMetadata",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.search",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8765,12 +8786,12 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/fhir/metadata";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/_search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -8785,7 +8806,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8797,6 +8818,17 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -8813,11 +8845,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -8868,14 +8904,23 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
     }
 
 
-    /// Name of the FHIR store to retrieve the capabilities for.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> {
-        self._name = new_value.to_string();
+    pub fn request(mut self, new_value: SearchResourcesRequest) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the FHIR store to retrieve resources from.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8884,7 +8929,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8909,7 +8954,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8929,7 +8974,321 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirGetMetadataCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// If a resource is found based on the search criteria specified in the query
+/// parameters, updates part of that resource by applying the operations
+/// specified in a [JSON Patch](http://jsonpatch.com/) document.
+/// 
+/// Implements the FHIR standard [conditional patch
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
+/// 
+/// Search terms are provided as query parameters following the same pattern as
+/// the search method.
+/// 
+/// If the search criteria identify more than one match, the request will
+/// return a `412 Precondition Failed` error.
+/// 
+/// The request body must contain a JSON Patch document, and the request
+/// headers must contain `Content-Type: application/json-patch+json`.
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of the updated resource, including the server-assigned version ID.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
+///
+/// A builder for the *locations.datasets.fhirStores.fhir.conditionalPatch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::HttpBody;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use healthcare1_beta1::CloudHealthcare;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = HttpBody::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_conditional_patch(req, "parent", "type")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudHealthcare<C, A>,
+    _request: HttpBody,
+    _parent: String,
+    _type_: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalPatch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        params.push(("type", self._type_.to_string()));
+        for &field in ["alt", "parent", "type"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["type", "parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the FHIR store this resource belongs to.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The FHIR resource type to update, such as Patient or Observation. For a
+    /// complete list, see the [FHIR Resource
+    /// Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    ///
+    /// Sets the *type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {
+        self._type_ = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9473,7 +9832,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, C, A> where C
 
 /// RetrieveSeriesMetadata returns instance associated with the given study and
 /// series, presented as metadata with the bulk data removed. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.retrieveMetadata* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9661,8 +10020,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a,
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}/metadata`.
+    /// The path of the RetrieveSeriesMetadata DICOMweb request (e.g.,
+    /// `studies/{study_id}/series/{series_id}/metadata`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -9769,7 +10128,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_patch(req, "name")
-///              .update_mask("invidunt")
+///              .update_mask("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -10057,8 +10416,8 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StorePatchCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_list("parent")
-///              .page_token("accusam")
-///              .page_size(-56)
+///              .page_token("eirmod")
+///              .page_size(-58)
 ///              .doit();
 /// # }
 /// ```
@@ -10308,6 +10667,8 @@ impl<'a, C, A> ProjectLocationDatasetListCall<'a, C, A> where C: BorrowMut<hyper
 /// `Operation.response` which contains a Dataset or
 /// `Operation.error`. The metadata
 /// field type is OperationMetadata.
+/// A Google Cloud Platform project can contain up to 500 datasets across all
+/// regions.
 ///
 /// A builder for the *locations.datasets.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10341,7 +10702,7 @@ impl<'a, C, A> ProjectLocationDatasetListCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_create(req, "parent")
-///              .dataset_id("et")
+///              .dataset_id("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -10600,6 +10961,292 @@ impl<'a, C, A> ProjectLocationDatasetCreateCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
+/// Retrieves all the resources in the patient compartment for a `Patient`
+/// resource.
+/// 
+/// Implements the FHIR extended operation
+/// [Patient-everything](http://hl7.org/implement/standards/fhir/STU3/patient-operations.html#everything).
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of a `Bundle` resource of type `searchset`, containing the results of the
+/// operation.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
+///
+/// A builder for the *locations.datasets.fhirStores.fhir.Patient-everything* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use healthcare1_beta1::CloudHealthcare;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir__patient_everything("name")
+///              .start("consetetur")
+///              .end("ut")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudHealthcare<C, A>,
+    _name: String,
+    _start: Option<String>,
+    _end: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.Patient-everything",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._start {
+            params.push(("start", value.to_string()));
+        }
+        if let Some(value) = self._end {
+            params.push(("end", value.to_string()));
+        }
+        for &field in ["alt", "name", "start", "end"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/$everything";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of the `Patient` resource for which the information is required.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The response includes records subsequent to the start date. If no start
+    /// date is provided, all records prior to the end date are in scope.
+    ///
+    /// Sets the *start* query property to the given value.
+    pub fn start(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {
+        self._start = Some(new_value.to_string());
+        self
+    }
+    /// The response includes records prior to the end date. If no end date is
+    /// provided, all records subsequent to the start date are in scope.
+    ///
+    /// Sets the *end* query property to the given value.
+    pub fn end(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {
+        self._end = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists the DICOM stores in the given dataset.
 ///
 /// A builder for the *locations.datasets.dicomStores.list* method supported by a *project* resource.
@@ -10628,9 +11275,9 @@ impl<'a, C, A> ProjectLocationDatasetCreateCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_dicom_stores_list("parent")
-///              .page_token("et")
-///              .page_size(-40)
-///              .filter("sanctus")
+///              .page_token("sed")
+///              .page_size(-3)
+///              .filter("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -10887,11 +11534,23 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreListCall<'a, C, A> where C: Borro
 }
 
 
-/// Get N most recent observations for patient, grouped by code
-/// that match given query parameters.
+/// Deletes FHIR resources that match a search query.
 /// 
+/// Implements the FHIR standard [conditional delete
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.13.1).
+/// If multiple resources match, all of them will be deleted.
+/// 
+/// Search terms are provided as query parameters following the same pattern as
+/// the search method.
+/// 
+/// Note: Unless resource versioning is disabled by setting the
+/// disable_resource_versioning flag
+/// on the FHIR store, the deleted resources will be moved to a history
+/// repository that can still be retrieved through vread
+/// and related methods, unless they are removed by the
+/// purge method.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir.Observation.get$lastn* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.conditionalDelete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -10916,27 +11575,28 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreListCall<'a, C, A> where C: Borro
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir__observation_getlastn("parent")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_conditional_delete("parent", "type")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
+    _type_: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -10945,11 +11605,12 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.Observation.get$lastn",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalDelete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        for &field in ["alt", "parent"].iter() {
+        params.push(("type", self._type_.to_string()));
+        for &field in ["alt", "parent", "type"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10961,12 +11622,12 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/Observation/$lastn";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -10980,8 +11641,8 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["type", "parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -11011,7 +11672,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11064,14 +11725,26 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
     }
 
 
-    /// Name of the FHIR store to retrieve resources from.
+    /// The name of the FHIR store this resource belongs to.
     ///
     /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// The FHIR resource type to delete, such as Patient or Observation. For a
+    /// complete list, see the [FHIR Resource
+    /// Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    ///
+    /// Sets the *type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> {
+        self._type_ = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11080,7 +11753,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11105,7 +11778,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11125,7 +11798,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11139,7 +11812,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationGet$lastnCall<'a, C
 
 /// RetrieveFrames returns instances associated with the given study, series,
 /// SOP Instance UID and frame numbers. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.4.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.instances.frames.retrieveFrames* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11327,9 +12000,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFra
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `studies/{study_id}/series/{series_id}/instance/{instance_id}/frames/{frame_list}`).
+    /// The path of the RetrieveFrames DICOMweb request (e.g.,
+    /// `studies/{study_id}/series/{series_id}/instances/{instance_id}/frames/{frame_list}`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -11403,7 +12075,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFra
 
 
 /// SearchForSeries returns a list of matching series. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
 ///
 /// A builder for the *locations.datasets.dicomStores.searchForSeries* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11591,9 +12263,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> where
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `series`).
+    /// The path of the SearchForSeries DICOMweb request(e.g., `series` or
+    /// `studies/{study_uid}/series`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -11666,17 +12337,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> where
 }
 
 
-/// Creates a new dataset containing de-identified data from the source
-/// dataset. The metadata field type
-/// is OperationMetadata.
-/// If the request is successful, the
-/// response field type is
-/// DeidentifySummary.
-/// If errors occur,
-/// details field type is
-/// DeidentifyErrorDetails.
+/// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a NOT_FOUND error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
 ///
-/// A builder for the *locations.datasets.deidentify* method supported by a *project* resource.
+/// A builder for the *locations.datasets.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -11688,7 +12357,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> where
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::DeidentifyDatasetRequest;
+/// use healthcare1_beta1::TestIamPermissionsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11702,33 +12371,33 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> where
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = DeidentifyDatasetRequest::default();
+/// let mut req = TestIamPermissionsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_deidentify(req, "sourceDataset")
+/// let result = hub.projects().locations_datasets_test_iam_permissions(req, "resource")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDeidentifyCall<'a, C, A>
+pub struct ProjectLocationDatasetTestIamPermissionCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _request: DeidentifyDatasetRequest,
-    _source_dataset: String,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetDeidentifyCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -11737,11 +12406,11 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.deidentify",
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.testIamPermissions",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("sourceDataset", self._source_dataset.to_string()));
-        for &field in ["alt", "sourceDataset"].iter() {
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11753,12 +12422,12 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+sourceDataset}:deidentify";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:testIamPermissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+sourceDataset}", "sourceDataset")].iter() {
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -11773,7 +12442,7 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["sourceDataset"].iter() {
+            for param_name in ["resource"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -11876,19 +12545,19 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeidentifyDatasetRequest) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Source dataset resource name. (e.g.,
-    /// `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`).
+    /// REQUIRED: The resource for which the policy detail is being requested.
+    /// See the operation documentation for the appropriate value for this field.
     ///
-    /// Sets the *source dataset* path property to the given value.
+    /// Sets the *resource* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_dataset(mut self, new_value: &str) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
-        self._source_dataset = new_value.to_string();
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
+        self._resource = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11897,7 +12566,7 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11922,7 +12591,7 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDeidentifyCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11942,7 +12611,7 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDeidentifyCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11982,10 +12651,10 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_messages_list("parent")
-///              .page_token("dolor")
-///              .page_size(-48)
-///              .order_by("dolor")
-///              .filter("et")
+///              .page_token("sit")
+///              .page_size(-26)
+///              .order_by("diam")
+///              .filter("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -12295,9 +12964,9 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> where C
 }
 
 
-/// Updates the configuration of the specified FHIR store.
+/// Lists information about the supported locations for this service.
 ///
-/// A builder for the *locations.datasets.fhirStores.patch* method supported by a *project* resource.
+/// A builder for the *locations.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -12309,7 +12978,6 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> where C
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::FhirStore;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12320,38 +12988,36 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> where C
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = FhirStore::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_patch(req, "name")
-///              .update_mask("amet.")
+/// let result = hub.projects().locations_list("name")
+///              .page_token("sadipscing")
+///              .page_size(-76)
+///              .filter("sadipscing")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStorePatchCall<'a, C, A>
+pub struct ProjectLocationListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _request: FhirStore,
     _name: String,
-    _update_mask: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, FhirStore)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListLocationsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -12360,14 +13026,20 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        for &field in ["alt", "name", "updateMask"].iter() {
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12379,7 +13051,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/locations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -12411,17 +13083,6 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -12438,15 +13099,11 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -12497,33 +13154,35 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FhirStore) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Output only. Resource name of the FHIR store, of the form
-    /// `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
+    /// The resource that owns the locations collection, if applicable.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
-    /// The update mask applies to the resource. For the `FieldMask` definition,
-    /// see
-    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    /// The standard list page token.
     ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
-        self._update_mask = Some(new_value.to_string());
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The standard list page size.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The standard list filter.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -12532,7 +13191,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12557,7 +13216,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12577,7 +13236,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12619,6 +13278,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_get_iam_policy("resource")
+///              .options_requested_policy_version(-96)
 ///              .doit();
 /// # }
 /// ```
@@ -12627,6 +13287,7 @@ pub struct ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12649,9 +13310,12 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> where C
         };
         dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12777,6 +13441,16 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> where C
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12840,299 +13514,6 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> where C
 }
 
 
-/// Updates the entire resource if the resource exists based on the
-/// search criteria specified via query parameters.
-/// 
-///
-/// A builder for the *locations.datasets.fhirStores.fhir.conditionalUpdateResource* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::HttpBody;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = HttpBody::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_conditional_update_resource(req, "parent", "type")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _request: HttpBody,
-    _parent: String,
-    _type_: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalUpdateResource",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        params.push(("type", self._type_.to_string()));
-        for &field in ["alt", "parent", "type"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["type", "parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The name of the FHIR store this resource belongs to.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The type of the resource to update.
-    ///
-    /// Sets the *type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A> {
-        self._type_ = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Creates a new HL7v2 store within the parent dataset.
 ///
 /// A builder for the *locations.datasets.hl7V2Stores.create* method supported by a *project* resource.
@@ -13167,7 +13548,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalUpdateResourceCall<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_create(req, "parent")
-///              .hl7_v2_store_id("sit")
+///              .hl7_v2_store_id("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -13425,300 +13806,8 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreCreateCall<'a, C, A> where C: Bor
 }
 
 
-/// Creates a FHIR resource.
-/// 
-///
-/// A builder for the *locations.datasets.fhirStores.fhir.createResource* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::HttpBody;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = HttpBody::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_create_resource(req, "parent", "type")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _request: HttpBody,
-    _parent: String,
-    _type_: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.createResource",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        params.push(("type", self._type_.to_string()));
-        for &field in ["alt", "parent", "type"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["type", "parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The name of the FHIR store this resource belongs to.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The type of the resource to create.
-    ///
-    /// Sets the *type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A> {
-        self._type_ = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirCreateResourceCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// RetrieveStudy returns all instances within the given study. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.1.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.retrieveStudy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -13906,8 +13995,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> 
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// The path of the RetrieveStudy DICOMweb request (e.g.,
+    /// `studies/{study_id}`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -13980,12 +14069,9 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> 
 }
 
 
-/// Updates the entire resource or creates a new resource with a client
-/// specified ID if the resource does not exist and the FHIR store has
-/// enable_update_create set.
-/// 
+/// Gets the configuration of the specified FHIR store.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir.update* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -13997,7 +14083,6 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> 
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::HttpBody;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14008,36 +14093,30 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> 
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = HttpBody::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_update(req, "name")
+/// let result = hub.projects().locations_datasets_fhir_stores_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _request: HttpBody,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, FhirStore)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -14046,9 +14125,9 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -14094,17 +14173,6 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -14121,15 +14189,11 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -14180,22 +14244,13 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The name of the resource to update.
+    /// The resource name of the FHIR store to get.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -14205,7 +14260,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14230,7 +14285,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14250,7 +14305,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14292,6 +14347,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_get_iam_policy("resource")
+///              .options_requested_policy_version(-45)
 ///              .doit();
 /// # }
 /// ```
@@ -14300,6 +14356,7 @@ pub struct ProjectLocationDatasetGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14322,9 +14379,12 @@ impl<'a, C, A> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14450,6 +14510,16 @@ impl<'a, C, A> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> where C: BorrowM
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14515,7 +14585,7 @@ impl<'a, C, A> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> where C: BorrowM
 
 /// StoreInstances stores DICOM instances associated with study instance unique
 /// identifiers (SUID). See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.6.1.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.storeInstances* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -14734,8 +14804,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> 
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// The path of the StoreInstances DICOMweb request (e.g.,
+    /// `studies/[{study_id}]`). Note that the `study_uid` is optional.
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -14842,7 +14912,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_messages_patch(req, "name")
-///              .update_mask("dolore")
+///              .update_mask("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -15095,298 +15165,6 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A> where 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates parts of a resource if the resource exists based on the
-/// search criteria specified via query parameters.
-///
-/// A builder for the *locations.datasets.fhirStores.fhir.conditionalPatchResource* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::HttpBody;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = HttpBody::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_conditional_patch_resource(req, "parent", "type")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _request: HttpBody,
-    _parent: String,
-    _type_: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalPatchResource",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        params.push(("type", self._type_.to_string()));
-        for &field in ["alt", "parent", "type"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["type", "parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The name of the FHIR store this resource belongs to.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The type of the resource to update.
-    ///
-    /// Sets the *type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A> {
-        self._type_ = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchResourceCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15873,8 +15651,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> whe
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}`).
+    /// The path of the DeleteSeries request (e.g.,
+    /// `studies/{study_id}/series/{series_id}`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -15947,6 +15725,254 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> whe
 }
 
 
+/// Deletes the specified FHIR store and removes all resources within it.
+///
+/// A builder for the *locations.datasets.fhirStores.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use healthcare1_beta1::CloudHealthcare;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_datasets_fhir_stores_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudHealthcare<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The resource name of the FHIR store to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists operations that match the specified filter in the request. If the
 /// server doesn't support this method, it returns `UNIMPLEMENTED`.
 /// 
@@ -15984,9 +16010,9 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> whe
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_operations_list("name")
-///              .page_token("takimata")
-///              .page_size(-40)
-///              .filter("kasd")
+///              .page_token("sadipscing")
+///              .page_size(-66)
+///              .filter("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -16274,7 +16300,7 @@ impl<'a, C, A> ProjectLocationDatasetOperationListCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_dicom_stores_create(req, "parent")
-///              .dicom_store_id("takimata")
+///              .dicom_store_id("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -16532,10 +16558,17 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> where C: Bor
 }
 
 
-/// Gets a version (current or historical) of FHIR resource by version id.
-/// 
+/// Creates a new dataset containing de-identified data from the source
+/// dataset. The metadata field type
+/// is OperationMetadata.
+/// If the request is successful, the
+/// response field type is
+/// DeidentifySummary.
+/// If errors occur,
+/// details field type is
+/// DeidentifyErrorDetails.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir._history.get* method supported by a *project* resource.
+/// A builder for the *locations.datasets.deidentify* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -16547,6 +16580,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> where C: Bor
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::DeidentifyDatasetRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16557,30 +16591,36 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> where C: Bor
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = DeidentifyDatasetRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir__history_get("name")
+/// let result = hub.projects().locations_datasets_deidentify(req, "sourceDataset")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A>
+pub struct ProjectLocationDatasetDeidentifyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _name: String,
+    _request: DeidentifyDatasetRequest,
+    _source_dataset: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetDeidentifyCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -16589,11 +16629,11 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir._history.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.deidentify",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("sourceDataset", self._source_dataset.to_string()));
+        for &field in ["alt", "sourceDataset"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16605,12 +16645,12 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+sourceDataset}:deidentify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+sourceDataset}", "sourceDataset")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -16625,7 +16665,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["sourceDataset"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -16637,6 +16677,17 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -16653,11 +16704,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -16708,14 +16763,24 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
     }
 
 
-    /// The name of the resource version to retrieve.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> {
-        self._name = new_value.to_string();
+    pub fn request(mut self, new_value: DeidentifyDatasetRequest) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Source dataset resource name. (e.g.,
+    /// `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`).
+    ///
+    /// Sets the *source dataset* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn source_dataset(mut self, new_value: &str) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
+        self._source_dataset = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -16724,7 +16789,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16749,7 +16814,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDeidentifyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16769,7 +16834,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirHistoryGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDeidentifyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17031,10 +17096,29 @@ impl<'a, C, A> ProjectLocationDatasetOperationGetCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Gets a FHIR resource.
+/// Updates the entire contents of a resource.
 /// 
+/// Implements the FHIR standard [update
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#update).
+/// 
+/// If the specified resource does
+/// not exist and the FHIR store has
+/// enable_update_create set, creates the
+/// resource with the client-specified ID.
+/// 
+/// The request body must contain a JSON-encoded FHIR resource, and the request
+/// headers must contain `Content-Type: application/fhir+json`. The resource
+/// must contain an `id` element having an identical value to the ID in the
+/// REST path of the request.
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of the updated resource, including the server-assigned version ID.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir.get* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.update* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -17046,6 +17130,7 @@ impl<'a, C, A> ProjectLocationDatasetOperationGetCall<'a, C, A> where C: BorrowM
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::HttpBody;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -17056,26 +17141,32 @@ impl<'a, C, A> ProjectLocationDatasetOperationGetCall<'a, C, A> where C: BorrowM
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = HttpBody::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_get("name")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_update(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
+    _request: HttpBody,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17088,9 +17179,9 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: Bor
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17136,6 +17227,17 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: Bor
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -17152,11 +17254,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: Bor
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -17207,13 +17313,22 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: Bor
     }
 
 
-    /// The name of the resource to retrieve.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the resource to update.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -17223,7 +17338,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17248,7 +17363,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: Bor
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17268,7 +17383,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17532,7 +17647,7 @@ impl<'a, C, A> ProjectLocationDatasetDeleteCall<'a, C, A> where C: BorrowMut<hyp
 
 
 /// SearchForInstances returns a list of matching instances. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.searchForInstances* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -17720,9 +17835,9 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C,
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `instances`).
+    /// The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+    /// `instances` or `series/{series_uid}/instances` or
+    /// `studies/{study_uid}/instances`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -17829,7 +17944,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_patch(req, "name")
-///              .update_mask("nonumy")
+///              .update_mask("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -18090,7 +18205,7 @@ impl<'a, C, A> ProjectLocationDatasetPatchCall<'a, C, A> where C: BorrowMut<hype
 
 
 /// SearchForSeries returns a list of matching series. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.searchForSeries* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -18278,9 +18393,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> 
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `series`).
+    /// The path of the SearchForSeries DICOMweb request(e.g., `series` or
+    /// `studies/{study_uid}/series`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -18342,6 +18456,269 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the contents of a FHIR resource.
+/// 
+/// Implements the FHIR standard [read
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#read).
+/// 
+/// Also supports the FHIR standard [conditional read
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cread)
+/// specified by supplying an `If-Modified-Since` header with a date/time value
+/// or an `If-None-Match` header with an ETag value.
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of the resource.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
+///
+/// A builder for the *locations.datasets.fhirStores.fhir.read* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use healthcare1_beta1::CloudHealthcare;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_read("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudHealthcare<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.read",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the resource to retrieve.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18920,11 +19297,27 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A> where 
 }
 
 
-/// Deletes all the historical versions of a resource (excluding current
-/// version) from the FHIR store. To remove all versions of a resource, first
-/// delete the current version and call this method.
+/// Retrieves the N most recent `Observation` resources for a subject matching
+/// search criteria specified as query parameters, grouped by
+/// `Observation.code`, sorted from most recent to oldest.
+/// 
+/// Implements the FHIR extended operation
+/// [Observation-lastn](http://hl7.org/implement/standards/fhir/STU3/observation-operations.html#lastn).
+/// 
+/// Search terms are provided as query parameters following the same pattern as
+/// the search method. This operation accepts an additional
+/// query parameter `max`, which specifies N, the maximum number of
+/// Observations to return from each group, with a default of 1.
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of a `Bundle` resource of type `searchset`, containing the results of the
+/// operation.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir.delete$purge* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.Observation-lastn* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -18949,27 +19342,27 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A> where 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_deletepurge("name")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir__observation_lastn("parent")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _name: String,
+    _parent: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -18978,11 +19371,11 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.delete$purge",
-                               http_method: hyper::method::Method::Delete });
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.Observation-lastn",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18994,12 +19387,12 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/$purge";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/Observation/$lastn";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -19014,7 +19407,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -19044,7 +19437,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19097,14 +19490,14 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
     }
 
 
-    /// The name of the resource to purge.
+    /// Name of the FHIR store to retrieve resources from.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> {
-        self._name = new_value.to_string();
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -19113,7 +19506,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19138,7 +19531,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19158,7 +19551,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A> whe
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirDelete$purgeCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19419,36 +19812,20 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> where C: Bor
 }
 
 
-/// Import resources to the FHIR store by loading data from the specified
-/// sources. Each resource must have a client-supplied ID, which is retained
-/// by the server.
+/// Gets the contents of a version (current or historical) of a FHIR resource
+/// by version ID.
 /// 
-/// The import operation is idempotent. Upon retry, the most recent data
-/// (matching the client-supplied ID) is overwritten, without creating a new
-/// resource version. If partial failures occur during the import, successful
-/// changes are not rolled back.
+/// Implements the FHIR standard [vread
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#vread).
 /// 
-/// If history imports are enabled
-/// (enable_history_import is set in the
-/// FHIR store's configuration), you can import historical versions of a
-/// resource by supplying a bundle of type `history`. The historical versions
-/// in the bundle must have `lastUpdated` timestamps. If a current or
-/// historical version with the supplied resource ID already exists, the
-/// bundle is rejected.
-/// 
-/// This method returns an Operation that can
-/// be used to track the status of the import by calling
-/// GetOperation.
-/// 
-/// Immediate fatal errors appear in the
-/// error field.
-/// Otherwise, when the operation finishes, a detailed response of type
-/// ImportResourcesResponse is returned in the
-/// response field.
-/// The metadata field type for this
-/// operation is OperationMetadata.
+/// On success, the response body will contain a JSON-encoded representation
+/// of the resource.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
 ///
-/// A builder for the *locations.datasets.fhirStores.import* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.vread* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -19460,7 +19837,6 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> where C: Bor
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::ImportResourcesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -19471,36 +19847,30 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> where C: Bor
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ImportResourcesRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_import(req, "name")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_vread("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreImportCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _request: ImportResourcesRequest,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -19509,9 +19879,9 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.import",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.vread",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -19525,7 +19895,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:import";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -19557,17 +19927,6 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -19584,15 +19943,11 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -19643,24 +19998,13 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImportResourcesRequest) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The name of the FHIR store to import FHIR resources to. The name should be
-    /// in the format of
-    /// `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
+    /// The name of the resource version to retrieve.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -19670,7 +20014,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19695,7 +20039,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19715,7 +20059,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19730,7 +20074,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
 /// RetrieveInstanceMetadata returns instance associated with the given study,
 /// series, and SOP Instance UID presented as metadata with the bulk data
 /// removed. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.instances.retrieveMetadata* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -19918,8 +20262,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadata
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
+    /// The path of the RetrieveInstanceMetadata DICOMweb request (e.g.,
     /// `studies/{study_id}/series/{series_id}/instances/{instance_id}/metadata`).
     ///
     /// Sets the *dicom web path* path property to the given value.
@@ -19994,7 +20337,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadata
 
 
 /// SearchForInstances returns a list of matching instances. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6.
 ///
 /// A builder for the *locations.datasets.dicomStores.searchForInstances* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -20182,9 +20525,9 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A> w
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `instances`).
+    /// The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+    /// `instances` or `series/{series_uid}/instances` or
+    /// `studies/{study_uid}/instances`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -20505,15 +20848,31 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> where C: Borrow
 }
 
 
-/// Returns permissions that a caller has on the specified resource.
-/// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// Executes all the requests in the given Bundle.
 /// 
-/// Note: This operation is designed to be used for building permission-aware
-/// UIs and command-line tools, not for authorization checking. This operation
-/// may "fail open" without warning.
+/// Implements the FHIR standard [batch/transaction
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#transaction).
+/// 
+/// Supports all interactions within a bundle, except search. This method
+/// accepts Bundles of type `batch` and `transaction`, processing them
+/// according to the [batch processing
+/// rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.1)
+/// and [transaction processing
+/// rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.2).
+/// 
+/// The request body must contain a JSON-encoded FHIR `Bundle` resource, and
+/// the request headers must contain `Content-Type: application/fhir+json`.
+/// 
+/// For a batch bundle or a successful transaction the response body will
+/// contain a JSON-encoded representation of a `Bundle` resource of type
+/// `batch-response` or `transaction-response` containing one entry for each
+/// entry in the request, with the outcome of processing the entry. In the
+/// case of an error for a transaction bundle, the response body will contain
+/// a JSON-encoded `OperationOutcome` resource describing the reason for the
+/// error. If the request cannot be mapped to a valid API method on a FHIR
+/// store, a generic GCP error might be returned instead.
 ///
-/// A builder for the *locations.datasets.testIamPermissions* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.executeBundle* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -20525,7 +20884,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> where C: Borrow
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::TestIamPermissionsRequest;
+/// use healthcare1_beta1::HttpBody;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -20539,33 +20898,33 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> where C: Borrow
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = TestIamPermissionsRequest::default();
+/// let mut req = HttpBody::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_test_iam_permissions(req, "resource")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_execute_bundle(req, "parent")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetTestIamPermissionCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
-    _request: TestIamPermissionsRequest,
-    _resource: String,
+    _request: HttpBody,
+    _parent: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -20574,11 +20933,11 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.testIamPermissions",
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.executeBundle",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -20590,12 +20949,12 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}:testIamPermissions";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -20610,7 +20969,7 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["resource"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -20713,19 +21072,18 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy detail is being requested.
-    /// See the operation documentation for the appropriate value for this field.
+    /// Name of the FHIR store in which this bundle will be executed.
     ///
-    /// Sets the *resource* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
-        self._resource = new_value.to_string();
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -20734,7 +21092,7 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20759,7 +21117,7 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20779,7 +21137,7 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20793,7 +21151,7 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
 
 /// RetrieveInstance returns instance associated with the given study, series,
 /// and SOP Instance UID. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.3.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.instances.retrieveInstance* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -20981,9 +21339,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstance
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
-    /// `studies/{study_id}/series/{series_id}/instance/{instance_id}`).
+    /// The path of the RetrieveInstance DICOMweb request (e.g.,
+    /// `studies/{study_id}/series/{series_id}/instances/{instance_id}`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -21058,7 +21415,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstance
 
 /// RetrieveStudyMetadata returns instance associated with the given study
 /// presented as metadata with the bulk data removed. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.retrieveMetadata* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -21246,8 +21603,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, 
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}/metadata`.
+    /// The path of the RetrieveStudyMetadata DICOMweb request (e.g.,
+    /// `studies/{study_id}/metadata`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -21321,7 +21678,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, 
 
 
 /// RetrieveSeries returns all instances within the given study and series. See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.2.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4.
 ///
 /// A builder for the *locations.datasets.dicomStores.studies.series.retrieveSeries* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -21509,8 +21866,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, 
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}`).
+    /// The path of the RetrieveSeries DICOMweb request (e.g.,
+    /// `studies/{study_id}/series/{series_id}`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -21617,7 +21974,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_dicom_stores_patch(req, "name")
-///              .update_mask("justo")
+///              .update_mask("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -22160,6 +22517,321 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreExportCall<'a, C, A> where C: Bor
 }
 
 
+/// Creates a FHIR resource.
+/// 
+/// Implements the FHIR standard [create
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#create),
+/// which creates a new resource with a server-assigned resource ID.
+/// 
+/// Also supports the FHIR standard [conditional create
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#ccreate),
+/// specified by supplying an `If-None-Exist` header containing a FHIR search
+/// query. If no resources match this search query, the server processes the
+/// create operation as normal.
+/// 
+/// The request body must contain a JSON-encoded FHIR resource, and the request
+/// headers must contain `Content-Type: application/fhir+json`.
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of the resource as it was created on the server, including the
+/// server-assigned resource ID and version ID.
+/// Errors generated by the FHIR store will contain a JSON-encoded
+/// `OperationOutcome` resource describing the reason for the error. If the
+/// request cannot be mapped to a valid API method on a FHIR store, a generic
+/// GCP error might be returned instead.
+///
+/// A builder for the *locations.datasets.fhirStores.fhir.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::HttpBody;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use healthcare1_beta1::CloudHealthcare;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = HttpBody::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_create(req, "parent", "type")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudHealthcare<C, A>,
+    _request: HttpBody,
+    _parent: String,
+    _type_: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        params.push(("type", self._type_.to_string()));
+        for &field in ["alt", "parent", "type"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["type", "parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the FHIR store this resource belongs to.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The FHIR resource type to create, such as Patient or Observation. For a
+    /// complete list, see the [FHIR Resource
+    /// Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+    /// Must match the resource type in the provided content.
+    ///
+    /// Sets the *type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {
+        self._type_ = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets the specified HL7v2 store.
 ///
 /// A builder for the *locations.datasets.hl7V2Stores.get* method supported by a *project* resource.
@@ -22436,9 +23108,9 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_fhir_stores_list("parent")
-///              .page_token("clita")
-///              .page_size(-79)
-///              .filter("justo")
+///              .page_token("aliquyam")
+///              .page_size(-67)
+///              .filter("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -22695,9 +23367,13 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreListCall<'a, C, A> where C: Borrow
 }
 
 
-/// Lists information about the supported locations for this service.
+/// Deletes all the historical versions of a resource (excluding the current
+/// version) from the FHIR store. To remove all versions of a resource, first
+/// delete the current version and then call this method.
+/// 
+/// This is not a FHIR standard operation.
 ///
-/// A builder for the *locations.list* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.fhir.Resource-purge* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -22722,33 +23398,27 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreListCall<'a, C, A> where C: Borrow
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_list("name")
-///              .page_token("clita")
-///              .page_size(-37)
-///              .filter("ut")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir__resource_purge("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListLocationsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -22757,20 +23427,11 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.Resource-purge",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -22782,7 +23443,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/locations";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/$purge";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -22832,7 +23493,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22885,35 +23546,14 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The resource that owns the locations collection, if applicable.
+    /// The name of the resource to purge.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> {
         self._name = new_value.to_string();
-        self
-    }
-    /// The standard list page token.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The standard list page size.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The standard list filter.
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
-        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -22922,7 +23562,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22947,7 +23587,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22967,7 +23607,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23007,9 +23647,9 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_list("parent")
-///              .page_token("eos")
-///              .page_size(-78)
-///              .filter("duo")
+///              .page_token("diam")
+///              .page_size(-62)
+///              .filter("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -23266,285 +23906,6 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreListCall<'a, C, A> where C: Borro
 }
 
 
-/// Executes all the requests in the given Bundle.
-///
-/// A builder for the *locations.datasets.fhirStores.executeBundle* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// use healthcare1_beta1::HttpBody;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = HttpBody::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_execute_bundle(req, "parent")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _request: HttpBody,
-    _parent: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.executeBundle",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        for &field in ["alt", "parent"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Name of the FHIR store in which this bundle will be executed.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreExecuteBundleCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// DeleteInstance deletes an instance associated with the given study, series,
 /// and SOP Instance UID. Delete requests are equivalent to the GET requests
 /// specified in the WADO-RS standard.
@@ -23735,8 +24096,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g.,
+    /// The path of the DeleteInstance request (e.g.,
     /// `studies/{study_id}/series/{series_id}/instances/{instance_id}`).
     ///
     /// Sets the *dicom web path* path property to the given value.
@@ -23999,8 +24359,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> where C
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// The path of the DeleteStudy request (e.g., `studies/{study_id}`).
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -24073,9 +24432,326 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> where C
 }
 
 
-/// Deletes the specified FHIR store and removes all resources within it.
+/// Import resources to the FHIR store by loading data from the specified
+/// sources. Each resource must have a client-supplied ID, which is retained
+/// by the server.
+/// 
+/// The import operation is idempotent. Upon retry, the most recent data
+/// (matching the client-supplied ID) is overwritten, without creating a new
+/// resource version. If partial failures occur during the import, successful
+/// changes are not rolled back.
+/// 
+/// If history imports are enabled
+/// (enable_history_import is set in the
+/// FHIR store's configuration), you can import historical versions of a
+/// resource by supplying a bundle of type `history`. The historical versions
+/// in the bundle must have `lastUpdated` timestamps. If a current or
+/// historical version with the supplied resource ID already exists, the
+/// bundle is rejected.
+/// 
+/// This method returns an Operation that can
+/// be used to track the status of the import by calling
+/// GetOperation.
+/// 
+/// Immediate fatal errors appear in the
+/// error field.
+/// Otherwise, when the operation finishes, a detailed response of type
+/// ImportResourcesResponse is returned in the
+/// response field.
+/// The metadata field type for this
+/// operation is OperationMetadata.
 ///
-/// A builder for the *locations.datasets.fhirStores.delete* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.import* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::ImportResourcesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use healthcare1_beta1::CloudHealthcare;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ImportResourcesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_datasets_fhir_stores_import(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationDatasetFhirStoreImportCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudHealthcare<C, A>,
+    _request: ImportResourcesRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.import",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:import";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ImportResourcesRequest) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the FHIR store to import FHIR resources to. The name should be
+    /// in the format of
+    /// `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the FHIR [capability
+/// statement](http://hl7.org/implement/standards/fhir/STU3/capabilitystatement.html)
+/// for the store, which contains a description of functionality supported by
+/// the server.
+/// 
+/// Implements the FHIR standard [capabilities
+/// interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#capabilities).
+/// 
+/// On success, the response body will contain a JSON-encoded representation
+/// of a `CapabilityStatement` resource.
+///
+/// A builder for the *locations.datasets.fhirStores.fhir.capabilities* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -24100,11 +24776,11 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> where C
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_delete("name")
+/// let result = hub.projects().locations_datasets_fhir_stores_fhir_capabilities("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
@@ -24114,13 +24790,13 @@ pub struct ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -24129,8 +24805,8 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.delete",
-                               http_method: hyper::method::Method::Delete });
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.capabilities",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
@@ -24145,7 +24821,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/fhir/metadata";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -24195,7 +24871,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -24248,13 +24924,13 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
     }
 
 
-    /// The resource name of the FHIR store to delete.
+    /// Name of the FHIR store to retrieve the capabilities for.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -24264,7 +24940,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24289,7 +24965,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24309,7 +24985,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24602,322 +25278,9 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, C, A> where 
 }
 
 
-/// Lists all the versions of a resource (including the current version and
-/// deleted versions) from the FHIR store.
-/// 
-///
-/// A builder for the *locations.datasets.fhirStores.fhir._history.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir__history_list("name")
-///              .since("invidunt")
-///              .page("rebum.")
-///              .count(-51)
-///              .at("clita")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _name: String,
-    _since: Option<String>,
-    _page: Option<String>,
-    _count: Option<i32>,
-    _at: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir._history.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._since {
-            params.push(("since", value.to_string()));
-        }
-        if let Some(value) = self._page {
-            params.push(("page", value.to_string()));
-        }
-        if let Some(value) = self._count {
-            params.push(("count", value.to_string()));
-        }
-        if let Some(value) = self._at {
-            params.push(("at", value.to_string()));
-        }
-        for &field in ["alt", "name", "since", "page", "count", "at"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/_history";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the resource to retrieve.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// Only include resource versions that were created at or after the given
-    /// instant in time. The instant in time uses the format
-    /// YYYY-MM-DDThh:mm:ss.sss+zz:zz (for example 2015-02-07T13:28:17.239+02:00 or
-    /// 2017-01-01T00:00:00Z). The time must be specified to the second and
-    /// include a time zone.
-    ///
-    /// Sets the *since* query property to the given value.
-    pub fn since(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {
-        self._since = Some(new_value.to_string());
-        self
-    }
-    /// Used to retrieve the first, previous, next, or last page of resource
-    /// versions when using pagination. Value should be set to the value of the
-    /// `link.url` field returned in the response to the previous request, where
-    /// `link.relation` is "first", "previous", "next" or "last".
-    /// Omit `page` if no previous request has been made.
-    ///
-    /// Sets the *page* query property to the given value.
-    pub fn page(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {
-        self._page = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of search results on a page.
-    ///
-    /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {
-        self._count = Some(new_value);
-        self
-    }
-    /// Only include resource versions that were current at some point during the
-    /// time period specified in the date time value. The date parameter format is
-    /// yyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm]
-    /// Clients may specify any of the following:
-    /// An entire year: `_at=2019`
-    /// An entire month: `_at=2019-01`
-    /// A specific day: `_at=2019-01-20`
-    /// A specific second: `_at=2018-12-31T23:59:58Z`
-    ///
-    /// Sets the *at* query property to the given value.
-    pub fn at(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {
-        self._at = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirHistoryListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// StoreInstances stores DICOM instances associated with study instance unique
 /// identifiers (SUID). See
-/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.6.1.
+/// http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5.
 ///
 /// A builder for the *locations.datasets.dicomStores.storeInstances* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -25136,8 +25499,8 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> where
         self._parent = new_value.to_string();
         self
     }
-    /// The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-    /// QIDO-RS standard (e.g., `studies/{study_id}`).
+    /// The path of the StoreInstances DICOMweb request (e.g.,
+    /// `studies/[{study_id}]`). Note that the `study_uid` is optional.
     ///
     /// Sets the *dicom web path* path property to the given value.
     ///
@@ -25199,273 +25562,6 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> where
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deletes FHIR resources matching a search query.
-/// 
-/// Note: unless resource versioning is disabled by setting the
-/// disable_resource_versioning flag
-/// on the FHIR store, the deleted resources will be moved to a history
-/// repository that can still be retrieved through GetResourceVersion and
-/// related methods, unless they are removed by the DeleteResourceVersions
-/// method.
-///
-/// A builder for the *locations.datasets.fhirStores.fhir.conditionalDeleteResource* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use healthcare1_beta1::CloudHealthcare;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir_conditional_delete_resource("parent", "type")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudHealthcare<C, A>,
-    _parent: String,
-    _type_: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalDeleteResource",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        params.push(("type", self._type_.to_string()));
-        for &field in ["alt", "parent", "type"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/fhir/{+type}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+type}", "type")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["type", "parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the FHIR store this resource belongs to.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The type of the resource to update.
-    ///
-    /// Sets the *type* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A> {
-        self._type_ = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteResourceCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25788,6 +25884,7 @@ impl<'a, C, A> ProjectLocationDatasetSetIamPolicyCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_get_iam_policy("resource")
+///              .options_requested_policy_version(-43)
 ///              .doit();
 /// # }
 /// ```
@@ -25796,6 +25893,7 @@ pub struct ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -25818,9 +25916,12 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> where 
         };
         dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.hl7V2Stores.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -25946,6 +26047,16 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> where 
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -26037,7 +26148,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> where 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_datasets_hl7_v2_stores_messages_get("name")
-///              .view("takimata")
+///              .view("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -26556,10 +26667,9 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> w
 }
 
 
-/// Gets all the resources in the patient compartment.
-/// 
+/// Updates the configuration of the specified FHIR store.
 ///
-/// A builder for the *locations.datasets.fhirStores.fhir.Patient.get$everything* method supported by a *project* resource.
+/// A builder for the *locations.datasets.fhirStores.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -26571,6 +26681,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> w
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_healthcare1_beta1 as healthcare1_beta1;
+/// use healthcare1_beta1::FhirStore;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -26581,34 +26692,38 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> w
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudHealthcare::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = FhirStore::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_datasets_fhir_stores_fhir__patient_geteverything("name")
-///              .start("rebum.")
-///              .end("Lorem")
+/// let result = hub.projects().locations_datasets_fhir_stores_patch(req, "name")
+///              .update_mask("diam")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A>
+pub struct ProjectLocationDatasetFhirStorePatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudHealthcare<C, A>,
+    _request: FhirStore,
     _name: String,
-    _start: Option<String>,
-    _end: Option<String>,
+    _update_mask: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, HttpBody)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, FhirStore)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -26617,17 +26732,14 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.fhir.Patient.get$everything",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "healthcare.projects.locations.datasets.fhirStores.patch",
+                               http_method: hyper::method::Method::Patch });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        if let Some(value) = self._start {
-            params.push(("start", value.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
         }
-        if let Some(value) = self._end {
-            params.push(("end", value.to_string()));
-        }
-        for &field in ["alt", "name", "start", "end"].iter() {
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -26639,7 +26751,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}/$everything";
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -26671,6 +26783,17 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -26687,11 +26810,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -26742,30 +26869,33 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
     }
 
 
-    /// Name of the patient for which the information is required.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: FhirStore) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Output only. Resource name of the FHIR store, of the form
+    /// `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
-    /// The response includes records subsequent to the start date. If no start
-    /// date is provided, all records prior to the end date are in scope.
+    /// The update mask applies to the resource. For the `FieldMask` definition,
+    /// see
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
-    /// Sets the *start* query property to the given value.
-    pub fn start(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A> {
-        self._start = Some(new_value.to_string());
-        self
-    }
-    /// The response includes records prior to the end date. If no end date is
-    /// provided, all records subsequent to the start date are in scope.
-    ///
-    /// Sets the *end* query property to the given value.
-    pub fn end(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A> {
-        self._end = Some(new_value.to_string());
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -26774,7 +26904,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26799,7 +26929,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26819,7 +26949,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirPatientGet$everythingCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

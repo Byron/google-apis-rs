@@ -672,15 +672,17 @@ fn main() {
         for authentication. To use an API key, append it to the URL as the value of
         a `key` parameter. For example:
         
-        `POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`"##),
+        `POST
+        https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli/projects_events-report",
                   vec![
                     (Some(r##"project-name"##),
                      None,
                      Some(r##"[Required] The resource name of the Google Cloud Platform project. Written
         as `projects/` plus the
-        [Google Cloud Platform project ID](https://support.google.com/cloud/answer/6158840).
-        Example: `projects/my-project-123`."##),
+        [Google Cloud Platform project
+        ID](https://support.google.com/cloud/answer/6158840). Example:
+        `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -794,7 +796,7 @@ fn main() {
     
     let mut app = App::new("clouderrorreporting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190321")
+           .version("1.0.9+20190626")
            .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Management* crate version *1.0.8+20190329*, where *20190329* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Android Management* crate version *1.0.9+20190624*, where *20190624* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Android Management* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/management).
@@ -246,9 +246,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -363,7 +361,7 @@ impl<'a, C, A> AndroidManagement<C, A>
         AndroidManagement {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://androidmanagement.googleapis.com/".to_string(),
             _root_url: "https://androidmanagement.googleapis.com/".to_string(),
         }
@@ -377,7 +375,7 @@ impl<'a, C, A> AndroidManagement<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -441,6 +439,9 @@ pub struct ApplicationReport {
     /// Package name of the app.
     #[serde(rename="packageName")]
     pub package_name: Option<String>,
+    /// List of keyed app states reported by the app.
+    #[serde(rename="keyedAppStates")]
+    pub keyed_app_states: Option<Vec<KeyedAppState>>,
     /// The SHA-256 hash of the app's APK file, which can be used to verify the app hasn't been modified. Each byte of the hash value is represented as a two-digit hexadecimal number.
     #[serde(rename="packageSha256Hash")]
     pub package_sha256_hash: Option<String>,
@@ -658,7 +659,7 @@ impl Part for MemoryInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules.
+    /// Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules. Use policy enforcement rules instead.
     #[serde(rename="complianceRules")]
     pub compliance_rules: Option<Vec<ComplianceRule>>,
     /// Whether roaming data services are disabled.
@@ -774,6 +775,9 @@ pub struct Policy {
     /// Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable.
     #[serde(rename="privateKeySelectionEnabled")]
     pub private_key_selection_enabled: Option<bool>,
+    /// Rules that define the behavior when a particular policy can not be applied on device
+    #[serde(rename="policyEnforcementRules")]
+    pub policy_enforcement_rules: Option<Vec<PolicyEnforcementRule>>,
     /// Actions to take during the setup process.
     #[serde(rename="setupActions")]
     pub setup_actions: Option<Vec<SetupAction>>,
@@ -859,6 +863,9 @@ pub struct Policy {
     /// Whether user uninstallation of applications is disabled.
     #[serde(rename="uninstallAppsDisabled")]
     pub uninstall_apps_disabled: Option<bool>,
+    /// The minimum allowed Android API level.
+    #[serde(rename="minimumApiLevel")]
+    pub minimum_api_level: Option<i32>,
     /// Whether outgoing calls are disabled.
     #[serde(rename="outgoingCallsDisabled")]
     pub outgoing_calls_disabled: Option<bool>,
@@ -950,6 +957,27 @@ pub struct ManagedPropertyEntry {
 impl Part for ManagedPropertyEntry {}
 
 
+/// Device network info.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NetworkInfo {
+    /// IMEI number of the GSM device. For example, A1000031212.
+    pub imei: Option<String>,
+    /// Alphabetic name of current registered operator. For example, Vodafone.
+    #[serde(rename="networkOperatorName")]
+    pub network_operator_name: Option<String>,
+    /// MEID number of the CDMA device. For example, A00000292788E1.
+    pub meid: Option<String>,
+    /// Wi-Fi MAC address of the device. For example, 7c:11:11:11:11:11.
+    #[serde(rename="wifiMacAddress")]
+    pub wifi_mac_address: Option<String>,
+}
+
+impl Part for NetworkInfo {}
+
+
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance:
 /// service Foo {
 ///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
@@ -974,14 +1002,7 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). The error model is designed to be:
-/// Simple to use and understand for most users
-/// Flexible enough to meet unexpected needsOverviewThe Status message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers understand and resolve the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package google.rpc that can be used for common error conditions.Language mappingThe Status message is the logical representation of the error model, but it is not necessarily the actual wire format. When the Status message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.Other usesThe error model and the Status message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.Example uses of this error model include:
-/// Partial errors. If a service needs to return partial errors to the client, it may embed the Status in the normal response to indicate the partial errors.
-/// Workflow errors. A typical workflow has multiple steps. Each step may have a Status message for error reporting.
-/// Batch operations. If a client uses batch request and batch response, the Status message should be used directly inside batch response, one for each error sub-response.
-/// Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the Status message.
-/// Logging. If some API errors are stored in logs, the message Status could be used directly after any stripping needed for security/privacy reasons.
+/// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). Each Status message contains three pieces of data: error code, error message, and error details.You can find out more about this error model and how to work with it in the API Design Guide (https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -998,18 +1019,50 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// An action to launch an app.
+/// Information about security related device settings on device.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LaunchAppAction {
-    /// Package name of app to be launched
-    #[serde(rename="packageName")]
-    pub package_name: Option<String>,
+pub struct DeviceSettings {
+    /// Whether ADB (https://developer.android.com/studio/command-line/adb.html) is enabled on the device.
+    #[serde(rename="adbEnabled")]
+    pub adb_enabled: Option<bool>,
+    /// Whether the storage encryption is enabled.
+    #[serde(rename="isEncrypted")]
+    pub is_encrypted: Option<bool>,
+    /// Whether developer mode is enabled on the device.
+    #[serde(rename="developmentSettingsEnabled")]
+    pub development_settings_enabled: Option<bool>,
+    /// Whether the device is secured with PIN/password.
+    #[serde(rename="isDeviceSecure")]
+    pub is_device_secure: Option<bool>,
+    /// Encryption status from DevicePolicyManager.
+    #[serde(rename="encryptionStatus")]
+    pub encryption_status: Option<String>,
+    /// Whether installing apps from unknown sources is enabled.
+    #[serde(rename="unknownSourcesEnabled")]
+    pub unknown_sources_enabled: Option<bool>,
+    /// Whether Verify Apps (Google Play Protect (https://support.google.com/googleplay/answer/2812853)) is enabled on the device.
+    #[serde(rename="verifyAppsEnabled")]
+    pub verify_apps_enabled: Option<bool>,
 }
 
-impl Part for LaunchAppAction {}
+impl Part for DeviceSettings {}
+
+
+/// An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a device or work profile to displays a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BlockAction {
+    /// Number of days the policy is non-compliant before the device or work profile is blocked. To block access immediately, set to 0. blockAfterDays must be less than wipeAfterDays.
+    #[serde(rename="blockAfterDays")]
+    pub block_after_days: Option<i32>,
+}
+
+impl Part for BlockAction {}
 
 
 /// A compliance rule condition which is satisfied if the Android Framework API level on the device doesn't meet a minimum requirement. There can only be one rule with this type of condition per policy.
@@ -1135,6 +1188,9 @@ pub struct Device {
     /// The time of device enrollment.
     #[serde(rename="enrollmentTime")]
     pub enrollment_time: Option<String>,
+    /// Map of selected system properties name and value related to the device.
+    #[serde(rename="systemProperties")]
+    pub system_properties: Option<HashMap<String, String>>,
     /// The state to be applied to the device. This field can be modified by a patch request. Note that when calling enterprises.devices.patch, ACTIVE and DISABLED are the only allowable values. To enter the device into a DELETED state, call enterprises.devices.delete.
     pub state: Option<String>,
     /// Memory information. This information is only available if memoryInfoEnabled is true in the device's policy.
@@ -1156,6 +1212,20 @@ pub struct Device {
 
 impl RequestValue for Device {}
 impl ResponseResult for Device {}
+
+
+/// Settings controlling the behavior of application reports.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApplicationReportingSettings {
+    /// Whether removed apps are included in application reports.
+    #[serde(rename="includeRemovedApps")]
+    pub include_removed_apps: Option<bool>,
+}
+
+impl Part for ApplicationReportingSettings {}
 
 
 /// A resource containing sign in details for an enterprise.
@@ -1218,6 +1288,31 @@ impl RequestValue for EnrollmentToken {}
 impl ResponseResult for EnrollmentToken {}
 
 
+/// Keyed app state reported by the app.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct KeyedAppState {
+    /// The key for the app state. Acts as a point of reference for what the app is providing state for. For example, when providing managed configuration feedback, this key could be the managed configuration key.
+    pub key: Option<String>,
+    /// The severity of the app state.
+    pub severity: Option<String>,
+    /// The time the app state was most recently updated.
+    #[serde(rename="lastUpdateTime")]
+    pub last_update_time: Option<String>,
+    /// Optionally, a free-form message string to explain the app state. If the state was triggered by a particular value (e.g. a managed configuration value), it should be included in the message.
+    pub message: Option<String>,
+    /// Optionally, a machine-readable value to be read by the EMM. For example, setting values that the admin can choose to query against in the EMM console (e.g. “notify me if the battery_warning data < 10”).
+    pub data: Option<String>,
+    /// The creation time of the app state on the device.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl Part for KeyedAppState {}
+
+
 /// Information about device hardware. The fields related to temperature thresholds are only available if hardwareStatusEnabled is true in the device's policy.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1267,6 +1362,89 @@ pub struct HardwareInfo {
 impl Part for HardwareInfo {}
 
 
+/// A rule that defines the actions to take if a device or work profile is not compliant with the policy specified in settingName.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PolicyEnforcementRule {
+    /// An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified.
+    #[serde(rename="wipeAction")]
+    pub wipe_action: Option<WipeAction>,
+    /// An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.
+    #[serde(rename="blockAction")]
+    pub block_action: Option<BlockAction>,
+    /// The top-level policy to enforce. For example, applications or passwordPolicies.
+    #[serde(rename="settingName")]
+    pub setting_name: Option<String>,
+}
+
+impl Part for PolicyEnforcementRule {}
+
+
+/// Response to a request to list web apps for a given enterprise.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [web apps list enterprises](struct.EnterpriseWebAppListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListWebAppsResponse {
+    /// If there are more results, a token to retrieve next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of web apps.
+    #[serde(rename="webApps")]
+    pub web_apps: Option<Vec<WebApp>>,
+}
+
+impl ResponseResult for ListWebAppsResponse {}
+
+
+/// This resource represents a long-running operation that is the result of a network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [devices operations get enterprises](struct.EnterpriseDeviceOperationGetCall.html) (response)
+/// * [devices issue command enterprises](struct.EnterpriseDeviceIssueCommandCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should be a resource name ending with operations/{unique_id}.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for Operation {}
+
+
+/// A list of package names.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PackageNameList {
+    /// A list of package names.
+    #[serde(rename="packageNames")]
+    pub package_names: Option<Vec<String>>,
+}
+
+impl Part for PackageNameList {}
+
+
 /// Requirements for the password used to unlock a device.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1312,83 +1490,6 @@ pub struct PasswordRequirements {
 }
 
 impl Part for PasswordRequirements {}
-
-
-/// Response to a request to list web apps for a given enterprise.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [web apps list enterprises](struct.EnterpriseWebAppListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListWebAppsResponse {
-    /// If there are more results, a token to retrieve next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of web apps.
-    #[serde(rename="webApps")]
-    pub web_apps: Option<Vec<WebApp>>,
-}
-
-impl ResponseResult for ListWebAppsResponse {}
-
-
-/// A list of package names.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PackageNameList {
-    /// A list of package names.
-    #[serde(rename="packageNames")]
-    pub package_names: Option<Vec<String>>,
-}
-
-impl Part for PackageNameList {}
-
-
-/// Information about device software.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SoftwareInfo {
-    /// An IETF BCP 47 language code for the primary locale on the device.
-    #[serde(rename="primaryLanguageCode")]
-    pub primary_language_code: Option<String>,
-    /// Build time.
-    #[serde(rename="androidBuildTime")]
-    pub android_build_time: Option<String>,
-    /// Android build ID string meant for displaying to the user. For example, shamu-userdebug 6.0.1 MOB30I 2756745 dev-keys.
-    #[serde(rename="androidBuildNumber")]
-    pub android_build_number: Option<String>,
-    /// SHA-256 hash of android.content.pm.Signature (https://developer.android.com/reference/android/content/pm/Signature.html) associated with the system package, which can be used to verify that the system build hasn't been modified.
-    #[serde(rename="deviceBuildSignature")]
-    pub device_build_signature: Option<String>,
-    /// The Android Device Policy app version code.
-    #[serde(rename="androidDevicePolicyVersionCode")]
-    pub android_device_policy_version_code: Option<i32>,
-    /// Security patch level, e.g. 2016-05-01.
-    #[serde(rename="securityPatchLevel")]
-    pub security_patch_level: Option<String>,
-    /// The Android Device Policy app version as displayed to the user.
-    #[serde(rename="androidDevicePolicyVersionName")]
-    pub android_device_policy_version_name: Option<String>,
-    /// Kernel version, for example, 2.6.32.9-g103d848.
-    #[serde(rename="deviceKernelVersion")]
-    pub device_kernel_version: Option<String>,
-    /// The user-visible Android version string. For example, 6.0.1.
-    #[serde(rename="androidVersion")]
-    pub android_version: Option<String>,
-    /// The system bootloader version number, e.g. 0.6.7.
-    #[serde(rename="bootloaderVersion")]
-    pub bootloader_version: Option<String>,
-}
-
-impl Part for SoftwareInfo {}
 
 
 /// A rule declaring which mitigating actions to take when a device is not compliant with its policy. For every rule, there is always an implicit mitigating action to set policy_compliant to false for the Device resource, and display a message on the device indicating that the device is not compliant with its policy. Other mitigating actions may optionally be taken as well, depending on the field values in the rule.
@@ -1591,36 +1692,18 @@ pub struct PersistentPreferredActivity {
 impl Part for PersistentPreferredActivity {}
 
 
-/// Information about security related device settings on device.
+/// An action to launch an app.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceSettings {
-    /// Whether ADB (https://developer.android.com/studio/command-line/adb.html) is enabled on the device.
-    #[serde(rename="adbEnabled")]
-    pub adb_enabled: Option<bool>,
-    /// Whether the storage encryption is enabled.
-    #[serde(rename="isEncrypted")]
-    pub is_encrypted: Option<bool>,
-    /// Whether developer mode is enabled on the device.
-    #[serde(rename="developmentSettingsEnabled")]
-    pub development_settings_enabled: Option<bool>,
-    /// Whether the device is secured with PIN/password.
-    #[serde(rename="isDeviceSecure")]
-    pub is_device_secure: Option<bool>,
-    /// Encryption status from DevicePolicyManager.
-    #[serde(rename="encryptionStatus")]
-    pub encryption_status: Option<String>,
-    /// Whether installing apps from unknown sources is enabled.
-    #[serde(rename="unknownSourcesEnabled")]
-    pub unknown_sources_enabled: Option<bool>,
-    /// Whether Verify Apps (Google Play Protect (https://support.google.com/googleplay/answer/2812853)) is enabled on the device.
-    #[serde(rename="verifyAppsEnabled")]
-    pub verify_apps_enabled: Option<bool>,
+pub struct LaunchAppAction {
+    /// Package name of app to be launched
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
 }
 
-impl Part for DeviceSettings {}
+impl Part for LaunchAppAction {}
 
 
 /// Device display information.
@@ -1743,25 +1826,30 @@ pub struct PowerManagementEvent {
 impl Part for PowerManagementEvent {}
 
 
-/// Device network info.
+/// A web token used to access the managed Google Play iframe.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [web tokens create enterprises](struct.EnterpriseWebTokenCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NetworkInfo {
-    /// IMEI number of the GSM device. For example, A1000031212.
-    pub imei: Option<String>,
-    /// Alphabetic name of current registered operator. For example, Vodafone.
-    #[serde(rename="networkOperatorName")]
-    pub network_operator_name: Option<String>,
-    /// MEID number of the CDMA device. For example, A00000292788E1.
-    pub meid: Option<String>,
-    /// Wi-Fi MAC address of the device. For example, 7c:11:11:11:11:11.
-    #[serde(rename="wifiMacAddress")]
-    pub wifi_mac_address: Option<String>,
+pub struct WebToken {
+    /// The URL of the parent frame hosting the iframe with the embedded UI. To prevent XSS, the iframe may not be hosted at other URLs. The URL must use the https scheme.
+    #[serde(rename="parentFrameUrl")]
+    pub parent_frame_url: Option<String>,
+    /// The name of the web token, which is generated by the server during creation in the form enterprises/{enterpriseId}/webTokens/{webTokenId}.
+    pub name: Option<String>,
+    /// The token value which is used in the hosting page to generate the iframe with the embedded UI. This is a read-only field generated by the server.
+    pub value: Option<String>,
+    /// Permissions available to an admin in the embedded UI. An admin must have all of these permissions in order to view the UI.
+    pub permissions: Option<Vec<String>>,
 }
 
-impl Part for NetworkInfo {}
+impl RequestValue for WebToken {}
+impl ResponseResult for WebToken {}
 
 
 /// Policy for an individual app.
@@ -1867,30 +1955,21 @@ pub struct ApplicationPermission {
 impl Part for ApplicationPermission {}
 
 
-/// A web token used to access the managed Google Play iframe.
+/// An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [web tokens create enterprises](struct.EnterpriseWebTokenCreateCall.html) (request|response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WebToken {
-    /// The URL of the parent frame hosting the iframe with the embedded UI. To prevent XSS, the iframe may not be hosted at other URLs. The URL must use the https scheme.
-    #[serde(rename="parentFrameUrl")]
-    pub parent_frame_url: Option<String>,
-    /// The name of the web token, which is generated by the server during creation in the form enterprises/{enterpriseId}/webTokens/{webTokenId}.
-    pub name: Option<String>,
-    /// The token value which is used in the hosting page to generate the iframe with the embedded UI. This is a read-only field generated by the server.
-    pub value: Option<String>,
-    /// Permissions available to an admin in the embedded UI. An admin must have all of these permissions in order to view the UI.
-    pub permissions: Option<Vec<String>>,
+pub struct WipeAction {
+    /// Number of days the policy is non-compliant before the device or work profile is wiped. wipeAfterDays must be greater than blockAfterDays.
+    #[serde(rename="wipeAfterDays")]
+    pub wipe_after_days: Option<i32>,
+    /// Whether the factory-reset protection data is preserved on the device. This setting doesn’t apply to work profiles.
+    #[serde(rename="preserveFrp")]
+    pub preserve_frp: Option<bool>,
 }
 
-impl RequestValue for WebToken {}
-impl ResponseResult for WebToken {}
+impl Part for WipeAction {}
 
 
 /// Settings controlling the behavior of status reports.
@@ -1917,6 +1996,9 @@ pub struct StatusReportingSettings {
     /// Whether power management event reporting is enabled.
     #[serde(rename="powerManagementEventsEnabled")]
     pub power_management_events_enabled: Option<bool>,
+    /// Application reporting settings. Only applicable if application_reports_enabled is true.
+    #[serde(rename="applicationReportingSettings")]
+    pub application_reporting_settings: Option<ApplicationReportingSettings>,
     /// Whether software info reporting is enabled.
     #[serde(rename="softwareInfoEnabled")]
     pub software_info_enabled: Option<bool>,
@@ -1944,31 +2026,45 @@ pub struct ExternalData {
 impl Part for ExternalData {}
 
 
-/// This resource represents a long-running operation that is the result of a network API call.
+/// Information about device software.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [devices operations get enterprises](struct.EnterpriseDeviceOperationGetCall.html) (response)
-/// * [devices issue command enterprises](struct.EnterpriseDeviceIssueCommandCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
-    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations/some/unique/name.
-    pub name: Option<String>,
-    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
+pub struct SoftwareInfo {
+    /// An IETF BCP 47 language code for the primary locale on the device.
+    #[serde(rename="primaryLanguageCode")]
+    pub primary_language_code: Option<String>,
+    /// Build time.
+    #[serde(rename="androidBuildTime")]
+    pub android_build_time: Option<String>,
+    /// Android build ID string meant for displaying to the user. For example, shamu-userdebug 6.0.1 MOB30I 2756745 dev-keys.
+    #[serde(rename="androidBuildNumber")]
+    pub android_build_number: Option<String>,
+    /// SHA-256 hash of android.content.pm.Signature (https://developer.android.com/reference/android/content/pm/Signature.html) associated with the system package, which can be used to verify that the system build hasn't been modified.
+    #[serde(rename="deviceBuildSignature")]
+    pub device_build_signature: Option<String>,
+    /// The Android Device Policy app version code.
+    #[serde(rename="androidDevicePolicyVersionCode")]
+    pub android_device_policy_version_code: Option<i32>,
+    /// Security patch level, e.g. 2016-05-01.
+    #[serde(rename="securityPatchLevel")]
+    pub security_patch_level: Option<String>,
+    /// The Android Device Policy app version as displayed to the user.
+    #[serde(rename="androidDevicePolicyVersionName")]
+    pub android_device_policy_version_name: Option<String>,
+    /// Kernel version, for example, 2.6.32.9-g103d848.
+    #[serde(rename="deviceKernelVersion")]
+    pub device_kernel_version: Option<String>,
+    /// The user-visible Android version string. For example, 6.0.1.
+    #[serde(rename="androidVersion")]
+    pub android_version: Option<String>,
+    /// The system bootloader version number, e.g. 0.6.7.
+    #[serde(rename="bootloaderVersion")]
+    pub bootloader_version: Option<String>,
 }
 
-impl ResponseResult for Operation {}
+impl Part for SoftwareInfo {}
 
 
 /// Configuration info for an HTTP proxy. For a direct proxy, set the host, port, and excluded_hosts fields. For a PAC script proxy, set the pac_uri field.

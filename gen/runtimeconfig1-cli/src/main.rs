@@ -451,7 +451,7 @@ fn main() {
     
     let mut app = App::new("runtimeconfig1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190330")
+           .version("1.0.9+20190624")
            .about("The Runtime Configurator allows you to dynamically configure and expose variables through Google Cloud Platform. In addition, you can also set Watchers and Waiters that will watch for changes to your data and return based on certain conditions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_runtimeconfig1_cli")
            .arg(Arg::with_name("url")

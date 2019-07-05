@@ -29,7 +29,7 @@
     "description": "The Replica Pool API allows users to declaratively provision and manage groups of Google Compute Engine instances based on a common template.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/compute/docs/replica-pool/", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/-TzTVsRsi4n00x2wApWXGdbgjmQ\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/-TzTVsRsi4n00x2wApWXGdbgjmQ\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"

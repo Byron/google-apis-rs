@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Drive Activity* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Drive Activity* crate version *1.0.9+20190702*, where *20190702* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Drive Activity* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/activity/).
@@ -217,9 +217,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -335,7 +333,7 @@ impl<'a, C, A> DriveActivityHub<C, A>
         DriveActivityHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://driveactivity.googleapis.com/".to_string(),
             _root_url: "https://driveactivity.googleapis.com/".to_string(),
         }
@@ -346,7 +344,7 @@ impl<'a, C, A> DriveActivityHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -539,18 +537,45 @@ pub struct New { _never_set: Option<bool> }
 impl Part for New {}
 
 
-/// A Drive item which is a folder.
+/// A lightweight reference to a shared drive.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DriveReference {
+    /// The resource name of the shared drive. The format is
+    /// "COLLECTION_ID/DRIVE_ID". Clients should not assume a specific collection
+    /// ID for this resource name.
+    pub name: Option<String>,
+    /// The title of the shared drive.
+    pub title: Option<String>,
+}
+
+impl Part for DriveReference {}
+
+
+/// This item is deprecated; please see `DriveFolder` instead.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Folder {
-    /// The type of Drive folder.
+    /// This field is deprecated; please see `DriveFolder.type` instead.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
 
 impl Part for Folder {}
+
+
+/// An object was uploaded into Drive.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Upload { _never_set: Option<bool> }
+
+impl Part for Upload {}
 
 
 /// A user whose account has since been deleted.
@@ -563,18 +588,17 @@ pub struct DeletedUser { _never_set: Option<bool> }
 impl Part for DeletedUser {}
 
 
-/// Information about a Team Drive.
+/// This item is deprecated; please see `Drive` instead.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDrive {
-    /// The root of this Team Drive.
+    /// This field is deprecated; please see `Drive.root` instead.
     pub root: Option<DriveItem>,
-    /// The resource name of the Team Drive. The format is
-    /// "teamDrives/TEAM_DRIVE_ID".
+    /// This field is deprecated; please see `Drive.name` instead.
     pub name: Option<String>,
-    /// The title of the Team Drive.
+    /// This field is deprecated; please see `Drive.title` instead.
     pub title: Option<String>,
 }
 
@@ -589,6 +613,17 @@ impl Part for TeamDrive {}
 pub struct Administrator { _never_set: Option<bool> }
 
 impl Part for Administrator {}
+
+
+/// Empty message representing an anonymous user or indicating the authenticated
+/// user should be anonymized.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AnonymousUser { _never_set: Option<bool> }
+
+impl Part for AnonymousUser {}
 
 
 /// The permission setting of an object.
@@ -646,15 +681,14 @@ pub struct SystemEvent {
 impl Part for SystemEvent {}
 
 
-/// Empty message representing an anonymous user or indicating the authenticated
-/// user should be anonymized.
+/// A Drive item which is a file.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AnonymousUser { _never_set: Option<bool> }
+pub struct DriveFile { _never_set: Option<bool> }
 
-impl Part for AnonymousUser {}
+impl Part for DriveFile {}
 
 
 /// Data describing the type and additional information of an action.
@@ -706,13 +740,19 @@ pub struct DriveItem {
     pub mime_type: Option<String>,
     /// The target Drive item. The format is "items/ITEM_ID".
     pub name: Option<String>,
-    /// The Drive item is a file.
-    pub file: Option<File>,
     /// The title of the Drive item.
     pub title: Option<String>,
+    /// The Drive item is a folder.
+    #[serde(rename="driveFolder")]
+    pub drive_folder: Option<DriveFolder>,
+    /// The Drive item is a file.
+    #[serde(rename="driveFile")]
+    pub drive_file: Option<DriveFile>,
+    /// This field is deprecated; please use the `driveFile` field instead.
+    pub file: Option<File>,
     /// Information about the owner of this Drive item.
     pub owner: Option<Owner>,
-    /// The Drive item is a folder.
+    /// This field is deprecated; please use the `driveFolder` field instead.
     pub folder: Option<Folder>,
 }
 
@@ -752,14 +792,20 @@ impl Part for Copy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveItemReference {
-    /// The Drive item is a folder.
-    pub folder: Option<Folder>,
+    /// The Drive item is a file.
+    #[serde(rename="driveFile")]
+    pub drive_file: Option<DriveFile>,
     /// The target Drive item. The format is "items/ITEM_ID".
     pub name: Option<String>,
-    /// The Drive item is a file.
+    /// This field is deprecated; please use the `driveFile` field instead.
     pub file: Option<File>,
     /// The title of the Drive item.
     pub title: Option<String>,
+    /// This field is deprecated; please use the `driveFolder` field instead.
+    pub folder: Option<Folder>,
+    /// The Drive item is a folder.
+    #[serde(rename="driveFolder")]
+    pub drive_folder: Option<DriveFolder>,
 }
 
 impl Part for DriveItemReference {}
@@ -805,7 +851,7 @@ impl Part for Comment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Target {
-    /// The target is a Team Drive.
+    /// This field is deprecated; please use the `drive` field instead.
     #[serde(rename="teamDrive")]
     pub team_drive: Option<TeamDrive>,
     /// The target is a comment on a Drive file.
@@ -814,6 +860,8 @@ pub struct Target {
     /// The target is a Drive item.
     #[serde(rename="driveItem")]
     pub drive_item: Option<DriveItem>,
+    /// The target is a shared drive.
+    pub drive: Option<Drive>,
 }
 
 impl Part for Target {}
@@ -845,25 +893,36 @@ impl Part for NoConsolidation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetReference {
-    /// The target is a Team Drive.
+    /// This field is deprecated; please use the `drive` field instead.
     #[serde(rename="teamDrive")]
     pub team_drive: Option<TeamDriveReference>,
     /// The target is a Drive item.
     #[serde(rename="driveItem")]
     pub drive_item: Option<DriveItemReference>,
+    /// The target is a shared drive.
+    pub drive: Option<DriveReference>,
 }
 
 impl Part for TargetReference {}
 
 
-/// An object was uploaded into Drive.
+/// Information about a shared drive.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Upload { _never_set: Option<bool> }
+pub struct Drive {
+    /// The root of this shared drive.
+    pub root: Option<DriveItem>,
+    /// The resource name of the shared drive. The format is
+    /// "COLLECTION_ID/DRIVE_ID". Clients should not assume a specific collection
+    /// ID for this resource name.
+    pub name: Option<String>,
+    /// The title of the shared drive.
+    pub title: Option<String>,
+}
 
-impl Part for Upload {}
+impl Part for Drive {}
 
 
 /// A comment on a file.
@@ -956,13 +1015,27 @@ pub struct DriveActivity {
     pub actors: Option<Vec<Actor>>,
     /// Details on all actions in this activity.
     pub actions: Option<Vec<Action>>,
-    /// All Drive objects this activity is about (e.g. file, folder, Team Drive).
+    /// All Google Drive objects this activity is about (e.g. file, folder, drive).
     /// This represents the state of the target immediately after the actions
     /// occurred.
     pub targets: Option<Vec<Target>>,
 }
 
 impl Part for DriveActivity {}
+
+
+/// A Drive item which is a folder.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DriveFolder {
+    /// The type of Drive folder.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for DriveFolder {}
 
 
 /// An object was deleted.
@@ -1118,16 +1191,15 @@ pub struct Move {
 impl Part for Move {}
 
 
-/// A lightweight reference to a Team Drive.
+/// This item is deprecated; please see `DriveReference` instead.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDriveReference {
-    /// The resource name of the Team Drive. The format is
-    /// "teamDrives/TEAM_DRIVE_ID".
+    /// This field is deprecated; please see `DriveReference.name` instead.
     pub name: Option<String>,
-    /// The title of the Team Drive.
+    /// This field is deprecated; please see `DriveReference.title` instead.
     pub title: Option<String>,
 }
 
@@ -1209,7 +1281,7 @@ pub struct User {
 impl Part for User {}
 
 
-/// A Drive item which is a file.
+/// This item is deprecated; please see `DriveFile` instead.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1239,11 +1311,13 @@ impl Part for SettingsChange {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Owner {
-    /// The Team Drive that owns the Drive item.
+    /// This field is deprecated; please use the `drive` field instead.
     #[serde(rename="teamDrive")]
     pub team_drive: Option<TeamDriveReference>,
     /// The domain of the Drive item owner.
     pub domain: Option<Domain>,
+    /// The drive that owns the item.
+    pub drive: Option<DriveReference>,
     /// The user that owns the Drive item.
     pub user: Option<User>,
 }

@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20190401*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Android Enterprise* API at revision *20190624*. The CLI is at version *1.0.9*.
 
 ```bash
 androidenterprise1 [options]
         devices
+                force-report-upload <enterprise-id> <user-id> <device-id> [-p <v>]...
                 get <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
                 get-state <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
                 list <enterprise-id> <user-id> [-p <v>]... [-o <out>]

@@ -25,11 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc* API at revision *20190313*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Dataproc* API at revision *20190620*. The CLI is at version *1.0.9*.
 
 ```bash
 dataproc1 [options]
         projects
+                locations-autoscaling-policies-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-autoscaling-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-autoscaling-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-workflow-templates-get <name> [-p <v>]... [-o <out>]
@@ -40,6 +43,9 @@ dataproc1 [options]
                 locations-workflow-templates-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-create <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-delete <project-id> <region> <cluster-name> [-p <v>]... [-o <out>]
                 regions-clusters-diagnose <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]

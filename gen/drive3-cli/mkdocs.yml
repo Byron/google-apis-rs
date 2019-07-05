@@ -1,4 +1,4 @@
-site_name: drive v1.0.8+20190328
+site_name: drive v1.0.9+20190620
 site_url: http://byron.github.io/google-apis-rs/google-drive3-cli
 site_description: A complete library to interact with drive (protocol v3)
 
@@ -19,6 +19,13 @@ pages:
 - ['comments_get.md', 'Comments', 'Get']
 - ['comments_list.md', 'Comments', 'List']
 - ['comments_update.md', 'Comments', 'Update']
+- ['drives_create.md', 'Drives', 'Create']
+- ['drives_delete.md', 'Drives', 'Delete']
+- ['drives_get.md', 'Drives', 'Get']
+- ['drives_hide.md', 'Drives', 'Hide']
+- ['drives_list.md', 'Drives', 'List']
+- ['drives_unhide.md', 'Drives', 'Unhide']
+- ['drives_update.md', 'Drives', 'Update']
 - ['files_copy.md', 'Files', 'Copy']
 - ['files_create.md', 'Files', 'Create']
 - ['files_delete.md', 'Files', 'Delete']
@@ -51,5 +58,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

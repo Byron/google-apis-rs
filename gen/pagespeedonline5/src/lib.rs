@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pagespeedonline* crate version *1.0.8+20190129*, where *20190129* is the exact revision of the *pagespeedonline:v5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *pagespeedonline* crate version *1.0.9+20190507*, where *20190507* is the exact revision of the *pagespeedonline:v5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *pagespeedonline* *v5* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v5/get-started).
@@ -216,9 +216,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -307,7 +305,7 @@ impl<'a, C, A> Pagespeedonline<C, A>
         Pagespeedonline {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/pagespeedonline/v5/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -318,7 +316,7 @@ impl<'a, C, A> Pagespeedonline<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -583,31 +581,34 @@ impl Part for LighthouseResultV5I18n {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LighthouseResultV5 {
+    /// Environment settings that were used when making this LHR.
+    pub environment: Option<LighthouseResultV5Environment>,
     /// The time that this run was fetched.
     #[serde(rename="fetchTime")]
     pub fetch_time: Option<String>,
-    /// The final resolved url that was audited.
-    #[serde(rename="finalUrl")]
-    pub final_url: Option<String>,
     /// Map of category groups in the LHR.
     #[serde(rename="categoryGroups")]
     pub category_groups: Option<HashMap<String, LighthouseResultV5CategoryGroups>>,
-    /// List of all run warnings in the LHR. Will always output to at least `[]`.
-    #[serde(rename="runWarnings")]
-    pub run_warnings: Option<Vec<String>>,
-    /// A top-level error message that, if present, indicates a serious enough problem that this Lighthouse result may need to be discarded.
-    #[serde(rename="runtimeError")]
-    pub runtime_error: Option<LighthouseResultV5RuntimeError>,
     /// The configuration settings for this LHR.
     #[serde(rename="configSettings")]
     pub config_settings: Option<LighthouseResultV5ConfigSettings>,
+    /// A top-level error message that, if present, indicates a serious enough problem that this Lighthouse result may need to be discarded.
+    #[serde(rename="runtimeError")]
+    pub runtime_error: Option<LighthouseResultV5RuntimeError>,
+    /// The final resolved url that was audited.
+    #[serde(rename="finalUrl")]
+    pub final_url: Option<String>,
     /// The lighthouse version that was used to generate this LHR.
     #[serde(rename="lighthouseVersion")]
     pub lighthouse_version: Option<String>,
-    /// Environment settings that were used when making this LHR.
-    pub environment: Option<LighthouseResultV5Environment>,
+    /// The Stack Pack advice strings.
+    #[serde(rename="stackPacks")]
+    pub stack_packs: Option<Vec<LighthouseResultV5StackPacks>>,
     /// The internationalization strings that are required to render the LHR.
     pub i18n: Option<LighthouseResultV5I18n>,
+    /// List of all run warnings in the LHR. Will always output to at least `[]`.
+    #[serde(rename="runWarnings")]
+    pub run_warnings: Option<Vec<String>>,
     /// Timing information for this LHR.
     pub timing: Option<LighthouseResultV5Timing>,
     /// The user agent that was used to run this LHR.
@@ -710,6 +711,27 @@ pub struct PagespeedApiLoadingExperienceV5 {
 }
 
 impl Part for PagespeedApiLoadingExperienceV5 {}
+
+
+/// The Stack Pack advice strings.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LighthouseResultV5StackPacks {
+    /// The stack pack advice strings.
+    pub descriptions: Option<HashMap<String, String>>,
+    /// The stack pack id.
+    pub id: Option<String>,
+    /// The stack pack icon data uri.
+    #[serde(rename="iconDataURL")]
+    pub icon_data_url: Option<String>,
+    /// The stack pack title.
+    pub title: Option<String>,
+}
+
+impl NestedType for LighthouseResultV5StackPacks {}
+impl Part for LighthouseResultV5StackPacks {}
 
 
 /// There is no detailed description.

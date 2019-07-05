@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storagetransfer* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *storagetransfer* crate version *1.0.9+20190702*, where *20190702* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *storagetransfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/storage-transfer/docs).
@@ -223,9 +223,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -334,7 +332,7 @@ impl<'a, C, A> Storagetransfer<C, A>
         Storagetransfer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://storagetransfer.googleapis.com/".to_string(),
             _root_url: "https://storagetransfer.googleapis.com/".to_string(),
         }
@@ -351,7 +349,7 @@ impl<'a, C, A> Storagetransfer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -435,12 +433,11 @@ impl Part for TransferSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AwsAccessKey {
-    /// AWS secret access key. This field is not returned in RPC responses.
-    /// Required.
+    /// Required. AWS secret access key. This field is not returned in RPC
+    /// responses.
     #[serde(rename="secretAccessKey")]
     pub secret_access_key: Option<String>,
-    /// AWS access key ID.
-    /// Required.
+    /// Required. AWS access key ID.
     #[serde(rename="accessKeyId")]
     pub access_key_id: Option<String>,
 }
@@ -459,9 +456,10 @@ pub struct ObjectConditions {
     /// `NOW` - `maxTimeElapsedSinceLastModification` and objects that don't have
     /// a `lastModificationTime` are transferred.
     /// 
-    /// Note that `NOW` refers to the creation time of the transfer job, and
+    /// Note that, for each `TransferOperation` started by this `TransferJob`,
+    /// `NOW` refers to the `start_time` of the 'TransferOperation`. Also,
     /// `lastModificationTime` refers to the time of the last change to the
-    /// object's content or metadata. Specifically, this would be the `updated`
+    /// object's content or metadata - specifically, this would be the `updated`
     /// property of GCS objects and the `LastModified` field of S3 objects.
     #[serde(rename="maxTimeElapsedSinceLastModification")]
     pub max_time_elapsed_since_last_modification: Option<String>,
@@ -511,9 +509,10 @@ pub struct ObjectConditions {
     /// `NOW` - `minTimeElapsedSinceLastModification` and objects that don't have a
     /// `lastModificationTime` are transferred.
     /// 
-    /// Note that `NOW` refers to the creation time of the transfer job, and
+    /// Note that, for each `TransferOperation` started by this `TransferJob`,
+    /// `NOW` refers to the `start_time` of the 'TransferOperation`. Also,
     /// `lastModificationTime` refers to the time of the last change to the
-    /// object's content or metadata. Specifically, this would be the `updated`
+    /// object's content or metadata - specifically, this would be the `updated`
     /// property of GCS objects and the `LastModified` field of S3 objects.
     #[serde(rename="minTimeElapsedSinceLastModification")]
     pub min_time_elapsed_since_last_modification: Option<String>,
@@ -608,7 +607,6 @@ pub struct TransferOperation {
     /// Status of the transfer operation.
     pub status: Option<String>,
     /// Transfer specification.
-    /// Required.
     #[serde(rename="transferSpec")]
     pub transfer_spec: Option<TransferSpec>,
     /// The name of the transfer job that triggers this transfer operation.
@@ -617,7 +615,6 @@ pub struct TransferOperation {
     /// A globally unique ID assigned by the system.
     pub name: Option<String>,
     /// The ID of the Google Cloud Platform Project that owns the operation.
-    /// Required.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// Summarizes errors encountered with sample error log entries.
@@ -643,16 +640,14 @@ impl Resource for TransferOperation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AwsS3Data {
-    /// AWS access key used to sign the API requests to the AWS S3 bucket.
-    /// Permissions on the bucket must be granted to the access ID of the
+    /// Required. AWS access key used to sign the API requests to the AWS S3
+    /// bucket. Permissions on the bucket must be granted to the access ID of the
     /// AWS access key.
-    /// Required.
     #[serde(rename="awsAccessKey")]
     pub aws_access_key: Option<AwsAccessKey>,
-    /// S3 Bucket name (see
+    /// Required. S3 Bucket name (see
     /// [Creating a
     /// bucket](http://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html)).
-    /// Required.
     #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
 }
@@ -669,9 +664,8 @@ pub struct ErrorLogEntry {
     /// A list of messages that carry the error details.
     #[serde(rename="errorDetails")]
     pub error_details: Option<Vec<String>>,
-    /// A URL that refers to the target (a data source, a data sink,
+    /// Required. A URL that refers to the target (a data source, a data sink,
     /// or an object) with which the error is associated.
-    /// Required.
     pub url: Option<String>,
 }
 
@@ -686,10 +680,9 @@ impl Part for ErrorLogEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GcsData {
-    /// Google Cloud Storage bucket name (see
+    /// Required. Google Cloud Storage bucket name (see
     /// [Bucket Name
     /// Requirements](https://cloud.google.com/storage/docs/naming#requirements)).
-    /// Required.
     #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
 }
@@ -744,10 +737,9 @@ impl Part for GcsData {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HttpData {
-    /// The URL that points to the file that stores the object list entries.
-    /// This file must allow public access.  Currently, only URLs with HTTP and
-    /// HTTPS schemes are supported.
-    /// Required.
+    /// Required. The URL that points to the file that stores the object list
+    /// entries. This file must allow public access.  Currently, only URLs with
+    /// HTTP and HTTPS schemes are supported.
     #[serde(rename="listUrl")]
     pub list_url: Option<String>,
 }
@@ -806,56 +798,11 @@ impl ResponseResult for Empty {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -886,7 +833,7 @@ impl Part for Status {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleServiceAccount {
-    /// Required.
+    /// Email address of the service account.
     #[serde(rename="accountEmail")]
     pub account_email: Option<String>,
 }
@@ -922,10 +869,9 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schedule {
-    /// The first day the recurring transfer is scheduled to run. If
+    /// Required. The first day the recurring transfer is scheduled to run. If
     /// `scheduleStartDate` is in the past, the transfer will run for the first
     /// time on the following day.
-    /// Required.
     #[serde(rename="scheduleStartDate")]
     pub schedule_start_date: Option<Date>,
     /// The time in UTC at which the transfer will be scheduled to start in a day.
@@ -963,8 +909,7 @@ pub struct ErrorSummary {
     /// error code for a single task.
     #[serde(rename="errorLogEntries")]
     pub error_log_entries: Option<Vec<ErrorLogEntry>>,
-    /// Count of this type of error.
-    /// Required.
+    /// Required. Count of this type of error.
     #[serde(rename="errorCount")]
     pub error_count: Option<i64>,
 }
@@ -998,8 +943,8 @@ impl RequestValue for ResumeTransferOperationRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateTransferJobRequest {
-    /// The ID of the Google Cloud Platform Console project that owns the job.
-    /// Required.
+    /// Required. The ID of the Google Cloud Platform Console project that owns the
+    /// job.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// The field mask of the fields in `transferJob` that are to be updated in
@@ -1010,11 +955,10 @@ pub struct UpdateTransferJobRequest {
     /// with the error `INVALID_ARGUMENT`.
     #[serde(rename="updateTransferJobFieldMask")]
     pub update_transfer_job_field_mask: Option<String>,
-    /// The job to update. `transferJob` is expected to specify only three fields:
-    /// `description`, `transferSpec`, and `status`.  An UpdateTransferJobRequest
-    /// that specifies other fields will be rejected with an error
-    /// `INVALID_ARGUMENT`.
-    /// Required.
+    /// Required. The job to update. `transferJob` is expected to specify only
+    /// three fields: `description`, `transferSpec`, and `status`.  An
+    /// UpdateTransferJobRequest that specifies other fields will be rejected with
+    /// an error `INVALID_ARGUMENT`.
     #[serde(rename="transferJob")]
     pub transfer_job: Option<TransferJob>,
 }
@@ -1095,7 +1039,7 @@ pub struct TransferJob {
     /// Transfer specification.
     #[serde(rename="transferSpec")]
     pub transfer_spec: Option<TransferSpec>,
-    /// This field cannot be changed by user requests.
+    /// Output only. The time that the transfer job was deleted.
     #[serde(rename="deletionTime")]
     pub deletion_time: Option<String>,
     /// Schedule specification.
@@ -1103,10 +1047,10 @@ pub struct TransferJob {
     /// The ID of the Google Cloud Platform Project that owns the job.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// This field cannot be changed by user requests.
+    /// Output only. The time that the transfer job was last modified.
     #[serde(rename="lastModificationTime")]
     pub last_modification_time: Option<String>,
-    /// This field cannot be changed by user requests.
+    /// Output only. The time that the transfer job was created.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// A globally unique name assigned by Storage Transfer Service when the
@@ -1241,8 +1185,7 @@ impl<'a, C, A> TransferOperationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the transfer operation.
-    ///            Required.
+    /// * `name` - Required. The name of the transfer operation.
     pub fn pause(&self, request: PauseTransferOperationRequest, name: &str) -> TransferOperationPauseCall<'a, C, A> {
         TransferOperationPauseCall {
             hub: self.hub,
@@ -1261,8 +1204,7 @@ impl<'a, C, A> TransferOperationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the transfer operation.
-    ///            Required.
+    /// * `name` - Required. The name of the transfer operation.
     pub fn resume(&self, request: ResumeTransferOperationRequest, name: &str) -> TransferOperationResumeCall<'a, C, A> {
         TransferOperationResumeCall {
             hub: self.hub,
@@ -1325,7 +1267,7 @@ impl<'a, C, A> TransferOperationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The value `transferOperations`.
+    /// * `name` - Required. The value `transferOperations`.
     pub fn list(&self, name: &str) -> TransferOperationListCall<'a, C, A> {
         TransferOperationListCall {
             hub: self.hub,
@@ -1411,9 +1353,8 @@ impl<'a, C, A> GoogleServiceAccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - The ID of the Google Cloud Platform Console project that the Google service
-    ///                 account is associated with.
-    ///                 Required.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform Console project that the
+    ///                 Google service account is associated with.
     pub fn get(&self, project_id: &str) -> GoogleServiceAccountGetCall<'a, C, A> {
         GoogleServiceAccountGetCall {
             hub: self.hub,
@@ -1490,8 +1431,7 @@ impl<'a, C, A> TransferJobMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `jobName` - The name of job to update.
-    ///               Required.
+    /// * `jobName` - Required. The name of job to update.
     pub fn patch(&self, request: UpdateTransferJobRequest, job_name: &str) -> TransferJobPatchCall<'a, C, A> {
         TransferJobPatchCall {
             hub: self.hub,
@@ -1509,8 +1449,7 @@ impl<'a, C, A> TransferJobMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `jobName` - The job to get.
-    ///               Required.
+    /// * `jobName` - Required. The job to get.
     pub fn get(&self, job_name: &str) -> TransferJobGetCall<'a, C, A> {
         TransferJobGetCall {
             hub: self.hub,
@@ -1754,8 +1693,7 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// The name of the transfer operation.
-    /// Required.
+    /// Required. The name of the transfer operation.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2034,8 +1972,7 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The name of the transfer operation.
-    /// Required.
+    /// Required. The name of the transfer operation.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2805,7 +2742,7 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The value `transferOperations`.
+    /// Required. The value `transferOperations`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2829,7 +2766,11 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._page_size = Some(new_value);
         self
     }
-    /// A list of query parameters specified as JSON text in the form of {\"project_id\" : \"my_project_id\", \"job_names\" : [\"jobid1\", \"jobid2\",...], \"operation_names\" : [\"opid1\", \"opid2\",...], \"transfer_statuses\":[\"status1\", \"status2\",...]}. Since `job_names`, `operation_names`, and `transfer_statuses` support multiple values, they must be specified with array notation. `job_names`, `operation_names`, and `transfer_statuses` are optional.
+    /// Required. A list of query parameters specified as JSON text in the form of: {"project_id":"my_project_id",
+    ///  "job_names":["jobid1","jobid2",...],
+    ///  "operation_names":["opid1","opid2",...],
+    ///  "transfer_statuses":["status1","status2",...]}.
+    /// Since `job_names`, `operation_names`, and `transfer_statuses` support multiple values, they must be specified with array notation. `project_id` is required. `job_names`, `operation_names`, and `transfer_statuses` are optional. The valid values for `transfer_statuses` are case-insensitive: `IN_PROGRESS`, `PAUSED`, `SUCCESS`, `FAILED`, and `ABORTED`.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> TransferOperationListCall<'a, C, A> {
@@ -3325,9 +3266,8 @@ impl<'a, C, A> GoogleServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The ID of the Google Cloud Platform Console project that the Google service
-    /// account is associated with.
-    /// Required.
+    /// Required. The ID of the Google Cloud Platform Console project that the
+    /// Google service account is associated with.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3577,10 +3517,10 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._page_size = Some(new_value);
         self
     }
-    /// A list of query parameters specified as JSON text in the form of
+    /// Required. A list of query parameters specified as JSON text in the form of:
     /// {"project_id":"my_project_id",
-    /// "job_names":["jobid1","jobid2",...],
-    /// "job_statuses":["status1","status2",...]}.
+    ///  "job_names":["jobid1","jobid2",...],
+    ///  "job_statuses":["status1","status2",...]}.
     /// Since `job_names` and `job_statuses` support multiple values, their values
     /// must be specified with array notation. `project_id` is required.
     /// `job_names` and `job_statuses` are optional.  The valid values for
@@ -3862,8 +3802,7 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The name of job to update.
-    /// Required.
+    /// Required. The name of job to update.
     ///
     /// Sets the *job name* path property to the given value.
     ///
@@ -4116,8 +4055,7 @@ impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The job to get.
-    /// Required.
+    /// Required. The job to get.
     ///
     /// Sets the *job name* path property to the given value.
     ///
@@ -4127,8 +4065,8 @@ impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._job_name = new_value.to_string();
         self
     }
-    /// The ID of the Google Cloud Platform Console project that owns the job.
-    /// Required.
+    /// Required. The ID of the Google Cloud Platform Console project that owns the
+    /// job.
     ///
     /// Sets the *project id* query property to the given value.
     pub fn project_id(mut self, new_value: &str) -> TransferJobGetCall<'a, C, A> {

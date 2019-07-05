@@ -38,7 +38,7 @@
     "canonicalName": "Cloud Search", 
     "description": "Cloud Search provides cloud-based search capabilities over G Suite data.  The Cloud Search API allows indexing of non-G Suite data into Cloud Search.", 
     "discoveryVersion": "v1", 
-    "documentationLink": "https://gsuite.google.com/products/cloud-search/", 
+    "documentationLink": "https://developers.google.com/cloud-search/docs/guides/", 
     "fullyEncodeReservedExpansion": true, 
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif", 
@@ -144,7 +144,7 @@
                                     ], 
                                     "parameters": {
                                         "debugOptions.enableDebugging": {
-                                            "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                            "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                             "location": "query", 
                                             "type": "boolean"
                                         }, 
@@ -211,7 +211,7 @@
                                             ], 
                                             "parameters": {
                                                 "debugOptions.enableDebugging": {
-                                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                                     "location": "query", 
                                                     "type": "boolean"
                                                 }, 
@@ -263,7 +263,7 @@
                                     ], 
                                     "parameters": {
                                         "debugOptions.enableDebugging": {
-                                            "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                            "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                             "location": "query", 
                                             "type": "boolean"
                                         }, 
@@ -317,7 +317,7 @@
                                     ], 
                                     "parameters": {
                                         "debugOptions.enableDebugging": {
-                                            "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                            "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                             "location": "query", 
                                             "type": "boolean"
                                         }, 
@@ -382,7 +382,7 @@
                             ], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -414,7 +414,7 @@
                             ], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -485,7 +485,7 @@
                                             "type": "string"
                                         }, 
                                         "debugOptions.enableDebugging": {
-                                            "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                            "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                             "location": "query", 
                                             "type": "boolean"
                                         }, 
@@ -566,7 +566,7 @@
                                             "type": "string"
                                         }, 
                                         "debugOptions.enableDebugging": {
-                                            "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                            "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                             "location": "query", 
                                             "type": "boolean"
                                         }, 
@@ -636,7 +636,7 @@
                                             "type": "string"
                                         }, 
                                         "debugOptions.enableDebugging": {
-                                            "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                            "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                             "location": "query", 
                                             "type": "boolean"
                                         }, 
@@ -926,12 +926,12 @@
                                     "type": "string"
                                 }, 
                                 "requestOptions.debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
                                 "requestOptions.languageCode": {
-                                    "description": "The BCP-47 language code, such as \"en-US\" or \"sr-Latn\".\nFor more information, see\nhttp://www.unicode.org/reports/tr35/#Unicode_locale_identifier.\nFor translations.", 
+                                    "description": "The BCP-47 language code, such as \"en-US\" or \"sr-Latn\".\nFor more information, see\nhttp://www.unicode.org/reports/tr35/#Unicode_locale_identifier.\nFor translations.\n\nWhen specified, the documents in search results are biased towards the\nspecified language.\nSuggest API does not use this parameter. It autocompletes only based on\ncharacters in the query.", 
                                     "location": "query", 
                                     "type": "string"
                                 }, 
@@ -993,7 +993,7 @@
                             ], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -1025,7 +1025,7 @@
                             ], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -1055,7 +1055,7 @@
                             "parameterOrder": [], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -1145,7 +1145,7 @@
                             ], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -1177,7 +1177,7 @@
                             ], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -1207,7 +1207,7 @@
                             "parameterOrder": [], 
                             "parameters": {
                                 "debugOptions.enableDebugging": {
-                                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                                     "location": "query", 
                                     "type": "boolean"
                                 }, 
@@ -1429,7 +1429,7 @@
             }
         }
     }, 
-    "revision": "20190328", 
+    "revision": "20190622", 
     "rootUrl": "https://cloudsearch.googleapis.com/", 
     "schemas": {
         "BooleanOperatorOptions": {
@@ -1580,7 +1580,7 @@
             "id": "DataSourceRestriction", 
             "properties": {
                 "filterOptions": {
-                    "description": "Filter options restricting the results. If multiple filters\nare present, they are grouped by object type before joining.\nFilters with the same object type are joined conjunctively, then\nthe resulting expressions are joined disjunctively.\n\nThe maximum number of elements is 20.", 
+                    "description": "Filter options restricting the results. If multiple filters\nare present, they are grouped by object type before joining.\nFilters with the same object type are joined conjunctively, then\nthe resulting expressions are joined disjunctively.\n\nThe maximum number of elements is 20.\n\nNOTE: Suggest API supports only few filters at the moment:\n  \"objecttype\", \"type\" and \"mimetype\".\nFor now, schema specific filters cannot be used to filter suggestions.", 
                     "items": {
                         "$ref": "FilterOptions"
                     }, 
@@ -1663,7 +1663,7 @@
             "id": "DebugOptions", 
             "properties": {
                 "enableDebugging": {
-                    "description": "If set, the request will enable debugging features of Cloud Search.\nOnly turn on this field, if asked by Google to help with debugging.", 
+                    "description": "If you are asked by Google to help with debugging, set this field.\nOtherwise, ignore this field.", 
                     "type": "boolean"
                 }
             }, 
@@ -2923,7 +2923,7 @@
             "id": "Metaline", 
             "properties": {
                 "properties": {
-                    "description": "The list of displayed properties for the metaline.", 
+                    "description": "The list of displayed properties for the metaline. The maxiumum number of\nproperties is 5.", 
                     "items": {
                         "$ref": "DisplayedProperty"
                     }, 
@@ -3008,7 +3008,7 @@
             "id": "ObjectDisplayOptions", 
             "properties": {
                 "metalines": {
-                    "description": "Defines the properties that will be displayed in the metalines of the\nsearch results. The property values will be displayed in the order given\nhere. If a property holds multiple values, all of the values will be\ndiplayed before the next properties. For this reason, it is a good practice\nto specify singular properties before repeated properties in this list. All\nof the properties must set\nis_returnable\nto true. The maximum number of elements is 3.", 
+                    "description": "Defines the properties that will be displayed in the metalines of the\nsearch results. The property values will be displayed in the order given\nhere. If a property holds multiple values, all of the values will be\ndiplayed before the next properties. For this reason, it is a good practice\nto specify singular properties before repeated properties in this list. All\nof the properties must set\nis_returnable\nto true. The maximum number of metalines is 3.", 
                     "items": {
                         "$ref": "Metaline"
                     }, 
@@ -3084,7 +3084,7 @@
                     "type": "object"
                 }, 
                 "name": {
-                    "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should have the format of `operations/some/unique/name`.", 
+                    "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should be a resource name ending with `operations/{unique_id}`.", 
                     "type": "string"
                 }, 
                 "response": {
@@ -3099,7 +3099,7 @@
             "type": "object"
         }, 
         "PeopleSuggestion": {
-            "description": "A people suggestion.", 
+            "description": "This field contains information about the person being suggested.", 
             "id": "PeopleSuggestion", 
             "properties": {
                 "person": {
@@ -3307,6 +3307,10 @@
                 }, 
                 "isSortable": {
                     "description": "Indicates that the property can be used for sorting. Cannot be true for\nproperties that are repeatable. Cannot be true for properties whose type\nis object or user identifier. IsReturnable must be true to set this option.\nOnly supported for Boolean, Date, Double, Integer, and Timestamp\nproperties.", 
+                    "type": "boolean"
+                }, 
+                "isWildcardSearchable": {
+                    "description": "Indicates that users can perform wildcard search for this\nproperty. Only supported for Text properties. IsReturnable must be true to\nset this option. In a given datasource maximum of 5 properties can be\nmarked as is_wildcard_searchable.\n\nNote: This is an alpha feature and is enabled for whitelisted users only.", 
                     "type": "boolean"
                 }, 
                 "name": {
@@ -3552,7 +3556,7 @@
             "type": "object"
         }, 
         "QuerySuggestion": {
-            "description": "A completed query suggestion.", 
+            "description": "This field does not contain anything as of now and is just used as an\nindicator that the suggest result was a phrase completion.", 
             "id": "QuerySuggestion", 
             "properties": {}, 
             "type": "object"
@@ -3610,7 +3614,7 @@
                     "description": "Debug options of the request"
                 }, 
                 "languageCode": {
-                    "description": "The BCP-47 language code, such as \"en-US\" or \"sr-Latn\".\nFor more information, see\nhttp://www.unicode.org/reports/tr35/#Unicode_locale_identifier.\nFor translations.", 
+                    "description": "The BCP-47 language code, such as \"en-US\" or \"sr-Latn\".\nFor more information, see\nhttp://www.unicode.org/reports/tr35/#Unicode_locale_identifier.\nFor translations.\n\nWhen specified, the documents in search results are biased towards the\nspecified language.\nSuggest API does not use this parameter. It autocompletes only based on\ncharacters in the query.", 
                     "type": "string"
                 }, 
                 "searchApplicationId": {
@@ -4056,7 +4060,7 @@
                     "type": "string"
                 }, 
                 "url": {
-                    "description": "The URL of the search result. The URL contains a Google redirect to the\nactual item.", 
+                    "description": "The URL of the search result. The URL contains a Google redirect to the\nactual item. This URL is signed and shouldn't be changed.", 
                     "type": "string"
                 }
             }, 
@@ -4255,7 +4259,7 @@
             "type": "object"
         }, 
         "Status": {
-            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security/privacy reasons.", 
+            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).", 
             "id": "Status", 
             "properties": {
                 "code": {
@@ -4311,14 +4315,14 @@
             "id": "SuggestRequest", 
             "properties": {
                 "dataSourceRestrictions": {
-                    "description": "The sources to use for suggestions. If not specified, all data sources\nfrom the current search application are used.", 
+                    "description": "The sources to use for suggestions. If not specified, all data sources\nfrom the current search application are used.\nSuggestions are based on Gmail titles. Suggestions from third party sources\nare not available.", 
                     "items": {
                         "$ref": "DataSourceRestriction"
                     }, 
                     "type": "array"
                 }, 
                 "query": {
-                    "description": "Partial query for the completion suggestion.", 
+                    "description": "Partial query for which autocomplete suggestions will be shown.\nFor example, if the query is \"sea\", then the server might return\n\"season\", \"search\", \"seagull\" and so on.", 
                     "type": "string"
                 }, 
                 "requestOptions": {
@@ -4333,7 +4337,7 @@
             "id": "SuggestResponse", 
             "properties": {
                 "suggestResults": {
-                    "description": "List of suggestion results.", 
+                    "description": "List of suggestions.", 
                     "items": {
                         "$ref": "SuggestResult"
                     }, 
@@ -4347,10 +4351,12 @@
             "id": "SuggestResult", 
             "properties": {
                 "peopleSuggestion": {
-                    "$ref": "PeopleSuggestion"
+                    "$ref": "PeopleSuggestion", 
+                    "description": "This is present when the suggestion indicates a person. It\ncontains more information about the person - like their email ID,\nname etc."
                 }, 
                 "querySuggestion": {
-                    "$ref": "QuerySuggestion"
+                    "$ref": "QuerySuggestion", 
+                    "description": "This field will be present if the suggested query is a word/phrase\ncompletion."
                 }, 
                 "source": {
                     "$ref": "Source", 

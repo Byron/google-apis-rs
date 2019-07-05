@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Clouderrorreporting* crate version *1.0.8+20190321*, where *20190321* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Clouderrorreporting* crate version *1.0.9+20190626*, where *20190626* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Clouderrorreporting* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/error-reporting/).
@@ -218,9 +218,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -332,7 +330,7 @@ impl<'a, C, A> Clouderrorreporting<C, A>
         Clouderrorreporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://clouderrorreporting.googleapis.com/".to_string(),
             _root_url: "https://clouderrorreporting.googleapis.com/".to_string(),
         }
@@ -343,7 +341,7 @@ impl<'a, C, A> Clouderrorreporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -709,15 +707,22 @@ pub struct ReportedErrorEvent {
     /// Supported languages are Java, Python, JavaScript, Ruby, C#, PHP, and Go.
     /// Supported stack trace formats are:
     /// 
-    /// * **Java**: Must be the return value of [`Throwable.printStackTrace()`](https://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#printStackTrace%28%29).
-    /// * **Python**: Must be the return value of [`traceback.format_exc()`](https://docs.python.org/2/library/traceback.html#traceback.format_exc).
-    /// * **JavaScript**: Must be the value of [`error.stack`](https://github.com/v8/v8/wiki/Stack-Trace-API)
-    /// as returned by V8.
-    /// * **Ruby**: Must contain frames returned by [`Exception.backtrace`](https://ruby-doc.org/core-2.2.0/Exception.html#method-i-backtrace).
-    /// * **C#**: Must be the return value of [`Exception.ToString()`](https://msdn.microsoft.com/en-us/library/system.exception.tostring.aspx).
+    /// * **Java**: Must be the return value of
+    /// [`Throwable.printStackTrace()`](https://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#printStackTrace%28%29).
+    /// * **Python**: Must be the return value of
+    /// [`traceback.format_exc()`](https://docs.python.org/2/library/traceback.html#traceback.format_exc).
+    /// * **JavaScript**: Must be the value of
+    /// [`error.stack`](https://github.com/v8/v8/wiki/Stack-Trace-API) as returned
+    /// by V8.
+    /// * **Ruby**: Must contain frames returned by
+    /// [`Exception.backtrace`](https://ruby-doc.org/core-2.2.0/Exception.html#method-i-backtrace).
+    /// * **C#**: Must be the return value of
+    /// [`Exception.ToString()`](https://msdn.microsoft.com/en-us/library/system.exception.tostring.aspx).
     /// * **PHP**: Must start with `PHP (Notice|Parse error|Fatal error|Warning)`
-    /// and contain the result of [`(string)$exception`](http://php.net/manual/en/exception.tostring.php).
-    /// * **Go**: Must be the return value of [`runtime.Stack()`](https://golang.org/pkg/runtime/debug/#Stack).
+    /// and contain the result of
+    /// [`(string)$exception`](http://php.net/manual/en/exception.tostring.php).
+    /// * **Go**: Must be the return value of
+    /// [`runtime.Stack()`](https://golang.org/pkg/runtime/debug/#Stack).
     pub message: Option<String>,
     /// [Optional] A description of the context in which the error occurred.
     pub context: Option<ErrorContext>,
@@ -978,15 +983,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// for authentication. To use an API key, append it to the URL as the value of
     /// a `key` parameter. For example:
     /// 
-    /// `POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
+    /// `POST
+    /// https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectName` - [Required] The resource name of the Google Cloud Platform project. Written
     ///                   as `projects/` plus the
-    ///                   [Google Cloud Platform project ID](https://support.google.com/cloud/answer/6158840).
-    ///                   Example: `projects/my-project-123`.
+    ///                   [Google Cloud Platform project
+    ///                   ID](https://support.google.com/cloud/answer/6158840). Example:
+    ///                   `projects/my-project-123`.
     pub fn events_report(&self, request: ReportedErrorEvent, project_name: &str) -> ProjectEventReportCall<'a, C, A> {
         ProjectEventReportCall {
             hub: self.hub,
@@ -2539,7 +2546,8 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// for authentication. To use an API key, append it to the URL as the value of
 /// a `key` parameter. For example:
 /// 
-/// `POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
+/// `POST
+/// https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
 ///
 /// A builder for the *events.report* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2747,8 +2755,9 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
     /// [Required] The resource name of the Google Cloud Platform project. Written
     /// as `projects/` plus the
-    /// [Google Cloud Platform project ID](https://support.google.com/cloud/answer/6158840).
-    /// Example: `projects/my-project-123`.
+    /// [Google Cloud Platform project
+    /// ID](https://support.google.com/cloud/answer/6158840). Example:
+    /// `projects/my-project-123`.
     ///
     /// Sets the *project name* path property to the given value.
     ///

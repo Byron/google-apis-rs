@@ -15,7 +15,7 @@
     "description": "The Google App State API.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/games/services/web/api/states", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/swZo7JM2ROZKlpCcnTqj1lpN-m0\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/9LfeWNSu4Rz9I4ria7noLYTjYQs\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -211,7 +211,7 @@
             }
         }
     }, 
-    "revision": "20190328", 
+    "revision": "20190627", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "GetResponse": {

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container Analysis* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *containeranalysis:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Container Analysis* crate version *1.0.9+20190625*, where *20190625* is the exact revision of the *containeranalysis:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Container Analysis* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-analysis/api/reference/rest/).
@@ -221,9 +221,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -336,7 +334,7 @@ impl<'a, C, A> ContainerAnalysis<C, A>
         ContainerAnalysis {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://containeranalysis.googleapis.com/".to_string(),
             _root_url: "https://containeranalysis.googleapis.com/".to_string(),
         }
@@ -347,7 +345,7 @@ impl<'a, C, A> ContainerAnalysis<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -462,6 +460,8 @@ pub struct Detail {
     /// obsolete details.
     #[serde(rename="isObsolete")]
     pub is_obsolete: Option<bool>,
+    /// Deprecated, do not use. Use fixed_location instead.
+    /// 
     /// The max version of the package in which the vulnerability exists.
     #[serde(rename="maxAffectedVersion")]
     pub max_affected_version: Option<Version>,
@@ -598,56 +598,11 @@ impl ResponseResult for Empty {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1073,7 +1028,7 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -1243,17 +1198,22 @@ pub struct BuildProvenance {
 impl Part for BuildProvenance {}
 
 
-/// Details of an attestation occurrence.
+/// Note holding the version of the provider's builder and the signature of the
+/// provenance message in the build details occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Details {
-    /// Required. Attestation for the resource.
-    pub attestation: Option<Attestation>,
+pub struct Build {
+    /// Required. Immutable. Version of the builder which produced this build.
+    #[serde(rename="builderVersion")]
+    pub builder_version: Option<String>,
+    /// Signature of the build in occurrences pointing to this build note
+    /// containing build details.
+    pub signature: Option<BuildSignature>,
 }
 
-impl Part for Details {}
+impl Part for Build {}
 
 
 /// Details of a deployment occurrence.
@@ -1446,22 +1406,17 @@ pub struct Version {
 impl Part for Version {}
 
 
-/// Note holding the version of the provider's builder and the signature of the
-/// provenance message in the build details occurrence.
+/// Details of an attestation occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Build {
-    /// Required. Immutable. Version of the builder which produced this build.
-    #[serde(rename="builderVersion")]
-    pub builder_version: Option<String>,
-    /// Signature of the build in occurrences pointing to this build note
-    /// containing build details.
-    pub signature: Option<BuildSignature>,
+pub struct Details {
+    /// Required. Attestation for the resource.
+    pub attestation: Option<Attestation>,
 }
 
-impl Part for Build {}
+impl Part for Details {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
@@ -1830,9 +1785,13 @@ impl Part for AuditLogConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceType {
+    /// Deprecated, do not use. Use uri instead.
+    /// 
     /// The hash of the resource content. For example, the Docker digest.
     #[serde(rename="contentHash")]
     pub content_hash: Option<Hash>,
+    /// Deprecated, do not use. Use uri instead.
+    /// 
     /// The name of the resource. For example, the name of a Docker image -
     /// "Debian".
     pub name: Option<String>,
@@ -1926,6 +1885,9 @@ pub struct Vulnerability {
     /// than a package being at an incorrect version.
     #[serde(rename="windowsDetails")]
     pub windows_details: Option<Vec<WindowsDetail>>,
+    /// The full description of the CVSSv3.
+    #[serde(rename="cvssV3")]
+    pub cvss_v3: Option<CVSSv3>,
     /// The CVSS score for this vulnerability.
     #[serde(rename="cvssScore")]
     pub cvss_score: Option<f32>,
@@ -2144,6 +2106,52 @@ pub struct Location {
 }
 
 impl Part for Location {}
+
+
+/// Common Vulnerability Scoring System version 3.
+/// For details, see https://www.first.org/cvss/specification-document
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CVSSv3 {
+    /// no description provided
+    #[serde(rename="attackComplexity")]
+    pub attack_complexity: Option<String>,
+    /// Base Metrics
+    /// Represents the intrinsic characteristics of a vulnerability that are
+    /// constant over time and across user environments.
+    #[serde(rename="attackVector")]
+    pub attack_vector: Option<String>,
+    /// no description provided
+    #[serde(rename="availabilityImpact")]
+    pub availability_impact: Option<String>,
+    /// no description provided
+    #[serde(rename="userInteraction")]
+    pub user_interaction: Option<String>,
+    /// The base score is a function of the base metric scores.
+    #[serde(rename="baseScore")]
+    pub base_score: Option<f32>,
+    /// no description provided
+    #[serde(rename="privilegesRequired")]
+    pub privileges_required: Option<String>,
+    /// no description provided
+    #[serde(rename="impactScore")]
+    pub impact_score: Option<f32>,
+    /// no description provided
+    #[serde(rename="exploitabilityScore")]
+    pub exploitability_score: Option<f32>,
+    /// no description provided
+    #[serde(rename="confidentialityImpact")]
+    pub confidentiality_impact: Option<String>,
+    /// no description provided
+    #[serde(rename="integrityImpact")]
+    pub integrity_impact: Option<String>,
+    /// no description provided
+    pub scope: Option<String>,
+}
+
+impl Part for CVSSv3 {}
 
 
 /// An instance of an analysis type that has been found on a resource.

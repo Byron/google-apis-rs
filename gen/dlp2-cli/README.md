@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *DLP* API at revision *20190402*. The CLI is at version *1.0.8*.
+This documentation was generated from the *DLP* API at revision *20190629*. The CLI is at version *1.0.9*.
 
 ```bash
 dlp2 [options]
@@ -73,6 +73,7 @@ dlp2 [options]
                 job-triggers-get <name> [-p <v>]... [-o <out>]
                 job-triggers-list <parent> [-p <v>]... [-o <out>]
                 job-triggers-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-content-deidentify <parent> <location> (-r <kv>)... [-p <v>]... [-o <out>]
                 stored-info-types-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 stored-info-types-delete <name> [-p <v>]... [-o <out>]
                 stored-info-types-get <name> [-p <v>]... [-o <out>]

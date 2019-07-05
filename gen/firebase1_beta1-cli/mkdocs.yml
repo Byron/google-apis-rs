@@ -1,0 +1,44 @@
+site_name: Firebase Management v1.0.9+20190703
+site_url: http://byron.github.io/google-apis-rs/google-firebase1_beta1-cli
+site_description: A complete library to interact with Firebase Management (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/firebase1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['available-projects_list.md', 'Available Projects', 'List']
+- ['operations_get.md', 'Operations', 'Get']
+- ['projects_add-firebase.md', 'Projects', 'Add Firebase']
+- ['projects_android-apps-create.md', 'Projects', 'Android Apps Create']
+- ['projects_android-apps-get.md', 'Projects', 'Android Apps Get']
+- ['projects_android-apps-get-config.md', 'Projects', 'Android Apps Get Config']
+- ['projects_android-apps-list.md', 'Projects', 'Android Apps List']
+- ['projects_android-apps-patch.md', 'Projects', 'Android Apps Patch']
+- ['projects_android-apps-sha-create.md', 'Projects', 'Android Apps Sha Create']
+- ['projects_android-apps-sha-delete.md', 'Projects', 'Android Apps Sha Delete']
+- ['projects_android-apps-sha-list.md', 'Projects', 'Android Apps Sha List']
+- ['projects_available-locations-list.md', 'Projects', 'Available Locations List']
+- ['projects_default-location-finalize.md', 'Projects', 'Default Location Finalize']
+- ['projects_get.md', 'Projects', 'Get']
+- ['projects_get-admin-sdk-config.md', 'Projects', 'Get Admin Sdk Config']
+- ['projects_ios-apps-create.md', 'Projects', 'Ios Apps Create']
+- ['projects_ios-apps-get.md', 'Projects', 'Ios Apps Get']
+- ['projects_ios-apps-get-config.md', 'Projects', 'Ios Apps Get Config']
+- ['projects_ios-apps-list.md', 'Projects', 'Ios Apps List']
+- ['projects_ios-apps-patch.md', 'Projects', 'Ios Apps Patch']
+- ['projects_list.md', 'Projects', 'List']
+- ['projects_patch.md', 'Projects', 'Patch']
+- ['projects_search-apps.md', 'Projects', 'Search Apps']
+- ['projects_web-apps-create.md', 'Projects', 'Web Apps Create']
+- ['projects_web-apps-get.md', 'Projects', 'Web Apps Get']
+- ['projects_web-apps-get-config.md', 'Projects', 'Web Apps Get Config']
+- ['projects_web-apps-list.md', 'Projects', 'Web Apps List']
+- ['projects_web-apps-patch.md', 'Projects', 'Web Apps Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
+

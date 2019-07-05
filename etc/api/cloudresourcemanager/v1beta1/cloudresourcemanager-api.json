@@ -177,7 +177,7 @@
                     "parameterOrder": [], 
                     "parameters": {
                         "filter": {
-                            "description": "An optional query string used to filter the Organizations to return in\nthe response. Filter rules are case-insensitive.\n\n\nOrganizations may be filtered by `owner.directoryCustomerId` or by\n`domain`, where the domain is a G Suite domain, for example:\n\n|Filter|Description|\n|------|-----------|\n|owner.directorycustomerid:123456789|Organizations with `owner.directory_customer_id` equal to `123456789`.|\n|domain:google.com|Organizations corresponding to the domain `google.com`.|\n\nThis field is optional.", 
+                            "description": "An optional query string used to filter the Organizations to return in\nthe response. Filter rules are case-insensitive.\n\n\nOrganizations may be filtered by `owner.directoryCustomerId` or by\n`domain`, where the domain is a G Suite domain, for example:\n\n* Filter `owner.directorycustomerid:123456789` returns Organization\nresources with `owner.directory_customer_id` equal to `123456789`.\n* Filter `domain:google.com` returns Organization resources corresponding\nto the domain `google.com`.\n\nThis field is optional.", 
                             "location": "query", 
                             "type": "string"
                         }, 
@@ -316,7 +316,7 @@
                     ]
                 }, 
                 "delete": {
-                    "description": "Marks the Project identified by the specified\n`project_id` (for example, `my-project-123`) for deletion.\nThis method will only affect the Project if it has a lifecycle state of\nACTIVE.\n\nThis method changes the Project's lifecycle state from\nACTIVE\nto DELETE_REQUESTED.\nThe deletion starts at an unspecified time, at which point the project is\nno longer accessible.\n\nUntil the deletion completes, you can check the lifecycle state\nchecked by retrieving the Project with GetProject,\nand the Project remains visible to ListProjects.\nHowever, you cannot update the project.\n\nAfter the deletion completes, the Project is not retrievable by\nthe  GetProject and\nListProjects methods.\n\nThe caller must have modify permissions for this Project.", 
+                    "description": "Marks the Project identified by the specified\n`project_id` (for example, `my-project-123`) for deletion.\nThis method will only affect the Project if it has a lifecycle state of\nACTIVE.\n\nThis method changes the Project's lifecycle state from\nACTIVE\nto DELETE_REQUESTED.\nThe deletion starts at an unspecified time, at which point the project is\nno longer accessible.\n\nUntil the deletion completes, you can check the lifecycle state\nchecked by retrieving the Project with GetProject,\nand the Project remains visible to ListProjects.\nHowever, you cannot update the project.\n\nAfter the deletion completes, the Project is not retrievable by\nthe  GetProject\nand ListProjects\nmethods.\n\nThe caller must have modify permissions for this Project.", 
                     "flatPath": "v1beta1/projects/{projectId}", 
                     "httpMethod": "DELETE", 
                     "id": "cloudresourcemanager.projects.delete", 
@@ -421,14 +421,14 @@
                     ]
                 }, 
                 "list": {
-                    "description": "Lists Projects that are visible to the user and satisfy the\nspecified filter. This method returns Projects in an unspecified order.\nThis method is eventually consistent with project mutations; this means\nthat a newly created project may not appear in the results or recent\nupdates to an existing project may not be reflected in the results. To\nretrieve the latest state of a project, use the GetProjectmethod.", 
+                    "description": "Lists Projects that the caller has the `resourcemanager.projects.get`\npermission on and satisfy the specified filter.\n\nThis method returns Projects in an unspecified order.\nThis method is eventually consistent with project mutations; this means\nthat a newly created project may not appear in the results or recent\nupdates to an existing project may not be reflected in the results. To\nretrieve the latest state of a project, use the\nGetProject method.\n\nNOTE: If the request filter contains a `parent.type` and `parent.id` and\nthe caller has the `resourcemanager.projects.list` permission on the\nparent, the results will be drawn from an alternate index which provides\nmore consistent results. In future versions of this API, this List method\nwill be split into List and Search to properly capture the behavorial\ndifference.", 
                     "flatPath": "v1beta1/projects", 
                     "httpMethod": "GET", 
                     "id": "cloudresourcemanager.projects.list", 
                     "parameterOrder": [], 
                     "parameters": {
                         "filter": {
-                            "description": "An expression for filtering the results of the request.  Filter rules are\ncase insensitive. The fields eligible for filtering are:\n\n+ `name`\n+ `id`\n+ <code>labels.<em>key</em></code> where *key* is the name of a label\n\nSome examples of using labels as filters:\n\n|Filter|Description|\n|------|-----------|\n|name:how*|The project's name starts with \"how\".|\n|name:Howl|The project's name is `Howl` or `howl`.|\n|name:HOWL|Equivalent to above.|\n|NAME:howl|Equivalent to above.|\n|labels.color:*|The project has the label `color`.|\n|labels.color:red|The project's label `color` has the value `red`.|\n|labels.color:red&nbsp;labels.size:big|The project's label `color` has the value `red` and its label `size` has the value `big`.\n\nIf you specify a filter that has both `parent.type` and `parent.id`, then\nthe `resourcemanager.projects.list` permission is checked on the parent.\nIf the user has this permission, all projects under the parent will be\nreturned after remaining filters have been applied. If the user lacks this\npermission, then all projects for which the user has the\n`resourcemanager.projects.get` permission will be returned after remaining\nfilters have been applied. If no filter is specified, the call will return\nprojects for which the user has `resourcemanager.projects.get` permissions.\n\nOptional.", 
+                            "description": "An expression for filtering the results of the request.  Filter rules are\ncase insensitive. The fields eligible for filtering are:\n\n+ `name`\n+ `id`\n+ `labels.<key>` (where *key* is the name of a label)\n+ `parent.type`\n+ `parent.id`\n\nSome examples of using labels as filters:\n\n| Filter           | Description                                         |\n|------------------|-----------------------------------------------------|\n| name:how*        | The project's name starts with \"how\".               |\n| name:Howl        | The project's name is `Howl` or `howl`.             |\n| name:HOWL        | Equivalent to above.                                |\n| NAME:howl        | Equivalent to above.                                |\n| labels.color:*   | The project has the label `color`.                  |\n| labels.color:red | The project's label `color` has the value `red`.    |\n| labels.color:red&nbsp;labels.size:big |The project's label `color` has\n  the value `red` and its label `size` has the value `big`.              |\n\nIf no filter is specified, the call will return projects for which the user\nhas the `resourcemanager.projects.get` permission.\n\nNOTE: To perform a by-parent query (eg., what projects are directly in a\nFolder), the caller must have the `resourcemanager.projects.list`\npermission on the parent and the filter must contain both a `parent.type`\nand a `parent.id` restriction\n(example: \"parent.type:folder parent.id:123\"). In this case an alternate\nsearch index is used which provides more consistent results.\n\nOptional.", 
                             "location": "query", 
                             "type": "string"
                         }, 
@@ -565,7 +565,7 @@
             }
         }
     }, 
-    "revision": "20190401", 
+    "revision": "20190701", 
     "rootUrl": "https://cloudresourcemanager.googleapis.com/", 
     "schemas": {
         "Ancestor": {
@@ -633,7 +633,7 @@
             "properties": {
                 "condition": {
                     "$ref": "Expr", 
-                    "description": "The condition that is associated with this binding.\nNOTE: an unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently."
+                    "description": "The condition that is associated with this binding.\nNOTE: An unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently."
                 }, 
                 "members": {
                     "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n", 
@@ -769,7 +769,24 @@
         "GetIamPolicyRequest": {
             "description": "Request message for `GetIamPolicy` method.", 
             "id": "GetIamPolicyRequest", 
-            "properties": {}, 
+            "properties": {
+                "options": {
+                    "$ref": "GetPolicyOptions", 
+                    "description": "OPTIONAL: A `GetPolicyOptions` object for specifying options to\n`GetIamPolicy`. This field is only used by Cloud IAM."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "GetPolicyOptions": {
+            "description": "Encapsulates settings provided to GetIamPolicy.", 
+            "id": "GetPolicyOptions", 
+            "properties": {
+                "requestedPolicyVersion": {
+                    "description": "Optional. The policy format version to be returned.\nAcceptable values are 0 and 1.\nIf the value is 0, or the field is omitted, policy format version 1 will be\nreturned.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }
+            }, 
             "type": "object"
         }, 
         "ListOrganizationsResponse": {

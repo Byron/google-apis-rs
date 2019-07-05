@@ -7,6 +7,8 @@ api:
     - v1
     acceleratedmobilepageurl:
     - v1
+    accessapproval:
+    - v1beta1
     accesscontextmanager:
     - v1
     - v1beta
@@ -108,6 +110,7 @@ api:
     - v1beta1
     - v2
     cloudscheduler:
+    - v1
     - v1beta1
     cloudsearch:
     - v1
@@ -122,6 +125,8 @@ api:
     - v2
     clouduseraccounts:
     - vm_beta
+    commentanalyzer:
+    - v1alpha1
     composer:
     - v1
     compute:
@@ -141,6 +146,8 @@ api:
     - v1
     dataflow:
     - v1b4
+    datafusion:
+    - v1beta1
     dataproc:
     - v1
     datastore:
@@ -179,8 +186,12 @@ api:
     - v2
     factchecktools:
     - v1alpha1
+    fcm:
+    - v1
     file:
     - v1
+    - v1beta1
+    firebase:
     - v1beta1
     firebasedynamiclinks:
     - v1
@@ -256,6 +267,8 @@ api:
     - v3
     oauth2:
     - v2
+    osconfig:
+    - v1alpha2
     oslogin:
     - v1
     - v1beta
@@ -387,6 +400,7 @@ api:
     webmasters:
     - v3
     websecurityscanner:
+    - v1
     - v1beta
     youtube:
     - v3

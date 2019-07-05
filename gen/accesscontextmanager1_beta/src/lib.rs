@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Context Manager* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *accesscontextmanager:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Access Context Manager* crate version *1.0.9+20190626*, where *20190626* is the exact revision of the *accesscontextmanager:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Access Context Manager* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/access-context-manager/docs/reference/rest/).
@@ -229,9 +229,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -344,7 +342,7 @@ impl<'a, C, A> AccessContextManager<C, A>
         AccessContextManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://accesscontextmanager.googleapis.com/".to_string(),
             _root_url: "https://accesscontextmanager.googleapis.com/".to_string(),
         }
@@ -358,7 +356,7 @@ impl<'a, C, A> AccessContextManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -386,77 +384,6 @@ impl<'a, C, A> AccessContextManager<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for
-/// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
-/// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Status {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for Status {}
-
-
 /// A response to `ListAccessLevelsRequest`.
 /// 
 /// # Activities
@@ -600,6 +527,115 @@ pub struct ListServicePerimetersResponse {
 impl ResponseResult for ListServicePerimetersResponse {}
 
 
+/// A response to `ListAccessPoliciesRequest`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list access policies](struct.AccessPolicyListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListAccessPoliciesResponse {
+    /// The pagination token to retrieve the next page of results. If the value is
+    /// empty, no further results remain.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of the AccessPolicy instances.
+    #[serde(rename="accessPolicies")]
+    pub access_policies: Option<Vec<AccessPolicy>>,
+}
+
+impl ResponseResult for ListAccessPoliciesResponse {}
+
+
+/// Alpha. Specifies how APIs are allowed to communicate within the Service
+/// Perimeter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VpcServiceRestriction {
+    /// Whether to restrict API calls within the Service Perimeter to the list of
+    /// APIs specified in 'allowed_services'.
+    #[serde(rename="enableRestriction")]
+    pub enable_restriction: Option<bool>,
+    /// The list of APIs usable within the Service Perimeter. Must be empty
+    /// unless 'enable_restriction' is True.
+    #[serde(rename="allowedServices")]
+    pub allowed_services: Option<Vec<String>>,
+}
+
+impl Part for VpcServiceRestriction {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
+/// 
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
+/// Alpha. Specifies how Access Levels are to be used for accessing the Service
+/// Perimeter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IngressServiceRestriction {
+    /// Whether to restrict the set of APIs callable outside the Service
+    /// Perimeter via Access Levels.
+    #[serde(rename="enableRestriction")]
+    pub enable_restriction: Option<bool>,
+    /// The list of APIs usable with a valid Access Level. Must be empty unless
+    /// 'enable_restriction' is True.
+    #[serde(rename="allowedServices")]
+    pub allowed_services: Option<Vec<String>>,
+}
+
+impl Part for IngressServiceRestriction {}
+
+
+/// Alpha. Specifies which services are granted access via this Bridge Service
+/// Perimeter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BridgeServiceRestriction {
+    /// Whether to restrict the set of APIs callable through the Bridge Service
+    /// Perimeter.
+    #[serde(rename="enableRestriction")]
+    pub enable_restriction: Option<bool>,
+    /// The list of APIs usable through the Bridge Perimeter. Must be empty
+    /// unless 'enable_restriction' is True.
+    #[serde(rename="allowedServices")]
+    pub allowed_services: Option<Vec<String>>,
+}
+
+impl Part for BridgeServiceRestriction {}
+
+
 /// `ServicePerimeter` describes a set of GCP resources which can freely import
 /// and export data amongst themselves, but not export outside of the
 /// `ServicePerimeter`. If a request with a source within this `ServicePerimeter`
@@ -661,15 +697,15 @@ impl ResponseResult for ServicePerimeter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServicePerimeterConfig {
+    /// Alpha. Configuration for which services may be used with Access Levels.
+    #[serde(rename="ingressServiceRestriction")]
+    pub ingress_service_restriction: Option<IngressServiceRestriction>,
     /// GCP services that are subject to the Service Perimeter restrictions. Must
     /// contain a list of services. For example, if
     /// `storage.googleapis.com` is specified, access to the storage buckets
     /// inside the perimeter must meet the perimeter's access restrictions.
     #[serde(rename="restrictedServices")]
     pub restricted_services: Option<Vec<String>>,
-    /// A list of GCP resources that are inside of the service perimeter.
-    /// Currently only projects are allowed. Format: `projects/{project_number}`
-    pub resources: Option<Vec<String>>,
     /// GCP services that are not subject to the Service Perimeter
     /// restrictions. Deprecated. Must be set to a single wildcard "*".
     /// 
@@ -677,6 +713,16 @@ pub struct ServicePerimeterConfig {
     /// "restricted_services" list, any service is treated as unrestricted.
     #[serde(rename="unrestrictedServices")]
     pub unrestricted_services: Option<Vec<String>>,
+    /// Alpha. Configuration for within Perimeter allowed APIs.
+    #[serde(rename="vpcServiceRestriction")]
+    pub vpc_service_restriction: Option<VpcServiceRestriction>,
+    /// A list of GCP resources that are inside of the service perimeter.
+    /// Currently only projects are allowed. Format: `projects/{project_number}`
+    pub resources: Option<Vec<String>>,
+    /// Alpha. Configuration for what services are accessible via the Bridge
+    /// Perimeter. Must be empty for non-Bridge Perimeters.
+    #[serde(rename="bridgeServiceRestriction")]
+    pub bridge_service_restriction: Option<BridgeServiceRestriction>,
     /// A list of `AccessLevel` resource names that allow resources within the
     /// `ServicePerimeter` to be accessed from the internet. `AccessLevels` listed
     /// must be in the same policy as this `ServicePerimeter`. Referencing a
@@ -690,29 +736,6 @@ pub struct ServicePerimeterConfig {
 }
 
 impl Part for ServicePerimeterConfig {}
-
-
-/// A response to `ListAccessPoliciesRequest`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list access policies](struct.AccessPolicyListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListAccessPoliciesResponse {
-    /// The pagination token to retrieve the next page of results. If the value is
-    /// empty, no further results remain.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of the AccessPolicy instances.
-    #[serde(rename="accessPolicies")]
-    pub access_policies: Option<Vec<AccessPolicy>>,
-}
-
-impl ResponseResult for ListAccessPoliciesResponse {}
 
 
 /// This resource represents a long-running operation that is the result of a
@@ -753,7 +776,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.

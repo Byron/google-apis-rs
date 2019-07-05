@@ -1,4 +1,4 @@
-site_name: Dialogflow v1.0.8+20190402
+site_name: Dialogflow v1.0.9+20190629
 site_url: http://byron.github.io/google-apis-rs/google-dialogflow2_beta1-cli
 site_description: A complete library to interact with Dialogflow (protocol v2beta1)
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_agent.md', 'Projects', 'Agent']
 - ['projects_agent-entity-types-batch-delete.md', 'Projects', 'Agent Entity Types Batch Delete']
 - ['projects_agent-entity-types-batch-update.md', 'Projects', 'Agent Entity Types Batch Update']
 - ['projects_agent-entity-types-create.md', 'Projects', 'Agent Entity Types Create']
@@ -66,6 +67,7 @@ pages:
 - ['projects_agent-sessions-entity-types-list.md', 'Projects', 'Agent Sessions Entity Types List']
 - ['projects_agent-sessions-entity-types-patch.md', 'Projects', 'Agent Sessions Entity Types Patch']
 - ['projects_agent-train.md', 'Projects', 'Agent Train']
+- ['projects_delete-agent.md', 'Projects', 'Delete Agent']
 - ['projects_get-agent.md', 'Projects', 'Get Agent']
 - ['projects_knowledge-bases-create.md', 'Projects', 'Knowledge Bases Create']
 - ['projects_knowledge-bases-delete.md', 'Projects', 'Knowledge Bases Delete']
@@ -82,5 +84,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

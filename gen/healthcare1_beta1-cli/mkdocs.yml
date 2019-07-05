@@ -1,4 +1,4 @@
-site_name: Cloud Healthcare v1.0.8+20190401
+site_name: Cloud Healthcare v1.0.9+20190628
 site_url: http://byron.github.io/google-apis-rs/google-healthcare1_beta1-cli
 site_description: A complete library to interact with Cloud Healthcare (protocol v1beta1)
 
@@ -44,24 +44,23 @@ pages:
 - ['projects_locations-datasets-dicom-stores-test-iam-permissions.md', 'Projects', 'Locations Datasets Dicom Stores Test Iam Permissions']
 - ['projects_locations-datasets-fhir-stores-create.md', 'Projects', 'Locations Datasets Fhir Stores Create']
 - ['projects_locations-datasets-fhir-stores-delete.md', 'Projects', 'Locations Datasets Fhir Stores Delete']
-- ['projects_locations-datasets-fhir-stores-execute-bundle.md', 'Projects', 'Locations Datasets Fhir Stores Execute Bundle']
 - ['projects_locations-datasets-fhir-stores-export.md', 'Projects', 'Locations Datasets Fhir Stores Export']
-- ['projects_locations-datasets-fhir-stores-fhir--observation-get$lastn.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  Observation Get$lastn']
-- ['projects_locations-datasets-fhir-stores-fhir--patient-get$everything.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  Patient Get$everything']
-- ['projects_locations-datasets-fhir-stores-fhir--history-get.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  History Get']
-- ['projects_locations-datasets-fhir-stores-fhir--history-list.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  History List']
-- ['projects_locations-datasets-fhir-stores-fhir--search.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  Search']
-- ['projects_locations-datasets-fhir-stores-fhir-conditional-delete-resource.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Conditional Delete Resource']
-- ['projects_locations-datasets-fhir-stores-fhir-conditional-patch-resource.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Conditional Patch Resource']
-- ['projects_locations-datasets-fhir-stores-fhir-conditional-update-resource.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Conditional Update Resource']
-- ['projects_locations-datasets-fhir-stores-fhir-create-resource.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Create Resource']
+- ['projects_locations-datasets-fhir-stores-fhir--observation-lastn.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  Observation Lastn']
+- ['projects_locations-datasets-fhir-stores-fhir--patient-everything.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  Patient Everything']
+- ['projects_locations-datasets-fhir-stores-fhir--resource-purge.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  Resource Purge']
+- ['projects_locations-datasets-fhir-stores-fhir-capabilities.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Capabilities']
+- ['projects_locations-datasets-fhir-stores-fhir-conditional-delete.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Conditional Delete']
+- ['projects_locations-datasets-fhir-stores-fhir-conditional-patch.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Conditional Patch']
+- ['projects_locations-datasets-fhir-stores-fhir-conditional-update.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Conditional Update']
+- ['projects_locations-datasets-fhir-stores-fhir-create.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Create']
 - ['projects_locations-datasets-fhir-stores-fhir-delete.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Delete']
-- ['projects_locations-datasets-fhir-stores-fhir-delete$purge.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Delete$purge']
-- ['projects_locations-datasets-fhir-stores-fhir-get.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Get']
-- ['projects_locations-datasets-fhir-stores-fhir-get-metadata.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Get Metadata']
+- ['projects_locations-datasets-fhir-stores-fhir-execute-bundle.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Execute Bundle']
+- ['projects_locations-datasets-fhir-stores-fhir-history.md', 'Projects', 'Locations Datasets Fhir Stores Fhir History']
 - ['projects_locations-datasets-fhir-stores-fhir-patch.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Patch']
-- ['projects_locations-datasets-fhir-stores-fhir-search-resources.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Search Resources']
+- ['projects_locations-datasets-fhir-stores-fhir-read.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Read']
+- ['projects_locations-datasets-fhir-stores-fhir-search.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Search']
 - ['projects_locations-datasets-fhir-stores-fhir-update.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Update']
+- ['projects_locations-datasets-fhir-stores-fhir-vread.md', 'Projects', 'Locations Datasets Fhir Stores Fhir Vread']
 - ['projects_locations-datasets-fhir-stores-get.md', 'Projects', 'Locations Datasets Fhir Stores Get']
 - ['projects_locations-datasets-fhir-stores-get-iam-policy.md', 'Projects', 'Locations Datasets Fhir Stores Get Iam Policy']
 - ['projects_locations-datasets-fhir-stores-import.md', 'Projects', 'Locations Datasets Fhir Stores Import']
@@ -96,5 +95,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

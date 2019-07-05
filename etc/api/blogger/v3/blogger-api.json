@@ -17,7 +17,7 @@
     "description": "API for access to the data within Blogger.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/blogger/docs/3.0/getting_started", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/zeFiTF7dFzipBcUZ7HKiIsW5EE0\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/zeFiTF7dFzipBcUZ7HKiIsW5EE0\"", 
     "icons": {
         "x16": "https://www.google.com/images/icons/product/blogger-16.png", 
         "x32": "https://www.google.com/images/icons/product/blogger-32.png"

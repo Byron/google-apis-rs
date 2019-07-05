@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Asset* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *cloudasset:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Asset* crate version *1.0.9+20190625*, where *20190625* is the exact revision of the *cloudasset:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Asset* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory).
@@ -222,9 +222,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -336,7 +334,7 @@ impl<'a, C, A> CloudAsset<C, A>
         CloudAsset {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://cloudasset.googleapis.com/".to_string(),
             _root_url: "https://cloudasset.googleapis.com/".to_string(),
         }
@@ -350,7 +348,7 @@ impl<'a, C, A> CloudAsset<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -378,77 +376,6 @@ impl<'a, C, A> CloudAsset<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for
-/// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
-/// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Status {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for Status {}
-
-
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
@@ -484,6 +411,27 @@ pub struct AuditLogConfig {
 }
 
 impl Part for AuditLogConfig {}
+
+
+/// Ignores policies set above this resource and restores the
+/// `constraint_default` enforcement behavior of the specific `Constraint` at
+/// this resource.
+/// 
+/// Suppose that `constraint_default` is set to `ALLOW` for the
+/// `Constraint` `constraints/serviceuser.services`. Suppose that organization
+/// foo.com sets a `Policy` at their Organization resource node that restricts
+/// the allowed service activations to deny all service activations. They
+/// could then set a `Policy` with the `policy_type` `restore_default` on
+/// several experimental projects, restoring the `constraint_default`
+/// enforcement of the `Constraint` for only those projects, allowing those
+/// projects to have all services activated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudOrgpolicyV1RestoreDefault { _never_set: Option<bool> }
+
+impl Part for GoogleCloudOrgpolicyV1RestoreDefault {}
 
 
 /// Representation of a cloud resource.
@@ -545,8 +493,8 @@ impl Part for ResourceType {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportAssetsRequest {
     /// A list of asset types of which to take a snapshot for. For example:
-    /// "compute.googleapis.com/Disk". If specified, only matching assets will be returned.
-    /// See [Introduction to Cloud Asset
+    /// "compute.googleapis.com/Disk". If specified, only matching assets will be
+    /// returned. See [Introduction to Cloud Asset
     /// Inventory](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview)
     /// for all supported asset types.
     #[serde(rename="assetTypes")]
@@ -620,6 +568,407 @@ pub struct TemporalAsset {
 impl Part for TemporalAsset {}
 
 
+/// Cloud asset. This includes all Google Cloud Platform resources,
+/// Cloud IAM policies, and other non-GCP assets.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Asset {
+    /// Representation of the actual Cloud IAM policy set on a cloud resource. For
+    /// each resource, there must be at most one Cloud IAM policy set on it.
+    #[serde(rename="iamPolicy")]
+    pub iam_policy: Option<Policy>,
+    /// Type of the asset. Example: "compute.googleapis.com/Disk".
+    #[serde(rename="assetType")]
+    pub asset_type: Option<String>,
+    /// Representation of the resource.
+    pub resource: Option<ResourceType>,
+    /// The full name of the asset. For example:
+    /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
+    /// See [Resource
+    /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
+    /// for more information.
+    pub name: Option<String>,
+    /// Representation of the Cloud Organization Policy set on an asset. For each
+    /// asset, there could be multiple Organization policies with different
+    /// constraints.
+    #[serde(rename="orgPolicy")]
+    pub org_policy: Option<Vec<GoogleCloudOrgpolicyV1Policy>>,
+}
+
+impl Part for Asset {}
+
+
+/// Output configuration for export assets destination.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OutputConfig {
+    /// Destination on Cloud Storage.
+    #[serde(rename="gcsDestination")]
+    pub gcs_destination: Option<GcsDestination>,
+}
+
+impl Part for OutputConfig {}
+
+
+/// Defines an Identity and Access Management (IAM) policy. It is used to
+/// specify access control policies for Cloud Platform resources.
+/// 
+/// 
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
+/// `members` to a `role`, where the members can be user accounts, Google groups,
+/// Google domains, and service accounts. A `role` is a named list of permissions
+/// defined by IAM.
+/// 
+/// **JSON Example**
+/// 
+///     {
+///       "bindings": [
+///         {
+///           "role": "roles/owner",
+///           "members": [
+///             "user:mike@example.com",
+///             "group:admins@example.com",
+///             "domain:google.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///           ]
+///         },
+///         {
+///           "role": "roles/viewer",
+///           "members": ["user:sean@example.com"]
+///         }
+///       ]
+///     }
+/// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
+    /// policy is overwritten blindly.
+    pub etag: Option<String>,
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
+    /// Deprecated.
+    pub version: Option<i32>,
+}
+
+impl Part for Policy {}
+
+
+/// Used in `policy_type` to specify how `list_policy` behaves at this
+/// resource.
+/// 
+/// `ListPolicy` can define specific values and subtrees of Cloud Resource
+/// Manager resource hierarchy (`Organizations`, `Folders`, `Projects`) that
+/// are allowed or denied by setting the `allowed_values` and `denied_values`
+/// fields. This is achieved by using the `under:` and optional `is:` prefixes.
+/// The `under:` prefix is used to denote resource subtree values.
+/// The `is:` prefix is used to denote specific values, and is required only
+/// if the value contains a ":". Values prefixed with "is:" are treated the
+/// same as values with no prefix.
+/// Ancestry subtrees must be in one of the following formats:
+///     - “projects/<project-id>”, e.g. “projects/tokyo-rain-123”
+///     - “folders/<folder-id>”, e.g. “folders/1234”
+///     - “organizations/<organization-id>”, e.g. “organizations/1234”
+/// The `supports_under` field of the associated `Constraint`  defines whether
+/// ancestry prefixes can be used. You can set `allowed_values` and
+/// `denied_values` in the same `Policy` if `all_values` is
+/// `ALL_VALUES_UNSPECIFIED`. `ALLOW` or `DENY` are used to allow or deny all
+/// values. If `all_values` is set to either `ALLOW` or `DENY`,
+/// `allowed_values` and `denied_values` must be unset.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudOrgpolicyV1ListPolicy {
+    /// The policy all_values state.
+    #[serde(rename="allValues")]
+    pub all_values: Option<String>,
+    /// List of values allowed  at this resource. Can only be set if `all_values`
+    /// is set to `ALL_VALUES_UNSPECIFIED`.
+    #[serde(rename="allowedValues")]
+    pub allowed_values: Option<Vec<String>>,
+    /// Determines the inheritance behavior for this `Policy`.
+    /// 
+    /// By default, a `ListPolicy` set at a resource supercedes any `Policy` set
+    /// anywhere up the resource hierarchy. However, if `inherit_from_parent` is
+    /// set to `true`, then the values from the effective `Policy` of the parent
+    /// resource are inherited, meaning the values set in this `Policy` are
+    /// added to the values inherited up the hierarchy.
+    /// 
+    /// Setting `Policy` hierarchies that inherit both allowed values and denied
+    /// values isn't recommended in most circumstances to keep the configuration
+    /// simple and understandable. However, it is possible to set a `Policy` with
+    /// `allowed_values` set that inherits a `Policy` with `denied_values` set.
+    /// In this case, the values that are allowed must be in `allowed_values` and
+    /// not present in `denied_values`.
+    /// 
+    /// For example, suppose you have a `Constraint`
+    /// `constraints/serviceuser.services`, which has a `constraint_type` of
+    /// `list_constraint`, and with `constraint_default` set to `ALLOW`.
+    /// Suppose that at the Organization level, a `Policy` is applied that
+    /// restricts the allowed API activations to {`E1`, `E2`}. Then, if a
+    /// `Policy` is applied to a project below the Organization that has
+    /// `inherit_from_parent` set to `false` and field all_values set to DENY,
+    /// then an attempt to activate any API will be denied.
+    /// 
+    /// The following examples demonstrate different possible layerings for
+    /// `projects/bar` parented by `organizations/foo`:
+    /// 
+    /// Example 1 (no inherited values):
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: “E1” allowed_values:”E2”}
+    ///   `projects/bar` has `inherit_from_parent` `false` and values:
+    ///     {allowed_values: "E3" allowed_values: "E4"}
+    /// The accepted values at `organizations/foo` are `E1`, `E2`.
+    /// The accepted values at `projects/bar` are `E3`, and `E4`.
+    /// 
+    /// Example 2 (inherited values):
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: “E1” allowed_values:”E2”}
+    ///   `projects/bar` has a `Policy` with values:
+    ///     {value: “E3” value: ”E4” inherit_from_parent: true}
+    /// The accepted values at `organizations/foo` are `E1`, `E2`.
+    /// The accepted values at `projects/bar` are `E1`, `E2`, `E3`, and `E4`.
+    /// 
+    /// Example 3 (inheriting both allowed and denied values):
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: "E1" allowed_values: "E2"}
+    ///   `projects/bar` has a `Policy` with:
+    ///     {denied_values: "E1"}
+    /// The accepted values at `organizations/foo` are `E1`, `E2`.
+    /// The value accepted at `projects/bar` is `E2`.
+    /// 
+    /// Example 4 (RestoreDefault):
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: “E1” allowed_values:”E2”}
+    ///   `projects/bar` has a `Policy` with values:
+    ///     {RestoreDefault: {}}
+    /// The accepted values at `organizations/foo` are `E1`, `E2`.
+    /// The accepted values at `projects/bar` are either all or none depending on
+    /// the value of `constraint_default` (if `ALLOW`, all; if
+    /// `DENY`, none).
+    /// 
+    /// Example 5 (no policy inherits parent policy):
+    ///   `organizations/foo` has no `Policy` set.
+    ///   `projects/bar` has no `Policy` set.
+    /// The accepted values at both levels are either all or none depending on
+    /// the value of `constraint_default` (if `ALLOW`, all; if
+    /// `DENY`, none).
+    /// 
+    /// Example 6 (ListConstraint allowing all):
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: “E1” allowed_values: ”E2”}
+    ///   `projects/bar` has a `Policy` with:
+    ///     {all: ALLOW}
+    /// The accepted values at `organizations/foo` are `E1`, E2`.
+    /// Any value is accepted at `projects/bar`.
+    /// 
+    /// Example 7 (ListConstraint allowing none):
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: “E1” allowed_values: ”E2”}
+    ///   `projects/bar` has a `Policy` with:
+    ///     {all: DENY}
+    /// The accepted values at `organizations/foo` are `E1`, E2`.
+    /// No value is accepted at `projects/bar`.
+    /// 
+    /// Example 10 (allowed and denied subtrees of Resource Manager hierarchy):
+    /// Given the following resource hierarchy
+    ///   O1->{F1, F2}; F1->{P1}; F2->{P2, P3},
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: "under:organizations/O1"}
+    ///   `projects/bar` has a `Policy` with:
+    ///     {allowed_values: "under:projects/P3"}
+    ///     {denied_values: "under:folders/F2"}
+    /// The accepted values at `organizations/foo` are `organizations/O1`,
+    ///   `folders/F1`, `folders/F2`, `projects/P1`, `projects/P2`,
+    ///   `projects/P3`.
+    /// The accepted values at `projects/bar` are `organizations/O1`,
+    ///   `folders/F1`, `projects/P1`.
+    #[serde(rename="inheritFromParent")]
+    pub inherit_from_parent: Option<bool>,
+    /// Optional. The Google Cloud Console will try to default to a configuration
+    /// that matches the value specified in this `Policy`. If `suggested_value`
+    /// is not set, it will inherit the value specified higher in the hierarchy,
+    /// unless `inherit_from_parent` is `false`.
+    #[serde(rename="suggestedValue")]
+    pub suggested_value: Option<String>,
+    /// List of values denied at this resource. Can only be set if `all_values`
+    /// is set to `ALL_VALUES_UNSPECIFIED`.
+    #[serde(rename="deniedValues")]
+    pub denied_values: Option<Vec<String>>,
+}
+
+impl Part for GoogleCloudOrgpolicyV1ListPolicy {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
+/// 
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
+/// Used in `policy_type` to specify how `boolean_policy` will behave at this
+/// resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudOrgpolicyV1BooleanPolicy {
+    /// If `true`, then the `Policy` is enforced. If `false`, then any
+    /// configuration is acceptable.
+    /// 
+    /// Suppose you have a `Constraint`
+    /// `constraints/compute.disableSerialPortAccess` with `constraint_default`
+    /// set to `ALLOW`. A `Policy` for that `Constraint` exhibits the following
+    /// behavior:
+    ///   - If the `Policy` at this resource has enforced set to `false`, serial
+    ///     port connection attempts will be allowed.
+    ///   - If the `Policy` at this resource has enforced set to `true`, serial
+    ///     port connection attempts will be refused.
+    ///   - If the `Policy` at this resource is `RestoreDefault`, serial port
+    ///     connection attempts will be allowed.
+    ///   - If no `Policy` is set at this resource or anywhere higher in the
+    ///     resource hierarchy, serial port connection attempts will be allowed.
+    ///   - If no `Policy` is set at this resource, but one exists higher in the
+    ///     resource hierarchy, the behavior is as if the`Policy` were set at
+    ///     this resource.
+    /// 
+    /// The following examples demonstrate the different possible layerings:
+    /// 
+    /// Example 1 (nearest `Constraint` wins):
+    ///   `organizations/foo` has a `Policy` with:
+    ///     {enforced: false}
+    ///   `projects/bar` has no `Policy` set.
+    /// The constraint at `projects/bar` and `organizations/foo` will not be
+    /// enforced.
+    /// 
+    /// Example 2 (enforcement gets replaced):
+    ///   `organizations/foo` has a `Policy` with:
+    ///     {enforced: false}
+    ///   `projects/bar` has a `Policy` with:
+    ///     {enforced: true}
+    /// The constraint at `organizations/foo` is not enforced.
+    /// The constraint at `projects/bar` is enforced.
+    /// 
+    /// Example 3 (RestoreDefault):
+    ///   `organizations/foo` has a `Policy` with:
+    ///     {enforced: true}
+    ///   `projects/bar` has a `Policy` with:
+    ///     {RestoreDefault: {}}
+    /// The constraint at `organizations/foo` is enforced.
+    /// The constraint at `projects/bar` is not enforced, because
+    /// `constraint_default` for the `Constraint` is `ALLOW`.
+    pub enforced: Option<bool>,
+}
+
+impl Part for GoogleCloudOrgpolicyV1BooleanPolicy {}
+
+
+/// Defines a Cloud Organization `Policy` which is used to specify `Constraints`
+/// for configurations of Cloud Platform resources.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudOrgpolicyV1Policy {
+    /// The time stamp the `Policy` was previously updated. This is set by the
+    /// server, not specified by the caller, and represents the last time a call to
+    /// `SetOrgPolicy` was made for that `Policy`. Any value set by the client will
+    /// be ignored.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Version of the `Policy`. Default version is 0;
+    pub version: Option<i32>,
+    /// An opaque tag indicating the current version of the `Policy`, used for
+    /// concurrency control.
+    /// 
+    /// When the `Policy` is returned from either a `GetPolicy` or a
+    /// `ListOrgPolicy` request, this `etag` indicates the version of the current
+    /// `Policy` to use when executing a read-modify-write loop.
+    /// 
+    /// When the `Policy` is returned from a `GetEffectivePolicy` request, the
+    /// `etag` will be unset.
+    /// 
+    /// When the `Policy` is used in a `SetOrgPolicy` method, use the `etag` value
+    /// that was returned from a `GetOrgPolicy` request as part of a
+    /// read-modify-write loop for concurrency control. Not setting the `etag`in a
+    /// `SetOrgPolicy` request will result in an unconditional write of the
+    /// `Policy`.
+    pub etag: Option<String>,
+    /// The name of the `Constraint` the `Policy` is configuring, for example,
+    /// `constraints/serviceuser.services`.
+    /// 
+    /// Immutable after creation.
+    pub constraint: Option<String>,
+    /// Restores the default behavior of the constraint; independent of
+    /// `Constraint` type.
+    #[serde(rename="restoreDefault")]
+    pub restore_default: Option<GoogleCloudOrgpolicyV1RestoreDefault>,
+    /// List of values either allowed or disallowed.
+    #[serde(rename="listPolicy")]
+    pub list_policy: Option<GoogleCloudOrgpolicyV1ListPolicy>,
+    /// For boolean `Constraints`, whether to enforce the `Constraint` or not.
+    #[serde(rename="booleanPolicy")]
+    pub boolean_policy: Option<GoogleCloudOrgpolicyV1BooleanPolicy>,
+}
+
+impl Part for GoogleCloudOrgpolicyV1Policy {}
+
+
 /// Associates `members` with a `role`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -630,7 +979,7 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -750,47 +1099,6 @@ pub struct AuditConfig {
 impl Part for AuditConfig {}
 
 
-/// Cloud asset. This includes all Google Cloud Platform resources,
-/// Cloud IAM policies, and other non-GCP assets.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Asset {
-    /// Representation of the actual Cloud IAM policy set on a cloud resource. For
-    /// each resource, there must be at most one Cloud IAM policy set on it.
-    #[serde(rename="iamPolicy")]
-    pub iam_policy: Option<Policy>,
-    /// Type of the asset. Example: "compute.googleapis.com/Disk".
-    #[serde(rename="assetType")]
-    pub asset_type: Option<String>,
-    /// Representation of the resource.
-    pub resource: Option<ResourceType>,
-    /// The full name of the asset. For example:
-    /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
-    /// See [Resource
-    /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
-    /// for more information.
-    pub name: Option<String>,
-}
-
-impl Part for Asset {}
-
-
-/// Output configuration for export assets destination.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OutputConfig {
-    /// Destination on Cloud Storage.
-    #[serde(rename="gcsDestination")]
-    pub gcs_destination: Option<GcsDestination>,
-}
-
-impl Part for OutputConfig {}
-
-
 /// A time window of (start_time, end_time].
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -807,80 +1115,6 @@ pub struct TimeWindow {
 }
 
 impl Part for TimeWindow {}
-
-
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
-/// 
-/// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
-/// 
-/// **JSON Example**
-/// 
-///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
-///       ]
-///     }
-/// 
-/// **YAML Example**
-/// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
-/// 
-/// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a policy from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform policy updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
-    /// systems are expected to put that etag in the request to `setIamPolicy` to
-    /// ensure that their change will be applied to the same version of the policy.
-    /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
-    pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
-    pub version: Option<i32>,
-}
-
-impl Part for Policy {}
 
 
 /// This resource represents a long-running operation that is the result of a
@@ -913,7 +1147,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -932,6 +1166,17 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GcsDestination {
+    /// The uri prefix of all generated Cloud Storage objects. For example:
+    /// "gs://bucket_name/object_name_prefix". Each object uri is in format:
+    /// "gs://bucket_name/object_name_prefix/<asset type>/<shard number> and only
+    /// contains assets for that type. <shard number> starts from 0. For example:
+    /// "gs://bucket_name/object_name_prefix/compute.googleapis.com/Disk/0" is
+    /// the first shard of output objects containing all
+    /// compute.googleapis.com/Disk assets. An INVALID_ARGUMENT error will be
+    /// returned if file with the same name "gs://bucket_name/object_name_prefix"
+    /// already exists.
+    #[serde(rename="uriPrefix")]
+    pub uri_prefix: Option<String>,
     /// The uri of the Cloud Storage object. It's the same uri that is used by
     /// gsutil. For example: "gs://bucket_name/object_name". See [Viewing and
     /// Editing Object
@@ -1602,7 +1847,8 @@ impl<'a, C, A> MethodBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hype
     /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
     /// See [Resource
     /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
-    /// and [Resource Name Format](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/resource-name-format)
+    /// and [Resource Name
+    /// Format](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/resource-name-format)
     /// for more info.
     /// 
     /// The request becomes a no-op if the asset name list is empty, and the max

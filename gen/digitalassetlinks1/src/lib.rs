@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *digitalassetlinks* crate version *1.0.8+20190323*, where *20190323* is the exact revision of the *digitalassetlinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *digitalassetlinks* crate version *1.0.9+20190619*, where *20190619* is the exact revision of the *digitalassetlinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *digitalassetlinks* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/digital-asset-links/).
@@ -220,9 +220,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -313,7 +311,7 @@ impl<'a, C, A> Digitalassetlinks<C, A>
         Digitalassetlinks {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://digitalassetlinks.googleapis.com/".to_string(),
             _root_url: "https://digitalassetlinks.googleapis.com/".to_string(),
         }
@@ -327,7 +325,7 @@ impl<'a, C, A> Digitalassetlinks<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -674,10 +672,11 @@ impl<'a, C, A> AssetlinkMethods<'a, C, A> {
     /// an HTTPS website or an Android app, the API will ensure that any
     /// statements used to generate the response have been made in a secure way by
     /// the owner of that asset.  Conversely, if the source asset is an insecure
-    /// HTTP website (that is, the URL starts with `http://` instead of `https://`),
-    /// the API cannot verify its statements securely, and it is not possible to
-    /// ensure that the website's statements have not been altered by a third
-    /// party.  For more information, see the [Digital Asset Links technical design
+    /// HTTP website (that is, the URL starts with `http://` instead of
+    /// `https://`), the API cannot verify its statements securely, and it is not
+    /// possible to ensure that the website's statements have not been altered by a
+    /// third party.  For more information, see the [Digital Asset Links technical
+    /// design
     /// specification](https://github.com/google/digitalassetlinks/blob/master/well-known/details.md).
     pub fn check(&self) -> AssetlinkCheckCall<'a, C, A> {
         AssetlinkCheckCall {
@@ -793,10 +792,11 @@ impl<'a, C, A> StatementMethods<'a, C, A> {
 /// an HTTPS website or an Android app, the API will ensure that any
 /// statements used to generate the response have been made in a secure way by
 /// the owner of that asset.  Conversely, if the source asset is an insecure
-/// HTTP website (that is, the URL starts with `http://` instead of `https://`),
-/// the API cannot verify its statements securely, and it is not possible to
-/// ensure that the website's statements have not been altered by a third
-/// party.  For more information, see the [Digital Asset Links technical design
+/// HTTP website (that is, the URL starts with `http://` instead of
+/// `https://`), the API cannot verify its statements securely, and it is not
+/// possible to ensure that the website's statements have not been altered by a
+/// third party.  For more information, see the [Digital Asset Links technical
+/// design
 /// specification](https://github.com/google/digitalassetlinks/blob/master/well-known/details.md).
 ///
 /// A builder for the *check* method supported by a *assetlink* resource.

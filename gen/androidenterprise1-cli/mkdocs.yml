@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.8+20190401
+site_name: Android Enterprise v1.0.9+20190624
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['devices_force-report-upload.md', 'Devices', 'Force Report Upload']
 - ['devices_get.md', 'Devices', 'Get']
 - ['devices_get-state.md', 'Devices', 'Get State']
 - ['devices_list.md', 'Devices', 'List']
@@ -97,5 +98,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

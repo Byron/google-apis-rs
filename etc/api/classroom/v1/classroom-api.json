@@ -867,7 +867,7 @@
                                     "type": "string"
                                 }, 
                                 "updateMask": {
-                                    "description": "Mask that identifies which fields on the course work to update.\nThis field is required to do an update. The update fails if invalid\nfields are specified. If a field supports empty values, it can be cleared\nby specifying it in the update mask and not in the CourseWork object. If a\nfield that does not support empty values is included in the update mask and\nnot set in the CourseWork object, an `INVALID_ARGUMENT` error will be\nreturned.\n\nThe following fields may be specified by teachers:\n\n* `title`\n* `description`\n* `state`\n* `due_date`\n* `due_time`\n* `max_points`\n* `scheduled_time`\n* `submission_modification_mode`", 
+                                    "description": "Mask that identifies which fields on the course work to update.\nThis field is required to do an update. The update fails if invalid\nfields are specified. If a field supports empty values, it can be cleared\nby specifying it in the update mask and not in the CourseWork object. If a\nfield that does not support empty values is included in the update mask and\nnot set in the CourseWork object, an `INVALID_ARGUMENT` error will be\nreturned.\n\nThe following fields may be specified by teachers:\n\n* `title`\n* `description`\n* `state`\n* `due_date`\n* `due_time`\n* `max_points`\n* `scheduled_time`\n* `submission_modification_mode`\n* `topic_id`", 
                                     "format": "google-fieldmask", 
                                     "location": "query", 
                                     "type": "string"
@@ -2151,7 +2151,7 @@
             }
         }
     }, 
-    "revision": "20190401", 
+    "revision": "20190701", 
     "rootUrl": "https://classroom.googleapis.com/", 
     "schemas": {
         "Announcement": {
@@ -2195,7 +2195,7 @@
                 }, 
                 "individualStudentsOptions": {
                     "$ref": "IndividualStudentsOptions", 
-                    "description": "Identifiers of students with access to the announcement.\nThis field is set only if `assigneeMode` is `INDIVIDUAL_STUDENTS`.\nIf the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students specified in this\nfield will be able to see the announcement."
+                    "description": "Identifiers of students with access to the announcement.\nThis field is set only if `assigneeMode` is `INDIVIDUAL_STUDENTS`.\nIf the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students\nspecified in this field will be able to see the announcement."
                 }, 
                 "materials": {
                     "description": "Additional materials.\n\nAnnouncements must have no more than 20 material items.", 
@@ -2382,7 +2382,7 @@
                 }, 
                 "teacherFolder": {
                     "$ref": "DriveFolder", 
-                    "description": "Information about a Drive Folder that is shared with all teachers of the\ncourse.\n\nThis field will only be set for teachers of the course and domain administrators.\n\nRead-only."
+                    "description": "Information about a Drive Folder that is shared with all teachers of the\ncourse.\n\nThis field will only be set for teachers of the course and domain\nadministrators.\n\nRead-only."
                 }, 
                 "teacherGroupEmail": {
                     "description": "The email address of a Google group containing all teachers of the course.\nThis group does not accept email and can only be used for permissions.\n\nRead-only.", 

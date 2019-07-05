@@ -566,6 +566,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -579,6 +582,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2277,92 +2281,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_execute_bundle(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content-type", "data"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::HttpBody = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_execute_bundle(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _projects_locations_datasets_fhir_stores_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2451,9 +2369,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir__observation_get$lastn(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir__observation_lastn(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__observation_getlastn(opt.value_of("parent").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__observation_lastn(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2503,9 +2421,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir__patient_get$everything(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir__patient_everything(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__patient_geteverything(opt.value_of("name").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__patient_everything(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2562,9 +2480,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir__history_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir__resource_purge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__history_get(opt.value_of("name").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__resource_purge(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2614,107 +2532,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir__history_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_capabilities(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__history_list(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "since" => {
-                    call = call.since(value.unwrap_or(""));
-                },
-                "page" => {
-                    call = call.page(value.unwrap_or(""));
-                },
-                "count" => {
-                    call = call.count(arg_from_str(value.unwrap_or("-0"), err, "count", "integer"));
-                },
-                "at" => {
-                    call = call.at(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["count", "since", "page", "at"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_locations_datasets_fhir_stores_fhir__search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["resource-type"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::SearchResourcesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__search(request, opt.value_of("parent").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_capabilities(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2764,9 +2584,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir_conditional_delete_resource(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_conditional_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_conditional_delete_resource(opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_conditional_delete(opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2816,7 +2636,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir_conditional_patch_resource(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_conditional_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2852,7 +2672,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::HttpBody = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_conditional_patch_resource(request, opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_conditional_patch(request, opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2902,7 +2722,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir_conditional_update_resource(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_conditional_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2938,7 +2758,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::HttpBody = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_conditional_update_resource(request, opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_conditional_update(request, opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2988,7 +2808,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir_create_resource(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3024,7 +2844,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::HttpBody = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_create_resource(request, opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("type").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3126,9 +2946,43 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir_delete$purge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_execute_bundle(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_deletepurge(opt.value_of("name").unwrap_or(""));
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content-type", "data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HttpBody = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_execute_bundle(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3178,12 +3032,24 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_history(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_get(opt.value_of("name").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_history(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "since" => {
+                    call = call.since(value.unwrap_or(""));
+                },
+                "page" => {
+                    call = call.page(value.unwrap_or(""));
+                },
+                "count" => {
+                    call = call.count(arg_from_str(value.unwrap_or("-0"), err, "count", "integer"));
+                },
+                "at" => {
+                    call = call.at(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3197,58 +3063,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_locations_datasets_fhir_stores_fhir_get_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_get_metadata(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["count", "since", "page", "at"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3368,9 +3183,94 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_datasets_fhir_stores_fhir_search_resources(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_datasets_fhir_stores_fhir_read(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_search_resources(opt.value_of("parent").unwrap_or(""), opt.value_of("resource-type").unwrap_or(""));
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_read(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_fhir_stores_fhir_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["resource-type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SearchResourcesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_search(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3506,6 +3406,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_datasets_fhir_stores_fhir_vread(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir_vread(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_datasets_fhir_stores_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_datasets_fhir_stores_get(opt.value_of("name").unwrap_or(""));
@@ -3564,6 +3516,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3577,6 +3532,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4083,6 +4039,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4096,6 +4055,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4332,6 +4292,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4345,6 +4308,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5816,59 +5780,56 @@ impl<'n> Engine<'n> {
                     ("locations-datasets-fhir-stores-delete", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_delete(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-execute-bundle", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_execute_bundle(opt, dry_run, &mut err);
-                    },
                     ("locations-datasets-fhir-stores-export", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_export(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir--observation-get$lastn", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir__observation_get$lastn(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir--observation-lastn", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir__observation_lastn(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir--patient-get$everything", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir__patient_get$everything(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir--patient-everything", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir__patient_everything(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir--history-get", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir__history_get(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir--resource-purge", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir__resource_purge(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir--history-list", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir__history_list(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-capabilities", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_capabilities(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir--search", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir__search(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-conditional-delete", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_conditional_delete(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir-conditional-delete-resource", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_conditional_delete_resource(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-conditional-patch", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_conditional_patch(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir-conditional-patch-resource", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_conditional_patch_resource(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-conditional-update", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_conditional_update(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir-conditional-update-resource", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_conditional_update_resource(opt, dry_run, &mut err);
-                    },
-                    ("locations-datasets-fhir-stores-fhir-create-resource", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_create_resource(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-create", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_create(opt, dry_run, &mut err);
                     },
                     ("locations-datasets-fhir-stores-fhir-delete", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_fhir_delete(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir-delete$purge", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_delete$purge(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-execute-bundle", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_execute_bundle(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir-get", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_get(opt, dry_run, &mut err);
-                    },
-                    ("locations-datasets-fhir-stores-fhir-get-metadata", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_get_metadata(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-history", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_history(opt, dry_run, &mut err);
                     },
                     ("locations-datasets-fhir-stores-fhir-patch", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_fhir_patch(opt, dry_run, &mut err);
                     },
-                    ("locations-datasets-fhir-stores-fhir-search-resources", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_fhir_search_resources(opt, dry_run, &mut err);
+                    ("locations-datasets-fhir-stores-fhir-read", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_read(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-fhir-stores-fhir-search", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_search(opt, dry_run, &mut err);
                     },
                     ("locations-datasets-fhir-stores-fhir-update", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_fhir_update(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-fhir-stores-fhir-vread", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir_vread(opt, dry_run, &mut err);
                     },
                     ("locations-datasets-fhir-stores-get", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_get(opt, dry_run, &mut err);
@@ -6054,13 +6015,15 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-datasets-create', 'locations-datasets-deidentify', 'locations-datasets-delete', 'locations-datasets-dicom-stores-create', 'locations-datasets-dicom-stores-delete', 'locations-datasets-dicom-stores-export', 'locations-datasets-dicom-stores-get', 'locations-datasets-dicom-stores-get-iam-policy', 'locations-datasets-dicom-stores-import', 'locations-datasets-dicom-stores-list', 'locations-datasets-dicom-stores-patch', 'locations-datasets-dicom-stores-search-for-instances', 'locations-datasets-dicom-stores-search-for-series', 'locations-datasets-dicom-stores-search-for-studies', 'locations-datasets-dicom-stores-set-iam-policy', 'locations-datasets-dicom-stores-store-instances', 'locations-datasets-dicom-stores-studies-delete', 'locations-datasets-dicom-stores-studies-retrieve-metadata', 'locations-datasets-dicom-stores-studies-retrieve-study', 'locations-datasets-dicom-stores-studies-search-for-instances', 'locations-datasets-dicom-stores-studies-search-for-series', 'locations-datasets-dicom-stores-studies-series-delete', 'locations-datasets-dicom-stores-studies-series-instances-delete', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-instance', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-retrieve-series', 'locations-datasets-dicom-stores-studies-series-search-for-instances', 'locations-datasets-dicom-stores-studies-store-instances', 'locations-datasets-dicom-stores-test-iam-permissions', 'locations-datasets-fhir-stores-create', 'locations-datasets-fhir-stores-delete', 'locations-datasets-fhir-stores-execute-bundle', 'locations-datasets-fhir-stores-export', 'locations-datasets-fhir-stores-fhir--observation-get$lastn', 'locations-datasets-fhir-stores-fhir--patient-get$everything', 'locations-datasets-fhir-stores-fhir--history-get', 'locations-datasets-fhir-stores-fhir--history-list', 'locations-datasets-fhir-stores-fhir--search', 'locations-datasets-fhir-stores-fhir-conditional-delete-resource', 'locations-datasets-fhir-stores-fhir-conditional-patch-resource', 'locations-datasets-fhir-stores-fhir-conditional-update-resource', 'locations-datasets-fhir-stores-fhir-create-resource', 'locations-datasets-fhir-stores-fhir-delete', 'locations-datasets-fhir-stores-fhir-delete$purge', 'locations-datasets-fhir-stores-fhir-get', 'locations-datasets-fhir-stores-fhir-get-metadata', 'locations-datasets-fhir-stores-fhir-patch', 'locations-datasets-fhir-stores-fhir-search-resources', 'locations-datasets-fhir-stores-fhir-update', 'locations-datasets-fhir-stores-get', 'locations-datasets-fhir-stores-get-iam-policy', 'locations-datasets-fhir-stores-import', 'locations-datasets-fhir-stores-list', 'locations-datasets-fhir-stores-patch', 'locations-datasets-fhir-stores-set-iam-policy', 'locations-datasets-fhir-stores-test-iam-permissions', 'locations-datasets-get', 'locations-datasets-get-iam-policy', 'locations-datasets-hl7-v2-stores-create', 'locations-datasets-hl7-v2-stores-delete', 'locations-datasets-hl7-v2-stores-get', 'locations-datasets-hl7-v2-stores-get-iam-policy', 'locations-datasets-hl7-v2-stores-list', 'locations-datasets-hl7-v2-stores-messages-create', 'locations-datasets-hl7-v2-stores-messages-delete', 'locations-datasets-hl7-v2-stores-messages-get', 'locations-datasets-hl7-v2-stores-messages-ingest', 'locations-datasets-hl7-v2-stores-messages-list', 'locations-datasets-hl7-v2-stores-messages-patch', 'locations-datasets-hl7-v2-stores-patch', 'locations-datasets-hl7-v2-stores-set-iam-policy', 'locations-datasets-hl7-v2-stores-test-iam-permissions', 'locations-datasets-list', 'locations-datasets-operations-get', 'locations-datasets-operations-list', 'locations-datasets-patch', 'locations-datasets-set-iam-policy', 'locations-datasets-test-iam-permissions', 'locations-get' and 'locations-list'", vec![
+        ("projects", "methods: 'locations-datasets-create', 'locations-datasets-deidentify', 'locations-datasets-delete', 'locations-datasets-dicom-stores-create', 'locations-datasets-dicom-stores-delete', 'locations-datasets-dicom-stores-export', 'locations-datasets-dicom-stores-get', 'locations-datasets-dicom-stores-get-iam-policy', 'locations-datasets-dicom-stores-import', 'locations-datasets-dicom-stores-list', 'locations-datasets-dicom-stores-patch', 'locations-datasets-dicom-stores-search-for-instances', 'locations-datasets-dicom-stores-search-for-series', 'locations-datasets-dicom-stores-search-for-studies', 'locations-datasets-dicom-stores-set-iam-policy', 'locations-datasets-dicom-stores-store-instances', 'locations-datasets-dicom-stores-studies-delete', 'locations-datasets-dicom-stores-studies-retrieve-metadata', 'locations-datasets-dicom-stores-studies-retrieve-study', 'locations-datasets-dicom-stores-studies-search-for-instances', 'locations-datasets-dicom-stores-studies-search-for-series', 'locations-datasets-dicom-stores-studies-series-delete', 'locations-datasets-dicom-stores-studies-series-instances-delete', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-instance', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-retrieve-series', 'locations-datasets-dicom-stores-studies-series-search-for-instances', 'locations-datasets-dicom-stores-studies-store-instances', 'locations-datasets-dicom-stores-test-iam-permissions', 'locations-datasets-fhir-stores-create', 'locations-datasets-fhir-stores-delete', 'locations-datasets-fhir-stores-export', 'locations-datasets-fhir-stores-fhir--observation-lastn', 'locations-datasets-fhir-stores-fhir--patient-everything', 'locations-datasets-fhir-stores-fhir--resource-purge', 'locations-datasets-fhir-stores-fhir-capabilities', 'locations-datasets-fhir-stores-fhir-conditional-delete', 'locations-datasets-fhir-stores-fhir-conditional-patch', 'locations-datasets-fhir-stores-fhir-conditional-update', 'locations-datasets-fhir-stores-fhir-create', 'locations-datasets-fhir-stores-fhir-delete', 'locations-datasets-fhir-stores-fhir-execute-bundle', 'locations-datasets-fhir-stores-fhir-history', 'locations-datasets-fhir-stores-fhir-patch', 'locations-datasets-fhir-stores-fhir-read', 'locations-datasets-fhir-stores-fhir-search', 'locations-datasets-fhir-stores-fhir-update', 'locations-datasets-fhir-stores-fhir-vread', 'locations-datasets-fhir-stores-get', 'locations-datasets-fhir-stores-get-iam-policy', 'locations-datasets-fhir-stores-import', 'locations-datasets-fhir-stores-list', 'locations-datasets-fhir-stores-patch', 'locations-datasets-fhir-stores-set-iam-policy', 'locations-datasets-fhir-stores-test-iam-permissions', 'locations-datasets-get', 'locations-datasets-get-iam-policy', 'locations-datasets-hl7-v2-stores-create', 'locations-datasets-hl7-v2-stores-delete', 'locations-datasets-hl7-v2-stores-get', 'locations-datasets-hl7-v2-stores-get-iam-policy', 'locations-datasets-hl7-v2-stores-list', 'locations-datasets-hl7-v2-stores-messages-create', 'locations-datasets-hl7-v2-stores-messages-delete', 'locations-datasets-hl7-v2-stores-messages-get', 'locations-datasets-hl7-v2-stores-messages-ingest', 'locations-datasets-hl7-v2-stores-messages-list', 'locations-datasets-hl7-v2-stores-messages-patch', 'locations-datasets-hl7-v2-stores-patch', 'locations-datasets-hl7-v2-stores-set-iam-policy', 'locations-datasets-hl7-v2-stores-test-iam-permissions', 'locations-datasets-list', 'locations-datasets-operations-get', 'locations-datasets-operations-list', 'locations-datasets-patch', 'locations-datasets-set-iam-policy', 'locations-datasets-test-iam-permissions', 'locations-get' and 'locations-list'", vec![
             ("locations-datasets-create",
                     Some(r##"Creates a new health dataset. Results are returned through the
         Operation interface which returns either an
         `Operation.response` which contains a Dataset or
         `Operation.error`. The metadata
-        field type is OperationMetadata."##),
+        field type is OperationMetadata.
+        A Google Cloud Platform project can contain up to 500 datasets across all
+        regions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-create",
                   vec![
                     (Some(r##"parent"##),
@@ -6367,7 +6330,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-search-for-instances",
                     Some(r##"SearchForInstances returns a list of matching instances. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7"##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-search-for-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -6379,9 +6342,9 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `instances`)."##),
+                     Some(r##"The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+        `instances` or `series/{series_uid}/instances` or
+        `studies/{study_uid}/instances`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6399,7 +6362,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-search-for-series",
                     Some(r##"SearchForSeries returns a list of matching series. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7"##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-search-for-series",
                   vec![
                     (Some(r##"parent"##),
@@ -6411,9 +6374,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `series`)."##),
+                     Some(r##"The path of the SearchForSeries DICOMweb request(e.g., `series` or
+        `studies/{study_uid}/series`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6431,7 +6393,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-search-for-studies",
                     Some(r##"SearchForStudies returns a list of matching studies. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7"##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-search-for-studies",
                   vec![
                     (Some(r##"parent"##),
@@ -6443,9 +6405,7 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `studies`)."##),
+                     Some(r##"The path of the SearchForStudies DICOMweb request (e.g., `studies`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6494,7 +6454,7 @@ fn main() {
             ("locations-datasets-dicom-stores-store-instances",
                     Some(r##"StoreInstances stores DICOM instances associated with study instance unique
         identifiers (SUID). See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.6.1."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-store-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -6506,8 +6466,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}`)."##),
+                     Some(r##"The path of the StoreInstances DICOMweb request (e.g.,
+        `studies/[{study_id}]`). Note that the `study_uid` is optional."##),
                      Some(true),
                      Some(false)),
         
@@ -6543,8 +6503,7 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}`)."##),
+                     Some(r##"The path of the DeleteStudy request (e.g., `studies/{study_id}`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6563,7 +6522,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-retrieve-metadata",
                     Some(r##"RetrieveStudyMetadata returns instance associated with the given study
         presented as metadata with the bulk data removed. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-retrieve-metadata",
                   vec![
                     (Some(r##"parent"##),
@@ -6575,8 +6534,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}/metadata`."##),
+                     Some(r##"The path of the RetrieveStudyMetadata DICOMweb request (e.g.,
+        `studies/{study_id}/metadata`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6594,7 +6553,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-retrieve-study",
                     Some(r##"RetrieveStudy returns all instances within the given study. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.1."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-retrieve-study",
                   vec![
                     (Some(r##"parent"##),
@@ -6606,8 +6565,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}`)."##),
+                     Some(r##"The path of the RetrieveStudy DICOMweb request (e.g.,
+        `studies/{study_id}`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6625,7 +6584,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-search-for-instances",
                     Some(r##"SearchForInstances returns a list of matching instances. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7"##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-search-for-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -6637,9 +6596,9 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `instances`)."##),
+                     Some(r##"The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+        `instances` or `series/{series_uid}/instances` or
+        `studies/{study_uid}/instances`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6657,7 +6616,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-search-for-series",
                     Some(r##"SearchForSeries returns a list of matching series. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7"##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-search-for-series",
                   vec![
                     (Some(r##"parent"##),
@@ -6669,9 +6628,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `series`)."##),
+                     Some(r##"The path of the SearchForSeries DICOMweb request(e.g., `series` or
+        `studies/{study_uid}/series`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6702,8 +6660,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}`)."##),
+                     Some(r##"The path of the DeleteSeries request (e.g.,
+        `studies/{study_id}/series/{series_id}`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6734,8 +6692,7 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
+                     Some(r##"The path of the DeleteInstance request (e.g.,
         `studies/{study_id}/series/{series_id}/instances/{instance_id}`)."##),
                      Some(true),
                      Some(false)),
@@ -6755,7 +6712,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames",
                     Some(r##"RetrieveFrames returns instances associated with the given study, series,
         SOP Instance UID and frame numbers. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.4."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames",
                   vec![
                     (Some(r##"parent"##),
@@ -6767,9 +6724,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `studies/{study_id}/series/{series_id}/instance/{instance_id}/frames/{frame_list}`)."##),
+                     Some(r##"The path of the RetrieveFrames DICOMweb request (e.g.,
+        `studies/{study_id}/series/{series_id}/instances/{instance_id}/frames/{frame_list}`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6789,7 +6745,7 @@ fn main() {
                     Some(r##"RetrieveRenderedFrames returns instances associated with the given study,
         series, SOP Instance UID and frame numbers in an acceptable Rendered Media
         Type. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.8."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered",
                   vec![
                     (Some(r##"parent"##),
@@ -6801,9 +6757,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `studies/{study_id}/series/{series_id}/instance/{instance_id}/frames/{frame_list}/rendered`)."##),
+                     Some(r##"The path of the RetrieveRenderedFrames DICOMweb request (e.g.,
+        `studies/{study_id}/series/{series_id}/instances/{instance_id}/frames/{frame_list}/rendered`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6822,7 +6777,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-instances-retrieve-instance",
                     Some(r##"RetrieveInstance returns instance associated with the given study, series,
         and SOP Instance UID. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.3."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-instance",
                   vec![
                     (Some(r##"parent"##),
@@ -6834,9 +6789,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `studies/{study_id}/series/{series_id}/instance/{instance_id}`)."##),
+                     Some(r##"The path of the RetrieveInstance DICOMweb request (e.g.,
+        `studies/{study_id}/series/{series_id}/instances/{instance_id}`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6856,7 +6810,7 @@ fn main() {
                     Some(r##"RetrieveInstanceMetadata returns instance associated with the given study,
         series, and SOP Instance UID presented as metadata with the bulk data
         removed. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata",
                   vec![
                     (Some(r##"parent"##),
@@ -6868,8 +6822,7 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
+                     Some(r##"The path of the RetrieveInstanceMetadata DICOMweb request (e.g.,
         `studies/{study_id}/series/{series_id}/instances/{instance_id}/metadata`)."##),
                      Some(true),
                      Some(false)),
@@ -6889,7 +6842,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered",
                     Some(r##"RetrieveRenderedInstance returns instance associated with the given study,
         series, and SOP Instance UID in an acceptable Rendered Media Type. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.8."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered",
                   vec![
                     (Some(r##"parent"##),
@@ -6901,9 +6854,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `studies/{study_id}/series/{series_id}/instance/{instance_id}/rendered`)."##),
+                     Some(r##"The path of the RetrieveRenderedInstance DICOMweb request (e.g.,
+        `studies/{study_id}/series/{series_id}/instances/{instance_id}/rendered`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6922,7 +6874,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-retrieve-metadata",
                     Some(r##"RetrieveSeriesMetadata returns instance associated with the given study and
         series, presented as metadata with the bulk data removed. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.6."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-retrieve-metadata",
                   vec![
                     (Some(r##"parent"##),
@@ -6934,8 +6886,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}/metadata`."##),
+                     Some(r##"The path of the RetrieveSeriesMetadata DICOMweb request (e.g.,
+        `studies/{study_id}/series/{series_id}/metadata`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6953,7 +6905,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-series-retrieve-series",
                     Some(r##"RetrieveSeries returns all instances within the given study and series. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.5.2."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-retrieve-series",
                   vec![
                     (Some(r##"parent"##),
@@ -6965,8 +6917,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}`)."##),
+                     Some(r##"The path of the RetrieveSeries DICOMweb request (e.g.,
+        `studies/{study_id}/series/{series_id}`)."##),
                      Some(true),
                      Some(false)),
         
@@ -6984,7 +6936,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-series-search-for-instances",
                     Some(r##"SearchForInstances returns a list of matching instances. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7"##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-search-for-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -6996,9 +6948,9 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g.,
-        `instances`)."##),
+                     Some(r##"The path of the SearchForInstancesRequest DICOMweb request (e.g.,
+        `instances` or `series/{series_uid}/instances` or
+        `studies/{study_uid}/instances`)."##),
                      Some(true),
                      Some(false)),
         
@@ -7017,7 +6969,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-store-instances",
                     Some(r##"StoreInstances stores DICOM instances associated with study instance unique
         identifiers (SUID). See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.6.1."##),
+        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-store-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -7029,8 +6981,8 @@ fn main() {
         
                     (Some(r##"dicom-web-path"##),
                      None,
-                     Some(r##"The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or
-        QIDO-RS standard (e.g., `studies/{study_id}`)."##),
+                     Some(r##"The path of the StoreInstances DICOMweb request (e.g.,
+        `studies/[{study_id}]`). Note that the `study_uid` is optional."##),
                      Some(true),
                      Some(false)),
         
@@ -7137,34 +7089,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-execute-bundle",
-                    Some(r##"Executes all the requests in the given Bundle."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-execute-bundle",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Name of the FHIR store in which this bundle will be executed."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("locations-datasets-fhir-stores-export",
                     Some(r##"Export resources from the FHIR store to the specified destination.
         
@@ -7207,11 +7131,27 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir--observation-get$lastn",
-                    Some(r##"Get N most recent observations for patient, grouped by code
-        that match given query parameters.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--observation-get$lastn",
+            ("locations-datasets-fhir-stores-fhir--observation-lastn",
+                    Some(r##"Retrieves the N most recent `Observation` resources for a subject matching
+        search criteria specified as query parameters, grouped by
+        `Observation.code`, sorted from most recent to oldest.
+        
+        Implements the FHIR extended operation
+        [Observation-lastn](http://hl7.org/implement/standards/fhir/STU3/observation-operations.html#lastn).
+        
+        Search terms are provided as query parameters following the same pattern as
+        the search method. This operation accepts an additional
+        query parameter `max`, which specifies N, the maximum number of
+        Observations to return from each group, with a default of 1.
+        
+        On success, the response body will contain a JSON-encoded representation
+        of a `Bundle` resource of type `searchset`, containing the results of the
+        operation.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--observation-lastn",
                   vec![
                     (Some(r##"parent"##),
                      None,
@@ -7231,14 +7171,25 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir--patient-get$everything",
-                    Some(r##"Gets all the resources in the patient compartment.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--patient-get$everything",
+            ("locations-datasets-fhir-stores-fhir--patient-everything",
+                    Some(r##"Retrieves all the resources in the patient compartment for a `Patient`
+        resource.
+        
+        Implements the FHIR extended operation
+        [Patient-everything](http://hl7.org/implement/standards/fhir/STU3/patient-operations.html#everything).
+        
+        On success, the response body will contain a JSON-encoded representation
+        of a `Bundle` resource of type `searchset`, containing the results of the
+        operation.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--patient-everything",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Name of the patient for which the information is required."##),
+                     Some(r##"Name of the `Patient` resource for which the information is required."##),
                      Some(true),
                      Some(false)),
         
@@ -7254,14 +7205,17 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir--history-get",
-                    Some(r##"Gets a version (current or historical) of FHIR resource by version id.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--history-get",
+            ("locations-datasets-fhir-stores-fhir--resource-purge",
+                    Some(r##"Deletes all the historical versions of a resource (excluding the current
+        version) from the FHIR store. To remove all versions of a resource, first
+        delete the current version and then call this method.
+        
+        This is not a FHIR standard operation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--resource-purge",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the resource version to retrieve."##),
+                     Some(r##"The name of the resource to purge."##),
                      Some(true),
                      Some(false)),
         
@@ -7277,15 +7231,22 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir--history-list",
-                    Some(r##"Lists all the versions of a resource (including the current version and
-        deleted versions) from the FHIR store.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--history-list",
+            ("locations-datasets-fhir-stores-fhir-capabilities",
+                    Some(r##"Gets the FHIR [capability
+        statement](http://hl7.org/implement/standards/fhir/STU3/capabilitystatement.html)
+        for the store, which contains a description of functionality supported by
+        the server.
+        
+        Implements the FHIR standard [capabilities
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#capabilities).
+        
+        On success, the response body will contain a JSON-encoded representation
+        of a `CapabilityStatement` resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-capabilities",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the resource to retrieve."##),
+                     Some(r##"Name of the FHIR store to retrieve the capabilities for."##),
                      Some(true),
                      Some(false)),
         
@@ -7301,66 +7262,23 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir--search",
-                    Some(r##"Searches resources in the given FHIR store.
+            ("locations-datasets-fhir-stores-fhir-conditional-delete",
+                    Some(r##"Deletes FHIR resources that match a search query.
         
-        # Search Parameters
+        Implements the FHIR standard [conditional delete
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.13.1).
+        If multiple resources match, all of them will be deleted.
         
-        The server's capability statement, retrieved through
-        GetCapabilityStatement, indicates which search
-        parameters are supported on each FHIR resource.
+        Search terms are provided as query parameters following the same pattern as
+        the search method.
         
-        # Search Modifiers
-        
-        Modifier   | Supported
-        ----------- | ---------
-        `:missing`  | Yes
-        `:exact`    | Yes
-        `:contains` | Yes
-        `:text`     | Yes
-        `:in`       | Yes
-        `:not-in`   | Yes
-        `:above`    | Yes
-        `:below`    | Yes
-        `:[type]`   | Yes
-        `:not`      | Yes
-        `:recurse`  | No"##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--search",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Name of the FHIR store to retrieve resources from."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-datasets-fhir-stores-fhir-conditional-delete-resource",
-                    Some(r##"Deletes FHIR resources matching a search query.
-        
-        Note: unless resource versioning is disabled by setting the
+        Note: Unless resource versioning is disabled by setting the
         disable_resource_versioning flag
         on the FHIR store, the deleted resources will be moved to a history
-        repository that can still be retrieved through GetResourceVersion and
-        related methods, unless they are removed by the DeleteResourceVersions
-        method."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-delete-resource",
+        repository that can still be retrieved through vread
+        and related methods, unless they are removed by the
+        purge method."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-delete",
                   vec![
                     (Some(r##"parent"##),
                      None,
@@ -7370,7 +7288,9 @@ fn main() {
         
                     (Some(r##"type"##),
                      None,
-                     Some(r##"The type of the resource to update."##),
+                     Some(r##"The FHIR resource type to delete, such as Patient or Observation. For a
+        complete list, see the [FHIR Resource
+        Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html)."##),
                      Some(true),
                      Some(false)),
         
@@ -7386,10 +7306,30 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir-conditional-patch-resource",
-                    Some(r##"Updates parts of a resource if the resource exists based on the
-        search criteria specified via query parameters."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-patch-resource",
+            ("locations-datasets-fhir-stores-fhir-conditional-patch",
+                    Some(r##"If a resource is found based on the search criteria specified in the query
+        parameters, updates part of that resource by applying the operations
+        specified in a [JSON Patch](http://jsonpatch.com/) document.
+        
+        Implements the FHIR standard [conditional patch
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
+        
+        Search terms are provided as query parameters following the same pattern as
+        the search method.
+        
+        If the search criteria identify more than one match, the request will
+        return a `412 Precondition Failed` error.
+        
+        The request body must contain a JSON Patch document, and the request
+        headers must contain `Content-Type: application/json-patch+json`.
+        
+        On success, the response body will contain a JSON-encoded representation
+        of the updated resource, including the server-assigned version ID.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-patch",
                   vec![
                     (Some(r##"parent"##),
                      None,
@@ -7399,7 +7339,9 @@ fn main() {
         
                     (Some(r##"type"##),
                      None,
-                     Some(r##"The type of the resource to update."##),
+                     Some(r##"The FHIR resource type to update, such as Patient or Observation. For a
+        complete list, see the [FHIR Resource
+        Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html)."##),
                      Some(true),
                      Some(false)),
         
@@ -7421,11 +7363,36 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir-conditional-update-resource",
-                    Some(r##"Updates the entire resource if the resource exists based on the
-        search criteria specified via query parameters.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-update-resource",
+            ("locations-datasets-fhir-stores-fhir-conditional-update",
+                    Some(r##"If a resource is found based on the search criteria specified in the query
+        parameters, updates the entire contents of that resource.
+        
+        Implements the FHIR standard [conditional update
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cond-update).
+        
+        Search terms are provided as query parameters following the same pattern as
+        the search method.
+        
+        If the search criteria identify more than one match, the request will
+        return a `412 Precondition Failed` error.
+        If the search criteria identify zero matches, and the supplied resource
+        body contains an `id`, and the FHIR store has
+        enable_update_create set, creates the
+        resource with the client-specified ID. If the search criteria identify zero
+        matches, and the supplied resource body does not contain an `id`, the
+        resource will be created with a server-assigned ID as per the
+        create method.
+        
+        The request body must contain a JSON-encoded FHIR resource, and the request
+        headers must contain `Content-Type: application/fhir+json`.
+        
+        On success, the response body will contain a JSON-encoded representation
+        of the updated resource, including the server-assigned version ID.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-update",
                   vec![
                     (Some(r##"parent"##),
                      None,
@@ -7435,7 +7402,10 @@ fn main() {
         
                     (Some(r##"type"##),
                      None,
-                     Some(r##"The type of the resource to update."##),
+                     Some(r##"The FHIR resource type to update, such as Patient or Observation. For a
+        complete list, see the [FHIR Resource
+        Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+        Must match the resource type in the provided content."##),
                      Some(true),
                      Some(false)),
         
@@ -7457,10 +7427,30 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir-create-resource",
+            ("locations-datasets-fhir-stores-fhir-create",
                     Some(r##"Creates a FHIR resource.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-create-resource",
+        
+        Implements the FHIR standard [create
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#create),
+        which creates a new resource with a server-assigned resource ID.
+        
+        Also supports the FHIR standard [conditional create
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#ccreate),
+        specified by supplying an `If-None-Exist` header containing a FHIR search
+        query. If no resources match this search query, the server processes the
+        create operation as normal.
+        
+        The request body must contain a JSON-encoded FHIR resource, and the request
+        headers must contain `Content-Type: application/fhir+json`.
+        
+        On success, the response body will contain a JSON-encoded representation
+        of the resource as it was created on the server, including the
+        server-assigned resource ID and version ID.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
@@ -7470,7 +7460,10 @@ fn main() {
         
                     (Some(r##"type"##),
                      None,
-                     Some(r##"The type of the resource to create."##),
+                     Some(r##"The FHIR resource type to create, such as Patient or Observation. For a
+        complete list, see the [FHIR Resource
+        Index](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html).
+        Must match the resource type in the provided content."##),
                      Some(true),
                      Some(false)),
         
@@ -7495,12 +7488,15 @@ fn main() {
             ("locations-datasets-fhir-stores-fhir-delete",
                     Some(r##"Deletes a FHIR resource.
         
-        Note: unless resource versioning is disabled by setting the
+        Implements the FHIR standard [delete
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#delete).
+        
+        Note: Unless resource versioning is disabled by setting the
         disable_resource_versioning flag
         on the FHIR store, the deleted resources will be moved to a history
-        repository that can still be retrieved through GetResourceVersion and
-        related methods, unless they are removed by the DeleteResourceVersions
-        method."##),
+        repository that can still be retrieved through vread
+        and related methods, unless they are removed by the
+        purge method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-delete",
                   vec![
                     (Some(r##"name"##),
@@ -7521,17 +7517,43 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir-delete$purge",
-                    Some(r##"Deletes all the historical versions of a resource (excluding current
-        version) from the FHIR store. To remove all versions of a resource, first
-        delete the current version and call this method."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-delete$purge",
+            ("locations-datasets-fhir-stores-fhir-execute-bundle",
+                    Some(r##"Executes all the requests in the given Bundle.
+        
+        Implements the FHIR standard [batch/transaction
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#transaction).
+        
+        Supports all interactions within a bundle, except search. This method
+        accepts Bundles of type `batch` and `transaction`, processing them
+        according to the [batch processing
+        rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.1)
+        and [transaction processing
+        rules](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.2).
+        
+        The request body must contain a JSON-encoded FHIR `Bundle` resource, and
+        the request headers must contain `Content-Type: application/fhir+json`.
+        
+        For a batch bundle or a successful transaction the response body will
+        contain a JSON-encoded representation of a `Bundle` resource of type
+        `batch-response` or `transaction-response` containing one entry for each
+        entry in the request, with the outcome of processing the entry. In the
+        case of an error for a transaction bundle, the response body will contain
+        a JSON-encoded `OperationOutcome` resource describing the reason for the
+        error. If the request cannot be mapped to a valid API method on a FHIR
+        store, a generic GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-execute-bundle",
                   vec![
-                    (Some(r##"name"##),
+                    (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the resource to purge."##),
+                     Some(r##"Name of the FHIR store in which this bundle will be executed."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -7545,10 +7567,21 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir-get",
-                    Some(r##"Gets a FHIR resource.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-get",
+            ("locations-datasets-fhir-stores-fhir-history",
+                    Some(r##"Lists all the versions of a resource (including the current version and
+        deleted versions) from the FHIR store.
+        
+        Implements the per-resource form of the FHIR standard [history
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#history).
+        
+        On success, the response body will contain a JSON-encoded representation
+        of a `Bundle` resource of type `history`, containing the version history
+        sorted from most recent to oldest versions.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-history",
                   vec![
                     (Some(r##"name"##),
                      None,
@@ -7568,33 +7601,22 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir-get-metadata",
-                    Some(r##"Gets the FHIR capability statement for the store, which contains a
-        description of functionality supported by the server.
-        "##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-get-metadata",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Name of the FHIR store to retrieve the capabilities for."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("locations-datasets-fhir-stores-fhir-patch",
-                    Some(r##"Updates part of an existing resource.
-        "##),
+                    Some(r##"Updates part of an existing resource by applying the operations specified
+        in a [JSON Patch](http://jsonpatch.com/) document.
+        
+        Implements the FHIR standard [patch
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#patch).
+        
+        The request body must contain a JSON Patch document, and the request
+        headers must contain `Content-Type: application/json-patch+json`.
+        
+        On success, the response body will contain a JSON-encoded representation
+        of the updated resource, including the server-assigned version ID.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-patch",
                   vec![
                     (Some(r##"name"##),
@@ -7621,41 +7643,28 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-fhir-search-resources",
-                    Some(r##"Searches resources in the given FHIR store.
+            ("locations-datasets-fhir-stores-fhir-read",
+                    Some(r##"Gets the contents of a FHIR resource.
         
-        # Search Parameters
+        Implements the FHIR standard [read
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#read).
         
-        The server's capability statement, retrieved through
-        GetCapabilityStatement, indicates which search
-        parameters are supported on each FHIR resource.
+        Also supports the FHIR standard [conditional read
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#cread)
+        specified by supplying an `If-Modified-Since` header with a date/time value
+        or an `If-None-Match` header with an ETag value.
         
-        # Search Modifiers
-        
-        Modifier   | Supported
-        ----------- | ---------
-        `:missing`  | Yes
-        `:exact`    | Yes
-        `:contains` | Yes
-        `:text`     | Yes
-        `:in`       | Yes
-        `:not-in`   | Yes
-        `:above`    | Yes
-        `:below`    | Yes
-        `:[type]`   | Yes
-        `:not`      | Yes
-        `:recurse`  | No"##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-search-resources",
+        On success, the response body will contain a JSON-encoded representation
+        of the resource.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-read",
                   vec![
-                    (Some(r##"parent"##),
+                    (Some(r##"name"##),
                      None,
-                     Some(r##"Name of the FHIR store to retrieve resources from."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"resource-type"##),
-                     None,
-                     Some(r##"The type of the resource to search."##),
+                     Some(r##"The name of the resource to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -7671,11 +7680,98 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-datasets-fhir-stores-fhir-search",
+                    Some(r##"Searches for resources in the given FHIR store according to criteria
+        specified as query parameters.
+        
+        Implements the FHIR standard [search
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#search)
+        using the search semantics described in the [FHIR Search
+        specification](http://hl7.org/implement/standards/fhir/STU3/search.html).
+        
+        Supports three methods of search defined by the specification:
+        
+        *  `GET [base]?[parameters]` to search across all resources.
+        *  `GET [base]/[type]?[parameters]` to search resources of a specified
+        type.
+        *  `POST [base]/[type]/_search?[parameters]` as an alternate form having
+        the same semantics as the `GET` method.
+        
+        The `GET` methods do not support compartment searches. The `POST` method
+        does not support `application/x-www-form-urlencoded` search parameters.
+        
+        On success, the response body will contain a JSON-encoded representation
+        of a `Bundle` resource of type `searchset`, containing the results of the
+        search.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead.
+        
+        The server's capability statement, retrieved through
+        capabilities, indicates what search parameters
+        are supported on each FHIR resource. A list of all search parameters
+        defined by the specification can be found in the [FHIR Search Parameter
+        Registry](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html).
+        
+        Supported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,
+        `:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.
+        
+        Supported search result parameters: `_sort`, `_count`, `_include`,
+        `_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.
+        
+        The maximum number of search results returned defaults to 100, which can
+        be overridden by the `_count` parameter up to a maximum limit of 1000. If
+        there are additional results, the returned `Bundle` will contain
+        pagination links."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-search",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Name of the FHIR store to retrieve resources from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-datasets-fhir-stores-fhir-update",
-                    Some(r##"Updates the entire resource or creates a new resource with a client
-        specified ID if the resource does not exist and the FHIR store has
-        enable_update_create set.
-        "##),
+                    Some(r##"Updates the entire contents of a resource.
+        
+        Implements the FHIR standard [update
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#update).
+        
+        If the specified resource does
+        not exist and the FHIR store has
+        enable_update_create set, creates the
+        resource with the client-specified ID.
+        
+        The request body must contain a JSON-encoded FHIR resource, and the request
+        headers must contain `Content-Type: application/fhir+json`. The resource
+        must contain an `id` element having an identical value to the ID in the
+        REST path of the request.
+        
+        On success, the response body will contain a JSON-encoded representation
+        of the updated resource, including the server-assigned version ID.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-update",
                   vec![
                     (Some(r##"name"##),
@@ -7689,6 +7785,39 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-fhir-stores-fhir-vread",
+                    Some(r##"Gets the contents of a version (current or historical) of a FHIR resource
+        by version ID.
+        
+        Implements the FHIR standard [vread
+        interaction](http://hl7.org/implement/standards/fhir/STU3/http.html#vread).
+        
+        On success, the response body will contain a JSON-encoded representation
+        of the resource.
+        Errors generated by the FHIR store will contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-vread",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the resource version to retrieve."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -8567,7 +8696,7 @@ fn main() {
     
     let mut app = App::new("healthcare1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190401")
+           .version("1.0.9+20190628")
            .about("Manage, store, and access healthcare data in Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli")
            .arg(Arg::with_name("url")

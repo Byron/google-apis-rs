@@ -1,4 +1,4 @@
-site_name: Cloud Machine Learning Engine v1.0.8+20190325
+site_name: Cloud Machine Learning Engine v1.0.9+20190621
 site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
 site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
 
@@ -9,7 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['operations_delete.md', 'Operations', 'Delete']
 - ['projects_get-config.md', 'Projects', 'Get Config']
 - ['projects_jobs-cancel.md', 'Projects', 'Jobs Cancel']
 - ['projects_jobs-create.md', 'Projects', 'Jobs Create']
@@ -42,5 +41,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

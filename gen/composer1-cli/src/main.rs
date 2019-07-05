@@ -784,7 +784,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent must be of the form "projects/{projectId}/locations/{locationId}"."##),
+                     Some(r##"The parent must be of the form
+        "projects/{projectId}/locations/{locationId}"."##),
                      Some(true),
                      Some(false)),
         
@@ -1013,7 +1014,7 @@ fn main() {
     
     let mut app = App::new("composer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190323")
+           .version("1.0.9+20190613")
            .about("Manages Apache Airflow environments on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_composer1_cli")
            .arg(Arg::with_name("url")

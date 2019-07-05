@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud KMS* crate version *1.0.8+20190328*, where *20190328* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud KMS* crate version *1.0.9+20190626*, where *20190626* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud KMS* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kms/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudKMS.html) ... 
 //! 
 //! * projects
-//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations key rings create*](struct.ProjectLocationKeyRingCreateCall.html), [*locations key rings crypto keys create*](struct.ProjectLocationKeyRingCryptoKeyCreateCall.html), [*locations key rings crypto keys crypto key versions asymmetric decrypt*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall.html), [*locations key rings crypto keys crypto key versions asymmetric sign*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall.html), [*locations key rings crypto keys crypto key versions create*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall.html), [*locations key rings crypto keys crypto key versions destroy*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall.html), [*locations key rings crypto keys crypto key versions get*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall.html), [*locations key rings crypto keys crypto key versions get public key*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall.html), [*locations key rings crypto keys crypto key versions list*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall.html), [*locations key rings crypto keys crypto key versions patch*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall.html), [*locations key rings crypto keys crypto key versions restore*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall.html), [*locations key rings crypto keys decrypt*](struct.ProjectLocationKeyRingCryptoKeyDecryptCall.html), [*locations key rings crypto keys encrypt*](struct.ProjectLocationKeyRingCryptoKeyEncryptCall.html), [*locations key rings crypto keys get*](struct.ProjectLocationKeyRingCryptoKeyGetCall.html), [*locations key rings crypto keys get iam policy*](struct.ProjectLocationKeyRingCryptoKeyGetIamPolicyCall.html), [*locations key rings crypto keys list*](struct.ProjectLocationKeyRingCryptoKeyListCall.html), [*locations key rings crypto keys patch*](struct.ProjectLocationKeyRingCryptoKeyPatchCall.html), [*locations key rings crypto keys set iam policy*](struct.ProjectLocationKeyRingCryptoKeySetIamPolicyCall.html), [*locations key rings crypto keys test iam permissions*](struct.ProjectLocationKeyRingCryptoKeyTestIamPermissionCall.html), [*locations key rings crypto keys update primary version*](struct.ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall.html), [*locations key rings get*](struct.ProjectLocationKeyRingGetCall.html), [*locations key rings get iam policy*](struct.ProjectLocationKeyRingGetIamPolicyCall.html), [*locations key rings import jobs get iam policy*](struct.ProjectLocationKeyRingImportJobGetIamPolicyCall.html), [*locations key rings import jobs set iam policy*](struct.ProjectLocationKeyRingImportJobSetIamPolicyCall.html), [*locations key rings import jobs test iam permissions*](struct.ProjectLocationKeyRingImportJobTestIamPermissionCall.html), [*locations key rings list*](struct.ProjectLocationKeyRingListCall.html), [*locations key rings set iam policy*](struct.ProjectLocationKeyRingSetIamPolicyCall.html), [*locations key rings test iam permissions*](struct.ProjectLocationKeyRingTestIamPermissionCall.html) and [*locations list*](struct.ProjectLocationListCall.html)
+//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations key rings create*](struct.ProjectLocationKeyRingCreateCall.html), [*locations key rings crypto keys create*](struct.ProjectLocationKeyRingCryptoKeyCreateCall.html), [*locations key rings crypto keys crypto key versions asymmetric decrypt*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall.html), [*locations key rings crypto keys crypto key versions asymmetric sign*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall.html), [*locations key rings crypto keys crypto key versions create*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall.html), [*locations key rings crypto keys crypto key versions destroy*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall.html), [*locations key rings crypto keys crypto key versions get*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall.html), [*locations key rings crypto keys crypto key versions get public key*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall.html), [*locations key rings crypto keys crypto key versions import*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall.html), [*locations key rings crypto keys crypto key versions list*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall.html), [*locations key rings crypto keys crypto key versions patch*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall.html), [*locations key rings crypto keys crypto key versions restore*](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall.html), [*locations key rings crypto keys decrypt*](struct.ProjectLocationKeyRingCryptoKeyDecryptCall.html), [*locations key rings crypto keys encrypt*](struct.ProjectLocationKeyRingCryptoKeyEncryptCall.html), [*locations key rings crypto keys get*](struct.ProjectLocationKeyRingCryptoKeyGetCall.html), [*locations key rings crypto keys get iam policy*](struct.ProjectLocationKeyRingCryptoKeyGetIamPolicyCall.html), [*locations key rings crypto keys list*](struct.ProjectLocationKeyRingCryptoKeyListCall.html), [*locations key rings crypto keys patch*](struct.ProjectLocationKeyRingCryptoKeyPatchCall.html), [*locations key rings crypto keys set iam policy*](struct.ProjectLocationKeyRingCryptoKeySetIamPolicyCall.html), [*locations key rings crypto keys test iam permissions*](struct.ProjectLocationKeyRingCryptoKeyTestIamPermissionCall.html), [*locations key rings crypto keys update primary version*](struct.ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall.html), [*locations key rings get*](struct.ProjectLocationKeyRingGetCall.html), [*locations key rings get iam policy*](struct.ProjectLocationKeyRingGetIamPolicyCall.html), [*locations key rings import jobs create*](struct.ProjectLocationKeyRingImportJobCreateCall.html), [*locations key rings import jobs get*](struct.ProjectLocationKeyRingImportJobGetCall.html), [*locations key rings import jobs get iam policy*](struct.ProjectLocationKeyRingImportJobGetIamPolicyCall.html), [*locations key rings import jobs list*](struct.ProjectLocationKeyRingImportJobListCall.html), [*locations key rings import jobs set iam policy*](struct.ProjectLocationKeyRingImportJobSetIamPolicyCall.html), [*locations key rings import jobs test iam permissions*](struct.ProjectLocationKeyRingImportJobTestIamPermissionCall.html), [*locations key rings list*](struct.ProjectLocationKeyRingListCall.html), [*locations key rings set iam policy*](struct.ProjectLocationKeyRingSetIamPolicyCall.html), [*locations key rings test iam permissions*](struct.ProjectLocationKeyRingTestIamPermissionCall.html) and [*locations list*](struct.ProjectLocationListCall.html)
 //! 
 //! 
 //! 
@@ -47,12 +47,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_key_rings_import_jobs_set_iam_policy(...).doit()
-//! let r = hub.projects().locations_key_rings_import_jobs_get_iam_policy(...).doit()
-//! let r = hub.projects().locations_key_rings_get_iam_policy(...).doit()
-//! let r = hub.projects().locations_key_rings_crypto_keys_set_iam_policy(...).doit()
-//! let r = hub.projects().locations_key_rings_set_iam_policy(...).doit()
-//! let r = hub.projects().locations_key_rings_crypto_keys_get_iam_policy(...).doit()
+//! let r = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_import(...).doit()
+//! let r = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_patch(...).doit()
+//! let r = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_create(...).doit()
+//! let r = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_destroy(...).doit()
+//! let r = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_get(...).doit()
+//! let r = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_restore(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -86,7 +86,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_cloudkms1 as cloudkms1;
-//! use cloudkms1::SetIamPolicyRequest;
+//! use cloudkms1::CryptoKeyVersion;
 //! use cloudkms1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -108,12 +108,13 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = SetIamPolicyRequest::default();
+//! let mut req = CryptoKeyVersion::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_key_rings_import_jobs_set_iam_policy(req, "resource")
+//! let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_patch(req, "name")
+//!              .update_mask("sed")
 //!              .doit();
 //! 
 //! match result {
@@ -222,9 +223,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -275,7 +274,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_cloudkms1 as cloudkms1;
-/// use cloudkms1::SetIamPolicyRequest;
+/// use cloudkms1::CryptoKeyVersion;
 /// use cloudkms1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -297,12 +296,13 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
+/// let mut req = CryptoKeyVersion::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_key_rings_import_jobs_set_iam_policy(req, "resource")
+/// let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_patch(req, "name")
+///              .update_mask("dolores")
 ///              .doit();
 /// 
 /// match result {
@@ -340,7 +340,7 @@ impl<'a, C, A> CloudKMS<C, A>
         CloudKMS {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://cloudkms.googleapis.com/".to_string(),
             _root_url: "https://cloudkms.googleapis.com/".to_string(),
         }
@@ -351,7 +351,7 @@ impl<'a, C, A> CloudKMS<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -492,11 +492,12 @@ impl RequestValue for DecryptRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations key rings crypto keys crypto key versions import projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall.html) (response)
+/// * [locations key rings crypto keys crypto key versions patch projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall.html) (request|response)
+/// * [locations key rings crypto keys crypto key versions create projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall.html) (request|response)
 /// * [locations key rings crypto keys crypto key versions destroy projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall.html) (response)
 /// * [locations key rings crypto keys crypto key versions get projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall.html) (response)
-/// * [locations key rings crypto keys crypto key versions patch projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall.html) (request|response)
 /// * [locations key rings crypto keys crypto key versions restore projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall.html) (response)
-/// * [locations key rings crypto keys crypto key versions create projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CryptoKeyVersion {
@@ -505,6 +506,11 @@ pub struct CryptoKeyVersion {
     /// DESTROY_SCHEDULED.
     #[serde(rename="destroyTime")]
     pub destroy_time: Option<String>,
+    /// Output only. The root cause of an import failure. Only present if
+    /// state is
+    /// IMPORT_FAILED.
+    #[serde(rename="importFailureReason")]
+    pub import_failure_reason: Option<String>,
     /// Output only. The resource name for this CryptoKeyVersion in the format
     /// `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
     pub name: Option<String>,
@@ -534,10 +540,37 @@ pub struct CryptoKeyVersion {
     /// Output only. The time at which this CryptoKeyVersion was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
+    /// Output only. The time at which this CryptoKeyVersion's key material
+    /// was imported.
+    #[serde(rename="importTime")]
+    pub import_time: Option<String>,
+    /// Output only. The name of the ImportJob used to import this
+    /// CryptoKeyVersion. Only present if the underlying key material was
+    /// imported.
+    #[serde(rename="importJob")]
+    pub import_job: Option<String>,
 }
 
 impl RequestValue for CryptoKeyVersion {}
 impl ResponseResult for CryptoKeyVersion {}
+
+
+/// The public key component of the wrapping key. For details of the type of
+/// key this public key corresponds to, see the ImportMethod.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WrappingPublicKey {
+    /// The public key, encoded in PEM format. For more information, see the [RFC
+    /// 7468](https://tools.ietf.org/html/rfc7468) sections for [General
+    /// Considerations](https://tools.ietf.org/html/rfc7468#section-2) and
+    /// [Textual Encoding of Subject Public Key Info]
+    /// (https://tools.ietf.org/html/rfc7468#section-13).
+    pub pem: Option<String>,
+}
+
+impl Part for WrappingPublicKey {}
 
 
 /// Response message for KeyManagementService.ListKeyRings.
@@ -587,37 +620,90 @@ pub struct ListLocationsResponse {
 impl ResponseResult for ListLocationsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// An ImportJob can be used to create CryptoKeys and
+/// CryptoKeyVersions using pre-existing key material,
+/// generated outside of Cloud KMS.
+/// 
+/// When an ImportJob is created, Cloud KMS will generate a "wrapping key",
+/// which is a public/private key pair. You use the wrapping key to encrypt (also
+/// known as wrap) the pre-existing key material to protect it during the import
+/// process. The nature of the wrapping key depends on the choice of
+/// import_method. When the wrapping key generation
+/// is complete, the state will be set to
+/// ACTIVE and the public_key
+/// can be fetched. The fetched public key can then be used to wrap your
+/// pre-existing key material.
+/// 
+/// Once the key material is wrapped, it can be imported into a new
+/// CryptoKeyVersion in an existing CryptoKey by calling
+/// ImportCryptoKeyVersion.
+/// Multiple CryptoKeyVersions can be imported with a single
+/// ImportJob. Cloud KMS uses the private key portion of the wrapping key to
+/// unwrap the key material. Only Cloud KMS has access to the private key.
+/// 
+/// An ImportJob expires 3 days after it is created. Once expired, Cloud KMS
+/// will no longer be able to import or unwrap any key material that was wrapped
+/// with the ImportJob's public key.
+/// 
+/// For more information, see
+/// [Importing a key](https://cloud.google.com/kms/docs/importing-a-key).
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations get projects](struct.ProjectLocationGetCall.html) (response)
+/// * [locations key rings import jobs get projects](struct.ProjectLocationKeyRingImportJobGetCall.html) (response)
+/// * [locations key rings import jobs create projects](struct.ProjectLocationKeyRingImportJobCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Location {
-    /// The friendly name for this location, typically a nearby city name.
-    /// For example, "Tokyo".
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Cross-service attributes for the location. For example
-    /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
-    pub labels: Option<HashMap<String, String>>,
-    /// The canonical id for this location. For example: `"us-east1"`.
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
-    /// Resource name for the location, which may vary between implementations.
-    /// For example: `"projects/example-project/locations/us-east1"`
+pub struct ImportJob {
+    /// Output only. The resource name for this ImportJob in the format
+    /// `projects/*/locations/*/keyRings/*/importJobs/*`.
     pub name: Option<String>,
-    /// Service-specific metadata. For example the available capacity at the given
-    /// location.
-    pub metadata: Option<HashMap<String, String>>,
+    /// Required and immutable. The protection level of the ImportJob. This
+    /// must match the
+    /// protection_level of the
+    /// version_template on the CryptoKey you
+    /// attempt to import into.
+    #[serde(rename="protectionLevel")]
+    pub protection_level: Option<String>,
+    /// Output only. Statement that was generated and signed by the key creator
+    /// (for example, an HSM) at key creation time. Use this statement to verify
+    /// attributes of the key as stored on the HSM, independently of Google.
+    /// Only present if the chosen ImportMethod is one with a protection
+    /// level of HSM.
+    pub attestation: Option<KeyOperationAttestation>,
+    /// Output only. The time this ImportJob expired. Only present if
+    /// state is EXPIRED.
+    #[serde(rename="expireEventTime")]
+    pub expire_event_time: Option<String>,
+    /// Output only. The time at which this ImportJob is scheduled for
+    /// expiration and can no longer be used to import key material.
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
+    /// Output only. The public key with which to wrap key material prior to
+    /// import. Only returned if state is
+    /// ACTIVE.
+    #[serde(rename="publicKey")]
+    pub public_key: Option<WrappingPublicKey>,
+    /// Output only. The current state of the ImportJob, indicating if it can
+    /// be used.
+    pub state: Option<String>,
+    /// Required and immutable. The wrapping method to be used for incoming
+    /// key material.
+    #[serde(rename="importMethod")]
+    pub import_method: Option<String>,
+    /// Output only. The time this ImportJob's key material was generated.
+    #[serde(rename="generateTime")]
+    pub generate_time: Option<String>,
+    /// Output only. The time at which this ImportJob was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
 }
 
-impl ResponseResult for Location {}
+impl RequestValue for ImportJob {}
+impl ResponseResult for ImportJob {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
@@ -776,7 +862,8 @@ pub struct CryptoKey {
     /// `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
     pub name: Option<String>,
     /// next_rotation_time will be advanced by this period when the service
-    /// automatically rotates a key. Must be at least one day.
+    /// automatically rotates a key. Must be at least 24 hours and at most
+    /// 876,000 hours.
     /// 
     /// If rotation_period is set, next_rotation_time must also be set.
     /// 
@@ -1130,6 +1217,77 @@ pub struct Expr {
 impl Part for Expr {}
 
 
+/// Request message for KeyManagementService.ImportCryptoKeyVersion.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations key rings crypto keys crypto key versions import projects](struct.ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImportCryptoKeyVersionRequest {
+    /// Required. The name of the ImportJob that was used to
+    /// wrap this key material.
+    #[serde(rename="importJob")]
+    pub import_job: Option<String>,
+    /// Required. The algorithm of
+    /// the key being imported. This does not need to match the
+    /// version_template of the CryptoKey this
+    /// version imports into.
+    pub algorithm: Option<String>,
+    /// Wrapped key material produced with
+    /// RSA_OAEP_3072_SHA1_AES_256
+    /// or
+    /// RSA_OAEP_4096_SHA1_AES_256.
+    /// 
+    /// This field contains the concatenation of two wrapped keys:
+    /// <ol>
+    ///   <li>An ephemeral AES-256 wrapping key wrapped with the
+    ///       public_key using RSAES-OAEP with SHA-1,
+    ///       MGF1 with SHA-1, and an empty label.
+    ///   </li>
+    ///   <li>The key to be imported, wrapped with the ephemeral AES-256 key
+    ///       using AES-KWP (RFC 5649).
+    ///   </li>
+    /// </ol>
+    /// 
+    /// This format is the same as the format produced by PKCS#11 mechanism
+    /// CKM_RSA_AES_KEY_WRAP.
+    #[serde(rename="rsaAesWrappedKey")]
+    pub rsa_aes_wrapped_key: Option<String>,
+}
+
+impl RequestValue for ImportCryptoKeyVersionRequest {}
+
+
+/// Response message for KeyManagementService.ListImportJobs.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations key rings import jobs list projects](struct.ProjectLocationKeyRingImportJobListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListImportJobsResponse {
+    /// A token to retrieve next page of results. Pass this value in
+    /// ListImportJobsRequest.page_token to retrieve the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The total number of ImportJobs that matched the query.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
+    /// The list of ImportJobs.
+    #[serde(rename="importJobs")]
+    pub import_jobs: Option<Vec<ImportJob>>,
+}
+
+impl ResponseResult for ListImportJobsResponse {}
+
+
 /// Contains an HSM-generated attestation about a key operation. For more
 /// information, see [Verifying attestations]
 /// (https://cloud.google.com/kms/docs/attest-key).
@@ -1158,7 +1316,7 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -1323,6 +1481,39 @@ pub struct Digest {
 impl Part for Digest {}
 
 
+/// A resource that represents Google Cloud Platform location.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations get projects](struct.ProjectLocationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Location {
+    /// The friendly name for this location, typically a nearby city name.
+    /// For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Cross-service attributes for the location. For example
+    /// 
+    ///     {"cloud.googleapis.com/region": "us-east1"}
+    pub labels: Option<HashMap<String, String>>,
+    /// The canonical id for this location. For example: `"us-east1"`.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
+    /// Resource name for the location, which may vary between implementations.
+    /// For example: `"projects/example-project/locations/us-east1"`
+    pub name: Option<String>,
+    /// Service-specific metadata. For example the available capacity at the given
+    /// location.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for Location {}
+
+
 
 // ###################
 // MethodBuilders ###
@@ -1352,7 +1543,7 @@ impl Part for Digest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudKMS::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_get(...)`, `locations_key_rings_create(...)`, `locations_key_rings_crypto_keys_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_destroy(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_list(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_patch(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_restore(...)`, `locations_key_rings_crypto_keys_decrypt(...)`, `locations_key_rings_crypto_keys_encrypt(...)`, `locations_key_rings_crypto_keys_get(...)`, `locations_key_rings_crypto_keys_get_iam_policy(...)`, `locations_key_rings_crypto_keys_list(...)`, `locations_key_rings_crypto_keys_patch(...)`, `locations_key_rings_crypto_keys_set_iam_policy(...)`, `locations_key_rings_crypto_keys_test_iam_permissions(...)`, `locations_key_rings_crypto_keys_update_primary_version(...)`, `locations_key_rings_get(...)`, `locations_key_rings_get_iam_policy(...)`, `locations_key_rings_import_jobs_get_iam_policy(...)`, `locations_key_rings_import_jobs_set_iam_policy(...)`, `locations_key_rings_import_jobs_test_iam_permissions(...)`, `locations_key_rings_list(...)`, `locations_key_rings_set_iam_policy(...)`, `locations_key_rings_test_iam_permissions(...)` and `locations_list(...)`
+/// // like `locations_get(...)`, `locations_key_rings_create(...)`, `locations_key_rings_crypto_keys_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_destroy(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_import(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_list(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_patch(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_restore(...)`, `locations_key_rings_crypto_keys_decrypt(...)`, `locations_key_rings_crypto_keys_encrypt(...)`, `locations_key_rings_crypto_keys_get(...)`, `locations_key_rings_crypto_keys_get_iam_policy(...)`, `locations_key_rings_crypto_keys_list(...)`, `locations_key_rings_crypto_keys_patch(...)`, `locations_key_rings_crypto_keys_set_iam_policy(...)`, `locations_key_rings_crypto_keys_test_iam_permissions(...)`, `locations_key_rings_crypto_keys_update_primary_version(...)`, `locations_key_rings_get(...)`, `locations_key_rings_get_iam_policy(...)`, `locations_key_rings_import_jobs_create(...)`, `locations_key_rings_import_jobs_get(...)`, `locations_key_rings_import_jobs_get_iam_policy(...)`, `locations_key_rings_import_jobs_list(...)`, `locations_key_rings_import_jobs_set_iam_policy(...)`, `locations_key_rings_import_jobs_test_iam_permissions(...)`, `locations_key_rings_list(...)`, `locations_key_rings_set_iam_policy(...)`, `locations_key_rings_test_iam_permissions(...)` and `locations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1450,6 +1641,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1547,6 +1740,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Imports a new CryptoKeyVersion into an existing CryptoKey using the
+    /// wrapped key material provided in the request.
+    /// 
+    /// The version ID will be assigned the next sequential id within the
+    /// CryptoKey.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the CryptoKey to
+    ///              be imported into.
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_import(&self, request: ImportCryptoKeyVersionRequest, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A> {
+        ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists information about the supported locations for this service.
     /// 
     /// # Arguments
@@ -1559,6 +1776,29 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create a new ImportJob within a KeyRing.
+    /// 
+    /// ImportJob.import_method is required.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the KeyRing associated with the
+    ///              ImportJobs.
+    pub fn locations_key_rings_import_jobs_create(&self, request: ImportJob, parent: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a, C, A> {
+        ProjectLocationKeyRingImportJobCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _import_job_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1648,6 +1888,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationKeyRingCryptoKeyGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1731,6 +1972,29 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationKeyRingImportJobGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists ImportJobs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The resource name of the KeyRing to list, in the format
+    ///              `projects/*/locations/*/keyRings/*`.
+    pub fn locations_key_rings_import_jobs_list(&self, parent: &str) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
+        ProjectLocationKeyRingImportJobListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1751,6 +2015,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationKeyRingGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1836,6 +2101,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _view: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1857,6 +2124,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _version_view: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1999,6 +2268,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Returns metadata for a given ImportJob.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the ImportJob to get.
+    pub fn locations_key_rings_import_jobs_get(&self, name: &str) -> ProjectLocationKeyRingImportJobGetCall<'a, C, A> {
+        ProjectLocationKeyRingImportJobGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Create a new CryptoKey within a KeyRing.
     /// 
     /// CryptoKey.purpose and
@@ -2015,6 +2301,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
+            _skip_initial_version_creation: Default::default(),
             _crypto_key_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2071,7 +2358,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_patch(req, "name")
-///              .update_mask("et")
+///              .update_mask("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -2615,7 +2902,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_create(req, "parent")
-///              .key_ring_id("accusam")
+///              .key_ring_id("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -2902,8 +3189,10 @@ impl<'a, C, A> ProjectLocationKeyRingCreateCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_list("parent")
-///              .page_token("justo")
-///              .page_size(-1)
+///              .page_token("labore")
+///              .page_size(-9)
+///              .order_by("nonumy")
+///              .filter("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -2914,6 +3203,8 @@ pub struct ProjectLocationKeyRingListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2936,7 +3227,7 @@ impl<'a, C, A> ProjectLocationKeyRingListCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2944,7 +3235,13 @@ impl<'a, C, A> ProjectLocationKeyRingListCall<'a, C, A> where C: BorrowMut<hyper
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        if let Some(value) = self._order_by {
+            params.push(("orderBy", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3086,6 +3383,23 @@ impl<'a, C, A> ProjectLocationKeyRingListCall<'a, C, A> where C: BorrowMut<hyper
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingListCall<'a, C, A> {
         self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Specify how the results should be sorted. If not specified, the
+    /// results will be sorted in the default order
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, C, A> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Only include resources that match the filter in the response
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4223,6 +4537,290 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetCall<'a, C, A> where C: BorrowM
 }
 
 
+/// Imports a new CryptoKeyVersion into an existing CryptoKey using the
+/// wrapped key material provided in the request.
+/// 
+/// The version ID will be assigned the next sequential id within the
+/// CryptoKey.
+///
+/// A builder for the *locations.keyRings.cryptoKeys.cryptoKeyVersions.import* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// use cloudkms1::ImportCryptoKeyVersionRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudkms1::CloudKMS;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudKMS::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ImportCryptoKeyVersionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_import(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudKMS<C, A>,
+    _request: ImportCryptoKeyVersionRequest,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CryptoKeyVersion)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.cryptoKeys.cryptoKeyVersions.import",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/cryptoKeyVersions:import";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ImportCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the CryptoKey to
+    /// be imported into.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists information about the supported locations for this service.
 ///
 /// A builder for the *locations.list* method supported by a *project* resource.
@@ -4251,9 +4849,9 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("gubergren")
-///              .page_size(-95)
-///              .filter("aliquyam")
+///              .page_token("justo")
+///              .page_size(-34)
+///              .filter("et")
 ///              .doit();
 /// # }
 /// ```
@@ -4496,6 +5094,301 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Create a new ImportJob within a KeyRing.
+/// 
+/// ImportJob.import_method is required.
+///
+/// A builder for the *locations.keyRings.importJobs.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// use cloudkms1::ImportJob;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudkms1::CloudKMS;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudKMS::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ImportJob::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_key_rings_import_jobs_create(req, "parent")
+///              .import_job_id("ipsum")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationKeyRingImportJobCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudKMS<C, A>,
+    _request: ImportJob,
+    _parent: String,
+    _import_job_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationKeyRingImportJobCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationKeyRingImportJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ImportJob)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.importJobs.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._import_job_id {
+            params.push(("importJobId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "importJobId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/importJobs";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ImportJob) -> ProjectLocationKeyRingImportJobCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the KeyRing associated with the
+    /// ImportJobs.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. It must be unique within a KeyRing and match the regular
+    /// expression `[a-zA-Z0-9_-]{1,63}`
+    ///
+    /// Sets the *import job id* query property to the given value.
+    pub fn import_job_id(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a, C, A> {
+        self._import_job_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationKeyRingImportJobCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5386,6 +6279,7 @@ impl<'a, C, A> ProjectLocationKeyRingTestIamPermissionCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_get_iam_policy("resource")
+///              .options_requested_policy_version(-9)
 ///              .doit();
 /// # }
 /// ```
@@ -5394,6 +6288,7 @@ pub struct ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudKMS<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5416,9 +6311,12 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> where C
         };
         dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.cryptoKeys.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5542,6 +6440,16 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> where C
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5922,7 +6830,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C, A>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_patch(req, "name")
-///              .update_mask("diam")
+///              .update_mask("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -6491,6 +7399,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C, A> where C: Bor
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_import_jobs_get_iam_policy("resource")
+///              .options_requested_policy_version(-39)
 ///              .doit();
 /// # }
 /// ```
@@ -6499,6 +7408,7 @@ pub struct ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudKMS<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6521,9 +7431,12 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> where C
         };
         dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.importJobs.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6649,6 +7562,16 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> where C
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6712,6 +7635,310 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> where C
 }
 
 
+/// Lists ImportJobs.
+///
+/// A builder for the *locations.keyRings.importJobs.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudkms1::CloudKMS;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudKMS::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_key_rings_import_jobs_list("parent")
+///              .page_token("amet")
+///              .page_size(-60)
+///              .order_by("labore")
+///              .filter("eirmod")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationKeyRingImportJobListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudKMS<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationKeyRingImportJobListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationKeyRingImportJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListImportJobsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.importJobs.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._order_by {
+            params.push(("orderBy", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/importJobs";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The resource name of the KeyRing to list, in the format
+    /// `projects/*/locations/*/keyRings/*`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional pagination token, returned earlier via
+    /// ListImportJobsResponse.next_page_token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional limit on the number of ImportJobs to include in the
+    /// response. Further ImportJobs can subsequently be obtained by
+    /// including the ListImportJobsResponse.next_page_token in a subsequent
+    /// request. If unspecified, the server will pick an appropriate default.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Specify how the results should be sorted. If not specified, the
+    /// results will be sorted in the default order
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Only include resources that match the filter in the response
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets the access control policy for a resource.
 /// Returns an empty policy if the resource exists and does not have a policy
 /// set.
@@ -6742,6 +7969,7 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_get_iam_policy("resource")
+///              .options_requested_policy_version(-37)
 ///              .doit();
 /// # }
 /// ```
@@ -6750,6 +7978,7 @@ pub struct ProjectLocationKeyRingGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudKMS<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6772,9 +8001,12 @@ impl<'a, C, A> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6898,6 +8130,16 @@ impl<'a, C, A> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> where C: BorrowM
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// Acceptable values are 0 and 1.
+    /// If the value is 0, or the field is omitted, policy format version 1 will be
+    /// returned.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7806,9 +9048,11 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C, A> wh
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_list("parent")
-///              .view("eos")
-///              .page_token("erat")
-///              .page_size(-95)
+///              .view("et")
+///              .page_token("duo")
+///              .page_size(-21)
+///              .order_by("eirmod")
+///              .filter("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -7820,6 +9064,8 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
     _view: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7842,7 +9088,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
         };
         dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.cryptoKeys.cryptoKeyVersions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._view {
             params.push(("view", value.to_string()));
@@ -7853,7 +9099,13 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "parent", "view", "pageToken", "pageSize"].iter() {
+        if let Some(value) = self._order_by {
+            params.push(("orderBy", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "view", "pageToken", "pageSize", "orderBy", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8005,6 +9257,23 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
         self._page_size = Some(new_value);
         self
     }
+    /// Optional. Specify how the results should be sorted. If not specified, the
+    /// results will be sorted in the default order
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Only include resources that match the filter in the response
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8096,9 +9365,11 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_list("parent")
-///              .version_view("eirmod")
-///              .page_token("elitr")
-///              .page_size(-97)
+///              .version_view("amet")
+///              .page_token("et")
+///              .page_size(-45)
+///              .order_by("ut")
+///              .filter("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -8110,6 +9381,8 @@ pub struct ProjectLocationKeyRingCryptoKeyListCall<'a, C, A>
     _version_view: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8132,7 +9405,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.cryptoKeys.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._version_view {
             params.push(("versionView", value.to_string()));
@@ -8143,7 +9416,13 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "parent", "versionView", "pageToken", "pageSize"].iter() {
+        if let Some(value) = self._order_by {
+            params.push(("orderBy", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "versionView", "pageToken", "pageSize", "orderBy", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8292,6 +9571,23 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> {
         self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Specify how the results should be sorted. If not specified, the
+    /// results will be sorted in the default order
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Only include resources that match the filter in the response
+    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10022,6 +11318,254 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, C, A> wh
 }
 
 
+/// Returns metadata for a given ImportJob.
+///
+/// A builder for the *locations.keyRings.importJobs.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudkms1::CloudKMS;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudKMS::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_key_rings_import_jobs_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationKeyRingImportJobGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudKMS<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationKeyRingImportJobGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationKeyRingImportJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ImportJob)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.importJobs.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the ImportJob to get.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationKeyRingImportJobGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Create a new CryptoKey within a KeyRing.
 /// 
 /// CryptoKey.purpose and
@@ -10060,7 +11604,8 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, C, A> wh
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_create(req, "parent")
-///              .crypto_key_id("Lorem")
+///              .skip_initial_version_creation(false)
+///              .crypto_key_id("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -10070,6 +11615,7 @@ pub struct ProjectLocationKeyRingCryptoKeyCreateCall<'a, C, A>
     hub: &'a CloudKMS<C, A>,
     _request: CryptoKey,
     _parent: String,
+    _skip_initial_version_creation: Option<bool>,
     _crypto_key_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10093,12 +11639,15 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C, A> where C: Borr
         };
         dlg.begin(MethodInfo { id: "cloudkms.projects.locations.keyRings.cryptoKeys.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._skip_initial_version_creation {
+            params.push(("skipInitialVersionCreation", value.to_string()));
+        }
         if let Some(value) = self._crypto_key_id {
             params.push(("cryptoKeyId", value.to_string()));
         }
-        for &field in ["alt", "parent", "cryptoKeyId"].iter() {
+        for &field in ["alt", "parent", "skipInitialVersionCreation", "cryptoKeyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10246,6 +11795,17 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C, A> where C: Borr
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// If set to true, the request will create a CryptoKey without any
+    /// CryptoKeyVersions. You must manually call
+    /// CreateCryptoKeyVersion or
+    /// ImportCryptoKeyVersion
+    /// before you can use this CryptoKey.
+    ///
+    /// Sets the *skip initial version creation* query property to the given value.
+    pub fn skip_initial_version_creation(mut self, new_value: bool) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C, A> {
+        self._skip_initial_version_creation = Some(new_value);
         self
     }
     /// Required. It must be unique within a KeyRing and match the regular

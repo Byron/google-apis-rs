@@ -1,4 +1,4 @@
-site_name: Cloud KMS v1.0.8+20190328
+site_name: Cloud KMS v1.0.9+20190626
 site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
 site_description: A complete library to interact with Cloud KMS (protocol v1)
 
@@ -18,6 +18,7 @@ pages:
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-destroy.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Destroy']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-get.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Get']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-get-public-key.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Get Public Key']
+- ['projects_locations-key-rings-crypto-keys-crypto-key-versions-import.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Import']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-list.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions List']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-patch.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Patch']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-restore.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Restore']
@@ -32,7 +33,10 @@ pages:
 - ['projects_locations-key-rings-crypto-keys-update-primary-version.md', 'Projects', 'Locations Key Rings Crypto Keys Update Primary Version']
 - ['projects_locations-key-rings-get.md', 'Projects', 'Locations Key Rings Get']
 - ['projects_locations-key-rings-get-iam-policy.md', 'Projects', 'Locations Key Rings Get Iam Policy']
+- ['projects_locations-key-rings-import-jobs-create.md', 'Projects', 'Locations Key Rings Import Jobs Create']
+- ['projects_locations-key-rings-import-jobs-get.md', 'Projects', 'Locations Key Rings Import Jobs Get']
 - ['projects_locations-key-rings-import-jobs-get-iam-policy.md', 'Projects', 'Locations Key Rings Import Jobs Get Iam Policy']
+- ['projects_locations-key-rings-import-jobs-list.md', 'Projects', 'Locations Key Rings Import Jobs List']
 - ['projects_locations-key-rings-import-jobs-set-iam-policy.md', 'Projects', 'Locations Key Rings Import Jobs Set Iam Policy']
 - ['projects_locations-key-rings-import-jobs-test-iam-permissions.md', 'Projects', 'Locations Key Rings Import Jobs Test Iam Permissions']
 - ['projects_locations-key-rings-list.md', 'Projects', 'Locations Key Rings List']
@@ -42,5 +46,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

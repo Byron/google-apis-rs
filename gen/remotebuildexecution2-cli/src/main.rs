@@ -52,6 +52,15 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "inline-stdout" => {
+                    call = call.inline_stdout(arg_from_str(value.unwrap_or("false"), err, "inline-stdout", "boolean"));
+                },
+                "inline-stderr" => {
+                    call = call.inline_stderr(arg_from_str(value.unwrap_or("false"), err, "inline-stderr", "boolean"));
+                },
+                "inline-output-files" => {
+                    call = call.add_inline_output_files(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -65,6 +74,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["inline-output-files", "inline-stderr", "inline-stdout"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -900,6 +910,13 @@ fn main() {
             ("get",
                     Some(r##"Retrieve a cached execution result.
         
+        Implementations SHOULD ensure that any blobs referenced from the
+        ContentAddressableStorage
+        are available at the time of returning the
+        ActionResult and will be
+        for some period of time afterwards. The TTLs of the referenced blobs SHOULD be increased
+        if necessary and applicable.
+        
         Errors:
         
         * `NOT_FOUND`: The requested `ActionResult` is not in the cache."##),
@@ -1306,7 +1323,14 @@ fn main() {
         
         ("methods", "methods: 'get-capabilities'", vec![
             ("get-capabilities",
-                    Some(r##"GetCapabilities returns the server capabilities configuration."##),
+                    Some(r##"GetCapabilities returns the server capabilities configuration of the
+        remote endpoint.
+        Only the capabilities of the services supported by the endpoint will
+        be returned:
+        * Execution + CAS + Action Cache endpoints should return both
+          CacheCapabilities and ExecutionCapabilities.
+        * Execution only endpoints should return ExecutionCapabilities.
+        * CAS + Action Cache only endpoints should return CacheCapabilities."##),
                     "Details at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli/methods_get-capabilities",
                   vec![
                     (Some(r##"instance-name"##),
@@ -1374,7 +1398,7 @@ fn main() {
     
     let mut app = App::new("remotebuildexecution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190326")
+           .version("1.0.9+20190702")
            .about("Supplies a Remote Execution API service for tools such as bazel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli")
            .arg(Arg::with_name("url")

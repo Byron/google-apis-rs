@@ -4,7 +4,7 @@
 [package]
 
 name = "google-oslogin1_beta-cli"
-version = "1.0.8+20190309"
+version = "1.0.9+20190614"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud OS Login (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/oslogin1_beta-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-oslogin1_beta]
 path = "../oslogin1_beta"
-version = "1.0.8+20190309"
+version = "1.0.9+20190614"

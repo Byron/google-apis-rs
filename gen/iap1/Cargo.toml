@@ -4,12 +4,12 @@
 [package]
 
 name = "google-iap1"
-version = "1.0.8+20190323"
+version = "1.0.9+20190628"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud IAP (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/iap1"
 homepage = "https://cloud.google.com/iap"
-documentation = "https://docs.rs/google-iap1/1.0.8+20190323"
+documentation = "https://docs.rs/google-iap1/1.0.9+20190628"
 license = "MIT"
 keywords = ["iap", "google", "protocol", "web", "api"]
 autobins = false

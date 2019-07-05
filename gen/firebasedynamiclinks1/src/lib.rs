@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.8+20190403*, where *20190403* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.9+20190628*, where *20190628* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Firebase Dynamic Links* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/dynamic-links/).
@@ -224,9 +224,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -338,7 +336,7 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
         FirebaseDynamicLinks {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
             _root_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
         }
@@ -355,7 +353,7 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -409,16 +407,10 @@ impl Part for NavigationInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIosPostInstallAttributionResponse {
-    /// Scion medium value to be propagated by iSDK to Scion at post-install.
-    #[serde(rename="utmMedium")]
-    pub utm_medium: Option<String>,
-    /// Scion source value to be propagated by iSDK to Scion at post-install.
-    #[serde(rename="utmSource")]
-    pub utm_source: Option<String>,
-    /// The minimum version for app, specified by dev through ?imv= parameter.
-    /// Return to iSDK to allow app to evaluate if current version meets this.
-    #[serde(rename="appMinimumVersion")]
-    pub app_minimum_version: Option<String>,
+    /// Describes why match failed, ie: "discarded due to low confidence".
+    /// This message will be publicly visible.
+    #[serde(rename="matchMessage")]
+    pub match_message: Option<String>,
     /// The confidence of the returned attribution.
     #[serde(rename="attributionConfidence")]
     pub attribution_confidence: Option<String>,
@@ -427,17 +419,12 @@ pub struct GetIosPostInstallAttributionResponse {
     /// this will be false.
     #[serde(rename="isStrongMatchExecutable")]
     pub is_strong_match_executable: Option<bool>,
-    /// User-agent specific custom-scheme URIs for iSDK to open. This will be set
-    /// according to the user-agent tha the click was originally made in. There is
-    /// no Safari-equivalent custom-scheme open URLs.
-    /// ie: googlechrome://www.example.com
-    /// ie: firefox://open-url?url=http://www.example.com
-    /// ie: opera-http://example.com
-    #[serde(rename="externalBrowserDestinationLink")]
-    pub external_browser_destination_link: Option<String>,
     /// Which IP version the request was made from.
     #[serde(rename="requestIpVersion")]
     pub request_ip_version: Option<String>,
+    /// Scion term value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmTerm")]
+    pub utm_term: Option<String>,
     /// Invitation ID attributed post-install via one of several techniques
     /// (fingerprint, copy unique).
     #[serde(rename="invitationId")]
@@ -453,16 +440,33 @@ pub struct GetIosPostInstallAttributionResponse {
     /// techniques (fingerprint, copy unique).
     #[serde(rename="requestedLink")]
     pub requested_link: Option<String>,
+    /// Scion medium value to be propagated by iSDK to Scion at post-install.
+    #[serde(rename="utmMedium")]
+    pub utm_medium: Option<String>,
+    /// Scion source value to be propagated by iSDK to Scion at post-install.
+    #[serde(rename="utmSource")]
+    pub utm_source: Option<String>,
+    /// The minimum version for app, specified by dev through ?imv= parameter.
+    /// Return to iSDK to allow app to evaluate if current version meets this.
+    #[serde(rename="appMinimumVersion")]
+    pub app_minimum_version: Option<String>,
+    /// User-agent specific custom-scheme URIs for iSDK to open. This will be set
+    /// according to the user-agent tha the click was originally made in. There is
+    /// no Safari-equivalent custom-scheme open URLs.
+    /// ie: googlechrome://www.example.com
+    /// ie: firefox://open-url?url=http://www.example.com
+    /// ie: opera-http://example.com
+    #[serde(rename="externalBrowserDestinationLink")]
+    pub external_browser_destination_link: Option<String>,
+    /// Scion content value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmContent")]
+    pub utm_content: Option<String>,
     /// The link to navigate to update the app if min version is not met.
     /// This is either (in order): 1) fallback link (from ?ifl= parameter, if
     /// specified by developer) or 2) AppStore URL (from ?isi= parameter, if
     /// specified), or 3) the payload link (from required link= parameter).
     #[serde(rename="fallbackLink")]
     pub fallback_link: Option<String>,
-    /// Describes why match failed, ie: "discarded due to low confidence".
-    /// This message will be publicly visible.
-    #[serde(rename="matchMessage")]
-    pub match_message: Option<String>,
     /// Scion campaign value to be propagated by iSDK to Scion at post-install.
     #[serde(rename="utmCampaign")]
     pub utm_campaign: Option<String>,
@@ -511,13 +515,15 @@ impl Part for AndroidInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateShortDynamicLinkRequest {
     /// Information about the Dynamic Link to be shortened.
-    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
+    /// [Learn
+    /// more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="dynamicLinkInfo")]
     pub dynamic_link_info: Option<DynamicLinkInfo>,
     /// Full long Dynamic Link URL with desired query parameters specified.
     /// For example,
     /// "https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample",
-    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
+    /// [Learn
+    /// more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="longDynamicLink")]
     pub long_dynamic_link: Option<String>,
     /// Google SDK version. Version takes the form "$major.$minor.$patch"
@@ -870,13 +876,15 @@ impl Part for ITunesConnectAnalytics {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateManagedShortLinkRequest {
     /// Information about the Dynamic Link to be shortened.
-    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
+    /// [Learn
+    /// more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="dynamicLinkInfo")]
     pub dynamic_link_info: Option<DynamicLinkInfo>,
     /// Full long Dynamic Link URL with desired query parameters specified.
     /// For example,
     /// "https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample",
-    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
+    /// [Learn
+    /// more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="longDynamicLink")]
     pub long_dynamic_link: Option<String>,
     /// Google SDK version. Version takes the form "$major.$minor.$patch"
@@ -909,13 +917,22 @@ pub struct GetIosReopenAttributionResponse {
     /// Scion medium value to be propagated by iSDK to Scion at app-reopen.
     #[serde(rename="utmMedium")]
     pub utm_medium: Option<String>,
+    /// Scion source value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmSource")]
+    pub utm_source: Option<String>,
     /// FDL input value of the "&imv=" parameter, minimum app version to be
     /// returned to Google Firebase SDK running on iOS-9.
     #[serde(rename="iosMinAppVersion")]
     pub ios_min_app_version: Option<String>,
-    /// Scion source value to be propagated by iSDK to Scion at app-reopen.
-    #[serde(rename="utmSource")]
-    pub utm_source: Option<String>,
+    /// Scion term value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmTerm")]
+    pub utm_term: Option<String>,
+    /// Scion content value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmContent")]
+    pub utm_content: Option<String>,
+    /// Optional invitation ID, for only invite typed requested FDL links.
+    #[serde(rename="invitationId")]
+    pub invitation_id: Option<String>,
     /// The entire FDL, expanded from a short link. It is the same as the
     /// requested_link, if it is long.
     #[serde(rename="resolvedLink")]
@@ -927,9 +944,6 @@ pub struct GetIosReopenAttributionResponse {
     /// FDL links and invite FDL links.
     #[serde(rename="deepLink")]
     pub deep_link: Option<String>,
-    /// Optional invitation ID, for only invite typed requested FDL links.
-    #[serde(rename="invitationId")]
-    pub invitation_id: Option<String>,
 }
 
 impl ResponseResult for GetIosReopenAttributionResponse {}

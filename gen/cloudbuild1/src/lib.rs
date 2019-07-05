@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Build* crate version *1.0.8+20190323*, where *20190323* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Build* crate version *1.0.9+20190702*, where *20190702* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Build* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/cloud-build/docs/).
@@ -221,9 +221,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -332,7 +330,7 @@ impl<'a, C, A> CloudBuild<C, A>
         CloudBuild {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://cloudbuild.googleapis.com/".to_string(),
             _root_url: "https://cloudbuild.googleapis.com/".to_string(),
         }
@@ -346,7 +344,7 @@ impl<'a, C, A> CloudBuild<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -374,6 +372,21 @@ impl<'a, C, A> CloudBuild<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// The request message for Operations.CancelOperation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancel operations](struct.OperationCancelCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelOperationRequest { _never_set: Option<bool> }
+
+impl RequestValue for CancelOperationRequest {}
+
+
 /// Start and end times for a build execution phase.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -461,6 +474,27 @@ pub struct RepoSource {
 }
 
 impl RequestValue for RepoSource {}
+
+
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list operations](struct.OperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
 
 
 /// Specifies a build to retry.
@@ -660,58 +694,32 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
+/// An image built by the pipeline.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuiltImage {
+    /// Output only. Stores timing information for pushing the specified image.
+    #[serde(rename="pushTiming")]
+    pub push_timing: Option<TimeSpan>,
+    /// Name used to push the container image to Google Container Registry, as
+    /// presented to `docker push`.
+    pub name: Option<String>,
+    /// Docker Registry 2.0 digest.
+    pub digest: Option<String>,
+}
+
+impl Part for BuiltImage {}
+
+
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -729,6 +737,27 @@ pub struct Status {
 }
 
 impl Part for Status {}
+
+
+/// Response containing existing `BuildTriggers`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [triggers list projects](struct.ProjectTriggerListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBuildTriggersResponse {
+    /// Token to receive the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// `BuildTriggers` for the project, sorted by `create_time` descending.
+    pub triggers: Option<Vec<BuildTrigger>>,
+}
+
+impl ResponseResult for ListBuildTriggersResponse {}
 
 
 /// Container message for hash values.
@@ -768,6 +797,73 @@ pub struct ArtifactObjects {
 }
 
 impl Part for ArtifactObjects {}
+
+
+/// Optional arguments to enable specific features of builds.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildOptions {
+    /// Option to specify behavior when there is an error in the substitution
+    /// checks.
+    #[serde(rename="substitutionOption")]
+    pub substitution_option: Option<String>,
+    /// Compute Engine machine type on which to run the build.
+    #[serde(rename="machineType")]
+    pub machine_type: Option<String>,
+    /// A list of global environment variable definitions that will exist for all
+    /// build steps in this build. If a variable is defined in both globally and in
+    /// a build step, the variable will use the build step value.
+    /// 
+    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
+    /// being given the value "VALUE".
+    pub env: Option<Vec<String>>,
+    /// Requested hash for SourceProvenance.
+    #[serde(rename="sourceProvenanceHash")]
+    pub source_provenance_hash: Option<Vec<String>>,
+    /// Option to define build log streaming behavior to Google Cloud
+    /// Storage.
+    #[serde(rename="logStreamingOption")]
+    pub log_streaming_option: Option<String>,
+    /// A list of global environment variables, which are encrypted using a Cloud
+    /// Key Management Service crypto key. These values must be specified in the
+    /// build's `Secret`. These variables will be available to all build steps
+    /// in this build.
+    #[serde(rename="secretEnv")]
+    pub secret_env: Option<Vec<String>>,
+    /// Requested disk size for the VM that runs the build. Note that this is *NOT*
+    /// "disk free"; some of the space will be used by the operating system and
+    /// build utilities. Also note that this is the minimum disk size that will be
+    /// allocated for the build -- the build may run with a larger disk than
+    /// requested. At present, the maximum disk size is 1000GB; builds that request
+    /// more than the maximum are rejected with an error.
+    #[serde(rename="diskSizeGb")]
+    pub disk_size_gb: Option<String>,
+    /// Option to specify the logging mode, which determines where the logs are
+    /// stored.
+    pub logging: Option<String>,
+    /// Global list of volumes to mount for ALL build steps
+    /// 
+    /// Each volume is created as an empty volume prior to starting the build
+    /// process. Upon completion of the build, volumes and their contents are
+    /// discarded. Global volume names and paths cannot conflict with the volumes
+    /// defined a build step.
+    /// 
+    /// Using a global volume in a build with only one step is not valid as
+    /// it is indicative of a build request with an incorrect configuration.
+    pub volumes: Option<Vec<Volume>>,
+    /// Requested verifiability options.
+    #[serde(rename="requestedVerifyOption")]
+    pub requested_verify_option: Option<String>,
+    /// Option to specify a `WorkerPool` for the build. User specifies the pool
+    /// with the format "[WORKERPOOL_PROJECT_ID]/[WORKERPOOL_NAME]".
+    /// This is an experimental field.
+    #[serde(rename="workerPool")]
+    pub worker_pool: Option<String>,
+}
+
+impl Part for BuildOptions {}
 
 
 /// PullRequestFilter contains filter properties for matching GitHub Pull
@@ -810,6 +906,8 @@ pub struct BuildTrigger {
     pub github: Option<GitHubEventsConfig>,
     /// Human-readable description of this trigger.
     pub description: Option<String>,
+    /// Tags for annotation of a `BuildTrigger`
+    pub tags: Option<Vec<String>>,
     /// Output only. Unique identifier of the trigger.
     pub id: Option<String>,
     /// ignored_files and included_files are file glob matches using
@@ -823,12 +921,12 @@ pub struct BuildTrigger {
     /// outside of the ignored_files globs, then we do not trigger a build.
     #[serde(rename="ignoredFiles")]
     pub ignored_files: Option<Vec<String>>,
-    /// Output only. Time when the trigger was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
     /// Path, from the source root, to a file whose contents is used for the
     /// template.
     pub filename: Option<String>,
+    /// Output only. Time when the trigger was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
     /// If true, the trigger will never result in a build.
     pub disabled: Option<bool>,
     /// Contents of the build template.
@@ -858,15 +956,53 @@ impl RequestValue for BuildTrigger {}
 impl ResponseResult for BuildTrigger {}
 
 
-/// A CheckSuiteFilter is a filter that indicates that we should build on all
-/// check suite events.
+/// Request to cancel an ongoing build.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [builds cancel projects](struct.ProjectBuildCancelCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelBuildRequest { _never_set: Option<bool> }
+
+impl RequestValue for CancelBuildRequest {}
+
+
+/// Artifacts created by the build pipeline.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CheckSuiteFilter { _never_set: Option<bool> }
+pub struct Results {
+    /// List of build step outputs, produced by builder images, in the order
+    /// corresponding to build step indices.
+    /// 
+    /// [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders)
+    /// can produce this output by writing to `$BUILDER_OUTPUT/output`.
+    /// Only the first 4KB of data is stored.
+    #[serde(rename="buildStepOutputs")]
+    pub build_step_outputs: Option<Vec<String>>,
+    /// Path to the artifact manifest. Only populated when artifacts are uploaded.
+    #[serde(rename="artifactManifest")]
+    pub artifact_manifest: Option<String>,
+    /// Time to push all non-container artifacts.
+    #[serde(rename="artifactTiming")]
+    pub artifact_timing: Option<TimeSpan>,
+    /// Container images that were built as a part of the build.
+    pub images: Option<Vec<BuiltImage>>,
+    /// List of build step digests, in the order corresponding to build step
+    /// indices.
+    #[serde(rename="buildStepImages")]
+    pub build_step_images: Option<Vec<String>>,
+    /// Number of artifacts uploaded. Only populated when artifacts are uploaded.
+    #[serde(rename="numArtifacts")]
+    pub num_artifacts: Option<String>,
+}
 
-impl Part for CheckSuiteFilter {}
+impl Part for Results {}
 
 
 /// A step in the build pipeline.
@@ -984,6 +1120,27 @@ pub struct Volume {
 impl Part for Volume {}
 
 
+/// Push contains filter properties for matching GitHub git pushes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PushFilter {
+    /// Regexes of tags to match.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    pub tag: Option<String>,
+    /// Regexes of branches to match.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    pub branch: Option<String>,
+}
+
+impl Part for PushFilter {}
+
+
 /// Container message for hashes of byte content of files, used in
 /// SourceProvenance messages to verify integrity of source input to the build.
 /// 
@@ -1054,240 +1211,6 @@ pub struct StorageSource {
 impl Part for StorageSource {}
 
 
-/// Response including listed builds.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [builds list projects](struct.ProjectBuildListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListBuildsResponse {
-    /// Token to receive the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Builds will be sorted by `create_time`, descending.
-    pub builds: Option<Vec<Build>>,
-}
-
-impl ResponseResult for ListBuildsResponse {}
-
-
-/// Push contains filter properties for matching GitHub git pushes.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PushFilter {
-    /// Regexes of tags to match.
-    /// 
-    /// The syntax of the regular expressions accepted is the syntax accepted by
-    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
-    pub tag: Option<String>,
-    /// Regexes of branches to match.
-    /// 
-    /// The syntax of the regular expressions accepted is the syntax accepted by
-    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
-    pub branch: Option<String>,
-}
-
-impl Part for PushFilter {}
-
-
-/// The response message for Operations.ListOperations.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list operations](struct.OperationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
-}
-
-impl ResponseResult for ListOperationsResponse {}
-
-
-/// Response containing existing `BuildTriggers`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [triggers list projects](struct.ProjectTriggerListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListBuildTriggersResponse {
-    /// Token to receive the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// `BuildTriggers` for the project, sorted by `create_time` descending.
-    pub triggers: Option<Vec<BuildTrigger>>,
-}
-
-impl ResponseResult for ListBuildTriggersResponse {}
-
-
-/// An image built by the pipeline.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuiltImage {
-    /// Output only. Stores timing information for pushing the specified image.
-    #[serde(rename="pushTiming")]
-    pub push_timing: Option<TimeSpan>,
-    /// Name used to push the container image to Google Container Registry, as
-    /// presented to `docker push`.
-    pub name: Option<String>,
-    /// Docker Registry 2.0 digest.
-    pub digest: Option<String>,
-}
-
-impl Part for BuiltImage {}
-
-
-/// Optional arguments to enable specific features of builds.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildOptions {
-    /// Option to specify behavior when there is an error in the substitution
-    /// checks.
-    #[serde(rename="substitutionOption")]
-    pub substitution_option: Option<String>,
-    /// Compute Engine machine type on which to run the build.
-    #[serde(rename="machineType")]
-    pub machine_type: Option<String>,
-    /// A list of global environment variable definitions that will exist for all
-    /// build steps in this build. If a variable is defined in both globally and in
-    /// a build step, the variable will use the build step value.
-    /// 
-    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
-    /// being given the value "VALUE".
-    pub env: Option<Vec<String>>,
-    /// Requested hash for SourceProvenance.
-    #[serde(rename="sourceProvenanceHash")]
-    pub source_provenance_hash: Option<Vec<String>>,
-    /// Option to define build log streaming behavior to Google Cloud
-    /// Storage.
-    #[serde(rename="logStreamingOption")]
-    pub log_streaming_option: Option<String>,
-    /// A list of global environment variables, which are encrypted using a Cloud
-    /// Key Management Service crypto key. These values must be specified in the
-    /// build's `Secret`. These variables will be available to all build steps
-    /// in this build.
-    #[serde(rename="secretEnv")]
-    pub secret_env: Option<Vec<String>>,
-    /// Requested disk size for the VM that runs the build. Note that this is *NOT*
-    /// "disk free"; some of the space will be used by the operating system and
-    /// build utilities. Also note that this is the minimum disk size that will be
-    /// allocated for the build -- the build may run with a larger disk than
-    /// requested. At present, the maximum disk size is 1000GB; builds that request
-    /// more than the maximum are rejected with an error.
-    #[serde(rename="diskSizeGb")]
-    pub disk_size_gb: Option<String>,
-    /// Option to specify the logging mode, which determines where the logs are
-    /// stored.
-    pub logging: Option<String>,
-    /// Global list of volumes to mount for ALL build steps
-    /// 
-    /// Each volume is created as an empty volume prior to starting the build
-    /// process. Upon completion of the build, volumes and their contents are
-    /// discarded. Global volume names and paths cannot conflict with the volumes
-    /// defined a build step.
-    /// 
-    /// Using a global volume in a build with only one step is not valid as
-    /// it is indicative of a build request with an incorrect configuration.
-    pub volumes: Option<Vec<Volume>>,
-    /// Requested verifiability options.
-    #[serde(rename="requestedVerifyOption")]
-    pub requested_verify_option: Option<String>,
-    /// Option to specify a `WorkerPool` for the build. User specifies the pool
-    /// with the format "[WORKERPOOL_PROJECT_ID]/[WORKERPOOL_NAME]".
-    /// This is an experimental field.
-    #[serde(rename="workerPool")]
-    pub worker_pool: Option<String>,
-}
-
-impl Part for BuildOptions {}
-
-
-/// Request to cancel an ongoing build.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [builds cancel projects](struct.ProjectBuildCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelBuildRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelBuildRequest {}
-
-
-/// Artifacts created by the build pipeline.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Results {
-    /// List of build step outputs, produced by builder images, in the order
-    /// corresponding to build step indices.
-    /// 
-    /// [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders)
-    /// can produce this output by writing to `$BUILDER_OUTPUT/output`.
-    /// Only the first 4KB of data is stored.
-    #[serde(rename="buildStepOutputs")]
-    pub build_step_outputs: Option<Vec<String>>,
-    /// Path to the artifact manifest. Only populated when artifacts are uploaded.
-    #[serde(rename="artifactManifest")]
-    pub artifact_manifest: Option<String>,
-    /// Time to push all non-container artifacts.
-    #[serde(rename="artifactTiming")]
-    pub artifact_timing: Option<TimeSpan>,
-    /// Container images that were built as a part of the build.
-    pub images: Option<Vec<BuiltImage>>,
-    /// List of build step digests, in the order corresponding to build step
-    /// indices.
-    #[serde(rename="buildStepImages")]
-    pub build_step_images: Option<Vec<String>>,
-    /// Number of artifacts uploaded. Only populated when artifacts are uploaded.
-    #[serde(rename="numArtifacts")]
-    pub num_artifacts: Option<String>,
-}
-
-impl Part for Results {}
-
-
-/// The request message for Operations.CancelOperation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancel operations](struct.OperationCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelOperationRequest {}
-
-
 /// This resource represents a long-running operation that is the result of a
 /// network API call.
 /// 
@@ -1322,7 +1245,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -1335,6 +1258,27 @@ impl Resource for Operation {}
 impl ResponseResult for Operation {}
 
 
+/// Response including listed builds.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [builds list projects](struct.ProjectBuildListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBuildsResponse {
+    /// Token to receive the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Builds will be sorted by `create_time`, descending.
+    pub builds: Option<Vec<Build>>,
+}
+
+impl ResponseResult for ListBuildsResponse {}
+
+
 /// GitHubEventsConfig describes the configuration of a trigger that creates a
 /// build whenever a GitHub event is received.
 /// 
@@ -1344,22 +1288,21 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GitHubEventsConfig {
-    /// Owner of the repository.
+    /// Owner of the repository. For example: The owner for
+    /// https://github.com/googlecloudplatform/cloud-builders is
+    /// "googlecloudplatform".
     pub owner: Option<String>,
-    /// Name of the repository.
-    pub name: Option<String>,
-    /// filter to match changes in refs like branches, tags.
-    pub push: Option<PushFilter>,
-    /// The installationID that emmits the GitHub event.
+    /// The installationID that emits the GitHub event.
     #[serde(rename="installationId")]
     pub installation_id: Option<String>,
     /// filter to match changes in pull requests.
     #[serde(rename="pullRequest")]
     pub pull_request: Option<PullRequestFilter>,
-    /// Output only. Indicates that a build was generated from a check suite
-    /// event.
-    #[serde(rename="checkSuite")]
-    pub check_suite: Option<CheckSuiteFilter>,
+    /// Name of the repository. For example: The name for
+    /// https://github.com/googlecloudplatform/cloud-builders is "cloud-builders".
+    pub name: Option<String>,
+    /// filter to match changes in refs like branches, tags.
+    pub push: Option<PushFilter>,
 }
 
 impl Part for GitHubEventsConfig {}

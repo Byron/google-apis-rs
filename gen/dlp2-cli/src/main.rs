@@ -1195,8 +1195,9 @@ impl<'n> Engine<'n> {
                     "inspect-config.limits.max-findings-per-item" => Some(("inspectConfig.limits.maxFindingsPerItem", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inspect-config.min-likelihood" => Some(("inspectConfig.minLikelihood", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inspect-template-name" => Some(("inspectTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["byte-item", "content-options", "data", "deidentify-template-name", "exclude-info-types", "include-quote", "inspect-config", "inspect-template-name", "item", "limits", "max-findings-per-item", "max-findings-per-request", "min-likelihood", "type", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["byte-item", "content-options", "data", "deidentify-template-name", "exclude-info-types", "include-quote", "inspect-config", "inspect-template-name", "item", "limits", "location", "max-findings-per-item", "max-findings-per-request", "min-likelihood", "type", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3116,6 +3117,102 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_content_deidentify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "deidentify-template-name" => Some(("deidentifyTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item.byte-item.type" => Some(("item.byteItem.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item.byte-item.data" => Some(("item.byteItem.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item.value" => Some(("item.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inspect-config.exclude-info-types" => Some(("inspectConfig.excludeInfoTypes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "inspect-config.content-options" => Some(("inspectConfig.contentOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "inspect-config.include-quote" => Some(("inspectConfig.includeQuote", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "inspect-config.limits.max-findings-per-request" => Some(("inspectConfig.limits.maxFindingsPerRequest", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inspect-config.limits.max-findings-per-item" => Some(("inspectConfig.limits.maxFindingsPerItem", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inspect-config.min-likelihood" => Some(("inspectConfig.minLikelihood", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inspect-template-name" => Some(("inspectTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["byte-item", "content-options", "data", "deidentify-template-name", "exclude-info-types", "include-quote", "inspect-config", "inspect-template-name", "item", "limits", "location", "max-findings-per-item", "max-findings-per-request", "min-likelihood", "type", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GooglePrivacyDlpV2DeidentifyContentRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_content_deidentify(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_stored_info_types_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3613,6 +3710,9 @@ impl<'n> Engine<'n> {
                     },
                     ("job-triggers-patch", Some(opt)) => {
                         call_result = self._projects_job_triggers_patch(opt, dry_run, &mut err);
+                    },
+                    ("locations-content-deidentify", Some(opt)) => {
+                        call_result = self._projects_locations_content_deidentify(opt, dry_run, &mut err);
                     },
                     ("stored-info-types-create", Some(opt)) => {
                         call_result = self._projects_stored_info_types_create(opt, dry_run, &mut err);
@@ -4162,7 +4262,7 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'content-deidentify', 'content-inspect', 'content-reidentify', 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'dlp-jobs-cancel', 'dlp-jobs-create', 'dlp-jobs-delete', 'dlp-jobs-get', 'dlp-jobs-list', 'image-redact', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'job-triggers-activate', 'job-triggers-create', 'job-triggers-delete', 'job-triggers-get', 'job-triggers-list', 'job-triggers-patch', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
+        ("projects", "methods: 'content-deidentify', 'content-inspect', 'content-reidentify', 'deidentify-templates-create', 'deidentify-templates-delete', 'deidentify-templates-get', 'deidentify-templates-list', 'deidentify-templates-patch', 'dlp-jobs-cancel', 'dlp-jobs-create', 'dlp-jobs-delete', 'dlp-jobs-get', 'dlp-jobs-list', 'image-redact', 'inspect-templates-create', 'inspect-templates-delete', 'inspect-templates-get', 'inspect-templates-list', 'inspect-templates-patch', 'job-triggers-activate', 'job-triggers-create', 'job-triggers-delete', 'job-triggers-get', 'job-triggers-list', 'job-triggers-patch', 'locations-content-deidentify', 'stored-info-types-create', 'stored-info-types-delete', 'stored-info-types-get', 'stored-info-types-list' and 'stored-info-types-patch'", vec![
             ("content-deidentify",
                     Some(r##"De-identifies potentially sensitive info from a ContentItem.
         This method has limits on input size and output size.
@@ -4878,6 +4978,48 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-content-deidentify",
+                    Some(r##"De-identifies potentially sensitive info from a ContentItem.
+        This method has limits on input size and output size.
+        See https://cloud.google.com/dlp/docs/deidentify-sensitive-data to
+        learn more.
+        
+        When no InfoTypes or CustomInfoTypes are specified in this request, the
+        system will automatically choose what detectors to run. By default this may
+        be all types, but may change over time as detectors are updated."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/projects_locations-content-deidentify",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The parent resource name, for example projects/my-project-id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"location"##),
+                     None,
+                     Some(r##"The geographic location to process de-identification. Reserved for future
+        extensions."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("stored-info-types-create",
                     Some(r##"Creates a pre-built stored infoType to be used for inspection.
         See https://cloud.google.com/dlp/docs/creating-stored-infotypes to
@@ -5025,7 +5167,7 @@ fn main() {
     
     let mut app = App::new("dlp2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190402")
+           .version("1.0.9+20190629")
            .about("Provides methods for detection, risk analysis, and de-identification of privacy-sensitive fragments in text, images, and Google Cloud Platform storage repositories.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_cli")
            .arg(Arg::with_name("url")

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudiot1-cli"
-version = "1.0.8+20190321"
+version = "1.0.9+20190618"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Iot (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudiot1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-cloudiot1]
 path = "../cloudiot1"
-version = "1.0.8+20190321"
+version = "1.0.9+20190618"

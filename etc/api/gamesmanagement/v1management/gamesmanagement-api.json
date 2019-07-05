@@ -15,7 +15,7 @@
     "description": "The Management API for Google Play Game Services.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/games/services", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/NQhqb1aowpOYwUuDDi-HVh1xJ30\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/PeI8pHLCi9WE8e-r-CurvFzseTA\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -523,7 +523,7 @@
             }
         }
     }, 
-    "revision": "20190328", 
+    "revision": "20190627", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "AchievementResetAllResponse": {

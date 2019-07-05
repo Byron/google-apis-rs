@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Texttospeech* crate version *1.0.8+20190322*, where *20190322* is the exact revision of the *texttospeech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Texttospeech* crate version *1.0.9+20190628*, where *20190628* is the exact revision of the *texttospeech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Texttospeech* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/text-to-speech/).
@@ -214,9 +214,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -323,7 +321,7 @@ impl<'a, C, A> Texttospeech<C, A>
         Texttospeech {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://texttospeech.googleapis.com/".to_string(),
             _root_url: "https://texttospeech.googleapis.com/".to_string(),
         }
@@ -337,7 +335,7 @@ impl<'a, C, A> Texttospeech<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -395,7 +393,8 @@ impl ResponseResult for ListVoicesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SynthesizeSpeechResponse {
     /// The audio data bytes encoded as specified in the request, including the
-    /// header (For LINEAR16 audio, we include the WAV header). Note: as
+    /// header for encodings that are wrapped in containers (e.g. MP3, OGG_OPUS).
+    /// For LINEAR16 audio, we include the WAV header. Note: as
     /// with all bytes fields, protobuffers use a pure binary representation,
     /// whereas JSON representations use base64.
     #[serde(rename="audioContent")]
@@ -434,45 +433,44 @@ impl RequestValue for SynthesizeSpeechRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AudioConfig {
-    /// An identifier which selects 'audio effects' profiles that are applied on
-    /// (post synthesized) text to speech.
-    /// Effects are applied on top of each other in the order they are given.
-    /// See
-    /// 
-    /// [audio-profiles](https:
-    /// //cloud.google.com/text-to-speech/docs/audio-profiles)
-    /// for current supported profile ids.
+    /// Optional. Input only. An identifier which selects 'audio effects' profiles
+    /// that are applied on (post synthesized) text to speech. Effects are applied
+    /// on top of each other in the order they are given. See
+    /// [audio
+    /// profiles](https://cloud.google.com/text-to-speech/docs/audio-profiles) for
+    /// current supported profile ids.
     #[serde(rename="effectsProfileId")]
     pub effects_profile_id: Option<Vec<String>>,
-    /// Required. The format of the requested audio byte stream.
+    /// Required. The format of the audio byte stream.
     #[serde(rename="audioEncoding")]
     pub audio_encoding: Option<String>,
-    /// Optional speaking pitch, in the range [-20.0, 20.0]. 20 means increase 20
-    /// semitones from the original pitch. -20 means decrease 20 semitones from the
-    /// original pitch.
+    /// Optional. Input only. Speaking pitch, in the range [-20.0, 20.0]. 20 means
+    /// increase 20 semitones from the original pitch. -20 means decrease 20
+    /// semitones from the original pitch.
     pub pitch: Option<f64>,
-    /// The synthesis sample rate (in hertz) for this audio. Optional.  If this is
-    /// different from the voice's natural sample rate, then the synthesizer will
-    /// honor this request by converting to the desired sample rate (which might
-    /// result in worse audio quality), unless the specified sample rate is not
-    /// supported for the encoding chosen, in which case it will fail the request
-    /// and return google.rpc.Code.INVALID_ARGUMENT.
+    /// The synthesis sample rate (in hertz) for this audio. Optional. When this is
+    /// specified in SynthesizeSpeechRequest, if this is different from the voice's
+    /// natural sample rate, then the synthesizer will honor this request by
+    /// converting to the desired sample rate (which might result in worse audio
+    /// quality), unless the specified sample rate is not supported for the
+    /// encoding chosen, in which case it will fail the request and return
+    /// google.rpc.Code.INVALID_ARGUMENT.
     #[serde(rename="sampleRateHertz")]
     pub sample_rate_hertz: Option<i32>,
-    /// Optional speaking rate/speed, in the range [0.25, 4.0]. 1.0 is the normal
-    /// native speed supported by the specific voice. 2.0 is twice as fast, and
-    /// 0.5 is half as fast. If unset(0.0), defaults to the native 1.0 speed. Any
-    /// other values < 0.25 or > 4.0 will return an error.
+    /// Optional. Input only. Speaking rate/speed, in the range [0.25, 4.0]. 1.0 is
+    /// the normal native speed supported by the specific voice. 2.0 is twice as
+    /// fast, and 0.5 is half as fast. If unset(0.0), defaults to the native 1.0
+    /// speed. Any other values < 0.25 or > 4.0 will return an error.
     #[serde(rename="speakingRate")]
     pub speaking_rate: Option<f64>,
-    /// Optional volume gain (in dB) of the normal native volume supported by the
-    /// specific voice, in the range [-96.0, 16.0]. If unset, or set to a value of
-    /// 0.0 (dB), will play at normal native signal amplitude. A value of -6.0 (dB)
-    /// will play at approximately half the amplitude of the normal native signal
-    /// amplitude. A value of +6.0 (dB) will play at approximately twice the
-    /// amplitude of the normal native signal amplitude. Strongly recommend not to
-    /// exceed +10 (dB) as there's usually no effective increase in loudness for
-    /// any value greater than that.
+    /// Optional. Input only. Volume gain (in dB) of the normal native volume
+    /// supported by the specific voice, in the range [-96.0, 16.0]. If unset, or
+    /// set to a value of 0.0 (dB), will play at normal native signal amplitude. A
+    /// value of -6.0 (dB) will play at approximately half the amplitude of the
+    /// normal native signal amplitude. A value of +6.0 (dB) will play at
+    /// approximately twice the amplitude of the normal native signal amplitude.
+    /// Strongly recommend not to exceed +10 (dB) as there's usually no effective
+    /// increase in loudness for any value greater than that.
     #[serde(rename="volumeGainDb")]
     pub volume_gain_db: Option<f64>,
 }

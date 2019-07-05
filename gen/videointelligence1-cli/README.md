@@ -25,15 +25,22 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Video Intelligence* API at revision *20190308*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud Video Intelligence* API at revision *20190626*. The CLI is at version *1.0.9*.
 
 ```bash
 videointelligence1 [options]
         operations
-                cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                cancel <name> [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
+                projects-locations-operations-cancel <name> [-p <v>]... [-o <out>]
+                projects-locations-operations-delete <name> [-p <v>]... [-o <out>]
+                projects-locations-operations-get <name> [-p <v>]... [-o <out>]
+        projects
+                locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-operations-delete <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
         videos
                 annotate (-r <kv>)... [-p <v>]... [-o <out>]
   videointelligence1 --help

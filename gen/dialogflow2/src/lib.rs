@@ -2,17 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dialogflow* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *dialogflow:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Dialogflow* crate version *1.0.9+20190629*, where *20190629* is the exact revision of the *dialogflow:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Dialogflow* *v2* API can be found at the
-//! [official documentation site](https://cloud.google.com/dialogflow-enterprise/).
+//! [official documentation site](https://cloud.google.com/dialogflow/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow2).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Dialogflow.html) ... 
 //! 
 //! * projects
-//!  * [*agent entity types batch delete*](struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](struct.ProjectAgentEntityTypePatchCall.html), [*agent export*](struct.ProjectAgentExportCall.html), [*agent import*](struct.ProjectAgentImportCall.html), [*agent intents batch delete*](struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](struct.ProjectAgentIntentGetCall.html), [*agent intents list*](struct.ProjectAgentIntentListCall.html), [*agent intents patch*](struct.ProjectAgentIntentPatchCall.html), [*agent restore*](struct.ProjectAgentRestoreCall.html), [*agent search*](struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](struct.ProjectAgentTrainCall.html), [*get agent*](struct.ProjectGetAgentCall.html) and [*operations get*](struct.ProjectOperationGetCall.html)
+//!  * [*agent*](struct.ProjectAgentCall.html), [*agent entity types batch delete*](struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](struct.ProjectAgentEntityTypePatchCall.html), [*agent export*](struct.ProjectAgentExportCall.html), [*agent import*](struct.ProjectAgentImportCall.html), [*agent intents batch delete*](struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](struct.ProjectAgentIntentGetCall.html), [*agent intents list*](struct.ProjectAgentIntentListCall.html), [*agent intents patch*](struct.ProjectAgentIntentPatchCall.html), [*agent restore*](struct.ProjectAgentRestoreCall.html), [*agent search*](struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](struct.ProjectAgentTrainCall.html), [*delete agent*](struct.ProjectDeleteAgentCall.html), [*get agent*](struct.ProjectGetAgentCall.html) and [*operations get*](struct.ProjectOperationGetCall.html)
 //! 
 //! 
 //! 
@@ -228,9 +228,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -346,7 +344,7 @@ impl<'a, C, A> Dialogflow<C, A>
         Dialogflow {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://dialogflow.googleapis.com/".to_string(),
             _root_url: "https://dialogflow.googleapis.com/".to_string(),
         }
@@ -357,7 +355,7 @@ impl<'a, C, A> Dialogflow<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -484,26 +482,6 @@ pub struct GoogleCloudDialogflowV2IntentMessageSimpleResponses {
 impl Part for GoogleCloudDialogflowV2IntentMessageSimpleResponses {}
 
 
-/// Represents the natural language text to be processed.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2TextInput {
-    /// Required. The language of this conversational query. See [Language
-    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
-    /// for a list of the currently supported language codes. Note that queries in
-    /// the same session do not necessarily need to specify the same language.
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// Required. The UTF-8 encoded natural language text to be processed.
-    /// Text length must not exceed 256 characters.
-    pub text: Option<String>,
-}
-
-impl Part for GoogleCloudDialogflowV2TextInput {}
-
-
 /// Represents the query input. It can contain either:
 /// 
 /// 1.  An audio config which
@@ -611,8 +589,8 @@ pub struct GoogleCloudDialogflowV2Intent {
     /// Optional. Indicates whether webhooks are enabled for the intent.
     #[serde(rename="webhookState")]
     pub webhook_state: Option<String>,
-    /// Optional. The list of platforms for which the first response will be
-    /// taken from among the messages assigned to the DEFAULT_PLATFORM.
+    /// Optional. The list of platforms for which the first responses will be
+    /// copied from the messages in PLATFORM_UNSPECIFIED (i.e. default platform).
     #[serde(rename="defaultResponsePlatforms")]
     pub default_response_platforms: Option<Vec<String>>,
     /// Optional. The name of the action associated with the intent.
@@ -712,7 +690,7 @@ pub struct GoogleCloudDialogflowV2BatchCreateEntitiesRequest {
     /// Optional. The language of entity synonyms defined in `entities`. If not
     /// specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     #[serde(rename="languageCode")]
@@ -746,77 +724,6 @@ pub struct GoogleCloudDialogflowV2IntentMessageCarouselSelect {
 }
 
 impl Part for GoogleCloudDialogflowV2IntentMessageCarouselSelect {}
-
-
-/// The `Status` type defines a logical error model that is suitable for
-/// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
-/// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleRpcStatus {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for GoogleRpcStatus {}
 
 
 /// An **entity entry** for an associated entity type.
@@ -924,7 +831,7 @@ pub struct GoogleCloudDialogflowV2IntentParameter {
     ///   `#context_name.parameter_name`.
     pub value: Option<String>,
     /// Optional. The collection of prompts that the agent can present to the
-    /// user in order to collect value for the parameter.
+    /// user in order to collect a value for the parameter.
     pub prompts: Option<Vec<String>>,
     /// Optional. Indicates whether the parameter represents a list of values.
     #[serde(rename="isList")]
@@ -935,6 +842,22 @@ pub struct GoogleCloudDialogflowV2IntentParameter {
 }
 
 impl Part for GoogleCloudDialogflowV2IntentParameter {}
+
+
+/// The quick replies response message.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2IntentMessageQuickReplies {
+    /// Optional. The collection of quick replies.
+    #[serde(rename="quickReplies")]
+    pub quick_replies: Option<Vec<String>>,
+    /// Optional. The title of the collection of quick replies.
+    pub title: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2IntentMessageQuickReplies {}
 
 
 /// An item in the carousel.
@@ -1008,7 +931,7 @@ pub struct GoogleCloudDialogflowV2BatchDeleteEntitiesRequest {
     /// Optional. The language of entity synonyms defined in `entities`. If not
     /// specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     #[serde(rename="languageCode")]
@@ -1037,6 +960,57 @@ pub struct GoogleCloudDialogflowV2IntentMessageCardButton {
 }
 
 impl Part for GoogleCloudDialogflowV2IntentMessageCardButton {}
+
+
+/// Instructs the speech recognizer how to process the audio content.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2InputAudioConfig {
+    /// Required. The language of the supplied audio. Dialogflow does not do
+    /// translations. See [Language
+    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
+    /// for a list of the currently supported language codes. Note that queries in
+    /// the same session do not necessarily need to specify the same language.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// Required. Audio encoding of the audio content to process.
+    #[serde(rename="audioEncoding")]
+    pub audio_encoding: Option<String>,
+    /// Optional. Which variant of the Speech model to use.
+    #[serde(rename="modelVariant")]
+    pub model_variant: Option<String>,
+    /// Optional. A list of strings containing words and phrases that the speech
+    /// recognizer should recognize with higher likelihood.
+    /// 
+    /// See [the Cloud Speech
+    /// documentation](https://cloud.google.com/speech-to-text/docs/basics#phrase-hints)
+    /// for more details.
+    #[serde(rename="phraseHints")]
+    pub phrase_hints: Option<Vec<String>>,
+    /// Required. Sample rate (in Hertz) of the audio content sent in the query.
+    /// Refer to
+    /// [Cloud Speech API
+    /// documentation](https://cloud.google.com/speech-to-text/docs/basics) for
+    /// more details.
+    #[serde(rename="sampleRateHertz")]
+    pub sample_rate_hertz: Option<i32>,
+    /// Optional. If `false` (default), recognition does not cease until the
+    /// client closes the stream.
+    /// If `true`, the recognizer will detect a single spoken utterance in input
+    /// audio. Recognition ceases when it detects the audio's voice has
+    /// stopped or paused. In this case, once a detected intent is received, the
+    /// client should close the stream and start a new request with a new stream as
+    /// needed.
+    /// Note: This setting is relevant only for streaming methods.
+    /// Note: When specified, InputAudioConfig.single_utterance takes precedence
+    /// over StreamingDetectIntentRequest.single_utterance.
+    #[serde(rename="singleUtterance")]
+    pub single_utterance: Option<bool>,
+}
+
+impl Part for GoogleCloudDialogflowV2InputAudioConfig {}
 
 
 /// Configuration of how speech should be synthesized.
@@ -1077,6 +1051,34 @@ pub struct GoogleCloudDialogflowV2SynthesizeSpeechConfig {
 impl Part for GoogleCloudDialogflowV2SynthesizeSpeechConfig {}
 
 
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [agent sessions delete contexts projects](struct.ProjectAgentSessionDeleteContextCall.html) (response)
+/// * [delete agent projects](struct.ProjectDeleteAgentCall.html) (response)
+/// * [agent entity types delete projects](struct.ProjectAgentEntityTypeDeleteCall.html) (response)
+/// * [agent sessions contexts delete projects](struct.ProjectAgentSessionContextDeleteCall.html) (response)
+/// * [agent sessions entity types delete projects](struct.ProjectAgentSessionEntityTypeDeleteCall.html) (response)
+/// * [agent intents delete projects](struct.ProjectAgentIntentDeleteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
+
+impl ResponseResult for GoogleProtobufEmpty {}
+
+
 /// The request message for EntityTypes.BatchUpdateEntityTypes.
 /// 
 /// # Activities
@@ -1091,7 +1093,7 @@ pub struct GoogleCloudDialogflowV2BatchUpdateEntityTypesRequest {
     /// Optional. The language of entity synonyms defined in `entity_types`. If not
     /// specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     #[serde(rename="languageCode")]
@@ -1170,7 +1172,7 @@ pub struct GoogleCloudDialogflowV2Context {
     pub name: Option<String>,
     /// Optional. The collection of parameters associated with this context.
     /// Refer to [this
-    /// doc](https://cloud.google.com/dialogflow-enterprise/docs/intents-actions-parameters)
+    /// doc](https://cloud.google.com/dialogflow/docs/intents-actions-parameters)
     /// for syntax.
     pub parameters: Option<HashMap<String, String>>,
     /// Optional. The number of conversational query requests after which the
@@ -1204,7 +1206,7 @@ pub struct GoogleCloudDialogflowV2BatchUpdateEntitiesRequest {
     /// Optional. The language of entity synonyms defined in `entities`. If not
     /// specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     #[serde(rename="languageCode")]
@@ -1269,6 +1271,20 @@ pub struct GoogleCloudDialogflowV2RestoreAgentRequest {
 impl RequestValue for GoogleCloudDialogflowV2RestoreAgentRequest {}
 
 
+/// The suggestion chip message that the user can tap to quickly post a reply
+/// to the conversation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2IntentMessageSuggestion {
+    /// Required. The text shown the in the suggestion chip.
+    pub title: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2IntentMessageSuggestion {}
+
+
 /// Represents a session entity type.
 /// 
 /// Extends or replaces a developer entity type at the user session level (we
@@ -1322,7 +1338,7 @@ pub struct GoogleCloudDialogflowV2BatchUpdateIntentsRequest {
     /// Optional. The language of training phrases, parameters and rich messages
     /// defined in `intents`. If not specified, the agent's default language is
     /// used. [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     #[serde(rename="languageCode")]
@@ -1344,20 +1360,6 @@ pub struct GoogleCloudDialogflowV2BatchUpdateIntentsRequest {
 }
 
 impl RequestValue for GoogleCloudDialogflowV2BatchUpdateIntentsRequest {}
-
-
-/// The suggestion chip message that the user can tap to quickly post a reply
-/// to the conversation.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2IntentMessageSuggestion {
-    /// Required. The text shown the in the suggestion chip.
-    pub title: Option<String>,
-}
-
-impl Part for GoogleCloudDialogflowV2IntentMessageSuggestion {}
 
 
 /// Configures the types of sentiment analysis to perform.
@@ -1435,7 +1437,7 @@ impl ResponseResult for GoogleCloudDialogflowV2ListSessionEntityTypesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EventInput {
     /// Required. The language of this query. See [Language
-    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
     /// for a list of the currently supported language codes. Note that queries in
     /// the same session do not necessarily need to specify the same language.
     #[serde(rename="languageCode")]
@@ -1470,6 +1472,26 @@ pub struct GoogleCloudDialogflowV2ListContextsResponse {
 }
 
 impl ResponseResult for GoogleCloudDialogflowV2ListContextsResponse {}
+
+
+/// Represents the natural language text to be processed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2TextInput {
+    /// Required. The language of this conversational query. See [Language
+    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
+    /// for a list of the currently supported language codes. Note that queries in
+    /// the same session do not necessarily need to specify the same language.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// Required. The UTF-8 encoded natural language text to be processed.
+    /// Text length must not exceed 256 characters.
+    pub text: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2TextInput {}
 
 
 /// The card response message.
@@ -1530,7 +1552,7 @@ pub struct GoogleCloudDialogflowV2TrainAgentRequest { _never_set: Option<bool> }
 impl RequestValue for GoogleCloudDialogflowV2TrainAgentRequest {}
 
 
-/// Instructs the speech synthesizer how to generate the output audio content.
+/// Instructs the speech synthesizer on how to generate the output audio content.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1632,42 +1654,6 @@ pub struct GoogleCloudDialogflowV2ListIntentsResponse {
 impl ResponseResult for GoogleCloudDialogflowV2ListIntentsResponse {}
 
 
-/// Instructs the speech recognizer how to process the audio content.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2InputAudioConfig {
-    /// Optional. The collection of phrase hints which are used to boost accuracy
-    /// of speech recognition.
-    /// Refer to
-    /// [Cloud Speech API
-    /// documentation](https://cloud.google.com/speech-to-text/docs/basics#phrase-hints)
-    /// for more details.
-    #[serde(rename="phraseHints")]
-    pub phrase_hints: Option<Vec<String>>,
-    /// Required. The language of the supplied audio. Dialogflow does not do
-    /// translations. See [Language
-    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
-    /// for a list of the currently supported language codes. Note that queries in
-    /// the same session do not necessarily need to specify the same language.
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// Required. Audio encoding of the audio content to process.
-    #[serde(rename="audioEncoding")]
-    pub audio_encoding: Option<String>,
-    /// Required. Sample rate (in Hertz) of the audio content sent in the query.
-    /// Refer to
-    /// [Cloud Speech API
-    /// documentation](https://cloud.google.com/speech-to-text/docs/basics) for
-    /// more details.
-    #[serde(rename="sampleRateHertz")]
-    pub sample_rate_hertz: Option<i32>,
-}
-
-impl Part for GoogleCloudDialogflowV2InputAudioConfig {}
-
-
 /// The result of sentiment analysis as configured by
 /// `sentiment_analysis_request_config`.
 /// 
@@ -1698,6 +1684,32 @@ pub struct GoogleCloudDialogflowV2IntentMessageListSelect {
 impl Part for GoogleCloudDialogflowV2IntentMessageListSelect {}
 
 
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
+/// 
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleRpcStatus {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for GoogleRpcStatus {}
+
+
 /// Additional info about the select item for when it is triggered in a
 /// dialog.
 /// 
@@ -1714,6 +1726,19 @@ pub struct GoogleCloudDialogflowV2IntentMessageSelectItemInfo {
 }
 
 impl Part for GoogleCloudDialogflowV2IntentMessageSelectItemInfo {}
+
+
+/// The collection of suggestions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2IntentMessageSuggestions {
+    /// Required. The list of suggested replies.
+    pub suggestions: Option<Vec<GoogleCloudDialogflowV2IntentMessageSuggestion>>,
+}
+
+impl Part for GoogleCloudDialogflowV2IntentMessageSuggestions {}
 
 
 /// The sentiment, such as positive/negative feeling or association, for a unit
@@ -1734,22 +1759,6 @@ pub struct GoogleCloudDialogflowV2Sentiment {
 impl Part for GoogleCloudDialogflowV2Sentiment {}
 
 
-/// The quick replies response message.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2IntentMessageQuickReplies {
-    /// Optional. The collection of quick replies.
-    #[serde(rename="quickReplies")]
-    pub quick_replies: Option<Vec<String>>,
-    /// Optional. The title of the collection of quick replies.
-    pub title: Option<String>,
-}
-
-impl Part for GoogleCloudDialogflowV2IntentMessageQuickReplies {}
-
-
 /// Represents the result of conversational query or event processing.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1764,6 +1773,7 @@ pub struct GoogleCloudDialogflowV2QueryResult {
     #[serde(rename="fulfillmentText")]
     pub fulfillment_text: Option<String>,
     /// This field is set to:
+    /// 
     /// - `false` if the matched intent has required parameters and not all of
     ///    the required parameter values have been collected.
     /// - `true` if all required parameter values have been collected, or if the
@@ -1774,7 +1784,7 @@ pub struct GoogleCloudDialogflowV2QueryResult {
     pub parameters: Option<HashMap<String, String>>,
     /// The language that was triggered during intent detection.
     /// See [Language
-    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
     /// for a list of the currently supported language codes.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
@@ -1811,12 +1821,14 @@ pub struct GoogleCloudDialogflowV2QueryResult {
     #[serde(rename="diagnosticInfo")]
     pub diagnostic_info: Option<HashMap<String, String>>,
     /// The original conversational query text:
+    /// 
     /// - If natural language text was provided as input, `query_text` contains
     ///   a copy of the input.
     /// - If natural language speech audio was provided as input, `query_text`
     ///   contains the speech recognition result. If speech recognizer produced
     ///   multiple alternatives, a particular one is picked.
-    /// - If an event was provided as input, `query_text` is not set.
+    /// - If automatic spell correction is enabled, `query_text` will contain the
+    ///   corrected user input.
     #[serde(rename="queryText")]
     pub query_text: Option<String>,
     /// The collection of output contexts. If applicable,
@@ -1901,33 +1913,6 @@ pub struct GoogleCloudDialogflowV2IntentTrainingPhrase {
 impl Part for GoogleCloudDialogflowV2IntentTrainingPhrase {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [agent intents delete projects](struct.ProjectAgentIntentDeleteCall.html) (response)
-/// * [agent sessions delete contexts projects](struct.ProjectAgentSessionDeleteContextCall.html) (response)
-/// * [agent sessions entity types delete projects](struct.ProjectAgentSessionEntityTypeDeleteCall.html) (response)
-/// * [agent entity types delete projects](struct.ProjectAgentEntityTypeDeleteCall.html) (response)
-/// * [agent sessions contexts delete projects](struct.ProjectAgentSessionContextDeleteCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
-
-impl ResponseResult for GoogleProtobufEmpty {}
-
-
 /// The image response message.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1944,26 +1929,6 @@ pub struct GoogleCloudDialogflowV2IntentMessageImage {
 }
 
 impl Part for GoogleCloudDialogflowV2IntentMessageImage {}
-
-
-/// The request message for EntityTypes.BatchDeleteEntityTypes.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [agent entity types batch delete projects](struct.ProjectAgentEntityTypeBatchDeleteCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2BatchDeleteEntityTypesRequest {
-    /// Required. The names entity types to delete. All names must point to the
-    /// same agent as `parent`.
-    #[serde(rename="entityTypeNames")]
-    pub entity_type_names: Option<Vec<String>>,
-}
-
-impl RequestValue for GoogleCloudDialogflowV2BatchDeleteEntityTypesRequest {}
 
 
 /// Represents the parameters of the conversational query.
@@ -2027,19 +1992,6 @@ pub struct GoogleCloudDialogflowV2IntentMessageSimpleResponse {
 impl Part for GoogleCloudDialogflowV2IntentMessageSimpleResponse {}
 
 
-/// The collection of suggestions.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2IntentMessageSuggestions {
-    /// Required. The list of suggested replies.
-    pub suggestions: Option<Vec<GoogleCloudDialogflowV2IntentMessageSuggestion>>,
-}
-
-impl Part for GoogleCloudDialogflowV2IntentMessageSuggestions {}
-
-
 /// Opens the given URI.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2093,7 +2045,7 @@ pub struct GoogleLongrunningOperation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -2112,6 +2064,7 @@ impl ResponseResult for GoogleLongrunningOperation {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [agent projects](struct.ProjectAgentCall.html) (request|response)
 /// * [get agent projects](struct.ProjectGetAgentCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -2119,7 +2072,7 @@ pub struct GoogleCloudDialogflowV2Agent {
     /// Optional. The URI of the agent's avatar.
     /// Avatars are used throughout the Dialogflow console and in the self-hosted
     /// [Web
-    /// Demo](https://cloud.google.com/dialogflow-enterprise/docs/integrations/web-demo)
+    /// Demo](https://cloud.google.com/dialogflow/docs/integrations/web-demo)
     /// integration.
     #[serde(rename="avatarUri")]
     pub avatar_uri: Option<String>,
@@ -2134,11 +2087,17 @@ pub struct GoogleCloudDialogflowV2Agent {
     pub parent: Option<String>,
     /// Required. The default language of the agent as a language tag. See
     /// [Language
-    /// Support](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
     /// for a list of the currently supported language codes. This field cannot be
     /// set by the `Update` method.
     #[serde(rename="defaultLanguageCode")]
     pub default_language_code: Option<String>,
+    /// Optional. API version displayed in Dialogflow console. If not specified,
+    /// V2 API is assumed. Clients are free to query different service endpoints
+    /// for different API versions. However, bots connectors and webhook calls will
+    /// follow the specified API version.
+    #[serde(rename="apiVersion")]
+    pub api_version: Option<String>,
     /// Optional. Determines whether this agent should log conversation queries.
     #[serde(rename="enableLogging")]
     pub enable_logging: Option<bool>,
@@ -2149,6 +2108,8 @@ pub struct GoogleCloudDialogflowV2Agent {
     /// `default_language_code`).
     #[serde(rename="supportedLanguageCodes")]
     pub supported_language_codes: Option<Vec<String>>,
+    /// Optional. The agent tier. If not specified, TIER_STANDARD is assumed.
+    pub tier: Option<String>,
     /// Required. The time zone of this agent from the
     /// [time zone database](https://www.iana.org/time-zones), e.g.,
     /// America/New_York, Europe/Paris.
@@ -2165,6 +2126,7 @@ pub struct GoogleCloudDialogflowV2Agent {
     pub classification_threshold: Option<f32>,
 }
 
+impl RequestValue for GoogleCloudDialogflowV2Agent {}
 impl ResponseResult for GoogleCloudDialogflowV2Agent {}
 
 
@@ -2220,6 +2182,26 @@ pub struct GoogleCloudDialogflowV2IntentFollowupIntentInfo {
 impl Part for GoogleCloudDialogflowV2IntentFollowupIntentInfo {}
 
 
+/// The request message for EntityTypes.BatchDeleteEntityTypes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [agent entity types batch delete projects](struct.ProjectAgentEntityTypeBatchDeleteCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2BatchDeleteEntityTypesRequest {
+    /// Required. The names entity types to delete. All names must point to the
+    /// same agent as `parent`.
+    #[serde(rename="entityTypeNames")]
+    pub entity_type_names: Option<Vec<String>>,
+}
+
+impl RequestValue for GoogleCloudDialogflowV2BatchDeleteEntityTypesRequest {}
+
+
 /// The text response message.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2262,7 +2244,7 @@ impl Part for GoogleCloudDialogflowV2IntentMessageText {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_export(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `get_agent(...)` and `operations_get(...)`
+/// // like `agent(...)`, `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_export(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `delete_agent(...)`, `get_agent(...)` and `operations_get(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2452,6 +2434,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _session: session.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates/updates the specified agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The project of this agent.
+    ///              Format: `projects/<Project ID>`.
+    pub fn agent(&self, request: GoogleCloudDialogflowV2Agent, parent: &str) -> ProjectAgentCall<'a, C, A> {
+        ProjectAgentCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2857,6 +2860,24 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project that the agent to delete is associated with.
+    ///              Format: `projects/<Project ID>`.
+    pub fn delete_agent(&self, parent: &str) -> ProjectDeleteAgentCall<'a, C, A> {
+        ProjectDeleteAgentCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5305,6 +5326,298 @@ impl<'a, C, A> ProjectAgentSessionDetectIntentCall<'a, C, A> where C: BorrowMut<
 }
 
 
+/// Creates/updates the specified agent.
+///
+/// A builder for the *agent* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// use dialogflow2::GoogleCloudDialogflowV2Agent;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dialogflow2::Dialogflow;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2Agent::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().agent(req, "parent")
+///              .update_mask("sea")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectAgentCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dialogflow<C, A>,
+    _request: GoogleCloudDialogflowV2Agent,
+    _parent: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectAgentCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2Agent)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dialogflow.projects.agent",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "parent", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/agent";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2Agent) -> ProjectAgentCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project of this agent.
+    /// Format: `projects/<Project ID>`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectAgentCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The mask to control which fields get updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAgentCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectAgentCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Deletes entity types in the specified agent.
 /// 
 /// Operation <response: google.protobuf.Empty>
@@ -5901,10 +6214,10 @@ impl<'a, C, A> ProjectAgentImportCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_list("parent")
-///              .page_token("dolores")
-///              .page_size(-61)
-///              .language_code("sadipscing")
-///              .intent_view("aliquyam")
+///              .page_token("sadipscing")
+///              .page_size(-31)
+///              .language_code("ea")
+///              .intent_view("no")
 ///              .doit();
 /// # }
 /// ```
@@ -6097,7 +6410,7 @@ impl<'a, C, A> ProjectAgentIntentListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Optional. The language to list training phrases, parameters and rich
     /// messages for. If not specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///
@@ -7053,8 +7366,8 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_entity_types_list("parent")
-///              .page_token("et")
-///              .page_size(-17)
+///              .page_token("diam")
+///              .page_size(-55)
 ///              .doit();
 /// # }
 /// ```
@@ -7327,8 +7640,8 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeListCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_contexts_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-5)
+///              .page_token("et")
+///              .page_size(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -7601,9 +7914,9 @@ impl<'a, C, A> ProjectAgentSessionContextListCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_list("parent")
-///              .page_token("duo")
-///              .page_size(-32)
-///              .language_code("sea")
+///              .page_token("sea")
+///              .page_size(-55)
+///              .language_code("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -7792,7 +8105,7 @@ impl<'a, C, A> ProjectAgentEntityTypeListCall<'a, C, A> where C: BorrowMut<hyper
     /// Optional. The language to list entity synonyms for. If not specified,
     /// the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///
@@ -8180,8 +8493,8 @@ impl<'a, C, A> ProjectAgentIntentBatchDeleteCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_patch(req, "name")
-///              .update_mask("erat")
-///              .language_code("sadipscing")
+///              .update_mask("dolor")
+///              .language_code("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -8385,7 +8698,7 @@ impl<'a, C, A> ProjectAgentEntityTypePatchCall<'a, C, A> where C: BorrowMut<hype
     /// Optional. The language of entity synonyms defined in `entity_type`. If not
     /// specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///
@@ -8990,7 +9303,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeGetCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_create(req, "parent")
-///              .language_code("amet")
+///              .language_code("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -9181,7 +9494,7 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// Optional. The language of entity synonyms defined in `entity_type`. If not
     /// specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///
@@ -9281,7 +9594,7 @@ impl<'a, C, A> ProjectAgentEntityTypeCreateCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_get("name")
-///              .language_code("labore")
+///              .language_code("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -9447,7 +9760,7 @@ impl<'a, C, A> ProjectAgentEntityTypeGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// Optional. The language to retrieve entity synonyms for. If not specified,
     /// the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///
@@ -9835,7 +10148,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_contexts_patch(req, "name")
-///              .update_mask("invidunt")
+///              .update_mask("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -10595,6 +10908,255 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
+/// Deletes the specified agent.
+///
+/// A builder for the *deleteAgent* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dialogflow2::Dialogflow;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().delete_agent("parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectDeleteAgentCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dialogflow<C, A>,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectDeleteAgentCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectDeleteAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleProtobufEmpty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dialogflow.projects.deleteAgent",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/agent";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The project that the agent to delete is associated with.
+    /// Format: `projects/<Project ID>`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectDeleteAgentCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeleteAgentCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteAgentCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDeleteAgentCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Retrieves the specified intent.
 ///
 /// A builder for the *agent.intents.get* method supported by a *project* resource.
@@ -10623,8 +11185,8 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_get("name")
-///              .language_code("sea")
-///              .intent_view("et")
+///              .language_code("et")
+///              .intent_view("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -10794,7 +11356,7 @@ impl<'a, C, A> ProjectAgentIntentGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Optional. The language to retrieve training phrases, parameters and rich
     /// messages for. If not specified, the agent's default language is used.
     /// [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///
@@ -11687,9 +12249,9 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_patch(req, "name")
-///              .update_mask("et")
-///              .language_code("amet")
-///              .intent_view("et")
+///              .update_mask("consetetur")
+///              .language_code("ut")
+///              .intent_view("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -11897,7 +12459,7 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Optional. The language of training phrases, parameters and rich messages
     /// defined in `intent`. If not specified, the agent's default language is
     /// used. [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///
@@ -12260,8 +12822,8 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_search("parent")
-///              .page_token("ea")
-///              .page_size(-80)
+///              .page_token("dolor")
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -12790,8 +13352,8 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_create(req, "parent")
-///              .language_code("dolor")
-///              .intent_view("et")
+///              .language_code("amet.")
+///              .intent_view("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -12986,7 +13548,7 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// Optional. The language of training phrases, parameters and rich messages
     /// defined in `intent`. If not specified, the agent's default language is
     /// used. [Many
-    /// languages](https://cloud.google.com/dialogflow-enterprise/docs/reference/language)
+    /// languages](https://cloud.google.com/dialogflow/docs/reference/language)
     /// are supported. Note: languages must be enabled in the agent before they can
     /// be used.
     ///

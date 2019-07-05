@@ -15,7 +15,7 @@
     "description": "Manages product items, inventory, and Merchant Center accounts for Google Shopping.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/shopping-content", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/uh6pImLtAzfcW3qnOu2tIOip1lc\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/Ip5eh1SzEl02M2LdgZypXgqt0eQ\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -233,7 +233,7 @@
                     ]
                 }, 
                 "link": {
-                    "description": "Performs an action on a link between a Merchant Center account and another account.", 
+                    "description": "Performs an action on a link between two Merchant Center accounts, namely accountId and linkedAccountId.", 
                     "httpMethod": "POST", 
                     "id": "content.accounts.link", 
                     "parameterOrder": [
@@ -1219,7 +1219,7 @@
         "orderinvoices": {
             "methods": {
                 "createchargeinvoice": {
-                    "description": "Creates a charge invoice for a shipment group, and triggers a charge capture for non-facilitated payment orders.", 
+                    "description": "Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders.", 
                     "httpMethod": "POST", 
                     "id": "content.orderinvoices.createchargeinvoice", 
                     "parameterOrder": [
@@ -1253,7 +1253,7 @@
                     ]
                 }, 
                 "createrefundinvoice": {
-                    "description": "Creates a refund invoice for one or more shipment groups, and triggers a refund for non-facilitated payment orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.", 
+                    "description": "Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.", 
                     "httpMethod": "POST", 
                     "id": "content.orderinvoices.createrefundinvoice", 
                     "parameterOrder": [
@@ -1874,7 +1874,7 @@
                             "type": "boolean"
                         }, 
                         "maxResults": {
-                            "description": "The maximum number of orders to return in the response, used for paging. The default value is 25 orders per page, and the maximum allowed value is 250 orders per page.\nKnown issue: All List calls will return all Orders without limit regardless of the value of this field.", 
+                            "description": "The maximum number of orders to return in the response, used for paging. The default value is 25 orders per page, and the maximum allowed value is 250 orders per page.", 
                             "format": "uint32", 
                             "location": "query", 
                             "type": "integer"
@@ -1887,15 +1887,7 @@
                             "type": "string"
                         }, 
                         "orderBy": {
-                            "description": "The ordering of the returned list. The only supported value are placedDate desc and placedDate asc for now, which returns orders sorted by placement date. \"placedDate desc\" stands for listing orders by placement date, from oldest to most recent. \"placedDate asc\" stands for listing orders by placement date, from most recent to oldest. In future releases we'll support other sorting criteria.", 
-                            "enum": [
-                                "placedDate asc", 
-                                "placedDate desc"
-                            ], 
-                            "enumDescriptions": [
-                                "", 
-                                ""
-                            ], 
+                            "description": "Order results by placement date in descending or ascending order.\n\nAcceptable values are:\n- placedDateAsc\n- placedDateDesc", 
                             "location": "query", 
                             "type": "string"
                         }, 
@@ -1915,7 +1907,7 @@
                             "type": "string"
                         }, 
                         "statuses": {
-                            "description": "Obtains orders that match any of the specified statuses. Multiple values can be specified with comma separation. Additionally, please note that active is a shortcut for pendingShipment and partiallyShipped, and completed is a shortcut for shipped , partiallyDelivered, delivered, partiallyReturned, returned, and canceled.", 
+                            "description": "Obtains orders that match any of the specified statuses. Please note that active is a shortcut for pendingShipment and partiallyShipped, and completed is a shortcut for shipped, partiallyDelivered, delivered, partiallyReturned, returned, and canceled.", 
                             "enum": [
                                 "active", 
                                 "canceled", 
@@ -2452,6 +2444,12 @@
                         "productId"
                     ], 
                     "parameters": {
+                        "feedId": {
+                            "description": "The Content API Supplemental Feed ID.", 
+                            "format": "uint64", 
+                            "location": "query", 
+                            "type": "string"
+                        }, 
                         "merchantId": {
                             "description": "The ID of the account that contains the product. This account cannot be a multi-client account.", 
                             "format": "uint64", 
@@ -2510,6 +2508,12 @@
                         "merchantId"
                     ], 
                     "parameters": {
+                        "feedId": {
+                            "description": "The Content API Supplemental Feed ID.", 
+                            "format": "uint64", 
+                            "location": "query", 
+                            "type": "string"
+                        }, 
                         "merchantId": {
                             "description": "The ID of the account that contains the product. This account cannot be a multi-client account.", 
                             "format": "uint64", 
@@ -2886,7 +2890,7 @@
             }
         }
     }, 
-    "revision": "20190327", 
+    "revision": "20190702", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Account": {
@@ -3753,6 +3757,19 @@
             }, 
             "type": "object"
         }, 
+        "BusinessDayConfig": {
+            "id": "BusinessDayConfig", 
+            "properties": {
+                "businessDays": {
+                    "description": "Regular business days. May not be empty.", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
         "CarrierRate": {
             "id": "CarrierRate", 
             "properties": {
@@ -4347,6 +4364,10 @@
                     "$ref": "CutoffTime", 
                     "description": "Business days cutoff time definition. If not configured the cutoff time will be defaulted to 8AM PST."
                 }, 
+                "handlingBusinessDayConfig": {
+                    "$ref": "BusinessDayConfig", 
+                    "description": "The business days during which orders can be handled. If not provided, Monday to Friday business days will be assumed."
+                }, 
                 "holidayCutoffs": {
                     "description": "Holiday cutoff definitions. If configured, they specify order cutoff times for holiday-specific shipping.", 
                     "items": {
@@ -4370,13 +4391,17 @@
                     "type": "integer"
                 }, 
                 "minTransitTimeInDays": {
-                    "description": "Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Either {min,max}transitTimeInDays or transitTimeTable must be set, but not both.", 
+                    "description": "Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Either {min,max}TransitTimeInDays or transitTimeTable must be set, but not both.", 
                     "format": "uint32", 
                     "type": "integer"
                 }, 
+                "transitBusinessDayConfig": {
+                    "$ref": "BusinessDayConfig", 
+                    "description": "The business days during which orders can be in-transit. If not provided, Monday to Friday business days will be assumed."
+                }, 
                 "transitTimeTable": {
                     "$ref": "TransitTable", 
-                    "description": "Transit time table, number of business days spent in transit based on row and column dimensions. Either {min,max}transitTimeInDays or transitTimeTable can be set, but not both."
+                    "description": "Transit time table, number of business days spent in transit based on row and column dimensions. Either {min,max}TransitTimeInDays or transitTimeTable can be set, but not both."
                 }
             }, 
             "type": "object"
@@ -5071,7 +5096,7 @@
                 }, 
                 "deliveryDetails": {
                     "$ref": "OrderDeliveryDetails", 
-                    "description": "The details for the delivery."
+                    "description": "Delivery details for shipments."
                 }, 
                 "id": {
                     "description": "The REST ID of the order. Globally unique.", 
@@ -5233,7 +5258,7 @@
                 }, 
                 "marketingRightsInfo": {
                     "$ref": "OrderCustomerMarketingRightsInfo", 
-                    "description": "Customer's marketing preferences."
+                    "description": "Customer's marketing preferences. Contains the marketing opt-in information that is current at the time that the merchant call. User preference selections can change from one order to the next so preferences must be checked with every order."
                 }
             }, 
             "type": "object"
@@ -5242,7 +5267,7 @@
             "id": "OrderCustomerMarketingRightsInfo", 
             "properties": {
                 "explicitMarketingPreference": {
-                    "description": "Last known user selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty.", 
+                    "description": "Last known customer selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty. If a customer selected granted in their most recent order, they can be subscribed to marketing emails. Customers who have chosen denied must not be subscribed, or must be unsubscribed if already opted-in.", 
                     "type": "string"
                 }, 
                 "lastUpdatedTimestamp": {
@@ -5273,6 +5298,13 @@
         "OrderLineItem": {
             "id": "OrderLineItem", 
             "properties": {
+                "adjustments": {
+                    "description": "Price and tax adjustments applied on the line item.", 
+                    "items": {
+                        "$ref": "OrderLineItemAdjustment"
+                    }, 
+                    "type": "array"
+                }, 
                 "annotations": {
                     "description": "Annotations that are attached to the line item.", 
                     "items": {
@@ -5347,6 +5379,24 @@
                 "tax": {
                     "$ref": "Price", 
                     "description": "Total tax amount for the line item. For example, if two items are purchased, and each have a cost tax of $2, the total tax amount will be $4."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "OrderLineItemAdjustment": {
+            "id": "OrderLineItemAdjustment", 
+            "properties": {
+                "priceAdjustment": {
+                    "$ref": "Price", 
+                    "description": "Adjustment for total price of the line item."
+                }, 
+                "taxAdjustment": {
+                    "$ref": "Price", 
+                    "description": "Adjustment for total tax of the line item."
+                }, 
+                "type": {
+                    "description": "Type of this adjustment.", 
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -5798,7 +5848,7 @@
             "id": "OrderShipment", 
             "properties": {
                 "carrier": {
-                    "description": "The carrier handling the shipment.\n\nAcceptable values for US are:  \n- \"gsx\" \n- \"ups\" \n- \"usps\" \n- \"fedex\" \n- \"dhl\" \n- \"ecourier\" \n- \"cxt\" \n- \"google\" \n- \"ontrac\" \n- \"emsy\" \n- \"ont\" \n- \"deliv\" \n- \"dynamex\" \n- \"lasership\" \n- \"mpx\" \n- \"uds\"  \n\nAcceptable values for FR are:  \n- \"colissimo\" \n- \"chronopost\"", 
+                    "description": "The carrier handling the shipment.\n\nAcceptable values for US are:  \n- \"gsx\" \n- \"ups\" \n- \"usps\" \n- \"fedex\" \n- \"dhl\" \n- \"ecourier\" \n- \"cxt\" \n- \"google\" \n- \"ontrac\" \n- \"emsy\" \n- \"ont\" \n- \"deliv\" \n- \"dynamex\" \n- \"lasership\" \n- \"mpx\" \n- \"uds\" \n- \"efw\"  \n\nAcceptable values for FR are:  \n- \"colissimo\" \n- \"chronopost\" \n- \"gls\" \n- \"dpd\" \n- \"bpost\"", 
                     "type": "string"
                 }, 
                 "creationDate": {
@@ -7636,7 +7686,7 @@
                     "description": "Price of the item."
                 }, 
                 "productTypes": {
-                    "description": "Categories of the item (formatted as in products feed specification).", 
+                    "description": "Categories of the item (formatted as in products data specification).", 
                     "items": {
                         "type": "string"
                     }, 
@@ -7654,7 +7704,7 @@
                     "description": "Advertised sale price of the item."
                 }, 
                 "salePriceEffectiveDate": {
-                    "description": "Date range during which the item is on sale (see products feed specification).", 
+                    "description": "Date range during which the item is on sale (see products data specification).", 
                     "type": "string"
                 }, 
                 "sellOnGoogleQuantity": {
@@ -7717,6 +7767,10 @@
                     "description": "The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
+                "taxCategory": {
+                    "description": "The tax category of the product, used to configure detailed tax nexus in account-level tax settings.", 
+                    "type": "string"
+                }, 
                 "taxes": {
                     "description": "Tax information.", 
                     "items": {
@@ -7726,6 +7780,10 @@
                 }, 
                 "title": {
                     "description": "Title of the item.", 
+                    "type": "string"
+                }, 
+                "transitTimeLabel": {
+                    "description": "The transit time label of the product, used to group product in account-level transit time tables.", 
                     "type": "string"
                 }, 
                 "unitPricingBaseMeasure": {
@@ -8006,6 +8064,11 @@
                     "description": "An entry ID, unique within the batch request.", 
                     "format": "uint32", 
                     "type": "integer"
+                }, 
+                "feedId": {
+                    "description": "The ContentAPI feed id.", 
+                    "format": "uint64", 
+                    "type": "string"
                 }, 
                 "merchantId": {
                     "description": "The ID of the managing account.", 
@@ -8860,6 +8923,13 @@
                     }, 
                     "description": "The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
+                }, 
+                "fees": {
+                    "description": "Fees for the item. Optional.", 
+                    "items": {
+                        "$ref": "OrderLineItemProductFee"
+                    }, 
+                    "type": "array"
                 }, 
                 "gtin": {
                     "description": "Global Trade Item Number (GTIN) of the item. Optional.", 

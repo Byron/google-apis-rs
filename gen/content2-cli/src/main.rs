@@ -8009,7 +8009,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("link",
-                    Some(r##"Performs an action on a link between a Merchant Center account and another account."##),
+                    Some(r##"Performs an action on a link between two Merchant Center accounts, namely accountId and linkedAccountId."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_link",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -9056,7 +9056,7 @@ fn main() {
         
         ("orderinvoices", "methods: 'createchargeinvoice' and 'createrefundinvoice'", vec![
             ("createchargeinvoice",
-                    Some(r##"Creates a charge invoice for a shipment group, and triggers a charge capture for non-facilitated payment orders."##),
+                    Some(r##"Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orderinvoices_createchargeinvoice",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -9090,7 +9090,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("createrefundinvoice",
-                    Some(r##"Creates a refund invoice for one or more shipment groups, and triggers a refund for non-facilitated payment orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice."##),
+                    Some(r##"Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orderinvoices_createrefundinvoice",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -10688,7 +10688,7 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190327")
+           .version("1.0.9+20190702")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")

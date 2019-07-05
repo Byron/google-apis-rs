@@ -4,7 +4,7 @@
 [package]
 
 name = "google-language1_beta1-cli"
-version = "1.0.8+20190327"
+version = "1.0.9+20190623"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Natural Language (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/language1_beta1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-language1_beta1]
 path = "../language1_beta1"
-version = "1.0.8+20190327"
+version = "1.0.9+20190623"

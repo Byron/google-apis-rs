@@ -4526,7 +4526,7 @@ fn main() {
                      Some(r##"Required. A unique identifier for the instance, which cannot be changed
         after the instance is created. Values are of the form
         `projects/<project>/instances/a-z*[a-z0-9]`. The final
-        segment of the name must be between 6 and 30 characters in length."##),
+        segment of the name must be between 2 and 64 characters in length."##),
                      Some(true),
                      Some(false)),
         
@@ -4619,7 +4619,7 @@ fn main() {
     
     let mut app = App::new("spanner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190312")
+           .version("1.0.9+20190613")
            .about("Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spanner1_cli")
            .arg(Arg::with_name("url")

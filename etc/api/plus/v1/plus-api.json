@@ -6,7 +6,7 @@
                     "description": "View your basic profile info, including your age range and language"
                 }, 
                 "https://www.googleapis.com/auth/plus.me": {
-                    "description": "Know who you are on Google"
+                    "description": "Associate you with your personal info on Google"
                 }, 
                 "https://www.googleapis.com/auth/userinfo.email": {
                     "description": "View your email address"
@@ -23,7 +23,7 @@
     "description": "Builds on top of the Google+ platform.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/+/api/", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/va5ODMMhlw4R_F2_Dx86cJc2pz4\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/w2FrgYFAkH9NArdWrHE1nhKOCxU\"", 
     "icons": {
         "x16": "http://www.google.com/images/icons/product/gplus-16.png", 
         "x32": "http://www.google.com/images/icons/product/gplus-32.png"
@@ -491,7 +491,7 @@
             }
         }
     }, 
-    "revision": "20190328", 
+    "revision": "20190616", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Acl": {

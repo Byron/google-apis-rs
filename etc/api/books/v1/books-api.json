@@ -14,7 +14,7 @@
     "description": "Searches for books and manages your Google Books library.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/books/docs/v1/getting_started", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/h5Orf5DrqrrUcgcY5Qi7H6FmfVA\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/h5Orf5DrqrrUcgcY5Qi7H6FmfVA\"", 
     "icons": {
         "x16": "https://www.google.com/images/icons/product/ebooks-16.png", 
         "x32": "https://www.google.com/images/icons/product/ebooks-32.png"

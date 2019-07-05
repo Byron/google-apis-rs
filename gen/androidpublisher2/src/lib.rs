@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Android Publisher* crate version *1.0.9+20190702*, where *20190702* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -237,9 +237,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -352,7 +350,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/androidpublisher/v2/applications/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -375,7 +373,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -755,7 +753,8 @@ pub struct ProductPurchase {
     pub developer_payload: Option<String>,
     /// The purchase state of the order. Possible values are:  
     /// - Purchased 
-    /// - Canceled
+    /// - Canceled 
+    /// - Pending
     #[serde(rename="purchaseState")]
     pub purchase_state: Option<i32>,
     /// The type of purchase of the inapp product. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  
@@ -1243,10 +1242,10 @@ impl Part for DeveloperComment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Testers {
-    /// no description provided
+    /// A list of all Google Groups, as email addresses, that define testers for this track.
     #[serde(rename="googleGroups")]
     pub google_groups: Option<Vec<String>>,
-    /// no description provided
+    /// A list of all Google+ Communities, as URLs, that define testers for this track.
     #[serde(rename="googlePlusCommunities")]
     pub google_plus_communities: Option<Vec<String>>,
 }
@@ -1413,7 +1412,7 @@ pub struct SubscriptionPurchase {
     /// Information provided by the user when they complete the subscription cancellation flow (cancellation reason survey).
     #[serde(rename="cancelSurveyResult")]
     pub cancel_survey_result: Option<SubscriptionCancelSurveyResult>,
-    /// The profile id of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
+    /// The Google profile id of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
     #[serde(rename="profileId")]
     pub profile_id: Option<String>,
     /// The purchase token of the originating purchase if this subscription is one of the following:  
@@ -2300,7 +2299,7 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume.
+    /// Updates the track configuration for the specified track type.
     /// 
     /// # Arguments
     ///
@@ -2593,7 +2592,7 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal".
+    /// * `track` - The track to read or modify.
     pub fn testers_patch(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterPatchCall<'a, C, A> {
         EditTesterPatchCall {
             hub: self.hub,
@@ -2650,7 +2649,7 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal".
+    /// * `track` - The track to read or modify.
     pub fn testers_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTesterGetCall<'a, C, A> {
         EditTesterGetCall {
             hub: self.hub,
@@ -2794,7 +2793,7 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume. This method supports patch semantics.
+    /// Updates the track configuration for the specified track type. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -2865,7 +2864,7 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal".
+    /// * `track` - The track to read or modify.
     pub fn testers_update(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterUpdateCall<'a, C, A> {
         EditTesterUpdateCall {
             hub: self.hub,
@@ -9338,7 +9337,7 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume.
+/// Updates the track configuration for the specified track type.
 ///
 /// A builder for the *tracks.update* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -13565,7 +13564,7 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal".
+    /// The track to read or modify.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -14331,7 +14330,7 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal".
+    /// The track to read or modify.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -16153,7 +16152,7 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume. This method supports patch semantics.
+/// Updates the track configuration for the specified track type. This method supports patch semantics.
 ///
 /// A builder for the *tracks.patch* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -17201,7 +17200,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal".
+    /// The track to read or modify.
     ///
     /// Sets the *track* path property to the given value.
     ///

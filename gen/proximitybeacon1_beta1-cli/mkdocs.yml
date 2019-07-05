@@ -1,4 +1,4 @@
-site_name: proximitybeacon v1.0.8+20190323
+site_name: proximitybeacon v1.0.9+20190323
 site_url: http://byron.github.io/google-apis-rs/google-proximitybeacon1_beta1-cli
 site_description: A complete library to interact with proximitybeacon (protocol v1beta1)
 
@@ -29,5 +29,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

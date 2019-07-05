@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Redis* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Redis* crate version *1.0.9+20190628*, where *20190628* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Cloud Redis* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/memorystore/docs/redis/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudRedis.html) ... 
 //! 
 //! * projects
-//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations instances create*](struct.ProjectLocationInstanceCreateCall.html), [*locations instances delete*](struct.ProjectLocationInstanceDeleteCall.html), [*locations instances failover*](struct.ProjectLocationInstanceFailoverCall.html), [*locations instances get*](struct.ProjectLocationInstanceGetCall.html), [*locations instances list*](struct.ProjectLocationInstanceListCall.html), [*locations instances patch*](struct.ProjectLocationInstancePatchCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
+//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations instances create*](struct.ProjectLocationInstanceCreateCall.html), [*locations instances delete*](struct.ProjectLocationInstanceDeleteCall.html), [*locations instances export*](struct.ProjectLocationInstanceExportCall.html), [*locations instances failover*](struct.ProjectLocationInstanceFailoverCall.html), [*locations instances get*](struct.ProjectLocationInstanceGetCall.html), [*locations instances import*](struct.ProjectLocationInstanceImportCall.html), [*locations instances list*](struct.ProjectLocationInstanceListCall.html), [*locations instances patch*](struct.ProjectLocationInstancePatchCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
 //! 
 //! 
 //! 
@@ -47,11 +47,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_instances_create(...).doit()
+//! let r = hub.projects().locations_instances_import(...).doit()
+//! let r = hub.projects().locations_instances_export(...).doit()
 //! let r = hub.projects().locations_instances_delete(...).doit()
 //! let r = hub.projects().locations_instances_failover(...).doit()
-//! let r = hub.projects().locations_operations_get(...).doit()
 //! let r = hub.projects().locations_instances_patch(...).doit()
+//! let r = hub.projects().locations_instances_create(...).doit()
+//! let r = hub.projects().locations_operations_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -112,8 +114,8 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_instances_create(req, "parent")
-//!              .instance_id("sed")
+//! let result = hub.projects().locations_instances_patch(req, "name")
+//!              .update_mask("sed")
 //!              .doit();
 //! 
 //! match result {
@@ -222,9 +224,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -298,8 +298,8 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_instances_create(req, "parent")
-///              .instance_id("dolores")
+/// let result = hub.projects().locations_instances_patch(req, "name")
+///              .update_mask("dolores")
 ///              .doit();
 /// 
 /// match result {
@@ -337,7 +337,7 @@ impl<'a, C, A> CloudRedis<C, A>
         CloudRedis {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://redis.googleapis.com/".to_string(),
             _root_url: "https://redis.googleapis.com/".to_string(),
         }
@@ -348,7 +348,7 @@ impl<'a, C, A> CloudRedis<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -409,95 +409,31 @@ pub struct ListInstancesResponse {
 impl ResponseResult for ListInstancesResponse {}
 
 
-/// The `Status` type defines a logical error model that is suitable for
-/// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
-/// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// The output content
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Status {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
+pub struct OutputConfig {
+    /// Google Cloud Storage destination for output content.
+    #[serde(rename="gcsDestination")]
+    pub gcs_destination: Option<GcsDestination>,
 }
 
-impl Part for Status {}
+impl Part for OutputConfig {}
 
 
-/// Request for Failover.
+/// The Cloud Storage location for the input content
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations instances failover projects](struct.ProjectLocationInstanceFailoverCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FailoverInstanceRequest {
-    /// Optional. Available data protection modes that the user can choose. If it's
-    /// unspecified, data protection mode will be LIMITED_DATA_LOSS by default.
-    #[serde(rename="dataProtectionMode")]
-    pub data_protection_mode: Option<String>,
+pub struct GcsSource {
+    /// Required. Source data URI. (e.g. 'gs://my_bucket/my_object').
+    pub uri: Option<String>,
 }
 
-impl RequestValue for FailoverInstanceRequest {}
+impl Part for GcsSource {}
 
 
 /// A Google Cloud Redis instance.
@@ -530,7 +466,10 @@ pub struct Instance {
     /// Optional. The version of Redis software.
     /// If not provided, latest supported version will be used. Updating the
     /// version will perform an upgrade/downgrade to the new version. Currently,
-    /// the supported values are `REDIS_3_2` for Redis 3.2.
+    /// the supported values are:
+    /// 
+    ///  *   `REDIS_4_0` for Redis 4.0 compatibility (default)
+    ///  *   `REDIS_3_2` for Redis 3.2 compatibility
     #[serde(rename="redisVersion")]
     pub redis_version: Option<String>,
     /// Output only. Hostname or IP address of the exposed Redis endpoint used by
@@ -547,8 +486,16 @@ pub struct Instance {
     /// http://redis.io/topics/config. Currently, the only supported parameters
     /// are:
     /// 
+    ///  Redis 3.2 and above:
+    /// 
     ///  *   maxmemory-policy
     ///  *   notify-keyspace-events
+    /// 
+    ///  Redis 4.0 and above:
+    /// 
+    ///  *   activedefrag
+    ///  *   lfu-log-factor
+    ///  *   lfu-decay-time
     #[serde(rename="redisConfigs")]
     pub redis_configs: Option<HashMap<String, String>>,
     /// Required. The service tier of the instance.
@@ -582,6 +529,13 @@ pub struct Instance {
     pub memory_size_gb: Option<i32>,
     /// Output only. The current state of this instance.
     pub state: Option<String>,
+    /// Output only. Cloud IAM identity used by import / export operations to
+    /// transfer data to/from Cloud Storage. Format is
+    /// "serviceAccount:<service_account_email>". The value may change over time
+    /// for a given instance so should be checked before each import/export
+    /// operation.
+    #[serde(rename="persistenceIamIdentity")]
+    pub persistence_iam_identity: Option<String>,
     /// Optional. The full name of the Google Compute Engine
     /// [network](/compute/docs/networks-and-firewalls#networks) to which the
     /// instance is connected. If left unspecified, the `default` network
@@ -650,62 +604,104 @@ pub struct Location {
 impl ResponseResult for Location {}
 
 
-/// This resource represents a long-running operation that is the result of a
-/// network API call.
+/// Request for Export.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations instances create projects](struct.ProjectLocationInstanceCreateCall.html) (response)
-/// * [locations instances delete projects](struct.ProjectLocationInstanceDeleteCall.html) (response)
-/// * [locations instances failover projects](struct.ProjectLocationInstanceFailoverCall.html) (response)
-/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
-/// * [locations instances patch projects](struct.ProjectLocationInstancePatchCall.html) (response)
+/// * [locations instances export projects](struct.ProjectLocationInstanceExportCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
-    /// If the value is `false`, it means the operation is still in progress.
-    /// If `true`, the operation is completed, and either `error` or `response` is
-    /// available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success.  If the original
-    /// method returns no data on success, such as `Delete`, the response is
-    /// `google.protobuf.Empty`.  If the original method is standard
-    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
-    /// methods, the response should have the type `XxxResponse`, where `Xxx`
-    /// is the original method name.  For example, if the original method name
-    /// is `TakeSnapshot()`, the inferred response type is
-    /// `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that
-    /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
-    pub name: Option<String>,
-    /// {
-    /// 
-    /// `createTime`: The time the operation was created.
-    /// 
-    /// `endTime`: The time the operation finished running.
-    /// 
-    /// `target`: Server-defined resource path for the target of the operation.
-    /// 
-    /// `verb`: Name of the verb executed by the operation.
-    /// 
-    /// `statusDetail`: Human-readable status of the operation, if any.
-    /// 
-    /// `cancelRequested`: Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
-    /// 
-    /// `apiVersion`: API version used to start the operation.
-    /// 
-    /// }
-    pub metadata: Option<HashMap<String, String>>,
+pub struct ExportInstanceRequest {
+    /// Required. Specify data to be exported.
+    #[serde(rename="outputConfig")]
+    pub output_config: Option<OutputConfig>,
 }
 
-impl ResponseResult for Operation {}
+impl RequestValue for ExportInstanceRequest {}
+
+
+/// Request for Failover.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations instances failover projects](struct.ProjectLocationInstanceFailoverCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FailoverInstanceRequest {
+    /// Optional. Available data protection modes that the user can choose. If it's
+    /// unspecified, data protection mode will be LIMITED_DATA_LOSS by default.
+    #[serde(rename="dataProtectionMode")]
+    pub data_protection_mode: Option<String>,
+}
+
+impl RequestValue for FailoverInstanceRequest {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
+/// 
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
+
+
+/// The input content
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InputConfig {
+    /// Google Cloud Storage location where input content is located.
+    #[serde(rename="gcsSource")]
+    pub gcs_source: Option<GcsSource>,
+}
+
+impl Part for InputConfig {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -732,25 +728,97 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The response message for Operations.ListOperations.
+/// Request for Import.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// * [locations instances import projects](struct.ProjectLocationInstanceImportCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
+pub struct ImportInstanceRequest {
+    /// Required. Specify data to be imported.
+    #[serde(rename="inputConfig")]
+    pub input_config: Option<InputConfig>,
 }
 
-impl ResponseResult for ListOperationsResponse {}
+impl RequestValue for ImportInstanceRequest {}
+
+
+/// This resource represents a long-running operation that is the result of a
+/// network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations instances import projects](struct.ProjectLocationInstanceImportCall.html) (response)
+/// * [locations instances export projects](struct.ProjectLocationInstanceExportCall.html) (response)
+/// * [locations instances delete projects](struct.ProjectLocationInstanceDeleteCall.html) (response)
+/// * [locations instances failover projects](struct.ProjectLocationInstanceFailoverCall.html) (response)
+/// * [locations instances patch projects](struct.ProjectLocationInstancePatchCall.html) (response)
+/// * [locations instances create projects](struct.ProjectLocationInstanceCreateCall.html) (response)
+/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is `false`, it means the operation is still in progress.
+    /// If `true`, the operation is completed, and either `error` or `response` is
+    /// available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success.  If the original
+    /// method returns no data on success, such as `Delete`, the response is
+    /// `google.protobuf.Empty`.  If the original method is standard
+    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
+    /// methods, the response should have the type `XxxResponse`, where `Xxx`
+    /// is the original method name.  For example, if the original method name
+    /// is `TakeSnapshot()`, the inferred response type is
+    /// `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that
+    /// originally returns it. If you use the default HTTP mapping, the
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
+    pub name: Option<String>,
+    /// {
+    /// 
+    /// `createTime`: The time the operation was created.
+    /// 
+    /// `endTime`: The time the operation finished running.
+    /// 
+    /// `target`: Server-defined resource path for the target of the operation.
+    /// 
+    /// `verb`: Name of the verb executed by the operation.
+    /// 
+    /// `statusDetail`: Human-readable status of the operation, if any.
+    /// 
+    /// `cancelRequested`: Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    /// 
+    /// `apiVersion`: API version used to start the operation.
+    /// 
+    /// }
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for Operation {}
+
+
+/// The Cloud Storage location for the output content
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GcsDestination {
+    /// Required. Data destination URI (e.g.
+    /// 'gs://my_bucket/my_object'). Existing files will be overwritten.
+    pub uri: Option<String>,
+}
+
+impl Part for GcsDestination {}
 
 
 
@@ -782,7 +850,7 @@ impl ResponseResult for ListOperationsResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudRedis::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_get(...)`, `locations_instances_create(...)`, `locations_instances_delete(...)`, `locations_instances_failover(...)`, `locations_instances_get(...)`, `locations_instances_list(...)`, `locations_instances_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
+/// // like `locations_get(...)`, `locations_instances_create(...)`, `locations_instances_delete(...)`, `locations_instances_export(...)`, `locations_instances_failover(...)`, `locations_instances_get(...)`, `locations_instances_import(...)`, `locations_instances_list(...)`, `locations_instances_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -799,6 +867,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Import a Redis RDB snapshot file from Cloud Storage into a Redis instance.
+    /// 
+    /// Redis may stop serving during this operation. Instance state will be
+    /// IMPORTING for entire operation. When complete, the instance will contain
+    /// only data from the imported file.
+    /// 
+    /// The returned operation is automatically deleted after a few hours, so
+    /// there is no need to call DeleteOperation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. Redis instance resource name using the form:
+    ///                `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    ///            where `location_id` refers to a GCP region.
+    pub fn locations_instances_import(&self, request: ImportInstanceRequest, name: &str) -> ProjectLocationInstanceImportCall<'a, C, A> {
+        ProjectLocationInstanceImportCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes a specific Redis instance.  Instance stops serving and data is
     /// deleted.
     /// 
@@ -806,10 +902,36 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `name` - Required. Redis instance resource name using the form:
     ///                `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-    ///            where `location_id` refers to a GCP region
+    ///            where `location_id` refers to a GCP region.
     pub fn locations_instances_delete(&self, name: &str) -> ProjectLocationInstanceDeleteCall<'a, C, A> {
         ProjectLocationInstanceDeleteCall {
             hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Export Redis instance data into a Redis RDB format file in Cloud Storage.
+    /// 
+    /// Redis will continue serving during this operation.
+    /// 
+    /// The returned operation is automatically deleted after a few hours, so
+    /// there is no need to call DeleteOperation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. Redis instance resource name using the form:
+    ///                `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    ///            where `location_id` refers to a GCP region.
+    pub fn locations_instances_export(&self, request: ExportInstanceRequest, name: &str) -> ProjectLocationInstanceExportCall<'a, C, A> {
+        ProjectLocationInstanceExportCall {
+            hub: self.hub,
+            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -862,7 +984,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `name` - Required. Redis instance resource name using the form:
     ///                `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-    ///            where `location_id` refers to a GCP region
+    ///            where `location_id` refers to a GCP region.
     pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a, C, A> {
         ProjectLocationInstanceGetCall {
             hub: self.hub,
@@ -875,15 +997,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Failover the master role to current replica node against a specific
-    /// STANDARD tier redis instance.
+    /// Initiates a failover of the master node to current replica node for a
+    /// specific STANDARD tier Cloud Memorystore for Redis instance.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Redis instance resource name using the form:
     ///                `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-    ///            where `location_id` refers to a GCP region
+    ///            where `location_id` refers to a GCP region.
     pub fn locations_instances_failover(&self, request: FailoverInstanceRequest, name: &str) -> ProjectLocationInstanceFailoverCall<'a, C, A> {
         ProjectLocationInstanceFailoverCall {
             hub: self.hub,
@@ -966,7 +1088,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the instance location using the form:
     ///                  `projects/{project_id}/locations/{location_id}`
-    ///              where `location_id` refers to a GCP region
+    ///              where `location_id` refers to a GCP region.
     pub fn locations_instances_create(&self, request: Instance, parent: &str) -> ProjectLocationInstanceCreateCall<'a, C, A> {
         ProjectLocationInstanceCreateCall {
             hub: self.hub,
@@ -1042,7 +1164,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `parent` - Required. The resource name of the instance location using the form:
     ///                  `projects/{project_id}/locations/{location_id}`
-    ///              where `location_id` refers to a GCP region
+    ///              where `location_id` refers to a GCP region.
     pub fn locations_instances_list(&self, parent: &str) -> ProjectLocationInstanceListCall<'a, C, A> {
         ProjectLocationInstanceListCall {
             hub: self.hub,
@@ -1089,6 +1211,294 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // ###################
 // CallBuilders   ###
 // #################
+
+/// Import a Redis RDB snapshot file from Cloud Storage into a Redis instance.
+/// 
+/// Redis may stop serving during this operation. Instance state will be
+/// IMPORTING for entire operation. When complete, the instance will contain
+/// only data from the imported file.
+/// 
+/// The returned operation is automatically deleted after a few hours, so
+/// there is no need to call DeleteOperation.
+///
+/// A builder for the *locations.instances.import* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_redis1 as redis1;
+/// use redis1::ImportInstanceRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use redis1::CloudRedis;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudRedis::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ImportInstanceRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_instances_import(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationInstanceImportCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudRedis<C, A>,
+    _request: ImportInstanceRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationInstanceImportCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationInstanceImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "redis.projects.locations.instances.import",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:import";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ImportInstanceRequest) -> ProjectLocationInstanceImportCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Redis instance resource name using the form:
+    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// where `location_id` refers to a GCP region.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceImportCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceImportCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceImportCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceImportCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
 
 /// Deletes a specific Redis instance.  Instance stops serving and data is
 /// deleted.
@@ -1268,7 +1678,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
 
     /// Required. Redis instance resource name using the form:
     ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-    /// where `location_id` refers to a GCP region
+    /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1330,6 +1740,292 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Export Redis instance data into a Redis RDB format file in Cloud Storage.
+/// 
+/// Redis will continue serving during this operation.
+/// 
+/// The returned operation is automatically deleted after a few hours, so
+/// there is no need to call DeleteOperation.
+///
+/// A builder for the *locations.instances.export* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_redis1 as redis1;
+/// use redis1::ExportInstanceRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use redis1::CloudRedis;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudRedis::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ExportInstanceRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_instances_export(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationInstanceExportCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudRedis<C, A>,
+    _request: ExportInstanceRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationInstanceExportCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationInstanceExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "redis.projects.locations.instances.export",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:export";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ExportInstanceRequest) -> ProjectLocationInstanceExportCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Redis instance resource name using the form:
+    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// where `location_id` refers to a GCP region.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceExportCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceExportCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceExportCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceExportCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2017,7 +2713,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
 
     /// Required. Redis instance resource name using the form:
     ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-    /// where `location_id` refers to a GCP region
+    /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2090,8 +2786,8 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Failover the master role to current replica node against a specific
-/// STANDARD tier redis instance.
+/// Initiates a failover of the master node to current replica node for a
+/// specific STANDARD tier Cloud Memorystore for Redis instance.
 ///
 /// A builder for the *locations.instances.failover* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2299,7 +2995,7 @@ impl<'a, C, A> ProjectLocationInstanceFailoverCall<'a, C, A> where C: BorrowMut<
     }
     /// Required. Redis instance resource name using the form:
     ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-    /// where `location_id` refers to a GCP region
+    /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2410,7 +3106,7 @@ impl<'a, C, A> ProjectLocationInstanceFailoverCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_patch(req, "name")
-///              .update_mask("labore")
+///              .update_mask("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -2710,9 +3406,9 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("nonumy")
-///              .page_size(-19)
-///              .filter("gubergren")
+///              .page_token("gubergren")
+///              .page_size(-95)
+///              .filter("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -3011,7 +3707,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_create(req, "parent")
-///              .instance_id("aliquyam")
+///              .instance_id("no")
 ///              .doit();
 /// # }
 /// ```
@@ -3190,7 +3886,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
     }
     /// Required. The resource name of the instance location using the form:
     ///     `projects/{project_id}/locations/{location_id}`
-    /// where `location_id` refers to a GCP region
+    /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3564,9 +4260,9 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("justo")
-///              .page_size(-21)
-///              .filter("et")
+///              .page_token("et")
+///              .page_size(-17)
+///              .filter("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -3855,8 +4551,8 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_list("parent")
-///              .page_token("diam")
-///              .page_size(-55)
+///              .page_token("Lorem")
+///              .page_size(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -4014,7 +4710,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
 
     /// Required. The resource name of the instance location using the form:
     ///     `projects/{project_id}/locations/{location_id}`
-    /// where `location_id` refers to a GCP region
+    /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *parent* path property to the given value.
     ///

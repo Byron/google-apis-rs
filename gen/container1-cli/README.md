@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container* API at revision *20190316*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Container* API at revision *20190610*. The CLI is at version *1.0.9*.
 
 ```bash
 container1 [options]
         projects
+                aggregated-usable-subnetworks-list <parent> [-p <v>]... [-o <out>]
                 locations-clusters-complete-ip-rotation <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-delete <name> [-p <v>]... [-o <out>]

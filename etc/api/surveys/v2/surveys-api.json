@@ -20,7 +20,7 @@
     "canonicalName": "Surveys", 
     "description": "Creates and conducts surveys, lists the surveys that an authenticated user owns, and retrieves survey results and information about specified surveys.", 
     "discoveryVersion": "v1", 
-    "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/Or-xZvCZIz5Paj-rr5c5BzwXAYo\"", 
+    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/Or-xZvCZIz5Paj-rr5c5BzwXAYo\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"

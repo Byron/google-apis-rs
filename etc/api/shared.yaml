@@ -37,6 +37,9 @@ api:
     - poly
     # versions listed but do not exists
     - websecurityscanner-v1beta
+    # The following do not have any sub-commands, and we don't currently support that. args_data array turns out empty in CLI
+    - websecurityscanner
+    - youtubeanalytics
   manually_added:
     - name: photoslibrary
       version: v1
@@ -73,7 +76,7 @@ directories:
   # The subdirectory to contain documentation from all APIs and related programs
   doc_subdir: doc
 cargo:
-  build_version: "1.0.8"
+  build_version: "1.0.9"
   repo_base_url: https://github.com/Byron/google-apis-rs
   authors:
     # don't forget to possibly add them to copyright authors
@@ -85,8 +88,7 @@ urls:
   authenticator_delegate: https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html
 copyright:
   license_abbrev: "MIT"
-  # should at some point be 2015-2016 ...
-  years: '2015-2016'
+  years: '2015-2019'
   authors:
     - 'Sebastian Thiel'
     

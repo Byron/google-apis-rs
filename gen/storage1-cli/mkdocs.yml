@@ -1,4 +1,4 @@
-site_name: storage v1.0.8+20190226
+site_name: storage v1.0.9+20190624
 site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
 site_description: A complete library to interact with storage (protocol v1)
 
@@ -55,9 +55,14 @@ pages:
 - ['objects_test-iam-permissions.md', 'Objects', 'Test Iam Permissions']
 - ['objects_update.md', 'Objects', 'Update']
 - ['objects_watch-all.md', 'Objects', 'Watch All']
+- ['projects_hmac-keys-create.md', 'Projects', 'Hmac Keys Create']
+- ['projects_hmac-keys-delete.md', 'Projects', 'Hmac Keys Delete']
+- ['projects_hmac-keys-get.md', 'Projects', 'Hmac Keys Get']
+- ['projects_hmac-keys-list.md', 'Projects', 'Hmac Keys List']
+- ['projects_hmac-keys-update.md', 'Projects', 'Hmac Keys Update']
 - ['projects_service-account-get.md', 'Projects', 'Service Account Get']
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

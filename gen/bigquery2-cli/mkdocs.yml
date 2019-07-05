@@ -1,4 +1,4 @@
-site_name: bigquery v1.0.8+20190314
+site_name: bigquery v1.0.9+20190630
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
 site_description: A complete library to interact with bigquery (protocol v2)
 
@@ -27,6 +27,11 @@ pages:
 - ['models_patch.md', 'Models', 'Patch']
 - ['projects_get-service-account.md', 'Projects', 'Get Service Account']
 - ['projects_list.md', 'Projects', 'List']
+- ['routines_delete.md', 'Routines', 'Delete']
+- ['routines_get.md', 'Routines', 'Get']
+- ['routines_insert.md', 'Routines', 'Insert']
+- ['routines_list.md', 'Routines', 'List']
+- ['routines_update.md', 'Routines', 'Update']
 - ['tabledata_insert-all.md', 'Tabledata', 'Insert All']
 - ['tabledata_list.md', 'Tabledata', 'List']
 - ['tables_delete.md', 'Tables', 'Delete']
@@ -38,5 +43,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

@@ -1,4 +1,4 @@
-site_name: Tag Manager v1.0.8+20190220
+site_name: Tag Manager v1.0.9+20190516
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager2-cli
 site_description: A complete library to interact with Tag Manager (protocol v2)
 
@@ -56,6 +56,12 @@ pages:
 - ['accounts_containers-workspaces-tags-list.md', 'Accounts', 'Containers Workspaces Tags List']
 - ['accounts_containers-workspaces-tags-revert.md', 'Accounts', 'Containers Workspaces Tags Revert']
 - ['accounts_containers-workspaces-tags-update.md', 'Accounts', 'Containers Workspaces Tags Update']
+- ['accounts_containers-workspaces-templates-create.md', 'Accounts', 'Containers Workspaces Templates Create']
+- ['accounts_containers-workspaces-templates-delete.md', 'Accounts', 'Containers Workspaces Templates Delete']
+- ['accounts_containers-workspaces-templates-get.md', 'Accounts', 'Containers Workspaces Templates Get']
+- ['accounts_containers-workspaces-templates-list.md', 'Accounts', 'Containers Workspaces Templates List']
+- ['accounts_containers-workspaces-templates-revert.md', 'Accounts', 'Containers Workspaces Templates Revert']
+- ['accounts_containers-workspaces-templates-update.md', 'Accounts', 'Containers Workspaces Templates Update']
 - ['accounts_containers-workspaces-triggers-create.md', 'Accounts', 'Containers Workspaces Triggers Create']
 - ['accounts_containers-workspaces-triggers-delete.md', 'Accounts', 'Containers Workspaces Triggers Delete']
 - ['accounts_containers-workspaces-triggers-get.md', 'Accounts', 'Containers Workspaces Triggers Get']
@@ -86,5 +92,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

@@ -46,6 +46,68 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _projects_aggregated_usable_subnetworks_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().aggregated_usable_subnetworks_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_clusters_complete_ip_rotation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -169,12 +231,16 @@ impl<'n> Engine<'n> {
                     "cluster.addons-config.horizontal-pod-autoscaling.disabled" => Some(("cluster.addonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.locations" => Some(("cluster.locations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.enable-kubernetes-alpha" => Some(("cluster.enableKubernetesAlpha", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.default-max-pods-constraint.max-pods-per-node" => Some(("cluster.defaultMaxPodsConstraint.maxPodsPerNode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.logging-service" => Some(("cluster.loggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.network-config.subnetwork" => Some(("cluster.networkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.network" => Some(("cluster.networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.location" => Some(("cluster.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.resource-usage-export-config.bigquery-destination.dataset-id" => Some(("cluster.resourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.resource-usage-export-config.enable-network-egress-metering" => Some(("cluster.resourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.resource-usage-export-config.consumption-metering-config.enabled" => Some(("cluster.resourceUsageExportConfig.consumptionMeteringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.master-ipv4-cidr-block" => Some(("cluster.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -237,7 +303,7 @@ impl<'n> Engine<'n> {
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-private-endpoint", "enable-private-nodes", "enable-tpu", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "tpu-ipv4-cidr-block", "use-ip-aliases", "username", "window", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "bigquery-destination", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "consumption-metering-config", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "dataset-id", "default-max-pods-constraint", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-network-egress-metering", "enable-private-endpoint", "enable-private-nodes", "enable-tpu", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "max-pods-per-node", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "resource-usage-export-config", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "tpu-ipv4-cidr-block", "use-ip-aliases", "username", "window", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -450,9 +516,6 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -569,8 +632,10 @@ impl<'n> Engine<'n> {
                     "node-pool.autoscaling.min-node-count" => Some(("nodePool.autoscaling.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.enabled" => Some(("nodePool.autoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.max-node-count" => Some(("nodePool.autoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.max-pods-constraint.max-pods-per-node" => Some(("nodePool.maxPodsConstraint.maxPodsPerNode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.version" => Some(("nodePool.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.initial-node-count" => Some(("nodePool.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.pod-ipv4-cidr-size" => Some(("nodePool.podIpv4CidrSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.status-message" => Some(("nodePool.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.machine-type" => Some(("nodePool.config.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.tags" => Some(("nodePool.config.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -586,7 +651,7 @@ impl<'n> Engine<'n> {
                     "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.self-link" => Some(("nodePool.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoscaling", "cluster-id", "config", "description", "disk-size-gb", "disk-type", "enabled", "image-type", "initial-node-count", "instance-group-urls", "labels", "local-ssd-count", "machine-type", "management", "max-node-count", "metadata", "min-cpu-platform", "min-node-count", "name", "node-pool", "oauth-scopes", "parent", "preemptible", "project-id", "self-link", "service-account", "status", "status-message", "tags", "upgrade-options", "version", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoscaling", "cluster-id", "config", "description", "disk-size-gb", "disk-type", "enabled", "image-type", "initial-node-count", "instance-group-urls", "labels", "local-ssd-count", "machine-type", "management", "max-node-count", "max-pods-constraint", "max-pods-per-node", "metadata", "min-cpu-platform", "min-node-count", "name", "node-pool", "oauth-scopes", "parent", "pod-ipv4-cidr-size", "preemptible", "project-id", "self-link", "service-account", "status", "status-message", "tags", "upgrade-options", "version", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2222,6 +2287,7 @@ impl<'n> Engine<'n> {
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-logging-service" => Some(("update.desiredLoggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-id" => Some(("update.desiredNodePoolId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.http-load-balancing.disabled" => Some(("update.desiredAddonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2232,12 +2298,15 @@ impl<'n> Engine<'n> {
                     "update.desired-locations" => Some(("update.desiredLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-node-version" => Some(("update.desiredNodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-image-type" => Some(("update.desiredImageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-resource-usage-export-config.bigquery-destination.dataset-id" => Some(("update.desiredResourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-resource-usage-export-config.enable-network-egress-metering" => Some(("update.desiredResourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-resource-usage-export-config.consumption-metering-config.enabled" => Some(("update.desiredResourceUsageExportConfig.consumptionMeteringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.min-node-count" => Some(("update.desiredNodePoolAutoscaling.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.enabled" => Some(("update.desiredNodePoolAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.max-node-count" => Some(("update.desiredNodePoolAutoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "desired-addons-config", "desired-image-type", "desired-locations", "desired-master-authorized-networks-config", "desired-master-version", "desired-monitoring-service", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-version", "disabled", "enabled", "horizontal-pod-autoscaling", "http-load-balancing", "kubernetes-dashboard", "max-node-count", "min-node-count", "name", "network-policy-config", "project-id", "update", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination", "cluster-id", "consumption-metering-config", "dataset-id", "desired-addons-config", "desired-image-type", "desired-locations", "desired-logging-service", "desired-master-authorized-networks-config", "desired-master-version", "desired-monitoring-service", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-version", "desired-resource-usage-export-config", "disabled", "enable-network-egress-metering", "enabled", "horizontal-pod-autoscaling", "http-load-balancing", "kubernetes-dashboard", "max-node-count", "min-node-count", "name", "network-policy-config", "project-id", "update", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2415,9 +2484,6 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -2921,12 +2987,16 @@ impl<'n> Engine<'n> {
                     "cluster.addons-config.horizontal-pod-autoscaling.disabled" => Some(("cluster.addonsConfig.horizontalPodAutoscaling.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.locations" => Some(("cluster.locations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.enable-kubernetes-alpha" => Some(("cluster.enableKubernetesAlpha", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.default-max-pods-constraint.max-pods-per-node" => Some(("cluster.defaultMaxPodsConstraint.maxPodsPerNode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.logging-service" => Some(("cluster.loggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "cluster.network-config.subnetwork" => Some(("cluster.networkConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network-config.network" => Some(("cluster.networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.location" => Some(("cluster.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.resource-usage-export-config.bigquery-destination.dataset-id" => Some(("cluster.resourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.resource-usage-export-config.enable-network-egress-metering" => Some(("cluster.resourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.resource-usage-export-config.consumption-metering-config.enabled" => Some(("cluster.resourceUsageExportConfig.consumptionMeteringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.enable-private-endpoint" => Some(("cluster.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.master-ipv4-cidr-block" => Some(("cluster.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.private-cluster-config.private-endpoint" => Some(("cluster.privateClusterConfig.privateEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2989,7 +3059,7 @@ impl<'n> Engine<'n> {
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-private-endpoint", "enable-private-nodes", "enable-tpu", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "tpu-ipv4-cidr-block", "use-ip-aliases", "username", "window", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["addons-config", "bigquery-destination", "client-certificate", "client-certificate-config", "client-key", "cluster", "cluster-ca-certificate", "cluster-ipv4-cidr", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "consumption-metering-config", "create-subnetwork", "create-time", "current-master-version", "current-node-count", "current-node-version", "daily-maintenance-window", "dataset-id", "default-max-pods-constraint", "description", "disabled", "disk-size-gb", "disk-type", "duration", "enable-kubernetes-alpha", "enable-network-egress-metering", "enable-private-endpoint", "enable-private-nodes", "enable-tpu", "enabled", "endpoint", "expire-time", "horizontal-pod-autoscaling", "http-load-balancing", "image-type", "initial-cluster-version", "initial-node-count", "instance-group-urls", "ip-allocation-policy", "issue-client-certificate", "kubernetes-dashboard", "label-fingerprint", "labels", "legacy-abac", "local-ssd-count", "location", "locations", "logging-service", "machine-type", "maintenance-policy", "master-auth", "master-authorized-networks-config", "master-ipv4-cidr-block", "max-pods-per-node", "metadata", "min-cpu-platform", "monitoring-service", "name", "network", "network-config", "network-policy", "network-policy-config", "node-config", "node-ipv4-cidr", "node-ipv4-cidr-block", "node-ipv4-cidr-size", "oauth-scopes", "parent", "password", "preemptible", "private-cluster-config", "private-endpoint", "project-id", "provider", "public-endpoint", "resource-labels", "resource-usage-export-config", "self-link", "service-account", "services-ipv4-cidr", "services-ipv4-cidr-block", "services-secondary-range-name", "start-time", "status", "status-message", "subnetwork", "subnetwork-name", "tags", "tpu-ipv4-cidr-block", "use-ip-aliases", "username", "window", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3791,8 +3861,10 @@ impl<'n> Engine<'n> {
                     "node-pool.autoscaling.min-node-count" => Some(("nodePool.autoscaling.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.enabled" => Some(("nodePool.autoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-pool.autoscaling.max-node-count" => Some(("nodePool.autoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.max-pods-constraint.max-pods-per-node" => Some(("nodePool.maxPodsConstraint.maxPodsPerNode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.version" => Some(("nodePool.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.initial-node-count" => Some(("nodePool.initialNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "node-pool.pod-ipv4-cidr-size" => Some(("nodePool.podIpv4CidrSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.status-message" => Some(("nodePool.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.machine-type" => Some(("nodePool.config.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-pool.config.tags" => Some(("nodePool.config.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3808,7 +3880,7 @@ impl<'n> Engine<'n> {
                     "node-pool.config.local-ssd-count" => Some(("nodePool.config.localSsdCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-pool.self-link" => Some(("nodePool.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoscaling", "cluster-id", "config", "description", "disk-size-gb", "disk-type", "enabled", "image-type", "initial-node-count", "instance-group-urls", "labels", "local-ssd-count", "machine-type", "management", "max-node-count", "metadata", "min-cpu-platform", "min-node-count", "name", "node-pool", "oauth-scopes", "parent", "preemptible", "project-id", "self-link", "service-account", "status", "status-message", "tags", "upgrade-options", "version", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-repair", "auto-upgrade", "auto-upgrade-start-time", "autoscaling", "cluster-id", "config", "description", "disk-size-gb", "disk-type", "enabled", "image-type", "initial-node-count", "instance-group-urls", "labels", "local-ssd-count", "machine-type", "management", "max-node-count", "max-pods-constraint", "max-pods-per-node", "metadata", "min-cpu-platform", "min-node-count", "name", "node-pool", "oauth-scopes", "parent", "pod-ipv4-cidr-size", "preemptible", "project-id", "self-link", "service-account", "status", "status-message", "tags", "upgrade-options", "version", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4880,6 +4952,7 @@ impl<'n> Engine<'n> {
                     "cluster-id" => Some(("clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-logging-service" => Some(("update.desiredLoggingService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-master-authorized-networks-config.enabled" => Some(("update.desiredMasterAuthorizedNetworksConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-id" => Some(("update.desiredNodePoolId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-addons-config.http-load-balancing.disabled" => Some(("update.desiredAddonsConfig.httpLoadBalancing.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4890,12 +4963,15 @@ impl<'n> Engine<'n> {
                     "update.desired-locations" => Some(("update.desiredLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update.desired-node-version" => Some(("update.desiredNodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update.desired-image-type" => Some(("update.desiredImageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-resource-usage-export-config.bigquery-destination.dataset-id" => Some(("update.desiredResourceUsageExportConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update.desired-resource-usage-export-config.enable-network-egress-metering" => Some(("update.desiredResourceUsageExportConfig.enableNetworkEgressMetering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "update.desired-resource-usage-export-config.consumption-metering-config.enabled" => Some(("update.desiredResourceUsageExportConfig.consumptionMeteringConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.min-node-count" => Some(("update.desiredNodePoolAutoscaling.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.enabled" => Some(("update.desiredNodePoolAutoscaling.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update.desired-node-pool-autoscaling.max-node-count" => Some(("update.desiredNodePoolAutoscaling.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update.desired-monitoring-service" => Some(("update.desiredMonitoringService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cluster-id", "desired-addons-config", "desired-image-type", "desired-locations", "desired-master-authorized-networks-config", "desired-master-version", "desired-monitoring-service", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-version", "disabled", "enabled", "horizontal-pod-autoscaling", "http-load-balancing", "kubernetes-dashboard", "max-node-count", "min-node-count", "name", "network-policy-config", "project-id", "update", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination", "cluster-id", "consumption-metering-config", "dataset-id", "desired-addons-config", "desired-image-type", "desired-locations", "desired-logging-service", "desired-master-authorized-networks-config", "desired-master-version", "desired-monitoring-service", "desired-node-pool-autoscaling", "desired-node-pool-id", "desired-node-version", "desired-resource-usage-export-config", "disabled", "enable-network-egress-metering", "enabled", "horizontal-pod-autoscaling", "http-load-balancing", "kubernetes-dashboard", "max-node-count", "min-node-count", "name", "network-policy-config", "project-id", "update", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5218,6 +5294,9 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("aggregated-usable-subnetworks-list", Some(opt)) => {
+                        call_result = self._projects_aggregated_usable_subnetworks_list(opt, dry_run, &mut err);
+                    },
                     ("locations-clusters-complete-ip-rotation", Some(opt)) => {
                         call_result = self._projects_locations_clusters_complete_ip_rotation(opt, dry_run, &mut err);
                     },
@@ -5495,7 +5574,30 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-clusters-complete-ip-rotation', 'locations-clusters-create', 'locations-clusters-delete', 'locations-clusters-get', 'locations-clusters-get-jwks', 'locations-clusters-list', 'locations-clusters-node-pools-create', 'locations-clusters-node-pools-delete', 'locations-clusters-node-pools-get', 'locations-clusters-node-pools-list', 'locations-clusters-node-pools-rollback', 'locations-clusters-node-pools-set-autoscaling', 'locations-clusters-node-pools-set-management', 'locations-clusters-node-pools-set-size', 'locations-clusters-node-pools-update', 'locations-clusters-set-addons', 'locations-clusters-set-legacy-abac', 'locations-clusters-set-locations', 'locations-clusters-set-logging', 'locations-clusters-set-maintenance-policy', 'locations-clusters-set-master-auth', 'locations-clusters-set-monitoring', 'locations-clusters-set-network-policy', 'locations-clusters-set-resource-labels', 'locations-clusters-start-ip-rotation', 'locations-clusters-update', 'locations-clusters-update-master', 'locations-clusters-well-known-get-openid-configuration', 'locations-get-server-config', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'zones-clusters-addons', 'zones-clusters-complete-ip-rotation', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-legacy-abac', 'zones-clusters-list', 'zones-clusters-locations', 'zones-clusters-logging', 'zones-clusters-master', 'zones-clusters-monitoring', 'zones-clusters-node-pools-autoscaling', 'zones-clusters-node-pools-create', 'zones-clusters-node-pools-delete', 'zones-clusters-node-pools-get', 'zones-clusters-node-pools-list', 'zones-clusters-node-pools-rollback', 'zones-clusters-node-pools-set-management', 'zones-clusters-node-pools-set-size', 'zones-clusters-node-pools-update', 'zones-clusters-resource-labels', 'zones-clusters-set-maintenance-policy', 'zones-clusters-set-master-auth', 'zones-clusters-set-network-policy', 'zones-clusters-start-ip-rotation', 'zones-clusters-update', 'zones-get-serverconfig', 'zones-operations-cancel', 'zones-operations-get' and 'zones-operations-list'", vec![
+        ("projects", "methods: 'aggregated-usable-subnetworks-list', 'locations-clusters-complete-ip-rotation', 'locations-clusters-create', 'locations-clusters-delete', 'locations-clusters-get', 'locations-clusters-get-jwks', 'locations-clusters-list', 'locations-clusters-node-pools-create', 'locations-clusters-node-pools-delete', 'locations-clusters-node-pools-get', 'locations-clusters-node-pools-list', 'locations-clusters-node-pools-rollback', 'locations-clusters-node-pools-set-autoscaling', 'locations-clusters-node-pools-set-management', 'locations-clusters-node-pools-set-size', 'locations-clusters-node-pools-update', 'locations-clusters-set-addons', 'locations-clusters-set-legacy-abac', 'locations-clusters-set-locations', 'locations-clusters-set-logging', 'locations-clusters-set-maintenance-policy', 'locations-clusters-set-master-auth', 'locations-clusters-set-monitoring', 'locations-clusters-set-network-policy', 'locations-clusters-set-resource-labels', 'locations-clusters-start-ip-rotation', 'locations-clusters-update', 'locations-clusters-update-master', 'locations-clusters-well-known-get-openid-configuration', 'locations-get-server-config', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'zones-clusters-addons', 'zones-clusters-complete-ip-rotation', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-legacy-abac', 'zones-clusters-list', 'zones-clusters-locations', 'zones-clusters-logging', 'zones-clusters-master', 'zones-clusters-monitoring', 'zones-clusters-node-pools-autoscaling', 'zones-clusters-node-pools-create', 'zones-clusters-node-pools-delete', 'zones-clusters-node-pools-get', 'zones-clusters-node-pools-list', 'zones-clusters-node-pools-rollback', 'zones-clusters-node-pools-set-management', 'zones-clusters-node-pools-set-size', 'zones-clusters-node-pools-update', 'zones-clusters-resource-labels', 'zones-clusters-set-maintenance-policy', 'zones-clusters-set-master-auth', 'zones-clusters-set-network-policy', 'zones-clusters-start-ip-rotation', 'zones-clusters-update', 'zones-get-serverconfig', 'zones-operations-cancel', 'zones-operations-get' and 'zones-operations-list'", vec![
+            ("aggregated-usable-subnetworks-list",
+                    Some(r##"Lists subnetworks that are usable for creating clusters in a project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_aggregated-usable-subnetworks-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The parent project where subnetworks are usable.
+        Specified in the format 'projects/*'."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-clusters-complete-ip-rotation",
                     Some(r##"Completes master IP rotation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-complete-ip-rotation",
@@ -5533,12 +5635,12 @@ fn main() {
         [default network](/compute/docs/networks-and-firewalls#networks).
         
         One firewall is added for the cluster. After cluster creation,
-        the cluster creates routes for each node to allow the containers
+        the Kubelet creates routes for each node to allow the containers
         on that node to communicate with all other instances in the
         cluster.
         
         Finally, an entry is added to the project's global metadata indicating
-        which CIDR range is being used by the cluster."##),
+        which CIDR range the cluster is using."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-create",
                   vec![
                     (Some(r##"parent"##),
@@ -5573,9 +5675,9 @@ fn main() {
         Firewalls and routes that were configured during cluster creation
         are also deleted.
         
-        Other Google Compute Engine resources that might be in use by the cluster
-        (e.g. load balancer resources) will not be deleted if they weren't present
-        at the initial create time."##),
+        Other Google Compute Engine resources that might be in use by the cluster,
+        such as load balancer resources, are not deleted if they weren't present
+        when the cluster was initially created."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-delete",
                   vec![
                     (Some(r##"name"##),
@@ -5621,7 +5723,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-get-jwks",
-                    Some(r##"GetJSONWebKeys gets the public component of the cluster signing keys in
+                    Some(r##"Gets the public component of the cluster signing keys in
         JSON Web Key format.
         This API is not yet intended for general use, and is not available for all
         clusters."##),
@@ -5726,7 +5828,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-node-pools-get",
-                    Some(r##"Retrieves the node pool requested."##),
+                    Some(r##"Retrieves the requested node pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-node-pools-get",
                   vec![
                     (Some(r##"name"##),
@@ -5773,8 +5875,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-node-pools-rollback",
-                    Some(r##"Roll back the previously Aborted or Failed NodePool upgrade.
-        This will be an no-op if the last upgrade successfully completed."##),
+                    Some(r##"Rolls back a previously Aborted or Failed NodePool upgrade.
+        This makes no changes if the last upgrade successfully completed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-node-pools-rollback",
                   vec![
                     (Some(r##"name"##),
@@ -5804,7 +5906,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-node-pools-set-autoscaling",
-                    Some(r##"Sets the autoscaling settings for a specific node pool."##),
+                    Some(r##"Sets the autoscaling settings for the specified node pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-node-pools-set-autoscaling",
                   vec![
                     (Some(r##"name"##),
@@ -5894,7 +5996,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-node-pools-update",
-                    Some(r##"Updates the version and/or image type for a specific node pool."##),
+                    Some(r##"Updates the version and/or image type for the specified node pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-node-pools-update",
                   vec![
                     (Some(r##"name"##),
@@ -6070,9 +6172,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-set-master-auth",
-                    Some(r##"Used to set master auth materials. Currently supports :-
-        Changing the admin password for a specific cluster.
-        This can be either via password generation or explicitly set the password."##),
+                    Some(r##"Sets master auth materials. Currently supports changing the admin password
+        or a specific cluster, either via password generation or explicitly setting
+        the password."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-set-master-auth",
                   vec![
                     (Some(r##"name"##),
@@ -6130,7 +6232,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-set-network-policy",
-                    Some(r##"Enables/Disables Network Policy for a cluster."##),
+                    Some(r##"Enables or disables Network Policy for a cluster."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-set-network-policy",
                   vec![
                     (Some(r##"name"##),
@@ -6188,7 +6290,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-start-ip-rotation",
-                    Some(r##"Start master IP rotation."##),
+                    Some(r##"Starts master IP rotation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-start-ip-rotation",
                   vec![
                     (Some(r##"name"##),
@@ -6275,9 +6377,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-clusters-well-known-get-openid-configuration",
-                    Some(r##"GetOpenIDConfig gets the OIDC discovery document for the cluster.
-        See the OpenID Connect Discovery 1.0 specification for details.
-        https://openid.net/specs/openid-connect-discovery-1_0.html
+                    Some(r##"Gets the OIDC discovery document for the cluster.
+        See the
+        [OpenID Connect Discovery 1.0
+        specification](https://openid.net/specs/openid-connect-discovery-1_0.html)
+        for details.
         This API is not yet intended for general use, and is not available for all
         clusters."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-clusters-well-known-get-openid-configuration",
@@ -6302,7 +6406,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-get-server-config",
-                    Some(r##"Returns configuration info about the Kubernetes Engine service."##),
+                    Some(r##"Returns configuration info about the Google Kubernetes Engine service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_locations-get-server-config",
                   vec![
                     (Some(r##"name"##),
@@ -6500,12 +6604,12 @@ fn main() {
         [default network](/compute/docs/networks-and-firewalls#networks).
         
         One firewall is added for the cluster. After cluster creation,
-        the cluster creates routes for each node to allow the containers
+        the Kubelet creates routes for each node to allow the containers
         on that node to communicate with all other instances in the
         cluster.
         
         Finally, an entry is added to the project's global metadata indicating
-        which CIDR range is being used by the cluster."##),
+        which CIDR range the cluster is using."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-create",
                   vec![
                     (Some(r##"project-id"##),
@@ -6550,9 +6654,9 @@ fn main() {
         Firewalls and routes that were configured during cluster creation
         are also deleted.
         
-        Other Google Compute Engine resources that might be in use by the cluster
-        (e.g. load balancer resources) will not be deleted if they weren't present
-        at the initial create time."##),
+        Other Google Compute Engine resources that might be in use by the cluster,
+        such as load balancer resources, are not deleted if they weren't present
+        when the cluster was initially created."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-delete",
                   vec![
                     (Some(r##"project-id"##),
@@ -6896,7 +7000,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-node-pools-autoscaling",
-                    Some(r##"Sets the autoscaling settings for a specific node pool."##),
+                    Some(r##"Sets the autoscaling settings for the specified node pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-node-pools-autoscaling",
                   vec![
                     (Some(r##"project-id"##),
@@ -7042,7 +7146,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-node-pools-get",
-                    Some(r##"Retrieves the node pool requested."##),
+                    Some(r##"Retrieves the requested node pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-node-pools-get",
                   vec![
                     (Some(r##"project-id"##),
@@ -7129,8 +7233,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-node-pools-rollback",
-                    Some(r##"Roll back the previously Aborted or Failed NodePool upgrade.
-        This will be an no-op if the last upgrade successfully completed."##),
+                    Some(r##"Rolls back a previously Aborted or Failed NodePool upgrade.
+        This makes no changes if the last upgrade successfully completed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-node-pools-rollback",
                   vec![
                     (Some(r##"project-id"##),
@@ -7289,7 +7393,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-node-pools-update",
-                    Some(r##"Updates the version and/or image type for a specific node pool."##),
+                    Some(r##"Updates the version and/or image type for the specified node pool."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-node-pools-update",
                   vec![
                     (Some(r##"project-id"##),
@@ -7431,9 +7535,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-set-master-auth",
-                    Some(r##"Used to set master auth materials. Currently supports :-
-        Changing the admin password for a specific cluster.
-        This can be either via password generation or explicitly set the password."##),
+                    Some(r##"Sets master auth materials. Currently supports changing the admin password
+        or a specific cluster, either via password generation or explicitly setting
+        the password."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-set-master-auth",
                   vec![
                     (Some(r##"project-id"##),
@@ -7479,7 +7583,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-set-network-policy",
-                    Some(r##"Enables/Disables Network Policy for a cluster."##),
+                    Some(r##"Enables or disables Network Policy for a cluster."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-set-network-policy",
                   vec![
                     (Some(r##"project-id"##),
@@ -7525,7 +7629,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-clusters-start-ip-rotation",
-                    Some(r##"Start master IP rotation."##),
+                    Some(r##"Starts master IP rotation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-clusters-start-ip-rotation",
                   vec![
                     (Some(r##"project-id"##),
@@ -7617,7 +7721,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("zones-get-serverconfig",
-                    Some(r##"Returns configuration info about the Kubernetes Engine service."##),
+                    Some(r##"Returns configuration info about the Google Kubernetes Engine service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_cli/projects_zones-get-serverconfig",
                   vec![
                     (Some(r##"project-id"##),
@@ -7771,7 +7875,7 @@ fn main() {
     
     let mut app = App::new("container1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190316")
+           .version("1.0.9+20190610")
            .about("Builds and manages container-based applications, powered by the open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_cli")
            .arg(Arg::with_name("url")

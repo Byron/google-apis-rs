@@ -2,14 +2,14 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *1.0.8+20190328*, where *20190328* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *drive* crate version *1.0.9+20190620*, where *20190620* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/drive2).
 //! # Features
 //! 
-//! Handle the following *Resources* with ease from the central [hub](struct.Drive.html) ... 
+//! Handle the following *Resources* with ease from the central [hub](struct.DriveHub.html) ... 
 //! 
 //! * [about](struct.About.html)
 //!  * [*get*](struct.AboutGetCall.html)
@@ -23,6 +23,8 @@
 //!  * [*delete*](struct.ChildrenDeleteCall.html), [*get*](struct.ChildrenGetCall.html), [*insert*](struct.ChildrenInsertCall.html) and [*list*](struct.ChildrenListCall.html)
 //! * [comments](struct.Comment.html)
 //!  * [*delete*](struct.CommentDeleteCall.html), [*get*](struct.CommentGetCall.html), [*insert*](struct.CommentInsertCall.html), [*list*](struct.CommentListCall.html), [*patch*](struct.CommentPatchCall.html) and [*update*](struct.CommentUpdateCall.html)
+//! * [drives](struct.Drive.html)
+//!  * [*delete*](struct.DriveDeleteCall.html), [*get*](struct.DriveGetCall.html), [*hide*](struct.DriveHideCall.html), [*insert*](struct.DriveInsertCall.html), [*list*](struct.DriveListCall.html), [*unhide*](struct.DriveUnhideCall.html) and [*update*](struct.DriveUpdateCall.html)
 //! * [files](struct.File.html)
 //!  * [*copy*](struct.FileCopyCall.html), [*delete*](struct.FileDeleteCall.html), [*empty trash*](struct.FileEmptyTrashCall.html), [*export*](struct.FileExportCall.html), [*generate ids*](struct.FileGenerateIdCall.html), [*get*](struct.FileGetCall.html), [*insert*](struct.FileInsertCall.html), [*list*](struct.FileListCall.html), [*patch*](struct.FilePatchCall.html), [*touch*](struct.FileTouchCall.html), [*trash*](struct.FileTrashCall.html), [*untrash*](struct.FileUntrashCall.html), [*update*](struct.FileUpdateCall.html) and [*watch*](struct.FileWatchCall.html)
 //! * parents
@@ -70,7 +72,7 @@
 //! 
 //! The API is structured into the following primary items:
 //! 
-//! * **[Hub](struct.Drive.html)**
+//! * **[Hub](struct.DriveHub.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
 //!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
@@ -146,7 +148,7 @@
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-//! use drive2::Drive;
+//! use drive2::DriveHub;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 //! // `client_secret`, among other things.
@@ -159,7 +161,7 @@
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 //!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
-//! let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+//! let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -170,19 +172,20 @@
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().patch(req, "fileId")
 //!              .use_content_as_indexable_text(false)
-//!              .update_viewed_date(false)
-//!              .timed_text_track_name("aliquyam")
-//!              .timed_text_language("ea")
-//!              .supports_team_drives(false)
+//!              .update_viewed_date(true)
+//!              .timed_text_track_name("ea")
+//!              .timed_text_language("no")
+//!              .supports_team_drives(true)
+//!              .supports_all_drives(true)
 //!              .set_modified_date(true)
-//!              .remove_parents("justo")
+//!              .remove_parents("et")
 //!              .pinned(true)
-//!              .ocr_language("et")
+//!              .ocr_language("ipsum")
 //!              .ocr(true)
-//!              .new_revision(false)
-//!              .modified_date_behavior("Lorem")
+//!              .new_revision(true)
+//!              .modified_date_behavior("duo")
 //!              .convert(true)
-//!              .add_parents("duo")
+//!              .add_parents("sea")
 //!              .doit();
 //! 
 //! match result {
@@ -291,9 +294,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -361,7 +362,7 @@ impl Default for Scope {
 // HUB ###
 // ######
 
-/// Central instance to access all Drive related resource activities
+/// Central instance to access all DriveHub related resource activities
 ///
 /// # Examples
 ///
@@ -377,7 +378,7 @@ impl Default for Scope {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -390,7 +391,7 @@ impl Default for Scope {
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -400,20 +401,21 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().patch(req, "fileId")
-///              .use_content_as_indexable_text(true)
+///              .use_content_as_indexable_text(false)
 ///              .update_viewed_date(false)
-///              .timed_text_track_name("eos")
-///              .timed_text_language("erat")
-///              .supports_team_drives(false)
-///              .set_modified_date(true)
-///              .remove_parents("eirmod")
+///              .timed_text_track_name("sadipscing")
+///              .timed_text_language("dolor")
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .set_modified_date(false)
+///              .remove_parents("no")
 ///              .pinned(true)
-///              .ocr_language("amet")
-///              .ocr(false)
+///              .ocr_language("eirmod")
+///              .ocr(true)
 ///              .new_revision(true)
-///              .modified_date_behavior("eirmod")
-///              .convert(true)
-///              .add_parents("invidunt")
+///              .modified_date_behavior("aliquyam")
+///              .convert(false)
+///              .add_parents("Lorem")
 ///              .doit();
 /// 
 /// match result {
@@ -434,7 +436,7 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Drive<C, A> {
+pub struct DriveHub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
@@ -442,16 +444,16 @@ pub struct Drive<C, A> {
     _root_url: String,
 }
 
-impl<'a, C, A> Hub for Drive<C, A> {}
+impl<'a, C, A> Hub for DriveHub<C, A> {}
 
-impl<'a, C, A> Drive<C, A>
+impl<'a, C, A> DriveHub<C, A>
     where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Drive<C, A> {
-        Drive {
+    pub fn new(client: C, authenticator: A) -> DriveHub<C, A> {
+        DriveHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://www.googleapis.com/drive/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -474,6 +476,9 @@ impl<'a, C, A> Drive<C, A>
     }
     pub fn comments(&'a self) -> CommentMethods<'a, C, A> {
         CommentMethods { hub: &self }
+    }
+    pub fn drives(&'a self) -> DriveMethods<'a, C, A> {
+        DriveMethods { hub: &self }
     }
     pub fn files(&'a self) -> FileMethods<'a, C, A> {
         FileMethods { hub: &self }
@@ -501,7 +506,7 @@ impl<'a, C, A> Drive<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -668,6 +673,28 @@ impl NestedType for AboutImportFormats {}
 impl Part for AboutImportFormats {}
 
 
+/// An image file and cropping parameters from which a background image for this shared drive is set. This is a write only field; it can only be set on drive.drives.update requests that don't set themeId. When specified, all fields of the backgroundImageFile must be set.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DriveBackgroundImageFile {
+    /// The width of the cropped image in the closed range of 0 to 1. This value represents the width of the cropped image divided by the width of the entire image. The height is computed by applying a width to height aspect ratio of 80 to 9. The resulting image must be at least 1280 pixels wide and 144 pixels high.
+    pub width: Option<f32>,
+    /// The Y coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the vertical distance from the top side of the entire image to the top side of the cropping area divided by the height of the entire image.
+    #[serde(rename="yCoordinate")]
+    pub y_coordinate: Option<f32>,
+    /// The ID of an image file in Google Drive to use for the background image.
+    pub id: Option<String>,
+    /// The X coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the horizontal distance from the left side of the entire image to the left side of the cropping area divided by the width of the entire image.
+    #[serde(rename="xCoordinate")]
+    pub x_coordinate: Option<f32>,
+}
+
+impl NestedType for DriveBackgroundImageFile {}
+impl Part for DriveBackgroundImageFile {}
+
+
 /// Information about supported additional roles per file type. The most specific type takes precedence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -727,6 +754,37 @@ pub struct AboutQuotaBytesByService {
 
 impl NestedType for AboutQuotaBytesByService {}
 impl Part for AboutQuotaBytesByService {}
+
+
+/// Details of whether the permissions on this shared drive item are inherited or directly on this item. This is an output-only field which is present only for shared drive items.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PermissionPermissionDetails {
+    /// Whether this permission is inherited. This field is always populated. This is an output-only field.
+    pub inherited: Option<bool>,
+    /// The permission type for this user. While new values may be added in future, the following are currently possible:  
+    /// - file 
+    /// - member
+    #[serde(rename="permissionType")]
+    pub permission_type: Option<String>,
+    /// The primary role for this user. While new values may be added in the future, the following are currently possible:  
+    /// - organizer 
+    /// - fileOrganizer 
+    /// - writer 
+    /// - reader
+    pub role: Option<String>,
+    /// Additional roles for this user. Only commenter is currently possible, though more may be supported in the future.
+    #[serde(rename="additionalRoles")]
+    pub additional_roles: Option<Vec<String>>,
+    /// The ID of the item from which this permission is inherited. This is an output-only field and is only populated for members of the shared drive.
+    #[serde(rename="inheritedFrom")]
+    pub inherited_from: Option<String>,
+}
+
+impl NestedType for PermissionPermissionDetails {}
+impl Part for PermissionPermissionDetails {}
 
 
 /// Metadata about image media. This will only be present for image types, and its contents will depend on what can be parsed from the image content.
@@ -868,7 +926,73 @@ pub struct AppList {
 impl ResponseResult for AppList {}
 
 
-/// Representation of a change to a file or Team Drive.
+/// Capabilities the current user has on this shared drive.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DriveCapabilities {
+    /// Whether the current user can read the revisions resource of files in this shared drive.
+    #[serde(rename="canReadRevisions")]
+    pub can_read_revisions: Option<bool>,
+    /// Whether the current user can copy files in this shared drive.
+    #[serde(rename="canCopy")]
+    pub can_copy: Option<bool>,
+    /// Whether the current user can delete this shared drive. Attempting to delete the shared drive may still fail if there are untrashed items inside the shared drive.
+    #[serde(rename="canDeleteDrive")]
+    pub can_delete_drive: Option<bool>,
+    /// Whether the current user can change the copyRequiresWriterPermission restriction of this shared drive.
+    #[serde(rename="canChangeCopyRequiresWriterPermissionRestriction")]
+    pub can_change_copy_requires_writer_permission_restriction: Option<bool>,
+    /// Whether the current user can trash children from folders in this shared drive.
+    #[serde(rename="canTrashChildren")]
+    pub can_trash_children: Option<bool>,
+    /// Whether the current user can change the driveMembersOnly restriction of this shared drive.
+    #[serde(rename="canChangeDriveMembersOnlyRestriction")]
+    pub can_change_drive_members_only_restriction: Option<bool>,
+    /// Whether the current user can change the background of this shared drive.
+    #[serde(rename="canChangeDriveBackground")]
+    pub can_change_drive_background: Option<bool>,
+    /// Whether the current user can comment on files in this shared drive.
+    #[serde(rename="canComment")]
+    pub can_comment: Option<bool>,
+    /// Whether the current user can delete children from folders in this shared drive.
+    #[serde(rename="canDeleteChildren")]
+    pub can_delete_children: Option<bool>,
+    /// Whether the current user can list the children of folders in this shared drive.
+    #[serde(rename="canListChildren")]
+    pub can_list_children: Option<bool>,
+    /// Whether the current user can rename files or folders in this shared drive.
+    #[serde(rename="canRename")]
+    pub can_rename: Option<bool>,
+    /// Whether the current user can rename this shared drive.
+    #[serde(rename="canRenameDrive")]
+    pub can_rename_drive: Option<bool>,
+    /// Whether the current user can add children to folders in this shared drive.
+    #[serde(rename="canAddChildren")]
+    pub can_add_children: Option<bool>,
+    /// Whether the current user can share files or folders in this shared drive.
+    #[serde(rename="canShare")]
+    pub can_share: Option<bool>,
+    /// Whether the current user can add members to this shared drive or remove them or change their role.
+    #[serde(rename="canManageMembers")]
+    pub can_manage_members: Option<bool>,
+    /// Whether the current user can download files in this shared drive.
+    #[serde(rename="canDownload")]
+    pub can_download: Option<bool>,
+    /// Whether the current user can change the domainUsersOnly restriction of this shared drive.
+    #[serde(rename="canChangeDomainUsersOnlyRestriction")]
+    pub can_change_domain_users_only_restriction: Option<bool>,
+    /// Whether the current user can edit files in this shared drive
+    #[serde(rename="canEdit")]
+    pub can_edit: Option<bool>,
+}
+
+impl NestedType for DriveCapabilities {}
+impl Part for DriveCapabilities {}
+
+
+/// Representation of a change to a file or shared drive.
 /// 
 /// # Activities
 /// 
@@ -882,22 +1006,30 @@ impl ResponseResult for AppList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Change {
-    /// The updated state of the Team Drive. Present if the type is teamDrive, the user is still a member of the Team Drive, and the Team Drive has not been deleted.
+    /// Deprecated - use drive instead.
     #[serde(rename="teamDrive")]
     pub team_drive: Option<TeamDrive>,
     /// This is always drive#change.
     pub kind: Option<String>,
-    /// Whether the file or Team Drive has been removed from this list of changes, for example by deletion or loss of access.
+    /// Whether the file or shared drive has been removed from this list of changes, for example by deletion or loss of access.
     pub deleted: Option<bool>,
+    /// The type of the change. Possible values are file and drive.
+    #[serde(rename="changeType")]
+    pub change_type: Option<String>,
+    /// The updated state of the shared drive. Present if the changeType is drive, the user is still a member of the shared drive, and the shared drive has not been deleted.
+    pub drive: Option<Drive>,
+    /// The ID of the shared drive associated with this change.
+    #[serde(rename="driveId")]
+    pub drive_id: Option<String>,
     /// The updated state of the file. Present if the type is file and the file has not been removed from this list of changes.
     pub file: Option<File>,
     /// The time of this modification.
     #[serde(rename="modificationDate")]
     pub modification_date: Option<String>,
-    /// The ID of the Team Drive associated with this change.
+    /// Deprecated - use driveId instead.
     #[serde(rename="teamDriveId")]
     pub team_drive_id: Option<String>,
-    /// The type of the change. Possible values are file and teamDrive.
+    /// Deprecated - use changeType instead.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The ID of the change.
@@ -972,6 +1104,26 @@ pub struct CommentList {
 }
 
 impl ResponseResult for CommentList {}
+
+
+/// A list of themes that are supported for shared drives.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AboutDriveThemes {
+    /// The color of this theme as an RGB hex string.
+    #[serde(rename="colorRgb")]
+    pub color_rgb: Option<String>,
+    /// A link to this theme's background image.
+    #[serde(rename="backgroundImageLink")]
+    pub background_image_link: Option<String>,
+    /// The ID of the theme.
+    pub id: Option<String>,
+}
+
+impl NestedType for AboutDriveThemes {}
+impl Part for AboutDriveThemes {}
 
 
 /// A list of revisions of a file.
@@ -1144,6 +1296,30 @@ impl NestedType for AboutExportFormats {}
 impl Part for AboutExportFormats {}
 
 
+/// A set of restrictions that apply to this shared drive or items inside this shared drive.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DriveRestrictions {
+    /// Whether administrative privileges on this shared drive are required to modify restrictions.
+    #[serde(rename="adminManagedRestrictions")]
+    pub admin_managed_restrictions: Option<bool>,
+    /// Whether the options to copy, print, or download files inside this shared drive, should be disabled for readers and commenters. When this restriction is set to true, it will override the similarly named field to true for any file inside this shared drive.
+    #[serde(rename="copyRequiresWriterPermission")]
+    pub copy_requires_writer_permission: Option<bool>,
+    /// Whether access to this shared drive and items inside this shared drive is restricted to users of the domain to which this shared drive belongs. This restriction may be overridden by other sharing policies controlled outside of this shared drive.
+    #[serde(rename="domainUsersOnly")]
+    pub domain_users_only: Option<bool>,
+    /// Whether access to items inside this shared drive is restricted to its members.
+    #[serde(rename="driveMembersOnly")]
+    pub drive_members_only: Option<bool>,
+}
+
+impl NestedType for DriveRestrictions {}
+impl Part for DriveRestrictions {}
+
+
 /// The various icons for the app.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1263,7 +1439,7 @@ impl NestedType for AboutAdditionalRoleInfoRoleSets {}
 impl Part for AboutAdditionalRoleInfoRoleSets {}
 
 
-/// A thumbnail for the file. This will only be used if Drive cannot generate a standard thumbnail.
+/// A thumbnail for the file. This will only be used if a standard thumbnail cannot be generated.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1278,6 +1454,29 @@ pub struct FileThumbnail {
 
 impl NestedType for FileThumbnail {}
 impl Part for FileThumbnail {}
+
+
+/// A list of shared drives.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list drives](struct.DriveListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DriveList {
+    /// The page token for the next page of shared drives. This will be absent if the end of the list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of shared drives. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    pub items: Option<Vec<Drive>>,
+    /// This is always drive#driveList
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for DriveList {}
 
 
 /// A list of generated IDs which can be provided in insert requests
@@ -1318,7 +1517,7 @@ pub struct Channel {
     /// A version-specific identifier for the watched resource.
     #[serde(rename="resourceUri")]
     pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
+    /// Identifies this as a notification channel used to watch for changes to a resource, which is "api#channel".
     pub kind: Option<String>,
     /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
     #[serde(rename="resourceId")]
@@ -1369,7 +1568,7 @@ impl NestedType for FileLabels {}
 impl Part for FileLabels {}
 
 
-/// Representation of a Team Drive.
+/// Deprecated: use the drive collection instead.
 /// 
 /// # Activities
 /// 
@@ -1433,6 +1632,9 @@ impl ResponseResult for TeamDrive {}
 pub struct Permission {
     /// The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.
     pub domain: Option<String>,
+    /// Details of whether the permissions on this shared drive item are inherited or directly on this item. This is an output-only field which is present only for shared drive items.
+    #[serde(rename="permissionDetails")]
+    pub permission_details: Option<Vec<PermissionPermissionDetails>>,
     /// Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.
     pub deleted: Option<bool>,
     /// The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.
@@ -1474,7 +1676,7 @@ pub struct Permission {
     /// A link to the profile photo, if available.
     #[serde(rename="photoLink")]
     pub photo_link: Option<String>,
-    /// Details of whether the permissions on this Team Drive item are inherited or directly on this item. This is an output-only field which is present only for Team Drive items.
+    /// Deprecated - use permissionDetails instead.
     #[serde(rename="teamDrivePermissionDetails")]
     pub team_drive_permission_details: Option<Vec<PermissionTeamDrivePermissionDetails>>,
     /// The account type. Allowed values are:  
@@ -1500,31 +1702,40 @@ impl ResponseResult for Permission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileCapabilities {
-    /// Whether the current user can read the revisions resource of this file. For a Team Drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
-    #[serde(rename="canReadRevisions")]
-    pub can_read_revisions: Option<bool>,
+    /// Whether the current user can move this item outside of this drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that is being added.
+    #[serde(rename="canMoveItemOutOfDrive")]
+    pub can_move_item_out_of_drive: Option<bool>,
     /// Whether the current user can restore this file from trash.
     #[serde(rename="canUntrash")]
     pub can_untrash: Option<bool>,
-    /// Whether the current user can copy this file. For a Team Drive item, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
+    /// Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
     #[serde(rename="canCopy")]
     pub can_copy: Option<bool>,
+    /// Whether the current user can move this item within this shared drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for items in shared drives.
+    #[serde(rename="canMoveItemWithinDrive")]
+    pub can_move_item_within_drive: Option<bool>,
+    /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
+    #[serde(rename="canReadRevisions")]
+    pub can_read_revisions: Option<bool>,
+    /// Deprecated - use canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveItemIntoTeamDrive")]
+    pub can_move_item_into_team_drive: Option<bool>,
+    /// Deprecated - use canMoveItemWithinDrive instead.
+    #[serde(rename="canMoveItemWithinTeamDrive")]
+    pub can_move_item_within_team_drive: Option<bool>,
+    /// Deprecated - use canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveItemOutOfTeamDrive")]
+    pub can_move_item_out_of_team_drive: Option<bool>,
+    /// Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
+    #[serde(rename="canDeleteChildren")]
+    pub can_delete_children: Option<bool>,
+    /// Whether the current user can change the copyRequiresWriterPermission restriction of this file.
+    #[serde(rename="canChangeCopyRequiresWriterPermission")]
+    pub can_change_copy_requires_writer_permission: Option<bool>,
     /// Whether the current user can download this file.
     #[serde(rename="canDownload")]
     pub can_download: Option<bool>,
-    /// Whether the current user can move this item into a Team Drive. If the item is in a Team Drive, this field is equivalent to canMoveTeamDriveItem.
-    #[serde(rename="canMoveItemIntoTeamDrive")]
-    pub can_move_item_into_team_drive: Option<bool>,
-    /// Whether the current user can move this Team Drive item within this Team Drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for Team Drive items.
-    #[serde(rename="canMoveItemWithinTeamDrive")]
-    pub can_move_item_within_team_drive: Option<bool>,
-    /// Whether the current user can move this Team Drive item outside of this Team Drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for Team Drive items.
-    #[serde(rename="canMoveItemOutOfTeamDrive")]
-    pub can_move_item_out_of_team_drive: Option<bool>,
-    /// Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for Team Drive items.
-    #[serde(rename="canDeleteChildren")]
-    pub can_delete_children: Option<bool>,
-    /// Whether the current user can move children of this folder within the Team Drive. This is false when the item is not a folder. Only populated for Team Drive items.
+    /// Deprecated - use canMoveChildrenWithinDrive instead.
     #[serde(rename="canMoveChildrenWithinTeamDrive")]
     pub can_move_children_within_team_drive: Option<bool>,
     /// Whether the current user can comment on this file.
@@ -1542,7 +1753,10 @@ pub struct FileCapabilities {
     /// Whether the current user can delete this file.
     #[serde(rename="canDelete")]
     pub can_delete: Option<bool>,
-    /// Deprecated - use canMoveItemWithinTeamDrive or canMoveItemOutOfTeamDrive instead.
+    /// Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.
+    #[serde(rename="canReadDrive")]
+    pub can_read_drive: Option<bool>,
+    /// Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.
     #[serde(rename="canMoveTeamDriveItem")]
     pub can_move_team_drive_item: Option<bool>,
     /// Whether the current user can add children to this folder. This is always false when the item is not a folder.
@@ -1554,24 +1768,27 @@ pub struct FileCapabilities {
     /// Whether the current user can modify the sharing settings for this file.
     #[serde(rename="canShare")]
     pub can_share: Option<bool>,
-    /// Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for Team Drive items.
+    /// Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canTrashChildren")]
     pub can_trash_children: Option<bool>,
-    /// Whether the current user can change the copyRequiresWriterPermission restriction of this file.
-    #[serde(rename="canChangeCopyRequiresWriterPermission")]
-    pub can_change_copy_requires_writer_permission: Option<bool>,
-    /// Whether the current user can move children of this folder outside of the Team Drive. This is false when the item is not a folder. Only populated for Team Drive items.
-    #[serde(rename="canMoveChildrenOutOfTeamDrive")]
-    pub can_move_children_out_of_team_drive: Option<bool>,
-    /// Whether the current user can remove children from this folder. This is always false when the item is not a folder. For Team Drive items, use canDeleteChildren or canTrashChildren instead.
-    #[serde(rename="canRemoveChildren")]
-    pub can_remove_children: Option<bool>,
-    /// Whether the current user can read the Team Drive to which this file belongs. Only populated for Team Drive files.
-    #[serde(rename="canReadTeamDrive")]
-    pub can_read_team_drive: Option<bool>,
     /// Whether the current user can edit this file.
     #[serde(rename="canEdit")]
     pub can_edit: Option<bool>,
+    /// Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
+    #[serde(rename="canMoveChildrenOutOfDrive")]
+    pub can_move_children_out_of_drive: Option<bool>,
+    /// Deprecated - use canMoveChildrenOutOfDrive instead.
+    #[serde(rename="canMoveChildrenOutOfTeamDrive")]
+    pub can_move_children_out_of_team_drive: Option<bool>,
+    /// Whether the current user can remove children from this folder. This is always false when the item is not a folder. For a folder in a shared drive, use canDeleteChildren or canTrashChildren instead.
+    #[serde(rename="canRemoveChildren")]
+    pub can_remove_children: Option<bool>,
+    /// Deprecated - use canReadDrive instead.
+    #[serde(rename="canReadTeamDrive")]
+    pub can_read_team_drive: Option<bool>,
+    /// Whether the current user can move children of this folder within the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
+    #[serde(rename="canMoveChildrenWithinDrive")]
+    pub can_move_children_within_drive: Option<bool>,
 }
 
 impl NestedType for FileCapabilities {}
@@ -1602,29 +1819,23 @@ impl NestedType for TeamDriveRestrictions {}
 impl Part for TeamDriveRestrictions {}
 
 
-/// Details of whether the permissions on this Team Drive item are inherited or directly on this item. This is an output-only field which is present only for Team Drive items.
+/// Deprecated - use permissionDetails instead.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionTeamDrivePermissionDetails {
-    /// Whether this permission is inherited. This field is always populated. This is an output-only field.
+    /// Deprecated - use permissionDetails/inherited instead.
     pub inherited: Option<bool>,
-    /// The Team Drive permission type for this user. While new values may be added in future, the following are currently possible:  
-    /// - file 
-    /// - member
+    /// Deprecated - use permissionDetails/permissionType instead.
     #[serde(rename="teamDrivePermissionType")]
     pub team_drive_permission_type: Option<String>,
-    /// The primary role for this user. While new values may be added in the future, the following are currently possible:  
-    /// - organizer 
-    /// - fileOrganizer 
-    /// - writer 
-    /// - reader
+    /// Deprecated - use permissionDetails/role instead.
     pub role: Option<String>,
-    /// Additional roles for this user. Only commenter is currently possible, though more may be supported in the future.
+    /// Deprecated - use permissionDetails/additionalRoles instead.
     #[serde(rename="additionalRoles")]
     pub additional_roles: Option<Vec<String>>,
-    /// The ID of the item from which this permission is inherited. This is an output-only field and is only populated for members of the Team Drive.
+    /// Deprecated - use permissionDetails/inheritedFrom instead.
     #[serde(rename="inheritedFrom")]
     pub inherited_from: Option<String>,
 }
@@ -1644,7 +1855,7 @@ impl Part for PermissionTeamDrivePermissionDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileList {
-    /// Whether the search process was incomplete. If true, then some search results may be missing, since all documents were not searched. This may occur when searching multiple Team Drives with the "default,allTeamDrives" corpora, but all corpora could not be searched. When this happens, it is suggested that clients narrow their query by choosing a different corpus such as "default" or "teamDrive".
+    /// Whether the search process was incomplete. If true, then some search results may be missing, since all documents were not searched. This may occur when searching multiple drives with the "allDrives" corpora, but all corpora could not be searched. When this happens, it is suggested that clients narrow their query by choosing a different corpus such as "default" or "drive".
     #[serde(rename="incompleteSearch")]
     pub incomplete_search: Option<bool>,
     /// The page token for the next page of files. This will be absent if the end of the files list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
@@ -1827,12 +2038,15 @@ pub struct About {
     /// List of max upload sizes for each file type. The most specific type takes precedence.
     #[serde(rename="maxUploadSizes")]
     pub max_upload_sizes: Option<Vec<AboutMaxUploadSizes>>,
+    /// A list of themes that are supported for shared drives.
+    #[serde(rename="driveThemes")]
+    pub drive_themes: Option<Vec<AboutDriveThemes>>,
     /// The current user's ID as visible in the permissions collection.
     #[serde(rename="permissionId")]
     pub permission_id: Option<String>,
     /// The name of the current user.
     pub name: Option<String>,
-    /// A list of themes that are supported for Team Drives.
+    /// Deprecated - use driveThemes instead.
     #[serde(rename="teamDriveThemes")]
     pub team_drive_themes: Option<Vec<AboutTeamDriveThemes>>,
     /// The total number of quota bytes.
@@ -1846,9 +2060,12 @@ pub struct About {
     /// The allowable import formats.
     #[serde(rename="importFormats")]
     pub import_formats: Option<Vec<AboutImportFormats>>,
-    /// Whether the user can create Team Drives.
+    /// Deprecated - use canCreateDrives instead.
     #[serde(rename="canCreateTeamDrives")]
     pub can_create_team_drives: Option<bool>,
+    /// Whether the user can create shared drives.
+    #[serde(rename="canCreateDrives")]
+    pub can_create_drives: Option<bool>,
     /// The id of the root folder.
     #[serde(rename="rootFolderId")]
     pub root_folder_id: Option<String>,
@@ -1879,19 +2096,19 @@ pub struct About {
 impl ResponseResult for About {}
 
 
-/// A list of themes that are supported for Team Drives.
+/// Deprecated - use driveThemes instead.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AboutTeamDriveThemes {
-    /// The color of this Team Drive theme as an RGB hex string.
+    /// Deprecated - use driveThemes/colorRgb instead.
     #[serde(rename="colorRgb")]
     pub color_rgb: Option<String>,
-    /// A link to this Team Drive theme's background image.
+    /// Deprecated - use driveThemes/backgroundImageLink instead.
     #[serde(rename="backgroundImageLink")]
     pub background_image_link: Option<String>,
-    /// The ID of the theme.
+    /// Deprecated - use driveThemes/id instead.
     pub id: Option<String>,
 }
 
@@ -1918,6 +2135,57 @@ pub struct StartPageToken {
 }
 
 impl ResponseResult for StartPageToken {}
+
+
+/// Representation of a shared drive.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list drives](struct.DriveListCall.html) (none)
+/// * [unhide drives](struct.DriveUnhideCall.html) (response)
+/// * [hide drives](struct.DriveHideCall.html) (response)
+/// * [delete drives](struct.DriveDeleteCall.html) (none)
+/// * [update drives](struct.DriveUpdateCall.html) (request|response)
+/// * [get drives](struct.DriveGetCall.html) (response)
+/// * [insert drives](struct.DriveInsertCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Drive {
+    /// A set of restrictions that apply to this shared drive or items inside this shared drive.
+    pub restrictions: Option<DriveRestrictions>,
+    /// The color of this shared drive as an RGB hex string. It can only be set on a drive.drives.update request that does not set themeId.
+    #[serde(rename="colorRgb")]
+    pub color_rgb: Option<String>,
+    /// A short-lived link to this shared drive's background image.
+    #[serde(rename="backgroundImageLink")]
+    pub background_image_link: Option<String>,
+    /// The name of this shared drive.
+    pub name: Option<String>,
+    /// The ID of the theme from which the background image and color will be set. The set of possible driveThemes can be retrieved from a drive.about.get response. When not specified on a drive.drives.insert request, a random theme is chosen from which the background image and color are set. This is a write-only field; it can only be set on requests that don't set colorRgb or backgroundImageFile.
+    #[serde(rename="themeId")]
+    pub theme_id: Option<String>,
+    /// This is always drive#drive
+    pub kind: Option<String>,
+    /// Capabilities the current user has on this shared drive.
+    pub capabilities: Option<DriveCapabilities>,
+    /// An image file and cropping parameters from which a background image for this shared drive is set. This is a write only field; it can only be set on drive.drives.update requests that don't set themeId. When specified, all fields of the backgroundImageFile must be set.
+    #[serde(rename="backgroundImageFile")]
+    pub background_image_file: Option<DriveBackgroundImageFile>,
+    /// The time at which the shared drive was created (RFC 3339 date-time).
+    #[serde(rename="createdDate")]
+    pub created_date: Option<String>,
+    /// Whether the shared drive is hidden from default view.
+    pub hidden: Option<bool>,
+    /// The ID of this shared drive which is also the ID of the top level folder of this shared drive.
+    pub id: Option<String>,
+}
+
+impl RequestValue for Drive {}
+impl Resource for Drive {}
+impl ResponseResult for Drive {}
 
 
 /// A key-value pair attached to a file that is either public or private to an application.
@@ -2178,7 +2446,7 @@ pub struct File {
     /// Name of the last user to modify this file.
     #[serde(rename="lastModifyingUserName")]
     pub last_modifying_user_name: Option<String>,
-    /// Whether writers can share the document with other users. Not populated for Team Drive files.
+    /// Whether writers can share the document with other users. Not populated for items in shared drives.
     #[serde(rename="writersCanShare")]
     pub writers_can_share: Option<bool>,
     /// User that shared the item with the current user, if available.
@@ -2203,10 +2471,10 @@ pub struct File {
     /// Whether the options to copy, print, or download this file, should be disabled for readers and commenters.
     #[serde(rename="copyRequiresWriterPermission")]
     pub copy_requires_writer_permission: Option<bool>,
-    /// The full file extension; extracted from the title. May contain multiple concatenated extensions, such as "tar.gz". Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.
+    /// The full file extension; extracted from the title. May contain multiple concatenated extensions, such as "tar.gz". Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
     #[serde(rename="fullFileExtension")]
     pub full_file_extension: Option<String>,
-    /// The time that the item was trashed (formatted RFC 3339 timestamp). Only populated for Team Drive files.
+    /// The time that the item was trashed (formatted RFC 3339 timestamp). Only populated for items in shared drives.
     #[serde(rename="trashedDate")]
     pub trashed_date: Option<String>,
     /// Deprecated: use capabilities/canReadRevisions.
@@ -2229,10 +2497,10 @@ pub struct File {
     /// Create time for this file (formatted RFC 3339 timestamp).
     #[serde(rename="createdDate")]
     pub created_date: Option<String>,
-    /// ID of the Team Drive the file resides in.
+    /// Deprecated - use driveId instead.
     #[serde(rename="teamDriveId")]
     pub team_drive_id: Option<String>,
-    /// An MD5 checksum for the content of this file. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.
+    /// An MD5 checksum for the content of this file. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
     #[serde(rename="md5Checksum")]
     pub md5_checksum: Option<String>,
     /// A link to the file's icon.
@@ -2246,26 +2514,26 @@ pub struct File {
     /// A link for opening the file in a relevant Google editor or viewer.
     #[serde(rename="alternateLink")]
     pub alternate_link: Option<String>,
-    /// Short lived download URL for the file. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.
-    #[serde(rename="downloadUrl")]
-    pub download_url: Option<String>,
+    /// ID of the shared drive the file resides in. Only populated for items in shared drives.
+    #[serde(rename="driveId")]
+    pub drive_id: Option<String>,
     /// The permissions for the authenticated user on this file.
     #[serde(rename="userPermission")]
     pub user_permission: Option<Permission>,
     /// Deprecated: use capabilities/canShare.
     pub shareable: Option<bool>,
-    /// The original filename of the uploaded content if available, or else the original value of the title field. This is only available for files with binary content in Drive.
+    /// The original filename of the uploaded content if available, or else the original value of the title field. This is only available for files with binary content in Google Drive.
     #[serde(rename="originalFilename")]
     pub original_filename: Option<String>,
-    /// The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.
+    /// The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
     #[serde(rename="fileExtension")]
     pub file_extension: Option<String>,
-    /// Whether any users are granted file access directly on this file. This field is only populated for Team Drive files.
+    /// Whether any users are granted file access directly on this file. This field is only populated for items in shared drives.
     #[serde(rename="hasAugmentedPermissions")]
     pub has_augmented_permissions: Option<bool>,
-    /// The list of permissions for users with access to this file. Not populated for Team Drive files.
+    /// The list of permissions for users with access to this file. Not populated for items in shared drives.
     pub permissions: Option<Vec<Permission>>,
-    /// The ID of the file's head revision. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.
+    /// The ID of the file's head revision. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
     #[serde(rename="headRevisionId")]
     pub head_revision_id: Option<String>,
     /// The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content's MIME type.
@@ -2282,18 +2550,21 @@ pub struct File {
     pub explicitly_trashed: Option<bool>,
     /// ETag of the file.
     pub etag: Option<String>,
-    /// Whether the file is owned by the current user. Not populated for Team Drive files.
+    /// Whether the file is owned by the current user. Not populated for items in shared drives.
     #[serde(rename="ownedByMe")]
     pub owned_by_me: Option<bool>,
     /// The ID of the file.
     pub id: Option<String>,
+    /// Short lived download URL for the file. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
+    #[serde(rename="downloadUrl")]
+    pub download_url: Option<String>,
     /// Metadata about video media. This will only be present for video types.
     #[serde(rename="videoMediaMetadata")]
     pub video_media_metadata: Option<FileVideoMediaMetadata>,
-    /// Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette. Not populated for Team Drive files.
+    /// Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette. Not populated for items in shared drives.
     #[serde(rename="folderColorRgb")]
     pub folder_color_rgb: Option<String>,
-    /// Name(s) of the owner(s) of this file. Not populated for Team Drive files.
+    /// Name(s) of the owner(s) of this file. Not populated for items in shared drives.
     #[serde(rename="ownerNames")]
     pub owner_names: Option<Vec<String>>,
     /// Time at which this file was shared with the user (formatted RFC 3339 timestamp).
@@ -2304,9 +2575,9 @@ pub struct File {
     /// Links for exporting Google Docs to specific formats.
     #[serde(rename="exportLinks")]
     pub export_links: Option<HashMap<String, String>>,
-    /// Whether the file has been shared. Not populated for Team Drive files.
+    /// Whether the file has been shared. Not populated for items in shared drives.
     pub shared: Option<bool>,
-    /// A thumbnail for the file. This will only be used if Drive cannot generate a standard thumbnail.
+    /// A thumbnail for the file. This will only be used if a standard thumbnail cannot be generated.
     pub thumbnail: Option<FileThumbnail>,
     /// A map of the id of each of the user's apps to a link to open this file with that app. Only populated when the drive.apps.readonly scope is used.
     #[serde(rename="openWithLinks")]
@@ -2319,19 +2590,19 @@ pub struct File {
     /// Deprecated.
     #[serde(rename="markedViewedByMeDate")]
     pub marked_viewed_by_me_date: Option<String>,
-    /// The size of the file in bytes. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.
+    /// The size of the file in bytes. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
     #[serde(rename="fileSize")]
     pub file_size: Option<String>,
     /// The list of properties.
     pub properties: Option<Vec<Property>>,
-    /// The owner(s) of this file. Not populated for Team Drive files.
+    /// The owner(s) of this file. Not populated for items in shared drives.
     pub owners: Option<Vec<User>>,
-    /// The title of this file. Note that for immutable items such as the top level folders of Team Drives, My Drive root folder, and Application Data folder the title is constant.
+    /// The title of this file. Note that for immutable items such as the top level folders of shared drives, My Drive root folder, and Application Data folder the title is constant.
     pub title: Option<String>,
     /// Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.
     #[serde(rename="modifiedByMeDate")]
     pub modified_by_me_date: Option<String>,
-    /// If the file has been explicitly trashed, the user who trashed it. Only populated for Team Drive files.
+    /// If the file has been explicitly trashed, the user who trashed it. Only populated for items in shared drives.
     #[serde(rename="trashingUser")]
     pub trashing_user: Option<User>,
     /// List of permission IDs for users with access to this file.
@@ -2407,7 +2678,7 @@ impl ResponseResult for TeamDriveList {}
 // #################
 
 /// A builder providing access to all methods supported on *file* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -2422,13 +2693,13 @@ impl ResponseResult for TeamDriveList {}
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `copy(...)`, `delete(...)`, `empty_trash(...)`, `export(...)`, `generate_ids(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)`, `touch(...)`, `trash(...)`, `untrash(...)`, `update(...)` and `watch(...)`
 /// // to build up your call.
@@ -2438,7 +2709,7 @@ impl ResponseResult for TeamDriveList {}
 pub struct FileMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for FileMethods<'a, C, A> {}
@@ -2460,6 +2731,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _update_viewed_date: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _revision_id: Default::default(),
             _projection: Default::default(),
             _acknowledge_abuse: Default::default(),
@@ -2485,6 +2757,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _timed_text_track_name: Default::default(),
             _timed_text_language: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _pinned: Default::default(),
             _ocr_language: Default::default(),
             _ocr: Default::default(),
@@ -2507,6 +2780,26 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             hub: self.hub,
             _file_id: file_id.to_string(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file or be an organizer on the parent for shared drive files.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file to delete.
+    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a, C, A> {
+        FileDeleteCall {
+            hub: self.hub,
+            _file_id: file_id.to_string(),
+            _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2530,6 +2823,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _timed_text_track_name: Default::default(),
             _timed_text_language: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _pinned: Default::default(),
             _ocr_language: Default::default(),
             _ocr: Default::default(),
@@ -2542,7 +2836,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves a file to the trash. The currently authenticated user must own the file or be at least a fileOrganizer on the parent for Team Drive files.
+    /// Moves a file to the trash. The currently authenticated user must own the file or be at least a fileOrganizer on the parent for shared drive files.
     /// 
     /// # Arguments
     ///
@@ -2552,6 +2846,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             hub: self.hub,
             _file_id: file_id.to_string(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2597,6 +2892,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             hub: self.hub,
             _team_drive_id: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _spaces: Default::default(),
             _q: Default::default(),
             _projection: Default::default(),
@@ -2604,6 +2900,8 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _order_by: Default::default(),
             _max_results: Default::default(),
             _include_team_drive_items: Default::default(),
+            _include_items_from_all_drives: Default::default(),
+            _drive_id: Default::default(),
             _corpus: Default::default(),
             _corpora: Default::default(),
             _delegate: Default::default(),
@@ -2624,6 +2922,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             hub: self.hub,
             _file_id: file_id.to_string(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2632,7 +2931,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates a set of file IDs which can be provided in insert requests.
+    /// Generates a set of file IDs which can be provided in insert or copy requests.
     pub fn generate_ids(&self) -> FileGenerateIdCall<'a, C, A> {
         FileGenerateIdCall {
             hub: self.hub,
@@ -2662,6 +2961,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _timed_text_track_name: Default::default(),
             _timed_text_language: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _set_modified_date: Default::default(),
             _remove_parents: Default::default(),
             _pinned: Default::default(),
@@ -2671,24 +2971,6 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _modified_date_behavior: Default::default(),
             _convert: Default::default(),
             _add_parents: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file or be an organizer on the parent for Team Drive files.
-    /// 
-    /// # Arguments
-    ///
-    /// * `fileId` - The ID of the file to delete.
-    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a, C, A> {
-        FileDeleteCall {
-            hub: self.hub,
-            _file_id: file_id.to_string(),
-            _supports_team_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2713,6 +2995,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _timed_text_track_name: Default::default(),
             _timed_text_language: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _set_modified_date: Default::default(),
             _remove_parents: Default::default(),
             _pinned: Default::default(),
@@ -2741,6 +3024,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _update_viewed_date: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _revision_id: Default::default(),
             _projection: Default::default(),
             _acknowledge_abuse: Default::default(),
@@ -2754,7 +3038,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *teamdrive* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -2769,13 +3053,13 @@ impl<'a, C, A> FileMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
@@ -2785,7 +3069,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
 pub struct TeamdriveMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for TeamdriveMethods<'a, C, A> {}
@@ -2794,7 +3078,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new Team Drive.
+    /// Deprecated use drives.insert instead.
     /// 
     /// # Arguments
     ///
@@ -2813,7 +3097,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a Team Drive's metadata by ID.
+    /// Deprecated use drives.get instead.
     /// 
     /// # Arguments
     ///
@@ -2831,7 +3115,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the user's Team Drives.
+    /// Deprecated use drives.list instead.
     pub fn list(&self) -> TeamdriveListCall<'a, C, A> {
         TeamdriveListCall {
             hub: self.hub,
@@ -2847,7 +3131,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes a Team Drive for which the user is an organizer. The Team Drive cannot contain any untrashed items.
+    /// Deprecated use drives.delete instead.
     /// 
     /// # Arguments
     ///
@@ -2864,7 +3148,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Team Drive's metadata
+    /// Deprecated use drives.update instead.
     /// 
     /// # Arguments
     ///
@@ -2886,7 +3170,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *realtime* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -2901,13 +3185,13 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `update(...)`
 /// // to build up your call.
@@ -2917,7 +3201,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
 pub struct RealtimeMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for RealtimeMethods<'a, C, A> {}
@@ -2964,7 +3248,7 @@ impl<'a, C, A> RealtimeMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *app* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -2979,13 +3263,13 @@ impl<'a, C, A> RealtimeMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
@@ -2995,7 +3279,7 @@ impl<'a, C, A> RealtimeMethods<'a, C, A> {
 pub struct AppMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for AppMethods<'a, C, A> {}
@@ -3037,8 +3321,8 @@ impl<'a, C, A> AppMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *about* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// A builder providing access to all methods supported on *drive* resources.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3053,38 +3337,147 @@ impl<'a, C, A> AppMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`
+/// // like `delete(...)`, `get(...)`, `hide(...)`, `insert(...)`, `list(...)`, `unhide(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.about();
+/// let rb = hub.drives();
 /// # }
 /// ```
-pub struct AboutMethods<'a, C, A>
+pub struct DriveMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for AboutMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for DriveMethods<'a, C, A> {}
 
-impl<'a, C, A> AboutMethods<'a, C, A> {
+impl<'a, C, A> DriveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the information about the current user along with Drive API settings
-    pub fn get(&self) -> AboutGetCall<'a, C, A> {
-        AboutGetCall {
+    /// Updates the metadata for a shared drive.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `driveId` - The ID of the shared drive.
+    pub fn update(&self, request: Drive, drive_id: &str) -> DriveUpdateCall<'a, C, A> {
+        DriveUpdateCall {
             hub: self.hub,
-            _start_change_id: Default::default(),
-            _max_change_id_count: Default::default(),
-            _include_subscribed: Default::default(),
+            _request: request,
+            _drive_id: drive_id.to_string(),
+            _use_domain_admin_access: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Restores a shared drive to the default view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `driveId` - The ID of the shared drive.
+    pub fn unhide(&self, drive_id: &str) -> DriveUnhideCall<'a, C, A> {
+        DriveUnhideCall {
+            hub: self.hub,
+            _drive_id: drive_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Permanently deletes a shared drive for which the user is an organizer. The shared drive cannot contain any untrashed items.
+    /// 
+    /// # Arguments
+    ///
+    /// * `driveId` - The ID of the shared drive.
+    pub fn delete(&self, drive_id: &str) -> DriveDeleteCall<'a, C, A> {
+        DriveDeleteCall {
+            hub: self.hub,
+            _drive_id: drive_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new shared drive.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `requestId` - An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a shared drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same shared drive. If the shared drive already exists a 409 error will be returned.
+    pub fn insert(&self, request: Drive, request_id: &str) -> DriveInsertCall<'a, C, A> {
+        DriveInsertCall {
+            hub: self.hub,
+            _request: request,
+            _request_id: request_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the user's shared drives.
+    pub fn list(&self) -> DriveListCall<'a, C, A> {
+        DriveListCall {
+            hub: self.hub,
+            _use_domain_admin_access: Default::default(),
+            _q: Default::default(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a shared drive's metadata by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `driveId` - The ID of the shared drive.
+    pub fn get(&self, drive_id: &str) -> DriveGetCall<'a, C, A> {
+        DriveGetCall {
+            hub: self.hub,
+            _drive_id: drive_id.to_string(),
+            _use_domain_admin_access: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Hides a shared drive from the default view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `driveId` - The ID of the shared drive.
+    pub fn hide(&self, drive_id: &str) -> DriveHideCall<'a, C, A> {
+        DriveHideCall {
+            hub: self.hub,
+            _drive_id: drive_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3095,7 +3488,7 @@ impl<'a, C, A> AboutMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *comment* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3110,13 +3503,13 @@ impl<'a, C, A> AboutMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -3126,7 +3519,7 @@ impl<'a, C, A> AboutMethods<'a, C, A> {
 pub struct CommentMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for CommentMethods<'a, C, A> {}
@@ -3258,7 +3651,7 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *children* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3273,13 +3666,13 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
@@ -3289,7 +3682,7 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
 pub struct ChildrenMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ChildrenMethods<'a, C, A> {}
@@ -3369,6 +3762,7 @@ impl<'a, C, A> ChildrenMethods<'a, C, A> {
             _request: request,
             _folder_id: folder_id.to_string(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3379,7 +3773,7 @@ impl<'a, C, A> ChildrenMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *channel* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3394,13 +3788,13 @@ impl<'a, C, A> ChildrenMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `stop(...)`
 /// // to build up your call.
@@ -3410,7 +3804,7 @@ impl<'a, C, A> ChildrenMethods<'a, C, A> {
 pub struct ChannelMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
@@ -3438,7 +3832,7 @@ impl<'a, C, A> ChannelMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *parent* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3453,13 +3847,13 @@ impl<'a, C, A> ChannelMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
@@ -3469,7 +3863,7 @@ impl<'a, C, A> ChannelMethods<'a, C, A> {
 pub struct ParentMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ParentMethods<'a, C, A> {}
@@ -3526,6 +3920,7 @@ impl<'a, C, A> ParentMethods<'a, C, A> {
             _request: request,
             _file_id: file_id.to_string(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3555,7 +3950,7 @@ impl<'a, C, A> ParentMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *reply* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3570,13 +3965,13 @@ impl<'a, C, A> ParentMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -3586,7 +3981,7 @@ impl<'a, C, A> ParentMethods<'a, C, A> {
 pub struct ReplyMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ReplyMethods<'a, C, A> {}
@@ -3610,6 +4005,27 @@ impl<'a, C, A> ReplyMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _comment_id: comment_id.to_string(),
             _reply_id: reply_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new reply to the given comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
+    pub fn insert(&self, request: CommentReply, file_id: &str, comment_id: &str) -> ReplyInsertCall<'a, C, A> {
+        ReplyInsertCall {
+            hub: self.hub,
+            _request: request,
+            _file_id: file_id.to_string(),
+            _comment_id: comment_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3654,27 +4070,6 @@ impl<'a, C, A> ReplyMethods<'a, C, A> {
             _comment_id: comment_id.to_string(),
             _reply_id: reply_id.to_string(),
             _include_deleted: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates a new reply to the given comment.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `fileId` - The ID of the file.
-    /// * `commentId` - The ID of the comment.
-    pub fn insert(&self, request: CommentReply, file_id: &str, comment_id: &str) -> ReplyInsertCall<'a, C, A> {
-        ReplyInsertCall {
-            hub: self.hub,
-            _request: request,
-            _file_id: file_id.to_string(),
-            _comment_id: comment_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3728,8 +4123,8 @@ impl<'a, C, A> ReplyMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *permission* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// A builder providing access to all methods supported on *about* resources.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3744,13 +4139,70 @@ impl<'a, C, A> ReplyMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`
+/// // to build up your call.
+/// let rb = hub.about();
+/// # }
+/// ```
+pub struct AboutMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for AboutMethods<'a, C, A> {}
+
+impl<'a, C, A> AboutMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the information about the current user along with Drive API settings
+    pub fn get(&self) -> AboutGetCall<'a, C, A> {
+        AboutGetCall {
+            hub: self.hub,
+            _start_change_id: Default::default(),
+            _max_change_id_count: Default::default(),
+            _include_subscribed: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *permission* resources.
+/// It is not used directly, but through the `DriveHub` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_drive2 as drive2;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use drive2::DriveHub;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `get_id_for_email(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -3760,7 +4212,7 @@ impl<'a, C, A> ReplyMethods<'a, C, A> {
 pub struct PermissionMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for PermissionMethods<'a, C, A> {}
@@ -3769,11 +4221,11 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a permission from a file or Team Drive.
+    /// Deletes a permission from a file or shared drive.
     /// 
     /// # Arguments
     ///
-    /// * `fileId` - The ID for the file or Team Drive.
+    /// * `fileId` - The ID for the file or shared drive.
     /// * `permissionId` - The ID for the permission.
     pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a, C, A> {
         PermissionDeleteCall {
@@ -3782,29 +4234,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _permission_id: permission_id.to_string(),
             _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Inserts a permission for a file or Team Drive.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `fileId` - The ID for the file or Team Drive.
-    pub fn insert(&self, request: Permission, file_id: &str) -> PermissionInsertCall<'a, C, A> {
-        PermissionInsertCall {
-            hub: self.hub,
-            _request: request,
-            _file_id: file_id.to_string(),
-            _use_domain_admin_access: Default::default(),
-            _supports_team_drives: Default::default(),
-            _send_notification_emails: Default::default(),
-            _email_message: Default::default(),
+            _supports_all_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3818,7 +4248,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `fileId` - The ID for the file or Team Drive.
+    /// * `fileId` - The ID for the file or shared drive.
     /// * `permissionId` - The ID for the permission.
     pub fn patch(&self, request: Permission, file_id: &str, permission_id: &str) -> PermissionPatchCall<'a, C, A> {
         PermissionPatchCall {
@@ -3829,6 +4259,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _use_domain_admin_access: Default::default(),
             _transfer_ownership: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _remove_expiration: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3838,17 +4269,18 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's or Team Drive's permissions.
+    /// Lists a file's or shared drive's permissions.
     /// 
     /// # Arguments
     ///
-    /// * `fileId` - The ID for the file or Team Drive.
+    /// * `fileId` - The ID for the file or shared drive.
     pub fn list(&self, file_id: &str) -> PermissionListCall<'a, C, A> {
         PermissionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
             _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _delegate: Default::default(),
@@ -3864,7 +4296,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `fileId` - The ID for the file or Team Drive.
+    /// * `fileId` - The ID for the file or shared drive.
     /// * `permissionId` - The ID for the permission.
     pub fn update(&self, request: Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a, C, A> {
         PermissionUpdateCall {
@@ -3875,6 +4307,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _use_domain_admin_access: Default::default(),
             _transfer_ownership: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _remove_expiration: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3888,7 +4321,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `fileId` - The ID for the file or Team Drive.
+    /// * `fileId` - The ID for the file or shared drive.
     /// * `permissionId` - The ID for the permission.
     pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a, C, A> {
         PermissionGetCall {
@@ -3897,6 +4330,31 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _permission_id: permission_id.to_string(),
             _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Inserts a permission for a file or shared drive.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file or shared drive.
+    pub fn insert(&self, request: Permission, file_id: &str) -> PermissionInsertCall<'a, C, A> {
+        PermissionInsertCall {
+            hub: self.hub,
+            _request: request,
+            _file_id: file_id.to_string(),
+            _use_domain_admin_access: Default::default(),
+            _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
+            _send_notification_emails: Default::default(),
+            _email_message: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3924,7 +4382,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *change* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -3939,13 +4397,13 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `get_start_page_token(...)`, `list(...)` and `watch(...)`
 /// // to build up your call.
@@ -3955,7 +4413,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
 pub struct ChangeMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for ChangeMethods<'a, C, A> {}
@@ -3970,6 +4428,8 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
             hub: self.hub,
             _team_drive_id: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
+            _drive_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3978,47 +4438,23 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Subscribe to changes for a user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn watch(&self, request: Channel) -> ChangeWatchCall<'a, C, A> {
-        ChangeWatchCall {
-            hub: self.hub,
-            _request: request,
-            _team_drive_id: Default::default(),
-            _supports_team_drives: Default::default(),
-            _start_change_id: Default::default(),
-            _spaces: Default::default(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _include_team_drive_items: Default::default(),
-            _include_subscribed: Default::default(),
-            _include_deleted: Default::default(),
-            _include_corpus_removals: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists the changes for a user or Team Drive.
+    /// Lists the changes for a user or shared drive.
     pub fn list(&self) -> ChangeListCall<'a, C, A> {
         ChangeListCall {
             hub: self.hub,
             _team_drive_id: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
             _start_change_id: Default::default(),
             _spaces: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _include_team_drive_items: Default::default(),
             _include_subscribed: Default::default(),
+            _include_items_from_all_drives: Default::default(),
             _include_deleted: Default::default(),
             _include_corpus_removals: Default::default(),
+            _drive_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4038,6 +4474,38 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
             _change_id: change_id.to_string(),
             _team_drive_id: Default::default(),
             _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
+            _drive_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Subscribe to changes for a user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn watch(&self, request: Channel) -> ChangeWatchCall<'a, C, A> {
+        ChangeWatchCall {
+            hub: self.hub,
+            _request: request,
+            _team_drive_id: Default::default(),
+            _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
+            _start_change_id: Default::default(),
+            _spaces: Default::default(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _include_team_drive_items: Default::default(),
+            _include_subscribed: Default::default(),
+            _include_items_from_all_drives: Default::default(),
+            _include_deleted: Default::default(),
+            _include_corpus_removals: Default::default(),
+            _drive_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4048,7 +4516,7 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *property* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -4063,13 +4531,13 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -4079,34 +4547,12 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
 pub struct PropertyMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for PropertyMethods<'a, C, A> {}
 
 impl<'a, C, A> PropertyMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates a property.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `fileId` - The ID of the file.
-    /// * `propertyKey` - The key of the property.
-    pub fn patch(&self, request: Property, file_id: &str, property_key: &str) -> PropertyPatchCall<'a, C, A> {
-        PropertyPatchCall {
-            hub: self.hub,
-            _request: request,
-            _file_id: file_id.to_string(),
-            _property_key: property_key.to_string(),
-            _visibility: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4188,6 +4634,28 @@ impl<'a, C, A> PropertyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates a property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `propertyKey` - The key of the property.
+    pub fn patch(&self, request: Property, file_id: &str, property_key: &str) -> PropertyPatchCall<'a, C, A> {
+        PropertyPatchCall {
+            hub: self.hub,
+            _request: request,
+            _file_id: file_id.to_string(),
+            _property_key: property_key.to_string(),
+            _visibility: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a property by its key.
     /// 
     /// # Arguments
@@ -4210,7 +4678,7 @@ impl<'a, C, A> PropertyMethods<'a, C, A> {
 
 
 /// A builder providing access to all methods supported on *revision* resources.
-/// It is not used directly, but through the `Drive` hub.
+/// It is not used directly, but through the `DriveHub` hub.
 ///
 /// # Example
 ///
@@ -4225,13 +4693,13 @@ impl<'a, C, A> PropertyMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::Drive;
+/// use drive2::DriveHub;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -4241,31 +4709,12 @@ impl<'a, C, A> PropertyMethods<'a, C, A> {
 pub struct RevisionMethods<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
 }
 
 impl<'a, C, A> MethodsBuilder for RevisionMethods<'a, C, A> {}
 
 impl<'a, C, A> RevisionMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Gets a specific revision.
-    /// 
-    /// # Arguments
-    ///
-    /// * `fileId` - The ID of the file.
-    /// * `revisionId` - The ID of the revision.
-    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a, C, A> {
-        RevisionGetCall {
-            hub: self.hub,
-            _file_id: file_id.to_string(),
-            _revision_id: revision_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4280,6 +4729,25 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
         RevisionPatchCall {
             hub: self.hub,
             _request: request,
+            _file_id: file_id.to_string(),
+            _revision_id: revision_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a specific revision.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `revisionId` - The ID of the revision.
+    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a, C, A> {
+        RevisionGetCall {
+            hub: self.hub,
             _file_id: file_id.to_string(),
             _revision_id: revision_id.to_string(),
             _delegate: Default::default(),
@@ -4379,13 +4847,13 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4395,22 +4863,24 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().watch(req, "fileId")
-///              .update_viewed_date(false)
+///              .update_viewed_date(true)
 ///              .supports_team_drives(false)
-///              .revision_id("sea")
-///              .projection("et")
-///              .acknowledge_abuse(false)
+///              .supports_all_drives(true)
+///              .revision_id("eirmod")
+///              .projection("sanctus")
+///              .acknowledge_abuse(true)
 ///              .doit();
 /// # }
 /// ```
 pub struct FileWatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Channel,
     _file_id: String,
     _update_viewed_date: Option<bool>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _revision_id: Option<String>,
     _projection: Option<String>,
     _acknowledge_abuse: Option<bool>,
@@ -4435,13 +4905,16 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "drive.files.watch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._update_viewed_date {
             params.push(("updateViewedDate", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._revision_id {
             params.push(("revisionId", value.to_string()));
@@ -4452,7 +4925,7 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._acknowledge_abuse {
             params.push(("acknowledgeAbuse", value.to_string()));
         }
-        for &field in ["fileId", "updateViewedDate", "supportsTeamDrives", "revisionId", "projection", "acknowledgeAbuse"].iter() {
+        for &field in ["fileId", "updateViewedDate", "supportsTeamDrives", "supportsAllDrives", "revisionId", "projection", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4621,11 +5094,18 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._update_viewed_date = Some(new_value);
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileWatchCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileWatchCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Specifies the Revision ID that should be downloaded. Ignored unless alt=media is specified.
@@ -4727,13 +5207,13 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4743,13 +5223,14 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().insert(req)
-///              .visibility("et")
+///              .visibility("amet")
 ///              .use_content_as_indexable_text(true)
-///              .timed_text_track_name("sanctus")
-///              .timed_text_language("et")
+///              .timed_text_track_name("consetetur")
+///              .timed_text_language("ut")
 ///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .pinned(true)
-///              .ocr_language("consetetur")
+///              .ocr_language("dolor")
 ///              .ocr(true)
 ///              .convert(true)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
@@ -4758,13 +5239,14 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 pub struct FileInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: File,
     _visibility: Option<String>,
     _use_content_as_indexable_text: Option<bool>,
     _timed_text_track_name: Option<String>,
     _timed_text_language: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _pinned: Option<bool>,
     _ocr_language: Option<String>,
     _ocr: Option<bool>,
@@ -4791,7 +5273,7 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.files.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
         if let Some(value) = self._visibility {
             params.push(("visibility", value.to_string()));
         }
@@ -4807,6 +5289,9 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
         if let Some(value) = self._pinned {
             params.push(("pinned", value.to_string()));
         }
@@ -4819,7 +5304,7 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
-        for &field in ["alt", "visibility", "useContentAsIndexableText", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
+        for &field in ["alt", "visibility", "useContentAsIndexableText", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5074,11 +5559,18 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to pin the head revision of the uploaded file. A file can have a maximum of 200 pinned revisions.
@@ -5185,27 +5677,29 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().untrash("fileId")
-///              .supports_team_drives(true)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
 ///              .doit();
 /// # }
 /// ```
 pub struct FileUntrashCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5227,12 +5721,15 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "drive.files.untrash",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "fileId", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5354,11 +5851,18 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._file_id = new_value.to_string();
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileUntrashCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileUntrashCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5420,6 +5924,259 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
+/// Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file or be an organizer on the parent for shared drive files.
+///
+/// A builder for the *delete* method supported by a *file* resource.
+/// It is not used directly, but through a `FileMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.files().delete("fileId")
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .doit();
+/// # }
+/// ```
+pub struct FileDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _file_id: String,
+    _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for FileDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.files.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        if let Some(value) = self._supports_team_drives {
+            params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["fileId", "supportsTeamDrives", "supportsAllDrives"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the file to delete.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// Deprecated use supportsAllDrives instead.
+    ///
+    /// Sets the *supports team drives* query property to the given value.
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileDeleteCall<'a, C, A> {
+        self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileDeleteCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Creates a copy of the specified file.
 ///
 /// A builder for the *copy* method supported by a *file* resource.
@@ -5438,13 +6195,13 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5454,27 +6211,29 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().copy(req, "fileId")
-///              .visibility("dolor")
-///              .timed_text_track_name("et")
-///              .timed_text_language("consetetur")
-///              .supports_team_drives(false)
-///              .pinned(true)
-///              .ocr_language("Lorem")
-///              .ocr(true)
-///              .convert(true)
+///              .visibility("vero")
+///              .timed_text_track_name("diam")
+///              .timed_text_language("rebum.")
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .pinned(false)
+///              .ocr_language("sadipscing")
+///              .ocr(false)
+///              .convert(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct FileCopyCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: File,
     _file_id: String,
     _visibility: Option<String>,
     _timed_text_track_name: Option<String>,
     _timed_text_language: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _pinned: Option<bool>,
     _ocr_language: Option<String>,
     _ocr: Option<bool>,
@@ -5500,7 +6259,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "drive.files.copy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._visibility {
             params.push(("visibility", value.to_string()));
@@ -5514,6 +6273,9 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
         if let Some(value) = self._pinned {
             params.push(("pinned", value.to_string()));
         }
@@ -5526,7 +6288,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
-        for &field in ["alt", "fileId", "visibility", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
+        for &field in ["alt", "fileId", "visibility", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5693,11 +6455,18 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to pin the head revision of the new copy. A file can have a maximum of 200 pinned revisions.
@@ -5787,7 +6556,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Moves a file to the trash. The currently authenticated user must own the file or be at least a fileOrganizer on the parent for Team Drive files.
+/// Moves a file to the trash. The currently authenticated user must own the file or be at least a fileOrganizer on the parent for shared drive files.
 ///
 /// A builder for the *trash* method supported by a *file* resource.
 /// It is not used directly, but through a `FileMethods` instance.
@@ -5804,27 +6573,29 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().trash("fileId")
 ///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct FileTrashCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5846,12 +6617,15 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "drive.files.trash",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "fileId", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5973,11 +6747,18 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._file_id = new_value.to_string();
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileTrashCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileTrashCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6059,13 +6840,13 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6076,7 +6857,7 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 pub struct FileExportCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _mime_type: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6300,13 +7081,13 @@ impl<'a, C, A> FileExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6317,7 +7098,7 @@ impl<'a, C, A> FileExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 pub struct FileEmptyTrashCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6496,37 +7277,41 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .team_drive_id("consetetur")
+///              .team_drive_id("clita")
 ///              .supports_team_drives(true)
-///              .spaces("vero")
-///              .q("sadipscing")
-///              .projection("invidunt")
-///              .page_token("consetetur")
-///              .order_by("dolore")
-///              .max_results(-19)
-///              .include_team_drive_items(false)
-///              .corpus("Lorem")
-///              .corpora("et")
+///              .supports_all_drives(false)
+///              .spaces("nonumy")
+///              .q("kasd")
+///              .projection("sanctus")
+///              .page_token("takimata")
+///              .order_by("At")
+///              .max_results(-86)
+///              .include_team_drive_items(true)
+///              .include_items_from_all_drives(false)
+///              .drive_id("sadipscing")
+///              .corpus("rebum.")
+///              .corpora("dolore")
 ///              .doit();
 /// # }
 /// ```
 pub struct FileListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _spaces: Option<String>,
     _q: Option<String>,
     _projection: Option<String>,
@@ -6534,6 +7319,8 @@ pub struct FileListCall<'a, C, A>
     _order_by: Option<String>,
     _max_results: Option<i32>,
     _include_team_drive_items: Option<bool>,
+    _include_items_from_all_drives: Option<bool>,
+    _drive_id: Option<String>,
     _corpus: Option<String>,
     _corpora: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -6557,12 +7344,15 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "drive.files.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
         if let Some(value) = self._team_drive_id {
             params.push(("teamDriveId", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._spaces {
             params.push(("spaces", value.to_string()));
@@ -6585,13 +7375,19 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._include_team_drive_items {
             params.push(("includeTeamDriveItems", value.to_string()));
         }
+        if let Some(value) = self._include_items_from_all_drives {
+            params.push(("includeItemsFromAllDrives", value.to_string()));
+        }
+        if let Some(value) = self._drive_id {
+            params.push(("driveId", value.to_string()));
+        }
         if let Some(value) = self._corpus {
             params.push(("corpus", value.to_string()));
         }
         if let Some(value) = self._corpora {
             params.push(("corpora", value.to_string()));
         }
-        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "spaces", "q", "projection", "pageToken", "orderBy", "maxResults", "includeTeamDriveItems", "corpus", "corpora"].iter() {
+        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "spaces", "q", "projection", "pageToken", "orderBy", "maxResults", "includeTeamDriveItems", "includeItemsFromAllDrives", "driveId", "corpus", "corpora"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6682,18 +7478,25 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// ID of Team Drive to search.
+    /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
     pub fn team_drive_id(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileListCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileListCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of spaces to query. Supported values are 'drive', 'appDataFolder' and 'photos'.
@@ -6738,11 +7541,25 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._max_results = Some(new_value);
         self
     }
-    /// Whether Team Drive items should be included in results.
+    /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
     pub fn include_team_drive_items(mut self, new_value: bool) -> FileListCall<'a, C, A> {
         self._include_team_drive_items = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether both My Drive and shared drive items should be included in results. This parameter will only be effective until June 1, 2020. Afterwards shared drive items will be included in the results.
+    ///
+    /// Sets the *include items from all drives* query property to the given value.
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> FileListCall<'a, C, A> {
+        self._include_items_from_all_drives = Some(new_value);
+        self
+    }
+    /// ID of the shared drive to search.
+    ///
+    /// Sets the *drive id* query property to the given value.
+    pub fn drive_id(mut self, new_value: &str) -> FileListCall<'a, C, A> {
+        self._drive_id = Some(new_value.to_string());
         self
     }
     /// The body of items (files/documents) to which the query applies. Deprecated: use 'corpora' instead.
@@ -6752,7 +7569,7 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._corpus = Some(new_value.to_string());
         self
     }
-    /// Comma-separated list of bodies of items (files/documents) to which the query applies. Supported bodies are 'default', 'domain', 'teamDrive' and 'allTeamDrives'. 'allTeamDrives' must be combined with 'default'; all other values must be used in isolation. Prefer 'default' or 'teamDrive' to 'allTeamDrives' for efficiency.
+    /// Bodies of items (files/documents) to which the query applies. Supported bodies are 'default', 'domain', 'drive' and 'allDrives'. Prefer 'default' or 'drive' to 'allDrives' for efficiency.
     ///
     /// Sets the *corpora* query property to the given value.
     pub fn corpora(mut self, new_value: &str) -> FileListCall<'a, C, A> {
@@ -6835,27 +7652,29 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().touch("fileId")
 ///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct FileTouchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6877,12 +7696,15 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "drive.files.touch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "fileId", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7004,11 +7826,18 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._file_id = new_value.to_string();
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileTouchCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileTouchCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7070,7 +7899,7 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Generates a set of file IDs which can be provided in insert requests.
+/// Generates a set of file IDs which can be provided in insert or copy requests.
 ///
 /// A builder for the *generateIds* method supported by a *file* resource.
 /// It is not used directly, but through a `FileMethods` instance.
@@ -7087,18 +7916,18 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().generate_ids()
-///              .space("takimata")
+///              .space("sit")
 ///              .max_results(-40)
 ///              .doit();
 /// # }
@@ -7106,7 +7935,7 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 pub struct FileGenerateIdCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _space: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -7320,13 +8149,13 @@ impl<'a, C, A> FileGenerateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7336,27 +8165,28 @@ impl<'a, C, A> FileGenerateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().update(req, "fileId")
-///              .use_content_as_indexable_text(true)
-///              .update_viewed_date(false)
-///              .timed_text_track_name("At")
-///              .timed_text_language("labore")
-///              .supports_team_drives(true)
-///              .set_modified_date(false)
-///              .remove_parents("sadipscing")
+///              .use_content_as_indexable_text(false)
+///              .update_viewed_date(true)
+///              .timed_text_track_name("ea")
+///              .timed_text_language("gubergren")
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .set_modified_date(true)
+///              .remove_parents("sea")
 ///              .pinned(false)
-///              .ocr_language("dolore")
+///              .ocr_language("ipsum")
 ///              .ocr(true)
-///              .new_revision(true)
-///              .modified_date_behavior("aliquyam")
-///              .convert(false)
-///              .add_parents("eirmod")
+///              .new_revision(false)
+///              .modified_date_behavior("sit")
+///              .convert(true)
+///              .add_parents("ut")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct FileUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: File,
     _file_id: String,
     _use_content_as_indexable_text: Option<bool>,
@@ -7364,6 +8194,7 @@ pub struct FileUpdateCall<'a, C, A>
     _timed_text_track_name: Option<String>,
     _timed_text_language: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _set_modified_date: Option<bool>,
     _remove_parents: Option<String>,
     _pinned: Option<bool>,
@@ -7395,7 +8226,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.files.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(18 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(19 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
@@ -7411,6 +8242,9 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._set_modified_date {
             params.push(("setModifiedDate", value.to_string()));
@@ -7439,7 +8273,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._add_parents {
             params.push(("addParents", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7725,11 +8559,18 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to set the modified date using the value supplied in the request body. Setting this field to true is equivalent to modifiedDateBehavior=fromBodyOrNow, and false is equivalent to modifiedDateBehavior=now. To prevent any changes to the modified date set modifiedDateBehavior=noChange.
@@ -7854,247 +8695,6 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file or be an organizer on the parent for Team Drive files.
-///
-/// A builder for the *delete* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.files().delete("fileId")
-///              .supports_team_drives(false)
-///              .doit();
-/// # }
-/// ```
-pub struct FileDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Drive<C, A>,
-    _file_id: String,
-    _supports_team_drives: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for FileDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.files.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        for &field in ["fileId", "supportsTeamDrives"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the file to delete.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// Whether the requesting application supports Team Drives.
-    ///
-    /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileDeleteCall<'a, C, A> {
-        self._supports_team_drives = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Updates file metadata and/or content. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *file* resource.
@@ -8113,13 +8713,13 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8130,26 +8730,27 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().patch(req, "fileId")
 ///              .use_content_as_indexable_text(true)
-///              .update_viewed_date(false)
-///              .timed_text_track_name("aliquyam")
-///              .timed_text_language("eos")
-///              .supports_team_drives(true)
+///              .update_viewed_date(true)
+///              .timed_text_track_name("accusam")
+///              .timed_text_language("clita")
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
 ///              .set_modified_date(false)
-///              .remove_parents("labore")
-///              .pinned(false)
-///              .ocr_language("aliquyam")
-///              .ocr(false)
-///              .new_revision(false)
-///              .modified_date_behavior("diam")
+///              .remove_parents("clita")
+///              .pinned(true)
+///              .ocr_language("ut")
+///              .ocr(true)
+///              .new_revision(true)
+///              .modified_date_behavior("voluptua.")
 ///              .convert(true)
-///              .add_parents("justo")
+///              .add_parents("sed")
 ///              .doit();
 /// # }
 /// ```
 pub struct FilePatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: File,
     _file_id: String,
     _use_content_as_indexable_text: Option<bool>,
@@ -8157,6 +8758,7 @@ pub struct FilePatchCall<'a, C, A>
     _timed_text_track_name: Option<String>,
     _timed_text_language: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _set_modified_date: Option<bool>,
     _remove_parents: Option<String>,
     _pinned: Option<bool>,
@@ -8187,7 +8789,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "drive.files.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(18 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(19 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
@@ -8203,6 +8805,9 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._set_modified_date {
             params.push(("setModifiedDate", value.to_string()));
@@ -8231,7 +8836,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._add_parents {
             params.push(("addParents", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8405,11 +9010,18 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._timed_text_language = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to set the modified date using the value supplied in the request body. Setting this field to true is equivalent to modifiedDateBehavior=fromBodyOrNow, and false is equivalent to modifiedDateBehavior=now. To prevent any changes to the modified date set modifiedDateBehavior=noChange.
@@ -8556,20 +9168,21 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().get("fileId")
-///              .update_viewed_date(true)
+///              .update_viewed_date(false)
 ///              .supports_team_drives(true)
-///              .revision_id("clita")
+///              .supports_all_drives(false)
+///              .revision_id("dolor")
 ///              .projection("diam")
 ///              .acknowledge_abuse(false)
 ///              .doit();
@@ -8578,10 +9191,11 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 pub struct FileGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _update_viewed_date: Option<bool>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _revision_id: Option<String>,
     _projection: Option<String>,
     _acknowledge_abuse: Option<bool>,
@@ -8606,13 +9220,16 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "drive.files.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._update_viewed_date {
             params.push(("updateViewedDate", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._revision_id {
             params.push(("revisionId", value.to_string()));
@@ -8623,7 +9240,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         if let Some(value) = self._acknowledge_abuse {
             params.push(("acknowledgeAbuse", value.to_string()));
         }
-        for &field in ["fileId", "updateViewedDate", "supportsTeamDrives", "revisionId", "projection", "acknowledgeAbuse"].iter() {
+        for &field in ["fileId", "updateViewedDate", "supportsTeamDrives", "supportsAllDrives", "revisionId", "projection", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8768,11 +9385,18 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._update_viewed_date = Some(new_value);
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> FileGetCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileGetCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Specifies the Revision ID that should be downloaded. Ignored unless alt=media is specified.
@@ -8855,7 +9479,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Creates a new Team Drive.
+/// Deprecated use drives.insert instead.
 ///
 /// A builder for the *insert* method supported by a *teamdrive* resource.
 /// It is not used directly, but through a `TeamdriveMethods` instance.
@@ -8873,13 +9497,13 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8895,7 +9519,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 pub struct TeamdriveInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: TeamDrive,
     _request_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9105,7 +9729,7 @@ impl<'a, C, A> TeamdriveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Gets a Team Drive's metadata by ID.
+/// Deprecated use drives.get instead.
 ///
 /// A builder for the *get* method supported by a *teamdrive* resource.
 /// It is not used directly, but through a `TeamdriveMethods` instance.
@@ -9122,13 +9746,13 @@ impl<'a, C, A> TeamdriveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9140,7 +9764,7 @@ impl<'a, C, A> TeamdriveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 pub struct TeamdriveGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _team_drive_id: String,
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
@@ -9357,7 +9981,7 @@ impl<'a, C, A> TeamdriveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Lists the user's Team Drives.
+/// Deprecated use drives.list instead.
 ///
 /// A builder for the *list* method supported by a *teamdrive* resource.
 /// It is not used directly, but through a `TeamdriveMethods` instance.
@@ -9374,28 +9998,28 @@ impl<'a, C, A> TeamdriveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().list()
 ///              .use_domain_admin_access(false)
-///              .q("dolores")
-///              .page_token("eos")
-///              .max_results(-78)
+///              .q("invidunt")
+///              .page_token("eirmod")
+///              .max_results(-77)
 ///              .doit();
 /// # }
 /// ```
 pub struct TeamdriveListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _use_domain_admin_access: Option<bool>,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -9612,7 +10236,7 @@ impl<'a, C, A> TeamdriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Permanently deletes a Team Drive for which the user is an organizer. The Team Drive cannot contain any untrashed items.
+/// Deprecated use drives.delete instead.
 ///
 /// A builder for the *delete* method supported by a *teamdrive* resource.
 /// It is not used directly, but through a `TeamdriveMethods` instance.
@@ -9629,13 +10253,13 @@ impl<'a, C, A> TeamdriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9646,7 +10270,7 @@ impl<'a, C, A> TeamdriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct TeamdriveDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _team_drive_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -9841,7 +10465,7 @@ impl<'a, C, A> TeamdriveDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates a Team Drive's metadata
+/// Deprecated use drives.update instead.
 ///
 /// A builder for the *update* method supported by a *teamdrive* resource.
 /// It is not used directly, but through a `TeamdriveMethods` instance.
@@ -9859,13 +10483,13 @@ impl<'a, C, A> TeamdriveDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9875,14 +10499,14 @@ impl<'a, C, A> TeamdriveDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().update(req, "teamDriveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct TeamdriveUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: TeamDrive,
     _team_drive_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -10142,25 +10766,25 @@ impl<'a, C, A> TeamdriveUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.realtime().update("fileId")
-///              .base_revision("ea")
+///              .base_revision("takimata")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct RealtimeUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _base_revision: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -10494,25 +11118,25 @@ impl<'a, C, A> RealtimeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.realtime().get("fileId")
-///              .revision(-48)
+///              .revision(-91)
 ///              .doit();
 /// # }
 /// ```
 pub struct RealtimeGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _revision: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -10735,13 +11359,13 @@ impl<'a, C, A> RealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10752,7 +11376,7 @@ impl<'a, C, A> RealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 pub struct AppGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _app_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10975,27 +11599,27 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().list()
-///              .language_code("kasd")
-///              .app_filter_mime_types("invidunt")
-///              .app_filter_extensions("rebum.")
+///              .language_code("Lorem")
+///              .app_filter_mime_types("Lorem")
+///              .app_filter_extensions("diam")
 ///              .doit();
 /// # }
 /// ```
 pub struct AppListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _language_code: Option<String>,
     _app_filter_mime_types: Option<String>,
     _app_filter_extensions: Option<String>,
@@ -11201,10 +11825,293 @@ impl<'a, C, A> AppListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Gets the information about the current user along with Drive API settings
+/// Updates the metadata for a shared drive.
 ///
-/// A builder for the *get* method supported by a *about* resource.
-/// It is not used directly, but through a `AboutMethods` instance.
+/// A builder for the *update* method supported by a *drive* resource.
+/// It is not used directly, but through a `DriveMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// use drive2::Drive;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Drive::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.drives().update(req, "driveId")
+///              .use_domain_admin_access(true)
+///              .doit();
+/// # }
+/// ```
+pub struct DriveUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _request: Drive,
+    _drive_id: String,
+    _use_domain_admin_access: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DriveUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> DriveUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Drive)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.drives.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("driveId", self._drive_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
+        for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "drives/{driveId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["driveId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Drive) -> DriveUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the shared drive.
+    ///
+    /// Sets the *drive id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn drive_id(mut self, new_value: &str) -> DriveUpdateCall<'a, C, A> {
+        self._drive_id = new_value.to_string();
+        self
+    }
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveUpdateCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DriveUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DriveUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Restores a shared drive to the default view.
+///
+/// A builder for the *unhide* method supported by a *drive* resource.
+/// It is not used directly, but through a `DriveMethods` instance.
 ///
 /// # Example
 ///
@@ -11218,42 +12125,37 @@ impl<'a, C, A> AppListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.about().get()
-///              .start_change_id("Lorem")
-///              .max_change_id_count(-63)
-///              .include_subscribed(true)
+/// let result = hub.drives().unhide("driveId")
 ///              .doit();
 /// # }
 /// ```
-pub struct AboutGetCall<'a, C, A>
+pub struct DriveUnhideCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
-    _start_change_id: Option<String>,
-    _max_change_id_count: Option<i64>,
-    _include_subscribed: Option<bool>,
+    hub: &'a DriveHub<C, A>,
+    _drive_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AboutGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for DriveUnhideCall<'a, C, A> {}
 
-impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DriveUnhideCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, About)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Drive)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -11261,19 +12163,11 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "drive.about.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._start_change_id {
-            params.push(("startChangeId", value.to_string()));
-        }
-        if let Some(value) = self._max_change_id_count {
-            params.push(("maxChangeIdCount", value.to_string()));
-        }
-        if let Some(value) = self._include_subscribed {
-            params.push(("includeSubscribed", value.to_string()));
-        }
-        for &field in ["alt", "startChangeId", "maxChangeIdCount", "includeSubscribed"].iter() {
+        dlg.begin(MethodInfo { id: "drive.drives.unhide",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("driveId", self._drive_id.to_string()));
+        for &field in ["alt", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11285,9 +12179,746 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "about";
+        let mut url = self.hub._base_url.clone() + "drives/{driveId}/unhide";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["driveId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the shared drive.
+    ///
+    /// Sets the *drive id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn drive_id(mut self, new_value: &str) -> DriveUnhideCall<'a, C, A> {
+        self._drive_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DriveUnhideCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DriveUnhideCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUnhideCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Permanently deletes a shared drive for which the user is an organizer. The shared drive cannot contain any untrashed items.
+///
+/// A builder for the *delete* method supported by a *drive* resource.
+/// It is not used directly, but through a `DriveMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.drives().delete("driveId")
+///              .doit();
+/// # }
+/// ```
+pub struct DriveDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _drive_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DriveDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> DriveDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.drives.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        params.push(("driveId", self._drive_id.to_string()));
+        for &field in ["driveId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "drives/{driveId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["driveId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the shared drive.
+    ///
+    /// Sets the *drive id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn drive_id(mut self, new_value: &str) -> DriveDeleteCall<'a, C, A> {
+        self._drive_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DriveDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DriveDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a new shared drive.
+///
+/// A builder for the *insert* method supported by a *drive* resource.
+/// It is not used directly, but through a `DriveMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// use drive2::Drive;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Drive::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.drives().insert(req, "requestId")
+///              .doit();
+/// # }
+/// ```
+pub struct DriveInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _request: Drive,
+    _request_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DriveInsertCall<'a, C, A> {}
+
+impl<'a, C, A> DriveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Drive)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.drives.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("requestId", self._request_id.to_string()));
+        for &field in ["alt", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "drives";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Drive) -> DriveInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a shared drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same shared drive. If the shared drive already exists a 409 error will be returned.
+    ///
+    /// Sets the *request id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request_id(mut self, new_value: &str) -> DriveInsertCall<'a, C, A> {
+        self._request_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DriveInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DriveInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the user's shared drives.
+///
+/// A builder for the *list* method supported by a *drive* resource.
+/// It is not used directly, but through a `DriveMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.drives().list()
+///              .use_domain_admin_access(true)
+///              .q("sea")
+///              .page_token("ut")
+///              .max_results(-39)
+///              .doit();
+/// # }
+/// ```
+pub struct DriveListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _use_domain_admin_access: Option<bool>,
+    _q: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DriveListCall<'a, C, A> {}
+
+impl<'a, C, A> DriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DriveList)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.drives.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
+        if let Some(value) = self._q {
+            params.push(("q", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "drives";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
 
@@ -11364,25 +12995,32 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Change ID to start counting from when calculating number of remaining change IDs
+    /// Issue the request as a domain administrator; if set to true, then all shared drives of the domain in which the requester is an administrator are returned.
     ///
-    /// Sets the *start change id* query property to the given value.
-    pub fn start_change_id(mut self, new_value: &str) -> AboutGetCall<'a, C, A> {
-        self._start_change_id = Some(new_value.to_string());
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveListCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
         self
     }
-    /// Maximum number of remaining change IDs to count
+    /// Query string for searching shared drives.
     ///
-    /// Sets the *max change id count* query property to the given value.
-    pub fn max_change_id_count(mut self, new_value: i64) -> AboutGetCall<'a, C, A> {
-        self._max_change_id_count = Some(new_value);
+    /// Sets the *q* query property to the given value.
+    pub fn q(mut self, new_value: &str) -> DriveListCall<'a, C, A> {
+        self._q = Some(new_value.to_string());
         self
     }
-    /// Whether to count changes outside the My Drive hierarchy. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the maxChangeIdCount.
+    /// Page token for shared drives.
     ///
-    /// Sets the *include subscribed* query property to the given value.
-    pub fn include_subscribed(mut self, new_value: bool) -> AboutGetCall<'a, C, A> {
-        self._include_subscribed = Some(new_value);
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> DriveListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of shared drives to return.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> DriveListCall<'a, C, A> {
+        self._max_results = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11391,7 +13029,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AboutGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DriveListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11412,7 +13050,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11421,7 +13059,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11432,7 +13070,499 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AboutGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets a shared drive's metadata by ID.
+///
+/// A builder for the *get* method supported by a *drive* resource.
+/// It is not used directly, but through a `DriveMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.drives().get("driveId")
+///              .use_domain_admin_access(true)
+///              .doit();
+/// # }
+/// ```
+pub struct DriveGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _drive_id: String,
+    _use_domain_admin_access: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DriveGetCall<'a, C, A> {}
+
+impl<'a, C, A> DriveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Drive)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.drives.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("driveId", self._drive_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
+        for &field in ["alt", "driveId", "useDomainAdminAccess"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "drives/{driveId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["driveId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the shared drive.
+    ///
+    /// Sets the *drive id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn drive_id(mut self, new_value: &str) -> DriveGetCall<'a, C, A> {
+        self._drive_id = new_value.to_string();
+        self
+    }
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveGetCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DriveGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DriveGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Hides a shared drive from the default view.
+///
+/// A builder for the *hide* method supported by a *drive* resource.
+/// It is not used directly, but through a `DriveMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.drives().hide("driveId")
+///              .doit();
+/// # }
+/// ```
+pub struct DriveHideCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _drive_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DriveHideCall<'a, C, A> {}
+
+impl<'a, C, A> DriveHideCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Drive)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.drives.hide",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("driveId", self._drive_id.to_string()));
+        for &field in ["alt", "driveId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "drives/{driveId}/hide";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{driveId}", "driveId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["driveId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the shared drive.
+    ///
+    /// Sets the *drive id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn drive_id(mut self, new_value: &str) -> DriveHideCall<'a, C, A> {
+        self._drive_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DriveHideCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DriveHideCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveHideCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11461,13 +13591,13 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11478,7 +13608,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 pub struct CommentDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _comment_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11702,25 +13832,25 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().get("fileId", "commentId")
-///              .include_deleted(false)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
 pub struct CommentGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _comment_id: String,
     _include_deleted: Option<bool>,
@@ -11967,13 +14097,13 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11989,7 +14119,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 pub struct CommentInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Comment,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -12238,13 +14368,13 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12260,7 +14390,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct CommentPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Comment,
     _file_id: String,
     _comment_id: String,
@@ -12521,13 +14651,13 @@ impl<'a, C, A> CommentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12543,7 +14673,7 @@ impl<'a, C, A> CommentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 pub struct CommentUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Comment,
     _file_id: String,
     _comment_id: String,
@@ -12803,28 +14933,28 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .updated_min("Lorem")
-///              .page_token("diam")
-///              .max_results(-36)
-///              .include_deleted(true)
+///              .updated_min("takimata")
+///              .page_token("et")
+///              .max_results(-91)
+///              .include_deleted(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct CommentListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _updated_min: Option<String>,
     _page_token: Option<String>,
@@ -13091,28 +15221,28 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().list("folderId")
-///              .q("ipsum")
-///              .page_token("ut")
-///              .order_by("dolor")
-///              .max_results(-9)
+///              .q("no")
+///              .page_token("invidunt")
+///              .order_by("rebum.")
+///              .max_results(-86)
 ///              .doit();
 /// # }
 /// ```
 pub struct ChildrenListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _folder_id: String,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -13379,13 +15509,13 @@ impl<'a, C, A> ChildrenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13396,7 +15526,7 @@ impl<'a, C, A> ChildrenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 pub struct ChildrenGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _folder_id: String,
     _child_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -13631,13 +15761,13 @@ impl<'a, C, A> ChildrenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13648,7 +15778,7 @@ impl<'a, C, A> ChildrenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 pub struct ChildrenDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _folder_id: String,
     _child_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -13873,13 +16003,13 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13889,17 +16019,19 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().insert(req, "folderId")
-///              .supports_team_drives(true)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
 ///              .doit();
 /// # }
 /// ```
 pub struct ChildrenInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: ChildReference,
     _folder_id: String,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13921,12 +16053,15 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "drive.children.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("folderId", self._folder_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "folderId", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["alt", "folderId", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14072,11 +16207,18 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._folder_id = new_value.to_string();
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> ChildrenInsertCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChildrenInsertCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -14156,13 +16298,13 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14178,7 +16320,7 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 pub struct ChannelStopCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Channel,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -14382,13 +16524,13 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14399,7 +16541,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 pub struct ParentListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -14622,13 +16764,13 @@ impl<'a, C, A> ParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14639,7 +16781,7 @@ impl<'a, C, A> ParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 pub struct ParentDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _parent_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14864,13 +17006,13 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14881,16 +17023,18 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.parents().insert(req, "fileId")
 ///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct ParentInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: ParentReference,
     _file_id: String,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14912,12 +17056,15 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "drive.parents.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "fileId", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15063,11 +17210,18 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._file_id = new_value.to_string();
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> ParentInsertCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> ParentInsertCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -15146,13 +17300,13 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15163,7 +17317,7 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 pub struct ParentGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _parent_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -15399,13 +17553,13 @@ impl<'a, C, A> ParentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15421,7 +17575,7 @@ impl<'a, C, A> ParentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 pub struct ReplyPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: CommentReply,
     _file_id: String,
     _comment_id: String,
@@ -15676,6 +17830,289 @@ impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
+/// Creates a new reply to the given comment.
+///
+/// A builder for the *insert* method supported by a *reply* resource.
+/// It is not used directly, but through a `ReplyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// use drive2::CommentReply;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CommentReply::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.replies().insert(req, "fileId", "commentId")
+///              .doit();
+/// # }
+/// ```
+pub struct ReplyInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _request: CommentReply,
+    _file_id: String,
+    _comment_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ReplyInsertCall<'a, C, A> {}
+
+impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CommentReply)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.replies.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("commentId", self._comment_id.to_string()));
+        for &field in ["alt", "fileId", "commentId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["commentId", "fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CommentReply) -> ReplyInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the file.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// The ID of the comment.
+    ///
+    /// Sets the *comment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn comment_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
+        self._comment_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists all of the replies to a comment.
 ///
 /// A builder for the *list* method supported by a *reply* resource.
@@ -15693,19 +18130,19 @@ impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("nonumy")
-///              .max_results(-84)
+///              .page_token("Lorem")
+///              .max_results(-96)
 ///              .include_deleted(true)
 ///              .doit();
 /// # }
@@ -15713,7 +18150,7 @@ impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 pub struct ReplyListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _comment_id: String,
     _page_token: Option<String>,
@@ -15981,13 +18418,13 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15999,7 +18436,7 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 pub struct ReplyGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -16240,289 +18677,6 @@ impl<'a, C, A> ReplyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Creates a new reply to the given comment.
-///
-/// A builder for the *insert* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// use drive2::CommentReply;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = CommentReply::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.replies().insert(req, "fileId", "commentId")
-///              .doit();
-/// # }
-/// ```
-pub struct ReplyInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Drive<C, A>,
-    _request: CommentReply,
-    _file_id: String,
-    _comment_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ReplyInsertCall<'a, C, A> {}
-
-impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, CommentReply)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.replies.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("commentId", self._comment_id.to_string()));
-        for &field in ["alt", "fileId", "commentId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/comments/{commentId}/replies";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{commentId}", "commentId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["commentId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CommentReply) -> ReplyInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the file.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// The ID of the comment.
-    ///
-    /// Sets the *comment id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
-        self._comment_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyInsertCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Deletes a reply.
 ///
 /// A builder for the *delete* method supported by a *reply* resource.
@@ -16540,13 +18694,13 @@ impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16557,7 +18711,7 @@ impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 pub struct ReplyDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -16794,13 +18948,13 @@ impl<'a, C, A> ReplyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16816,7 +18970,7 @@ impl<'a, C, A> ReplyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 pub struct ReplyUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: CommentReply,
     _file_id: String,
     _comment_id: String,
@@ -17071,7 +19225,250 @@ impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Deletes a permission from a file or Team Drive.
+/// Gets the information about the current user along with Drive API settings
+///
+/// A builder for the *get* method supported by a *about* resource.
+/// It is not used directly, but through a `AboutMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.about().get()
+///              .start_change_id("clita")
+///              .max_change_id_count(-24)
+///              .include_subscribed(false)
+///              .doit();
+/// # }
+/// ```
+pub struct AboutGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _start_change_id: Option<String>,
+    _max_change_id_count: Option<i64>,
+    _include_subscribed: Option<bool>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AboutGetCall<'a, C, A> {}
+
+impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, About)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.about.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._start_change_id {
+            params.push(("startChangeId", value.to_string()));
+        }
+        if let Some(value) = self._max_change_id_count {
+            params.push(("maxChangeIdCount", value.to_string()));
+        }
+        if let Some(value) = self._include_subscribed {
+            params.push(("includeSubscribed", value.to_string()));
+        }
+        for &field in ["alt", "startChangeId", "maxChangeIdCount", "includeSubscribed"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "about";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Change ID to start counting from when calculating number of remaining change IDs
+    ///
+    /// Sets the *start change id* query property to the given value.
+    pub fn start_change_id(mut self, new_value: &str) -> AboutGetCall<'a, C, A> {
+        self._start_change_id = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of remaining change IDs to count
+    ///
+    /// Sets the *max change id count* query property to the given value.
+    pub fn max_change_id_count(mut self, new_value: i64) -> AboutGetCall<'a, C, A> {
+        self._max_change_id_count = Some(new_value);
+        self
+    }
+    /// Whether to count changes outside the My Drive hierarchy. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the maxChangeIdCount.
+    ///
+    /// Sets the *include subscribed* query property to the given value.
+    pub fn include_subscribed(mut self, new_value: bool) -> AboutGetCall<'a, C, A> {
+        self._include_subscribed = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AboutGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AboutGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a permission from a file or shared drive.
 ///
 /// A builder for the *delete* method supported by a *permission* resource.
 /// It is not used directly, but through a `PermissionMethods` instance.
@@ -17088,30 +19485,32 @@ impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().delete("fileId", "permissionId")
-///              .use_domain_admin_access(false)
-///              .supports_team_drives(true)
+///              .use_domain_admin_access(true)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
 ///              .doit();
 /// # }
 /// ```
 pub struct PermissionDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17133,7 +19532,7 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._use_domain_admin_access {
@@ -17142,7 +19541,10 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17243,7 +19645,7 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// The ID for the file or Team Drive.
+    /// The ID for the file or shared drive.
     ///
     /// Sets the *file id* path property to the given value.
     ///
@@ -17263,18 +19665,25 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._permission_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionDeleteCall<'a, C, A> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -17336,325 +19745,6 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Inserts a permission for a file or Team Drive.
-///
-/// A builder for the *insert* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// use drive2::Permission;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Permission::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.permissions().insert(req, "fileId")
-///              .use_domain_admin_access(false)
-///              .supports_team_drives(false)
-///              .send_notification_emails(true)
-///              .email_message("et")
-///              .doit();
-/// # }
-/// ```
-pub struct PermissionInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Drive<C, A>,
-    _request: Permission,
-    _file_id: String,
-    _use_domain_admin_access: Option<bool>,
-    _supports_team_drives: Option<bool>,
-    _send_notification_emails: Option<bool>,
-    _email_message: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for PermissionInsertCall<'a, C, A> {}
-
-impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Permission)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.permissions.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._send_notification_emails {
-            params.push(("sendNotificationEmails", value.to_string()));
-        }
-        if let Some(value) = self._email_message {
-            params.push(("emailMessage", value.to_string()));
-        }
-        for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "sendNotificationEmails", "emailMessage"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Permission) -> PermissionInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID for the file or Team Drive.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
-    ///
-    /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
-        self._use_domain_admin_access = Some(new_value);
-        self
-    }
-    /// Whether the requesting application supports Team Drives.
-    ///
-    /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
-        self._supports_team_drives = Some(new_value);
-        self
-    }
-    /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.
-    ///
-    /// Sets the *send notification emails* query property to the given value.
-    pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
-        self._send_notification_emails = Some(new_value);
-        self
-    }
-    /// A plain text custom message to include in notification emails.
-    ///
-    /// Sets the *email message* query property to the given value.
-    pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
-        self._email_message = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionInsertCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Updates a permission using patch semantics.
 ///
 /// A builder for the *patch* method supported by a *permission* resource.
@@ -17673,13 +19763,13 @@ impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17690,22 +19780,24 @@ impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().patch(req, "fileId", "permissionId")
 ///              .use_domain_admin_access(false)
-///              .transfer_ownership(true)
-///              .supports_team_drives(true)
-///              .remove_expiration(true)
+///              .transfer_ownership(false)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .remove_expiration(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct PermissionPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Permission,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
     _transfer_ownership: Option<bool>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _remove_expiration: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -17728,7 +19820,7 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "drive.permissions.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._use_domain_admin_access {
@@ -17740,10 +19832,13 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
         if let Some(value) = self._remove_expiration {
             params.push(("removeExpiration", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "removeExpiration"].iter() {
+        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17879,7 +19974,7 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The ID for the file or Team Drive.
+    /// The ID for the file or shared drive.
     ///
     /// Sets the *file id* path property to the given value.
     ///
@@ -17899,7 +19994,7 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._permission_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
@@ -17913,11 +20008,18 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._transfer_ownership = Some(new_value);
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to remove the expiration date.
@@ -17986,7 +20088,7 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Lists a file's or Team Drive's permissions.
+/// Lists a file's or shared drive's permissions.
 ///
 /// A builder for the *list* method supported by a *permission* resource.
 /// It is not used directly, but through a `PermissionMethods` instance.
@@ -18003,31 +20105,33 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().list("fileId")
-///              .use_domain_admin_access(true)
-///              .supports_team_drives(false)
-///              .page_token("labore")
-///              .max_results(-61)
+///              .use_domain_admin_access(false)
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .page_token("accusam")
+///              .max_results(-86)
 ///              .doit();
 /// # }
 /// ```
 pub struct PermissionListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -18051,7 +20155,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "drive.permissions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_domain_admin_access {
             params.push(("useDomainAdminAccess", value.to_string()));
@@ -18059,13 +20163,16 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "pageToken", "maxResults"].iter() {
+        for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18177,7 +20284,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The ID for the file or Team Drive.
+    /// The ID for the file or shared drive.
     ///
     /// Sets the *file id* path property to the given value.
     ///
@@ -18187,18 +20294,25 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._file_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionListCall<'a, C, A> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> PermissionListCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionListCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
@@ -18208,7 +20322,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of permissions to return per page. When not set for files in a Team Drive, at most 100 results will be returned. When not set for files that are not in a Team Drive, the entire list will be returned.
+    /// The maximum number of permissions to return per page. When not set for files in a shared drive, at most 100 results will be returned. When not set for files that are not in a shared drive, the entire list will be returned.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> PermissionListCall<'a, C, A> {
@@ -18292,13 +20406,13 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18309,8 +20423,9 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
 ///              .use_domain_admin_access(false)
-///              .transfer_ownership(true)
+///              .transfer_ownership(false)
 ///              .supports_team_drives(false)
+///              .supports_all_drives(false)
 ///              .remove_expiration(true)
 ///              .doit();
 /// # }
@@ -18318,13 +20433,14 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 pub struct PermissionUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Permission,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
     _transfer_ownership: Option<bool>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _remove_expiration: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -18347,7 +20463,7 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._use_domain_admin_access {
@@ -18359,10 +20475,13 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
         if let Some(value) = self._remove_expiration {
             params.push(("removeExpiration", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "removeExpiration"].iter() {
+        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18498,7 +20617,7 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The ID for the file or Team Drive.
+    /// The ID for the file or shared drive.
     ///
     /// Sets the *file id* path property to the given value.
     ///
@@ -18518,7 +20637,7 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._permission_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
@@ -18532,11 +20651,18 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._transfer_ownership = Some(new_value);
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to remove the expiration date.
@@ -18622,30 +20748,32 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("fileId", "permissionId")
-///              .use_domain_admin_access(true)
-///              .supports_team_drives(false)
+///              .use_domain_admin_access(false)
+///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
 pub struct PermissionGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -18667,7 +20795,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "drive.permissions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
         if let Some(value) = self._use_domain_admin_access {
@@ -18676,7 +20804,10 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18788,7 +20919,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID for the file or Team Drive.
+    /// The ID for the file or shared drive.
     ///
     /// Sets the *file id* path property to the given value.
     ///
@@ -18808,18 +20939,25 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._permission_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionGetCall<'a, C, A> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> PermissionGetCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionGetCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -18881,6 +21019,337 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
+/// Inserts a permission for a file or shared drive.
+///
+/// A builder for the *insert* method supported by a *permission* resource.
+/// It is not used directly, but through a `PermissionMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// use drive2::Permission;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Permission::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.permissions().insert(req, "fileId")
+///              .use_domain_admin_access(true)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .send_notification_emails(false)
+///              .email_message("et")
+///              .doit();
+/// # }
+/// ```
+pub struct PermissionInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _request: Permission,
+    _file_id: String,
+    _use_domain_admin_access: Option<bool>,
+    _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
+    _send_notification_emails: Option<bool>,
+    _email_message: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PermissionInsertCall<'a, C, A> {}
+
+impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Permission)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.permissions.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
+        if let Some(value) = self._supports_team_drives {
+            params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        if let Some(value) = self._send_notification_emails {
+            params.push(("sendNotificationEmails", value.to_string()));
+        }
+        if let Some(value) = self._email_message {
+            params.push(("emailMessage", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmails", "emailMessage"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Permission) -> PermissionInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID for the file or shared drive.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
+    /// Deprecated use supportsAllDrives instead.
+    ///
+    /// Sets the *supports team drives* query property to the given value.
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.
+    ///
+    /// Sets the *send notification emails* query property to the given value.
+    pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._send_notification_emails = Some(new_value);
+        self
+    }
+    /// A plain text custom message to include in notification emails.
+    ///
+    /// Sets the *email message* query property to the given value.
+    pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
+        self._email_message = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Returns the permission ID for an email address.
 ///
 /// A builder for the *getIdForEmail* method supported by a *permission* resource.
@@ -18898,13 +21367,13 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18915,7 +21384,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct PermissionGetIdForEmailCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _email: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -19138,28 +21607,32 @@ impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::C
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("consetetur")
+///              .team_drive_id("et")
 ///              .supports_team_drives(true)
+///              .supports_all_drives(false)
+///              .drive_id("sit")
 ///              .doit();
 /// # }
 /// ```
 pub struct ChangeGetStartPageTokenCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
+    _drive_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -19181,14 +21654,20 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "drive.changes.getStartPageToken",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._team_drive_id {
             params.push(("teamDriveId", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "teamDriveId", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        if let Some(value) = self._drive_id {
+            params.push(("driveId", value.to_string()));
+        }
+        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -19279,18 +21758,32 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The ID of the Team Drive for which the starting pageToken for listing future changes from that Team Drive will be returned.
+    /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
     pub fn team_drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a, C, A> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// The ID of the shared drive for which the starting pageToken for listing future changes from that shared drive will be returned.
+    ///
+    /// Sets the *drive id* query property to the given value.
+    pub fn drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a, C, A> {
+        self._drive_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -19352,365 +21845,7 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Subscribe to changes for a user.
-///
-/// A builder for the *watch* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// use drive2::Channel;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Channel::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.changes().watch(req)
-///              .team_drive_id("consetetur")
-///              .supports_team_drives(true)
-///              .start_change_id("justo")
-///              .spaces("tempor")
-///              .page_token("gubergren")
-///              .max_results(-84)
-///              .include_team_drive_items(false)
-///              .include_subscribed(true)
-///              .include_deleted(false)
-///              .include_corpus_removals(false)
-///              .doit();
-/// # }
-/// ```
-pub struct ChangeWatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Drive<C, A>,
-    _request: Channel,
-    _team_drive_id: Option<String>,
-    _supports_team_drives: Option<bool>,
-    _start_change_id: Option<String>,
-    _spaces: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _include_team_drive_items: Option<bool>,
-    _include_subscribed: Option<bool>,
-    _include_deleted: Option<bool>,
-    _include_corpus_removals: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ChangeWatchCall<'a, C, A> {}
-
-impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.changes.watch",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
-        if let Some(value) = self._team_drive_id {
-            params.push(("teamDriveId", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._start_change_id {
-            params.push(("startChangeId", value.to_string()));
-        }
-        if let Some(value) = self._spaces {
-            params.push(("spaces", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._include_team_drive_items {
-            params.push(("includeTeamDriveItems", value.to_string()));
-        }
-        if let Some(value) = self._include_subscribed {
-            params.push(("includeSubscribed", value.to_string()));
-        }
-        if let Some(value) = self._include_deleted {
-            params.push(("includeDeleted", value.to_string()));
-        }
-        if let Some(value) = self._include_corpus_removals {
-            params.push(("includeCorpusRemovals", value.to_string()));
-        }
-        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "startChangeId", "spaces", "pageToken", "maxResults", "includeTeamDriveItems", "includeSubscribed", "includeDeleted", "includeCorpusRemovals"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "changes/watch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChangeWatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The Team Drive from which changes will be returned. If specified the change IDs will be reflective of the Team Drive; use the combined Team Drive ID and change ID as an identifier.
-    ///
-    /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
-        self._team_drive_id = Some(new_value.to_string());
-        self
-    }
-    /// Whether the requesting application supports Team Drives.
-    ///
-    /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
-        self._supports_team_drives = Some(new_value);
-        self
-    }
-    /// Deprecated - use pageToken instead.
-    ///
-    /// Sets the *start change id* query property to the given value.
-    pub fn start_change_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
-        self._start_change_id = Some(new_value.to_string());
-        self
-    }
-    /// A comma-separated list of spaces to query. Supported values are 'drive', 'appDataFolder' and 'photos'.
-    ///
-    /// Sets the *spaces* query property to the given value.
-    pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
-        self._spaces = Some(new_value.to_string());
-        self
-    }
-    /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response or to the response from the getStartPageToken method.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum number of changes to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ChangeWatchCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// Whether Team Drive files or changes should be included in results.
-    ///
-    /// Sets the *include team drive items* query property to the given value.
-    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
-        self._include_team_drive_items = Some(new_value);
-        self
-    }
-    /// Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the result.
-    ///
-    /// Sets the *include subscribed* query property to the given value.
-    pub fn include_subscribed(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
-        self._include_subscribed = Some(new_value);
-        self
-    }
-    /// Whether to include changes indicating that items have been removed from the list of changes, for example by deletion or loss of access.
-    ///
-    /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
-        self._include_deleted = Some(new_value);
-        self
-    }
-    /// Whether changes should include the file resource if the file is still accessible by the user at the time of the request, even when a file was removed from the list of changes and there will be no further change entries for this file.
-    ///
-    /// Sets the *include corpus removals* query property to the given value.
-    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
-        self._include_corpus_removals = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeWatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeWatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists the changes for a user or Team Drive.
+/// Lists the changes for a user or shared drive.
 ///
 /// A builder for the *list* method supported by a *change* resource.
 /// It is not used directly, but through a `ChangeMethods` instance.
@@ -19727,44 +21862,50 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list()
-///              .team_drive_id("magna")
-///              .supports_team_drives(true)
-///              .start_change_id("invidunt")
-///              .spaces("accusam")
-///              .page_token("labore")
-///              .max_results(-79)
-///              .include_team_drive_items(true)
-///              .include_subscribed(false)
+///              .team_drive_id("aliquyam")
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .start_change_id("gubergren")
+///              .spaces("sit")
+///              .page_token("gubergren")
+///              .max_results(-2)
+///              .include_team_drive_items(false)
+///              .include_subscribed(true)
+///              .include_items_from_all_drives(false)
 ///              .include_deleted(false)
-///              .include_corpus_removals(false)
+///              .include_corpus_removals(true)
+///              .drive_id("diam")
 ///              .doit();
 /// # }
 /// ```
 pub struct ChangeListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
     _start_change_id: Option<String>,
     _spaces: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _include_team_drive_items: Option<bool>,
     _include_subscribed: Option<bool>,
+    _include_items_from_all_drives: Option<bool>,
     _include_deleted: Option<bool>,
     _include_corpus_removals: Option<bool>,
+    _drive_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -19786,12 +21927,15 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.changes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
         if let Some(value) = self._team_drive_id {
             params.push(("teamDriveId", value.to_string()));
         }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
         }
         if let Some(value) = self._start_change_id {
             params.push(("startChangeId", value.to_string()));
@@ -19811,13 +21955,19 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._include_subscribed {
             params.push(("includeSubscribed", value.to_string()));
         }
+        if let Some(value) = self._include_items_from_all_drives {
+            params.push(("includeItemsFromAllDrives", value.to_string()));
+        }
         if let Some(value) = self._include_deleted {
             params.push(("includeDeleted", value.to_string()));
         }
         if let Some(value) = self._include_corpus_removals {
             params.push(("includeCorpusRemovals", value.to_string()));
         }
-        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "startChangeId", "spaces", "pageToken", "maxResults", "includeTeamDriveItems", "includeSubscribed", "includeDeleted", "includeCorpusRemovals"].iter() {
+        if let Some(value) = self._drive_id {
+            params.push(("driveId", value.to_string()));
+        }
+        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "startChangeId", "spaces", "pageToken", "maxResults", "includeTeamDriveItems", "includeSubscribed", "includeItemsFromAllDrives", "includeDeleted", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -19908,18 +22058,25 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The Team Drive from which changes will be returned. If specified the change IDs will be reflective of the Team Drive; use the combined Team Drive ID and change ID as an identifier.
+    /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
     pub fn team_drive_id(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
         self
     }
     /// Deprecated - use pageToken instead.
@@ -19950,7 +22107,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._max_results = Some(new_value);
         self
     }
-    /// Whether Team Drive files or changes should be included in results.
+    /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
     pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
@@ -19962,6 +22119,13 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Sets the *include subscribed* query property to the given value.
     pub fn include_subscribed(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether both My Drive and shared drive items should be included in results. This parameter will only be effective until June 1, 2020. Afterwards shared drive items will be included in the results.
+    ///
+    /// Sets the *include items from all drives* query property to the given value.
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
+        self._include_items_from_all_drives = Some(new_value);
         self
     }
     /// Whether to include changes indicating that items have been removed from the list of changes, for example by deletion or loss of access.
@@ -19976,6 +22140,13 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Sets the *include corpus removals* query property to the given value.
     pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._include_corpus_removals = Some(new_value);
+        self
+    }
+    /// The shared drive from which changes will be returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
+    ///
+    /// Sets the *drive id* query property to the given value.
+    pub fn drive_id(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+        self._drive_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -20054,29 +22225,33 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get("changeId")
-///              .team_drive_id("Lorem")
+///              .team_drive_id("sadipscing")
 ///              .supports_team_drives(true)
+///              .supports_all_drives(false)
+///              .drive_id("sit")
 ///              .doit();
 /// # }
 /// ```
 pub struct ChangeGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _change_id: String,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
+    _drive_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -20098,7 +22273,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "drive.changes.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("changeId", self._change_id.to_string()));
         if let Some(value) = self._team_drive_id {
             params.push(("teamDriveId", value.to_string()));
@@ -20106,7 +22281,13 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "changeId", "teamDriveId", "supportsTeamDrives"].iter() {
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        if let Some(value) = self._drive_id {
+            params.push(("driveId", value.to_string()));
+        }
+        for &field in ["alt", "changeId", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -20228,18 +22409,32 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._change_id = new_value.to_string();
         self
     }
-    /// The Team Drive from which the change will be returned.
+    /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
     pub fn team_drive_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
-    /// Whether the requesting application supports Team Drives.
+    /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
     pub fn supports_team_drives(mut self, new_value: bool) -> ChangeGetCall<'a, C, A> {
         self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// The shared drive from which the change will be returned.
+    ///
+    /// Sets the *drive id* query property to the given value.
+    pub fn drive_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
+        self._drive_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -20301,10 +22496,10 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Updates a property.
+/// Subscribe to changes for a user.
 ///
-/// A builder for the *patch* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods` instance.
+/// A builder for the *watch* method supported by a *change* resource.
+/// It is not used directly, but through a `ChangeMethods` instance.
 ///
 /// # Example
 ///
@@ -20315,50 +22510,72 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_drive2 as drive2;
-/// use drive2::Property;
+/// use drive2::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Property::default();
+/// let mut req = Channel::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.properties().patch(req, "fileId", "propertyKey")
-///              .visibility("takimata")
+/// let result = hub.changes().watch(req)
+///              .team_drive_id("dolore")
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .start_change_id("sit")
+///              .spaces("ut")
+///              .page_token("diam")
+///              .max_results(-39)
+///              .include_team_drive_items(false)
+///              .include_subscribed(false)
+///              .include_items_from_all_drives(true)
+///              .include_deleted(false)
+///              .include_corpus_removals(false)
+///              .drive_id("clita")
 ///              .doit();
 /// # }
 /// ```
-pub struct PropertyPatchCall<'a, C, A>
+pub struct ChangeWatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
-    _request: Property,
-    _file_id: String,
-    _property_key: String,
-    _visibility: Option<String>,
+    hub: &'a DriveHub<C, A>,
+    _request: Channel,
+    _team_drive_id: Option<String>,
+    _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
+    _start_change_id: Option<String>,
+    _spaces: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _include_team_drive_items: Option<bool>,
+    _include_subscribed: Option<bool>,
+    _include_items_from_all_drives: Option<bool>,
+    _include_deleted: Option<bool>,
+    _include_corpus_removals: Option<bool>,
+    _drive_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for PropertyPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ChangeWatchCall<'a, C, A> {}
 
-impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Property)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -20366,15 +22583,49 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "drive.properties.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("propertyKey", self._property_key.to_string()));
-        if let Some(value) = self._visibility {
-            params.push(("visibility", value.to_string()));
+        dlg.begin(MethodInfo { id: "drive.changes.watch",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
+        if let Some(value) = self._team_drive_id {
+            params.push(("teamDriveId", value.to_string()));
         }
-        for &field in ["alt", "fileId", "propertyKey", "visibility"].iter() {
+        if let Some(value) = self._supports_team_drives {
+            params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        if let Some(value) = self._start_change_id {
+            params.push(("startChangeId", value.to_string()));
+        }
+        if let Some(value) = self._spaces {
+            params.push(("spaces", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._include_team_drive_items {
+            params.push(("includeTeamDriveItems", value.to_string()));
+        }
+        if let Some(value) = self._include_subscribed {
+            params.push(("includeSubscribed", value.to_string()));
+        }
+        if let Some(value) = self._include_items_from_all_drives {
+            params.push(("includeItemsFromAllDrives", value.to_string()));
+        }
+        if let Some(value) = self._include_deleted {
+            params.push(("includeDeleted", value.to_string()));
+        }
+        if let Some(value) = self._include_corpus_removals {
+            params.push(("includeCorpusRemovals", value.to_string()));
+        }
+        if let Some(value) = self._drive_id {
+            params.push(("driveId", value.to_string()));
+        }
+        for &field in ["alt", "teamDriveId", "supportsTeamDrives", "supportsAllDrives", "startChangeId", "spaces", "pageToken", "maxResults", "includeTeamDriveItems", "includeSubscribed", "includeItemsFromAllDrives", "includeDeleted", "includeCorpusRemovals", "driveId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -20386,32 +22637,11 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/properties/{propertyKey}";
+        let mut url = self.hub._base_url.clone() + "changes/watch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{propertyKey}", "propertyKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["propertyKey", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
@@ -20445,7 +22675,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20506,35 +22736,99 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Property) -> PropertyPatchCall<'a, C, A> {
+    pub fn request(mut self, new_value: Channel) -> ChangeWatchCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The ID of the file.
+    /// Deprecated use driveId instead.
     ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
-        self._file_id = new_value.to_string();
+    /// Sets the *team drive id* query property to the given value.
+    pub fn team_drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
+        self._team_drive_id = Some(new_value.to_string());
         self
     }
-    /// The key of the property.
+    /// Deprecated use supportsAllDrives instead.
     ///
-    /// Sets the *property key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn property_key(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
-        self._property_key = new_value.to_string();
+    /// Sets the *supports team drives* query property to the given value.
+    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
+        self._supports_team_drives = Some(new_value);
         self
     }
-    /// The visibility of the property. Allowed values are PRIVATE and PUBLIC. (Default: PRIVATE)
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
     ///
-    /// Sets the *visibility* query property to the given value.
-    pub fn visibility(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
-        self._visibility = Some(new_value.to_string());
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - use pageToken instead.
+    ///
+    /// Sets the *start change id* query property to the given value.
+    pub fn start_change_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
+        self._start_change_id = Some(new_value.to_string());
+        self
+    }
+    /// A comma-separated list of spaces to query. Supported values are 'drive', 'appDataFolder' and 'photos'.
+    ///
+    /// Sets the *spaces* query property to the given value.
+    pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
+        self._spaces = Some(new_value.to_string());
+        self
+    }
+    /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response or to the response from the getStartPageToken method.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of changes to return.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> ChangeWatchCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// Deprecated use includeItemsFromAllDrives instead.
+    ///
+    /// Sets the *include team drive items* query property to the given value.
+    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
+        self._include_team_drive_items = Some(new_value);
+        self
+    }
+    /// Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the result.
+    ///
+    /// Sets the *include subscribed* query property to the given value.
+    pub fn include_subscribed(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
+        self._include_subscribed = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether both My Drive and shared drive items should be included in results. This parameter will only be effective until June 1, 2020. Afterwards shared drive items will be included in the results.
+    ///
+    /// Sets the *include items from all drives* query property to the given value.
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
+        self._include_items_from_all_drives = Some(new_value);
+        self
+    }
+    /// Whether to include changes indicating that items have been removed from the list of changes, for example by deletion or loss of access.
+    ///
+    /// Sets the *include deleted* query property to the given value.
+    pub fn include_deleted(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
+        self._include_deleted = Some(new_value);
+        self
+    }
+    /// Whether changes should include the file resource if the file is still accessible by the user at the time of the request, even when a file was removed from the list of changes and there will be no further change entries for this file.
+    ///
+    /// Sets the *include corpus removals* query property to the given value.
+    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
+        self._include_corpus_removals = Some(new_value);
+        self
+    }
+    /// The shared drive from which changes will be returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
+    ///
+    /// Sets the *drive id* query property to the given value.
+    pub fn drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
+        self._drive_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -20543,7 +22837,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20564,7 +22858,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20584,7 +22878,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeWatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20613,25 +22907,25 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().delete("fileId", "propertyKey")
-///              .visibility("erat")
+///              .visibility("clita")
 ///              .doit();
 /// # }
 /// ```
 pub struct PropertyDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _property_key: String,
     _visibility: Option<String>,
@@ -20867,13 +23161,13 @@ impl<'a, C, A> PropertyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20889,7 +23183,7 @@ impl<'a, C, A> PropertyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 pub struct PropertyInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Property,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -21137,13 +23431,13 @@ impl<'a, C, A> PropertyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21154,7 +23448,7 @@ impl<'a, C, A> PropertyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 pub struct PropertyListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -21378,13 +23672,13 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21394,14 +23688,14 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().update(req, "fileId", "propertyKey")
-///              .visibility("sed")
+///              .visibility("sit")
 ///              .doit();
 /// # }
 /// ```
 pub struct PropertyUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Property,
     _file_id: String,
     _property_key: String,
@@ -21655,6 +23949,301 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
+/// Updates a property.
+///
+/// A builder for the *patch* method supported by a *property* resource.
+/// It is not used directly, but through a `PropertyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// use drive2::Property;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Property::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.properties().patch(req, "fileId", "propertyKey")
+///              .visibility("erat")
+///              .doit();
+/// # }
+/// ```
+pub struct PropertyPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _request: Property,
+    _file_id: String,
+    _property_key: String,
+    _visibility: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PropertyPatchCall<'a, C, A> {}
+
+impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Property)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.properties.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("propertyKey", self._property_key.to_string()));
+        if let Some(value) = self._visibility {
+            params.push(("visibility", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "propertyKey", "visibility"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/properties/{propertyKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{propertyKey}", "propertyKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["propertyKey", "fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Property) -> PropertyPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the file.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// The key of the property.
+    ///
+    /// Sets the *property key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn property_key(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
+        self._property_key = new_value.to_string();
+        self
+    }
+    /// The visibility of the property. Allowed values are PRIVATE and PUBLIC. (Default: PRIVATE)
+    ///
+    /// Sets the *visibility* query property to the given value.
+    pub fn visibility(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
+        self._visibility = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets a property by its key.
 ///
 /// A builder for the *get* method supported by a *property* resource.
@@ -21672,25 +24261,25 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().get("fileId", "propertyKey")
-///              .visibility("nonumy")
+///              .visibility("et")
 ///              .doit();
 /// # }
 /// ```
 pub struct PropertyGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _property_key: String,
     _visibility: Option<String>,
@@ -21919,258 +24508,6 @@ impl<'a, C, A> PropertyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Gets a specific revision.
-///
-/// A builder for the *get* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.revisions().get("fileId", "revisionId")
-///              .doit();
-/// # }
-/// ```
-pub struct RevisionGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Drive<C, A>,
-    _file_id: String,
-    _revision_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for RevisionGetCall<'a, C, A> {}
-
-impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Revision)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.revisions.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
-        for &field in ["alt", "fileId", "revisionId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["revisionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the file.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// The ID of the revision.
-    ///
-    /// Sets the *revision id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
-        self._revision_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::MetadataReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Updates a revision. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *revision* resource.
@@ -22189,13 +24526,13 @@ impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22211,7 +24548,7 @@ impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 pub struct RevisionPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Revision,
     _file_id: String,
     _revision_id: String,
@@ -22454,6 +24791,258 @@ impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
+/// Gets a specific revision.
+///
+/// A builder for the *get* method supported by a *revision* resource.
+/// It is not used directly, but through a `RevisionMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.revisions().get("fileId", "revisionId")
+///              .doit();
+/// # }
+/// ```
+pub struct RevisionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _file_id: String,
+    _revision_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RevisionGetCall<'a, C, A> {}
+
+impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Revision)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.revisions.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("revisionId", self._revision_id.to_string()));
+        for &field in ["alt", "fileId", "revisionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::MetadataReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["revisionId", "fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the file.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// The ID of the revision.
+    ///
+    /// Sets the *revision id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
+        self._revision_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::MetadataReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Permanently deletes a file version. You can only delete revisions for files with binary content, like images or videos. Revisions for other files, like Google Docs or Sheets, and the last remaining file version can't be deleted.
 ///
 /// A builder for the *delete* method supported by a *revision* resource.
@@ -22471,13 +25060,13 @@ impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22488,7 +25077,7 @@ impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 pub struct RevisionDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _revision_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -22713,13 +25302,13 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22735,7 +25324,7 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 pub struct RevisionUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _request: Revision,
     _file_id: String,
     _revision_id: String,
@@ -22995,26 +25584,26 @@ impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::Drive;
+/// # use drive2::DriveHub;
 /// 
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Drive::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
-///              .page_token("eirmod")
-///              .max_results(-58)
+///              .page_token("takimata")
+///              .max_results(-28)
 ///              .doit();
 /// # }
 /// ```
 pub struct RevisionListCall<'a, C, A>
     where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, A>,
+    hub: &'a DriveHub<C, A>,
     _file_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,

@@ -1,4 +1,4 @@
-site_name: Android Publisher v1.0.8+20190402
+site_name: Android Publisher v1.0.9+20190702
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher3-cli
 site_description: A complete library to interact with Android Publisher (protocol v3)
 
@@ -50,8 +50,12 @@ pages:
 - ['inappproducts_list.md', 'Inappproducts', 'List']
 - ['inappproducts_patch.md', 'Inappproducts', 'Patch']
 - ['inappproducts_update.md', 'Inappproducts', 'Update']
+- ['internalappsharingartifacts_uploadapk.md', 'Internalappsharingartifacts', 'Uploadapk']
+- ['internalappsharingartifacts_uploadbundle.md', 'Internalappsharingartifacts', 'Uploadbundle']
 - ['orders_refund.md', 'Orders', 'Refund']
+- ['purchases_products-acknowledge.md', 'Purchases', 'Products Acknowledge']
 - ['purchases_products-get.md', 'Purchases', 'Products Get']
+- ['purchases_subscriptions-acknowledge.md', 'Purchases', 'Subscriptions Acknowledge']
 - ['purchases_subscriptions-cancel.md', 'Purchases', 'Subscriptions Cancel']
 - ['purchases_subscriptions-defer.md', 'Purchases', 'Subscriptions Defer']
 - ['purchases_subscriptions-get.md', 'Purchases', 'Subscriptions Get']
@@ -64,5 +68,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

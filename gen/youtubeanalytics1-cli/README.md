@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *YouTube Analytics* API can be found at the
-[official documentation site](http://developers.google.com/youtube/analytics/).
+[official documentation site](https://developers.google.com/youtube/analytics).
 
 # Installation and Source Code
 
@@ -25,28 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube Analytics* API at revision *20190403*. The CLI is at version *1.0.8*.
+This documentation was generated from the *YouTube Analytics* API at revision *20190703*. The CLI is at version *1.0.8*.
 
 ```bash
 youtubeanalytics1 [options]
-        group-items
-                delete <id> [-p <v>]...
-                insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <group-id> [-p <v>]... [-o <out>]
-        groups
-                delete <id> [-p <v>]...
-                insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
-                update (-r <kv>)... [-p <v>]... [-o <out>]
-        reports
-                query <ids> <start-date> <end-date> <metrics> [-p <v>]... [-o <out>]
   youtubeanalytics1 --help
 
 Configuration:
-  [--scope <url>]...
-            Specify the authentication a method should be executed in. Each scope
-            requires the user to grant this application permission to use it.
-            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.

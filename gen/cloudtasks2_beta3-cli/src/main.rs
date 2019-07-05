@@ -184,6 +184,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "stackdriver-logging-config.sampling-ratio" => Some(("stackdriverLoggingConfig.samplingRatio", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "rate-limits.max-concurrent-dispatches" => Some(("rateLimits.maxConcurrentDispatches", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "rate-limits.max-burst-size" => Some(("rateLimits.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "rate-limits.max-dispatches-per-second" => Some(("rateLimits.maxDispatchesPerSecond", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -199,7 +200,7 @@ impl<'n> Engine<'n> {
                     "retry-config.max-backoff" => Some(("retryConfig.maxBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.min-backoff" => Some(("retryConfig.minBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "service", "state", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "sampling-ratio", "service", "stackdriver-logging-config", "state", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -533,6 +534,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "stackdriver-logging-config.sampling-ratio" => Some(("stackdriverLoggingConfig.samplingRatio", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "rate-limits.max-concurrent-dispatches" => Some(("rateLimits.maxConcurrentDispatches", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "rate-limits.max-burst-size" => Some(("rateLimits.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "rate-limits.max-dispatches-per-second" => Some(("rateLimits.maxDispatchesPerSecond", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -548,7 +550,7 @@ impl<'n> Engine<'n> {
                     "retry-config.max-backoff" => Some(("retryConfig.maxBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.min-backoff" => Some(("retryConfig.minBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "service", "state", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "sampling-ratio", "service", "stackdriver-logging-config", "state", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -974,6 +976,14 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "response-view" => Some(("responseView", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.body" => Some(("task.httpRequest.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.http-method" => Some(("task.httpRequest.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.url" => Some(("task.httpRequest.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oidc-token.audience" => Some(("task.httpRequest.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oidc-token.service-account-email" => Some(("task.httpRequest.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oauth-token.scope" => Some(("task.httpRequest.oauthToken.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.oauth-token.service-account-email" => Some(("task.httpRequest.oauthToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.http-request.headers" => Some(("task.httpRequest.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "task.app-engine-http-request.body" => Some(("task.appEngineHttpRequest.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.headers" => Some(("task.appEngineHttpRequest.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "task.app-engine-http-request.app-engine-routing.instance" => Some(("task.appEngineHttpRequest.appEngineRouting.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1000,7 +1010,7 @@ impl<'n> Engine<'n> {
                     "task.dispatch-count" => Some(("task.dispatchCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "task.name" => Some(("task.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "body", "code", "create-time", "dispatch-count", "dispatch-deadline", "dispatch-time", "first-attempt", "headers", "host", "http-method", "instance", "last-attempt", "message", "name", "relative-uri", "response-count", "response-status", "response-time", "response-view", "schedule-time", "service", "task", "version", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "audience", "body", "code", "create-time", "dispatch-count", "dispatch-deadline", "dispatch-time", "first-attempt", "headers", "host", "http-method", "http-request", "instance", "last-attempt", "message", "name", "oauth-token", "oidc-token", "relative-uri", "response-count", "response-status", "response-time", "response-view", "schedule-time", "scope", "service", "service-account-email", "task", "url", "version", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1607,8 +1617,9 @@ fn main() {
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-        before using this method."##),
+        [Overview of Queue Management and
+        queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+        this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-queues-create",
                   vec![
                     (Some(r##"parent"##),
@@ -1653,8 +1664,9 @@ fn main() {
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-        before using this method."##),
+        [Overview of Queue Management and
+        queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+        this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-queues-delete",
                   vec![
                     (Some(r##"name"##),
@@ -1780,8 +1792,9 @@ fn main() {
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
-        before using this method."##),
+        [Overview of Queue Management and
+        queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml) before using
+        this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-queues-patch",
                   vec![
                     (Some(r##"name"##),
@@ -1911,7 +1924,8 @@ fn main() {
         WARNING: Resuming many high-QPS queues at the same time can
         lead to target overloading. If you are resuming high-QPS
         queues, follow the 500/50/5 pattern described in
-        [Managing Cloud Tasks Scaling Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling)."##),
+        [Managing Cloud Tasks Scaling
+        Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-queues-resume",
                   vec![
                     (Some(r##"name"##),
@@ -1985,8 +1999,7 @@ fn main() {
         
         Tasks cannot be updated after creation; there is no UpdateTask command.
         
-        * For App Engine queues, the maximum task size is
-          100KB."##),
+        * The maximum task size is 100KB."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli/projects_locations-queues-tasks-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2200,7 +2213,7 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190326")
+           .version("1.0.9+20190618")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli")
            .arg(Arg::with_name("url")

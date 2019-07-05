@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Provisioning Partner* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Android Provisioning Partner* crate version *1.0.9+20190622*, where *20190622* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Android Provisioning Partner* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/zero-touch/).
@@ -225,9 +225,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -317,7 +315,7 @@ impl<'a, C, A> AndroidProvisioningPartner<C, A>
         AndroidProvisioningPartner {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://androiddeviceprovisioning.googleapis.com/".to_string(),
             _root_url: "https://androiddeviceprovisioning.googleapis.com/".to_string(),
         }
@@ -334,7 +332,7 @@ impl<'a, C, A> AndroidProvisioningPartner<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -368,9 +366,16 @@ impl<'a, C, A> AndroidProvisioningPartner<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PartnerUnclaim {
+    /// The duration of the vacation unlock starting from when the request is
+    /// processed. (1 day is treated as 24 hours)
+    #[serde(rename="vacationModeDays")]
+    pub vacation_mode_days: Option<i32>,
     /// Device identifier of the device.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
+    /// The expiration time of the vacation unlock.
+    #[serde(rename="vacationModeExpireTime")]
+    pub vacation_mode_expire_time: Option<String>,
     /// Device ID of the device.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
@@ -594,56 +599,11 @@ impl ResponseResult for ListVendorCustomersResponse {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -846,9 +806,17 @@ impl ResponseResult for Device {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceClaim {
+    /// The timestamp when the device was put into ‘vacation mode’. This value is
+    /// present iff the device is in 'vacation mode'.
+    #[serde(rename="vacationModeStartTime")]
+    pub vacation_mode_start_time: Option<String>,
     /// The ID of the Customer that purchased the device.
     #[serde(rename="ownerCompanyId")]
     pub owner_company_id: Option<String>,
+    /// The timestamp when the device will exit ‘vacation mode’. This value is
+    /// present iff the device is in 'vacation mode'.
+    #[serde(rename="vacationModeExpireTime")]
+    pub vacation_mode_expire_time: Option<String>,
     /// Output only. The type of claim made on the device.
     #[serde(rename="sectionType")]
     pub section_type: Option<String>,
@@ -1044,9 +1012,16 @@ impl ResponseResult for FindDevicesByOwnerResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnclaimDeviceRequest {
+    /// The duration of the vacation unlock starting from when the request is
+    /// processed. (1 day is treated as 24 hours)
+    #[serde(rename="vacationModeDays")]
+    pub vacation_mode_days: Option<i32>,
     /// The device identifier you used when you claimed this device.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
+    /// The expiration time of the vacation unlock.
+    #[serde(rename="vacationModeExpireTime")]
+    pub vacation_mode_expire_time: Option<String>,
     /// The device ID returned by `ClaimDevice`.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
@@ -1201,7 +1176,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// This field will contain a `DevicesLongRunningOperationMetadata` object if the operation is created by `claimAsync`, `unclaimAsync`, or `updateMetadataAsync`.
     pub metadata: Option<HashMap<String, String>>,

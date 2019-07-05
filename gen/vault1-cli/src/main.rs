@@ -397,10 +397,12 @@ impl<'n> Engine<'n> {
                     "requester.display-name" => Some(("requester.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "requester.email" => Some(("requester.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.terms" => Some(("query.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.shared-drive-info.shared-drive-ids" => Some(("query.sharedDriveInfo.sharedDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.team-drive-info.team-drive-ids" => Some(("query.teamDriveInfo.teamDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.mail-options.exclude-drafts" => Some(("query.mailOptions.excludeDrafts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.search-method" => Some(("query.searchMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.hangouts-chat-info.room-id" => Some(("query.hangoutsChatInfo.roomId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.method" => Some(("query.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.hangouts-chat-options.include-rooms" => Some(("query.hangoutsChatOptions.includeRooms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.start-time" => Some(("query.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -409,11 +411,12 @@ impl<'n> Engine<'n> {
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.end-time" => Some(("query.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-options.include-shared-drives" => Some(("query.driveOptions.includeSharedDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.version-date" => Some(("query.driveOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.include-team-drives" => Some(("query.driveOptions.includeTeamDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-team-drives", "mail-options", "matter-id", "name", "org-unit-id", "org-unit-info", "query", "region", "requester", "room-id", "search-method", "show-confidential-mode-content", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "version-date"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "name", "org-unit-id", "org-unit-info", "query", "region", "requester", "room-id", "search-method", "shared-drive-ids", "shared-drive-info", "show-confidential-mode-content", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "version-date"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -715,10 +718,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "last-name" => Some(("lastName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hold-time" => Some(("holdTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "first-name" => Some(("firstName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "hold-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "email", "first-name", "hold-time", "last-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -999,6 +1005,7 @@ impl<'n> Engine<'n> {
                     "query.mail-query.end-time" => Some(("query.mailQuery.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.mail-query.terms" => Some(("query.mailQuery.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.mail-query.start-time" => Some(("query.mailQuery.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-query.include-shared-drive-files" => Some(("query.driveQuery.includeSharedDriveFiles", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-query.include-team-drive-files" => Some(("query.driveQuery.includeTeamDriveFiles", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.groups-query.end-time" => Some(("query.groupsQuery.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.groups-query.terms" => Some(("query.groupsQuery.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1006,7 +1013,7 @@ impl<'n> Engine<'n> {
                     "corpus" => Some(("corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hold-id" => Some(("holdId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["corpus", "drive-query", "end-time", "groups-query", "hangouts-chat-query", "hold-id", "hold-time", "include-rooms", "include-team-drive-files", "mail-query", "name", "org-unit", "org-unit-id", "query", "start-time", "terms", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["corpus", "drive-query", "end-time", "groups-query", "hangouts-chat-query", "hold-id", "hold-time", "include-rooms", "include-shared-drive-files", "include-team-drive-files", "mail-query", "name", "org-unit", "org-unit-id", "query", "start-time", "terms", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1352,6 +1359,7 @@ impl<'n> Engine<'n> {
                     "query.mail-query.end-time" => Some(("query.mailQuery.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.mail-query.terms" => Some(("query.mailQuery.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.mail-query.start-time" => Some(("query.mailQuery.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-query.include-shared-drive-files" => Some(("query.driveQuery.includeSharedDriveFiles", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-query.include-team-drive-files" => Some(("query.driveQuery.includeTeamDriveFiles", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.groups-query.end-time" => Some(("query.groupsQuery.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.groups-query.terms" => Some(("query.groupsQuery.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1359,7 +1367,7 @@ impl<'n> Engine<'n> {
                     "corpus" => Some(("corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hold-id" => Some(("holdId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["corpus", "drive-query", "end-time", "groups-query", "hangouts-chat-query", "hold-id", "hold-time", "include-rooms", "include-team-drive-files", "mail-query", "name", "org-unit", "org-unit-id", "query", "start-time", "terms", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["corpus", "drive-query", "end-time", "groups-query", "hangouts-chat-query", "hold-id", "hold-time", "include-rooms", "include-shared-drive-files", "include-team-drive-files", "mail-query", "name", "org-unit", "org-unit-id", "query", "start-time", "terms", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1678,10 +1686,12 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "matter-id" => Some(("matterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.terms" => Some(("query.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.shared-drive-info.shared-drive-ids" => Some(("query.sharedDriveInfo.sharedDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.team-drive-info.team-drive-ids" => Some(("query.teamDriveInfo.teamDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.mail-options.exclude-drafts" => Some(("query.mailOptions.excludeDrafts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.search-method" => Some(("query.searchMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.hangouts-chat-info.room-id" => Some(("query.hangoutsChatInfo.roomId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.method" => Some(("query.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.hangouts-chat-options.include-rooms" => Some(("query.hangoutsChatOptions.includeRooms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.start-time" => Some(("query.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1690,13 +1700,14 @@ impl<'n> Engine<'n> {
                     "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.end-time" => Some(("query.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-options.include-shared-drives" => Some(("query.driveOptions.includeSharedDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.drive-options.version-date" => Some(("query.driveOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.drive-options.include-team-drives" => Some(("query.driveOptions.includeTeamDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "saved-query-id" => Some(("savedQueryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "create-time", "data-scope", "display-name", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-team-drives", "mail-options", "matter-id", "org-unit-id", "org-unit-info", "query", "room-id", "saved-query-id", "search-method", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "version-date"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "create-time", "data-scope", "display-name", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-shared-drives", "include-team-drives", "mail-options", "matter-id", "method", "org-unit-id", "org-unit-info", "query", "room-id", "saved-query-id", "search-method", "shared-drive-ids", "shared-drive-info", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "version-date"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3069,7 +3080,7 @@ fn main() {
     
     let mut app = App::new("vault1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190312")
+           .version("1.0.9+20190614")
            .about("Archiving and eDiscovery for G Suite.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vault1_cli")
            .arg(Arg::with_name("url")

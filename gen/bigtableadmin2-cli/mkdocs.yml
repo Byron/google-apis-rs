@@ -1,4 +1,4 @@
-site_name: Bigtable Admin v1.0.8+20190328
+site_name: Bigtable Admin v1.0.9+20190506
 site_url: http://byron.github.io/google-apis-rs/google-bigtableadmin2-cli
 site_description: A complete library to interact with Bigtable Admin (protocol v2)
 
@@ -43,8 +43,10 @@ pages:
 - ['projects_instances-tables-test-iam-permissions.md', 'Projects', 'Instances Tables Test Iam Permissions']
 - ['projects_instances-test-iam-permissions.md', 'Projects', 'Instances Test Iam Permissions']
 - ['projects_instances-update.md', 'Projects', 'Instances Update']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

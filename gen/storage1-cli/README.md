@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storage* API at revision *20190226*. The CLI is at version *1.0.8*.
+This documentation was generated from the *storage* API at revision *20190624*. The CLI is at version *1.0.9*.
 
 ```bash
 storage1 [options]
@@ -83,6 +83,11 @@ storage1 [options]
                 update <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
                 watch-all <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                hmac-keys-create <project-id> <service-account-email> [-p <v>]... [-o <out>]
+                hmac-keys-delete <project-id> <access-id> [-p <v>]...
+                hmac-keys-get <project-id> <access-id> [-p <v>]... [-o <out>]
+                hmac-keys-list <project-id> [-p <v>]... [-o <out>]
+                hmac-keys-update <project-id> <access-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-account-get <project-id> [-p <v>]... [-o <out>]
   storage1 --help
 

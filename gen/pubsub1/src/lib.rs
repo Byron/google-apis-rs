@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.8+20190314*, where *20190314* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Pubsub* crate version *1.0.9+20190625*, where *20190625* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -222,9 +222,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -340,7 +338,7 @@ impl<'a, C, A> Pubsub<C, A>
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://pubsub.googleapis.com/".to_string(),
             _root_url: "https://pubsub.googleapis.com/".to_string(),
         }
@@ -351,7 +349,7 @@ impl<'a, C, A> Pubsub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -992,7 +990,8 @@ pub struct Subscription {
     /// messages are not expunged from the subscription's backlog, even if they are
     /// acknowledged, until they fall out of the `message_retention_duration`
     /// window. This must be true if you would like to
-    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time">
+    /// <a
+    /// href="https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time">
     /// Seek to a timestamp</a>.
     #[serde(rename="retainAckedMessages")]
     pub retain_acked_messages: Option<bool>,
@@ -1002,9 +1001,6 @@ pub struct Subscription {
     /// operations on the subscription. If `expiration_policy` is not set, a
     /// *default policy* with `ttl` of 31 days will be used. The minimum allowed
     /// value for `expiration_policy.ttl` is 1 day.
-    /// <b>BETA:</b> This feature is part of a beta release. This API might be
-    /// changed in backward-incompatible ways and is not recommended for production
-    /// use. It is not subject to any SLA or deprecation policy.
     #[serde(rename="expirationPolicy")]
     pub expiration_policy: Option<ExpirationPolicy>,
 }
@@ -1145,6 +1141,24 @@ pub struct Snapshot {
 impl ResponseResult for Snapshot {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MessageStoragePolicy {
+    /// A list of IDs of GCP regions where messages that are published to the topic
+    /// may be persisted in storage. Messages published by publishers running in
+    /// non-allowed GCP regions (or running outside of GCP altogether) will be
+    /// routed for storage in one of the allowed regions. An empty list means that
+    /// no regions are allowed, and is not a valid configuration.
+    #[serde(rename="allowedPersistenceRegions")]
+    pub allowed_persistence_regions: Option<Vec<String>>,
+}
+
+impl Part for MessageStoragePolicy {}
+
+
 /// A policy that specifies the conditions for resource expiration (i.e.,
 /// automatic resource deletion).
 /// 
@@ -1173,8 +1187,8 @@ pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
-    /// Unimplemented. The condition that is associated with this binding.
-    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// The condition that is associated with this binding.
+    /// NOTE: An unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
     pub condition: Option<Expr>,
@@ -1260,6 +1274,17 @@ pub struct Topic {
     /// signs (`%`). It must be between 3 and 255 characters in length, and it
     /// must not start with `"goog"`.
     pub name: Option<String>,
+    /// Policy constraining the set of Google Cloud Platform regions where messages
+    /// published to the topic may be stored. If not present, then no constraints
+    /// are in effect.
+    #[serde(rename="messageStoragePolicy")]
+    pub message_storage_policy: Option<MessageStoragePolicy>,
+    /// The resource name of the Cloud KMS CryptoKey to be used to protect access
+    /// to messages published on this topic.
+    /// 
+    /// The expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
+    #[serde(rename="kmsKeyName")]
+    pub kms_key_name: Option<String>,
 }
 
 impl RequestValue for Topic {}
@@ -1880,9 +1905,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// If the name is not provided in the request, the server will assign a random
     /// name for this subscription on the same project as the topic, conforming
     /// to the
-    /// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
-    /// The generated name is populated in the returned Subscription object.
-    /// Note that for REST API requests, you must specify a name in the request.
+    /// [resource name
+    /// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+    /// generated name is populated in the returned Subscription object. Note that
+    /// for REST API requests, you must specify a name in the request.
     /// 
     /// # Arguments
     ///
@@ -1945,9 +1971,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// the request, the server will assign a random
     /// name for this snapshot on the same project as the subscription, conforming
     /// to the
-    /// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
-    /// The generated name is populated in the returned Snapshot object. Note that
-    /// for REST API requests, you must specify a name in the request.
+    /// [resource name
+    /// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+    /// generated name is populated in the returned Snapshot object. Note that for
+    /// REST API requests, you must specify a name in the request.
     /// 
     /// # Arguments
     ///
@@ -7894,9 +7921,10 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// If the name is not provided in the request, the server will assign a random
 /// name for this subscription on the same project as the topic, conforming
 /// to the
-/// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
-/// The generated name is populated in the returned Subscription object.
-/// Note that for REST API requests, you must specify a name in the request.
+/// [resource name
+/// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+/// generated name is populated in the returned Subscription object. Note that
+/// for REST API requests, you must specify a name in the request.
 ///
 /// A builder for the *subscriptions.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8479,9 +8507,10 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
 /// the request, the server will assign a random
 /// name for this snapshot on the same project as the subscription, conforming
 /// to the
-/// [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
-/// The generated name is populated in the returned Snapshot object. Note that
-/// for REST API requests, you must specify a name in the request.
+/// [resource name
+/// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+/// generated name is populated in the returned Snapshot object. Note that for
+/// REST API requests, you must specify a name in the request.
 ///
 /// A builder for the *snapshots.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

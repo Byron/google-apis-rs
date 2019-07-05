@@ -25,12 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Photos Library* API at revision *20190402*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Photos Library* API at revision *20190702*. The CLI is at version *1.0.9*.
 
 ```bash
 photoslibrary1 [options]
         albums
                 add-enrichment <album-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                batch-add-media-items <album-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                batch-remove-media-items <album-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 get <album-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]

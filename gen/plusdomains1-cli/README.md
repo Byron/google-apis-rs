@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *plusDomains* API at revision *20190328*. The CLI is at version *1.0.8*.
+This documentation was generated from the *plusDomains* API at revision *20190616*. The CLI is at version *1.0.9*.
 
 ```bash
 plusdomains1 [options]
@@ -45,7 +45,6 @@ plusdomains1 [options]
                 get <user-id> [-p <v>]... [-o <out>]
                 list <user-id> <collection> [-p <v>]... [-o <out>]
                 list-by-activity <activity-id> <collection> [-p <v>]... [-o <out>]
-                list-by-circle <circle-id> [-p <v>]... [-o <out>]
   plusdomains1 --help
 
 Configuration:

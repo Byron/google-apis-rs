@@ -1,4 +1,4 @@
-site_name: Cloud OS Login v1.0.8+20190309
+site_name: Cloud OS Login v1.0.9+20190614
 site_url: http://byron.github.io/google-apis-rs/google-oslogin1_beta-cli
 site_description: A complete library to interact with Cloud OS Login (protocol v1beta)
 
@@ -18,5 +18,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
 

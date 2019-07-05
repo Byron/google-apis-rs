@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *1.0.8+20190401*, where *20190401* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *classroom* crate version *1.0.9+20190701*, where *20190701* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -262,9 +262,7 @@ use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
-              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
-              Resource, ErrorResponse, remove_json_null_values};
+pub use cmn::*;
 
 
 // ##############
@@ -451,7 +449,7 @@ impl<'a, C, A> Classroom<C, A>
         Classroom {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.8".to_string(),
+            _user_agent: "google-api-rust-client/1.0.9".to_string(),
             _base_url: "https://classroom.googleapis.com/".to_string(),
             _root_url: "https://classroom.googleapis.com/".to_string(),
         }
@@ -471,7 +469,7 @@ impl<'a, C, A> Classroom<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.8`.
+    /// It defaults to `google-api-rust-client/1.0.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -559,8 +557,8 @@ pub struct Announcement {
     pub alternate_link: Option<String>,
     /// Identifiers of students with access to the announcement.
     /// This field is set only if `assigneeMode` is `INDIVIDUAL_STUDENTS`.
-    /// If the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students specified in this
-    /// field will be able to see the announcement.
+    /// If the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students
+    /// specified in this field will be able to see the announcement.
     #[serde(rename="individualStudentsOptions")]
     pub individual_students_options: Option<IndividualStudentsOptions>,
     /// Classroom-assigned identifier of this announcement, unique per course.
@@ -1019,7 +1017,8 @@ pub struct Course {
     /// Information about a Drive Folder that is shared with all teachers of the
     /// course.
     /// 
-    /// This field will only be set for teachers of the course and domain administrators.
+    /// This field will only be set for teachers of the course and domain
+    /// administrators.
     /// 
     /// Read-only.
     #[serde(rename="teacherFolder")]
@@ -13733,6 +13732,7 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * `max_points`
     /// * `scheduled_time`
     /// * `submission_modification_mode`
+    /// * `topic_id`
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> CourseCourseWorkPatchCall<'a, C, A> {

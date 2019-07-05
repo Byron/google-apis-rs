@@ -46,58 +46,6 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
-    fn _operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.operations().delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _projects_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get_config(opt.value_of("name").unwrap_or(""));
@@ -262,14 +210,15 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "job-id" => Some(("jobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-output.is-built-in-algorithm-job" => Some(("trainingOutput.isBuiltInAlgorithmJob", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "training-output.completed-trial-count" => Some(("trainingOutput.completedTrialCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-output.is-hyperparameter-tuning-job" => Some(("trainingOutput.isHyperparameterTuningJob", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-output.is-built-in-algorithm-job" => Some(("trainingOutput.isBuiltInAlgorithmJob", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-output.consumed-ml-units" => Some(("trainingOutput.consumedMLUnits", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "training-output.hyperparameter-metric-tag" => Some(("trainingOutput.hyperparameterMetricTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.framework" => Some(("trainingOutput.builtInAlgorithmOutput.framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.model-path" => Some(("trainingOutput.builtInAlgorithmOutput.modelPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.runtime-version" => Some(("trainingOutput.builtInAlgorithmOutput.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.python-version" => Some(("trainingOutput.builtInAlgorithmOutput.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-output.consumed-ml-units" => Some(("trainingOutput.consumedMLUnits", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-input.model-name" => Some(("predictionInput.modelName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-input.signature-name" => Some(("predictionInput.signatureName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -284,6 +233,7 @@ impl<'n> Engine<'n> {
                     "prediction-input.input-paths" => Some(("predictionInput.inputPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "prediction-input.output-data-format" => Some(("predictionInput.outputDataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.image-uri" => Some(("trainingInput.parameterServerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -306,9 +256,12 @@ impl<'n> Engine<'n> {
                     "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.worker-count" => Some(("trainingInput.workerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-type" => Some(("trainingInput.parameterServerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.max-running-time" => Some(("trainingInput.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.image-uri" => Some(("trainingInput.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -320,7 +273,7 @@ impl<'n> Engine<'n> {
                     "prediction-output.error-count" => Some(("predictionOutput.errorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "end-time", "error-count", "error-message", "etag", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "signature-name", "start-time", "state", "training-input", "training-output", "type", "uri", "version-name", "worker-config", "worker-count", "worker-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "end-time", "error-count", "error-message", "etag", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "version-name", "worker-config", "worker-count", "worker-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -574,14 +527,15 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "job-id" => Some(("jobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-output.is-built-in-algorithm-job" => Some(("trainingOutput.isBuiltInAlgorithmJob", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "training-output.completed-trial-count" => Some(("trainingOutput.completedTrialCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-output.is-hyperparameter-tuning-job" => Some(("trainingOutput.isHyperparameterTuningJob", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-output.is-built-in-algorithm-job" => Some(("trainingOutput.isBuiltInAlgorithmJob", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-output.consumed-ml-units" => Some(("trainingOutput.consumedMLUnits", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "training-output.hyperparameter-metric-tag" => Some(("trainingOutput.hyperparameterMetricTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.framework" => Some(("trainingOutput.builtInAlgorithmOutput.framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.model-path" => Some(("trainingOutput.builtInAlgorithmOutput.modelPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.runtime-version" => Some(("trainingOutput.builtInAlgorithmOutput.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-output.built-in-algorithm-output.python-version" => Some(("trainingOutput.builtInAlgorithmOutput.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-output.consumed-ml-units" => Some(("trainingOutput.consumedMLUnits", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-input.model-name" => Some(("predictionInput.modelName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-input.signature-name" => Some(("predictionInput.signatureName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -596,6 +550,7 @@ impl<'n> Engine<'n> {
                     "prediction-input.input-paths" => Some(("predictionInput.inputPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "prediction-input.output-data-format" => Some(("predictionInput.outputDataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.image-uri" => Some(("trainingInput.parameterServerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -618,9 +573,12 @@ impl<'n> Engine<'n> {
                     "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.worker-count" => Some(("trainingInput.workerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-type" => Some(("trainingInput.parameterServerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.max-running-time" => Some(("trainingInput.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.image-uri" => Some(("trainingInput.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -632,7 +590,7 @@ impl<'n> Engine<'n> {
                     "prediction-output.error-count" => Some(("predictionOutput.errorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "end-time", "error-count", "error-message", "etag", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "signature-name", "start-time", "state", "training-input", "training-output", "type", "uri", "version-name", "worker-config", "worker-count", "worker-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "end-time", "error-count", "error-message", "etag", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "version-name", "worker-config", "worker-count", "worker-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1013,10 +971,13 @@ impl<'n> Engine<'n> {
                     "default-version.description" => Some(("defaultVersion.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.runtime-version" => Some(("defaultVersion.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.manual-scaling.nodes" => Some(("defaultVersion.manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.prediction-class" => Some(("defaultVersion.predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.labels" => Some(("defaultVersion.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "default-version.service-account" => Some(("defaultVersion.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.python-version" => Some(("defaultVersion.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.framework" => Some(("defaultVersion.framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.package-uris" => Some(("defaultVersion.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "default-version.etag" => Some(("defaultVersion.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.last-use-time" => Some(("defaultVersion.lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.deployment-uri" => Some(("defaultVersion.deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1026,7 +987,7 @@ impl<'n> Engine<'n> {
                     "online-prediction-logging" => Some(("onlinePredictionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "online-prediction-console-logging", "online-prediction-logging", "python-version", "regions", "runtime-version", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "online-prediction-console-logging", "online-prediction-logging", "package-uris", "prediction-class", "python-version", "regions", "runtime-version", "service-account", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1338,10 +1299,13 @@ impl<'n> Engine<'n> {
                     "default-version.description" => Some(("defaultVersion.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.runtime-version" => Some(("defaultVersion.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.manual-scaling.nodes" => Some(("defaultVersion.manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.prediction-class" => Some(("defaultVersion.predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.labels" => Some(("defaultVersion.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "default-version.service-account" => Some(("defaultVersion.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.python-version" => Some(("defaultVersion.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.framework" => Some(("defaultVersion.framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.package-uris" => Some(("defaultVersion.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "default-version.etag" => Some(("defaultVersion.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.last-use-time" => Some(("defaultVersion.lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.deployment-uri" => Some(("defaultVersion.deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1351,7 +1315,7 @@ impl<'n> Engine<'n> {
                     "online-prediction-logging" => Some(("onlinePredictionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "online-prediction-console-logging", "online-prediction-logging", "python-version", "regions", "runtime-version", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "online-prediction-console-logging", "online-prediction-logging", "package-uris", "prediction-class", "python-version", "regions", "runtime-version", "service-account", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1616,10 +1580,13 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-version" => Some(("runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manual-scaling.nodes" => Some(("manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "prediction-class" => Some(("predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "python-version" => Some(("pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "framework" => Some(("framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-uris" => Some(("packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-use-time" => Some(("lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment-uri" => Some(("deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1627,7 +1594,7 @@ impl<'n> Engine<'n> {
                     "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "python-version", "runtime-version", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "package-uris", "prediction-class", "python-version", "runtime-version", "service-account", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1882,10 +1849,13 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-version" => Some(("runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manual-scaling.nodes" => Some(("manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "prediction-class" => Some(("predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "python-version" => Some(("pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "framework" => Some(("framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-uris" => Some(("packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-use-time" => Some(("lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment-uri" => Some(("deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1893,7 +1863,7 @@ impl<'n> Engine<'n> {
                     "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "python-version", "runtime-version", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "package-uris", "prediction-class", "python-version", "runtime-version", "service-account", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2298,17 +2268,6 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("operations", Some(opt)) => {
-                match opt.subcommand() {
-                    ("delete", Some(opt)) => {
-                        call_result = self._operations_delete(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("operations".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("get-config", Some(opt)) => {
@@ -2489,34 +2448,6 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("operations", "methods: 'delete'", vec![
-            ("delete",
-                    Some(r##"Deletes a long-running operation. This method indicates that the client is
-        no longer interested in the operation result. It does not cancel the
-        operation. If the server doesn't support this method, it returns
-        `google.rpc.Code.UNIMPLEMENTED`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/operations_delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation resource to be deleted."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
         ("projects", "methods: 'get-config', 'jobs-cancel', 'jobs-create', 'jobs-get', 'jobs-get-iam-policy', 'jobs-list', 'jobs-patch', 'jobs-set-iam-policy', 'jobs-test-iam-permissions', 'locations-get', 'locations-list', 'models-create', 'models-delete', 'models-get', 'models-get-iam-policy', 'models-list', 'models-patch', 'models-set-iam-policy', 'models-test-iam-permissions', 'models-versions-create', 'models-versions-delete', 'models-versions-get', 'models-versions-list', 'models-versions-patch', 'models-versions-set-default', 'operations-cancel', 'operations-get', 'operations-list' and 'predict'", vec![
             ("get-config",
                     Some(r##"Get the service account information associated with your project. You need
@@ -3320,7 +3251,7 @@ fn main() {
                   ]),
             ("predict",
                     Some(r##"Performs prediction on the data in the request.
-        Cloud ML Engine implements a custom `predict` verb on top of an HTTP POST
+        AI Platform implements a custom `predict` verb on top of an HTTP POST
         method. <p>For details of the request and response format, see the **guide
         to the [predict request format](/ml-engine/docs/v1/predict-request)**."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_predict",
@@ -3357,7 +3288,7 @@ fn main() {
     
     let mut app = App::new("ml1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190325")
+           .version("1.0.9+20190621")
            .about("An API to enable creating and using machine learning models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_ml1_cli")
            .arg(Arg::with_name("url")

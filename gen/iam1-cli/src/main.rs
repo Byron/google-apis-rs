@@ -1577,6 +1577,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1590,6 +1593,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3069,9 +3073,26 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource name of the parent resource in one of the following formats:
-        `organizations/{ORGANIZATION_ID}`
-        `projects/{PROJECT_ID}`"##),
+                     Some(r##"The `parent` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `parent` value format is described below:
+        
+        * [`projects.roles.create()`](/iam/reference/rest/v1/projects.roles/create):
+          `projects/{PROJECT_ID}`. This method creates project-level
+          [custom roles](/iam/docs/understanding-custom-roles).
+          Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles`
+        
+        * [`organizations.roles.create()`](/iam/reference/rest/v1/organizations.roles/create):
+          `organizations/{ORGANIZATION_ID}`. This method creates organization-level
+          [custom roles](/iam/docs/understanding-custom-roles). Example request
+          URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3105,9 +3126,26 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`projects.roles.delete()`](/iam/reference/rest/v1/projects.roles/delete):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only
+          [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.delete()`](/iam/reference/rest/v1/organizations.roles/delete):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          deletes only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3129,10 +3167,33 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `roles/{ROLE_NAME}`
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`roles`](/iam/reference/rest/v1/roles),
+        [`projects`](/iam/reference/rest/v1/projects.roles), or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`roles.get()`](/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`.
+          This method returns results from all
+          [predefined roles](/iam/docs/understanding-roles#predefined_roles) in
+          Cloud IAM. Example request URL:
+          `https://iam.googleapis.com/v1/roles/{ROLE_NAME}`
+        
+        * [`projects.roles.get()`](/iam/reference/rest/v1/projects.roles/get):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only
+          [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.get()`](/iam/reference/rest/v1/organizations.roles/get):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          returns only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3154,10 +3215,33 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource name of the parent resource in one of the following formats:
-        `` (empty string) -- this refers to curated roles.
-        `organizations/{ORGANIZATION_ID}`
-        `projects/{PROJECT_ID}`"##),
+                     Some(r##"The `parent` parameter's value depends on the target resource for the
+        request, namely
+        [`roles`](/iam/reference/rest/v1/roles),
+        [`projects`](/iam/reference/rest/v1/projects.roles), or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `parent` value format is described below:
+        
+        * [`roles.list()`](/iam/reference/rest/v1/roles/list): An empty string.
+          This method doesn't require a resource; it simply returns all
+          [predefined roles](/iam/docs/understanding-roles#predefined_roles) in
+          Cloud IAM. Example request URL:
+          `https://iam.googleapis.com/v1/roles`
+        
+        * [`projects.roles.list()`](/iam/reference/rest/v1/projects.roles/list):
+          `projects/{PROJECT_ID}`. This method lists all project-level
+          [custom roles](/iam/docs/understanding-custom-roles).
+          Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles`
+        
+        * [`organizations.roles.list()`](/iam/reference/rest/v1/organizations.roles/list):
+          `organizations/{ORGANIZATION_ID}`. This method lists all
+          organization-level [custom roles](/iam/docs/understanding-custom-roles).
+          Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3179,10 +3263,26 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `roles/{ROLE_NAME}`
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`projects.roles.patch()`](/iam/reference/rest/v1/projects.roles/patch):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only
+          [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.patch()`](/iam/reference/rest/v1/organizations.roles/patch):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          updates only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3210,9 +3310,26 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`projects.roles.undelete()`](/iam/reference/rest/v1/projects.roles/undelete):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes
+          only [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.undelete()`](/iam/reference/rest/v1/organizations.roles/undelete):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          undeletes only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3269,9 +3386,26 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource name of the parent resource in one of the following formats:
-        `organizations/{ORGANIZATION_ID}`
-        `projects/{PROJECT_ID}`"##),
+                     Some(r##"The `parent` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `parent` value format is described below:
+        
+        * [`projects.roles.create()`](/iam/reference/rest/v1/projects.roles/create):
+          `projects/{PROJECT_ID}`. This method creates project-level
+          [custom roles](/iam/docs/understanding-custom-roles).
+          Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles`
+        
+        * [`organizations.roles.create()`](/iam/reference/rest/v1/organizations.roles/create):
+          `organizations/{ORGANIZATION_ID}`. This method creates organization-level
+          [custom roles](/iam/docs/understanding-custom-roles). Example request
+          URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3305,9 +3439,26 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`projects.roles.delete()`](/iam/reference/rest/v1/projects.roles/delete):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only
+          [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.delete()`](/iam/reference/rest/v1/organizations.roles/delete):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          deletes only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3329,10 +3480,33 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `roles/{ROLE_NAME}`
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`roles`](/iam/reference/rest/v1/roles),
+        [`projects`](/iam/reference/rest/v1/projects.roles), or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`roles.get()`](/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`.
+          This method returns results from all
+          [predefined roles](/iam/docs/understanding-roles#predefined_roles) in
+          Cloud IAM. Example request URL:
+          `https://iam.googleapis.com/v1/roles/{ROLE_NAME}`
+        
+        * [`projects.roles.get()`](/iam/reference/rest/v1/projects.roles/get):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only
+          [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.get()`](/iam/reference/rest/v1/organizations.roles/get):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          returns only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3354,10 +3528,33 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource name of the parent resource in one of the following formats:
-        `` (empty string) -- this refers to curated roles.
-        `organizations/{ORGANIZATION_ID}`
-        `projects/{PROJECT_ID}`"##),
+                     Some(r##"The `parent` parameter's value depends on the target resource for the
+        request, namely
+        [`roles`](/iam/reference/rest/v1/roles),
+        [`projects`](/iam/reference/rest/v1/projects.roles), or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `parent` value format is described below:
+        
+        * [`roles.list()`](/iam/reference/rest/v1/roles/list): An empty string.
+          This method doesn't require a resource; it simply returns all
+          [predefined roles](/iam/docs/understanding-roles#predefined_roles) in
+          Cloud IAM. Example request URL:
+          `https://iam.googleapis.com/v1/roles`
+        
+        * [`projects.roles.list()`](/iam/reference/rest/v1/projects.roles/list):
+          `projects/{PROJECT_ID}`. This method lists all project-level
+          [custom roles](/iam/docs/understanding-custom-roles).
+          Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles`
+        
+        * [`organizations.roles.list()`](/iam/reference/rest/v1/organizations.roles/list):
+          `organizations/{ORGANIZATION_ID}`. This method lists all
+          organization-level [custom roles](/iam/docs/understanding-custom-roles).
+          Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3379,10 +3576,26 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `roles/{ROLE_NAME}`
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`projects.roles.patch()`](/iam/reference/rest/v1/projects.roles/patch):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only
+          [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.patch()`](/iam/reference/rest/v1/organizations.roles/patch):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          updates only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3410,9 +3623,26 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`projects`](/iam/reference/rest/v1/projects.roles) or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`projects.roles.undelete()`](/iam/reference/rest/v1/projects.roles/undelete):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes
+          only [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.undelete()`](/iam/reference/rest/v1/organizations.roles/undelete):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          undeletes only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3491,8 +3721,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-disable",
-                    Some(r##"Disables a ServiceAccount.
-        The API is currently in alpha phase."##),
+                    Some(r##"DisableServiceAccount is currently in the alpha launch stage.
+        
+        Disables a ServiceAccount,
+        which immediately prevents the service account from authenticating and
+        gaining access to APIs.
+        
+        Disabled service accounts can be safely restored by using
+        EnableServiceAccount at any point. Deleted service accounts cannot be
+        restored using this method.
+        
+        Disabling a service account that is bound to VMs, Apps, Functions, or
+        other jobs will cause those jobs to lose access to resources if they are
+        using the disabled service account.
+        
+        To improve reliability of your services and avoid unexpected outages, it
+        is recommended to first disable a service account rather than delete it.
+        After disabling the service account, wait at least 24 hours to verify there
+        are no unintended consequences, and then delete the service account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-disable",
                   vec![
                     (Some(r##"name"##),
@@ -3524,8 +3770,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-enable",
-                    Some(r##"Enables a ServiceAccount.
-         The API is currently in alpha phase."##),
+                    Some(r##"EnableServiceAccount is currently in the alpha launch stage.
+        
+         Restores a disabled ServiceAccount
+         that has been manually disabled by using DisableServiceAccount. Service
+         accounts that have been disabled by other means or for other reasons,
+         such as abuse, cannot be restored using this method.
+        
+         EnableServiceAccount will have no effect on a service account that is
+         not disabled.  Enabling an already enabled service account will have no
+         effect."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-enable",
                   vec![
                     (Some(r##"name"##),
@@ -3989,8 +4243,7 @@ fn main() {
         Updates a ServiceAccount.
         
         Currently, only the following fields are updatable:
-        `display_name` .
-        The `etag` is mandatory."##),
+        `display_name` and `description`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-update",
                   vec![
                     (Some(r##"name"##),
@@ -4034,10 +4287,33 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the role in one of the following formats:
-        `roles/{ROLE_NAME}`
-        `organizations/{ORGANIZATION_ID}/roles/{ROLE_NAME}`
-        `projects/{PROJECT_ID}/roles/{ROLE_NAME}`"##),
+                     Some(r##"The `name` parameter's value depends on the target resource for the
+        request, namely
+        [`roles`](/iam/reference/rest/v1/roles),
+        [`projects`](/iam/reference/rest/v1/projects.roles), or
+        [`organizations`](/iam/reference/rest/v1/organizations.roles). Each
+        resource type's `name` value format is described below:
+        
+        * [`roles.get()`](/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`.
+          This method returns results from all
+          [predefined roles](/iam/docs/understanding-roles#predefined_roles) in
+          Cloud IAM. Example request URL:
+          `https://iam.googleapis.com/v1/roles/{ROLE_NAME}`
+        
+        * [`projects.roles.get()`](/iam/reference/rest/v1/projects.roles/get):
+          `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only
+          [custom roles](/iam/docs/understanding-custom-roles) that have been
+          created at the project level. Example request URL:
+          `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        * [`organizations.roles.get()`](/iam/reference/rest/v1/organizations.roles/get):
+          `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method
+          returns only [custom roles](/iam/docs/understanding-custom-roles) that
+          have been created at the organization level. Example request URL:
+          `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`
+        
+        Note: Wildcard (*) values are invalid; you must specify a complete project
+        ID or organization ID."##),
                      Some(true),
                      Some(false)),
         
@@ -4099,7 +4375,7 @@ fn main() {
     
     let mut app = App::new("iam1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20190321")
+           .version("1.0.9+20190627")
            .about("Manages identity and access control for Google Cloud Platform resources, including the creation of service accounts, which you can use to authenticate to Google and make API calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iam1_cli")
            .arg(Arg::with_name("url")
