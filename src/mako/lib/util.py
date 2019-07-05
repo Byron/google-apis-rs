@@ -217,6 +217,10 @@ def markdown_comment(s):
 def estr(l):
     return ['"%s"' % i for i in l]
 
+# escape all '"' with '\"'
+def escape_rust_string(s):
+    return s.replace('"', '\\"')
+
 ## -- End Filters -- @}
 
 # ==============================================================================

@@ -2,7 +2,7 @@
 <%!
     import os
 
-    from util import (put_and, supports_scopes, api_index, indent_by, enclose_in, put_and)
+    from util import (put_and, supports_scopes, api_index, indent_by, enclose_in, put_and, escape_rust_string)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
                      CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG,
@@ -239,7 +239,7 @@ let mut app = App::new("${util.program_name()}")
 .author("${', '.join(cargo.authors)}")
 .version("${util.crate_version()}")
 % if description is not UNDEFINED:
-.about("${description}")
+.about("${escape_rust_string(description)}")
 % endif
 .after_help("${url_info}")
 % for flag, desc, arg_name, multiple in global_args:
