@@ -727,10 +727,10 @@ pub struct ExportStats {
     pub size_in_bytes: Option<String>,
     /// The number of documents already processed by the export.
     #[serde(rename="exportedArtifactCount")]
-    pub exported_artifact_count: Option<i64>,
+    pub exported_artifact_count: Option<String>,
     /// The number of documents to be exported.
     #[serde(rename="totalArtifactCount")]
-    pub total_artifact_count: Option<i64>,
+    pub total_artifact_count: Option<String>,
 }
 
 impl Part for ExportStats {}

@@ -918,7 +918,7 @@ pub struct Version {
     /// Output only. The total number of files associated with the version.
     /// <br>This value is calculated after a version is `FINALIZED`.
     #[serde(rename="fileCount")]
-    pub file_count: Option<i64>,
+    pub file_count: Option<String>,
 }
 
 impl RequestValue for Version {}

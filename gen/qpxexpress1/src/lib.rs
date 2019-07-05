@@ -523,7 +523,7 @@ pub struct TripOptionsRequest {
     pub passengers: Option<PassengerCounts>,
     /// IATA country code representing the point of ticketing.
     #[serde(rename="ticketingCountry")]
-    pub ticketing_country: Option<i64>,
+    pub ticketing_country: Option<String>,
     /// The slices that make up the itinerary of this trip. A slice represents a traveler's intent, the portion of a low-fare search corresponding to a traveler's request to get between two points. One-way journeys are generally expressed using one slice, round-trips using two. An example of a one slice trip with three segments might be BOS-SYD, SYD-LAX, LAX-BOS if the traveler only stopped in SYD and LAX just long enough to change planes.
     pub slice: Option<Vec<SliceInput>>,
     /// The number of solutions to return, maximum 500.
@@ -532,7 +532,7 @@ pub struct TripOptionsRequest {
     pub refundable: Option<bool>,
     /// IATA country code representing the point of sale. This determines the "equivalent amount paid" currency for the ticket.
     #[serde(rename="saleCountry")]
-    pub sale_country: Option<i64>,
+    pub sale_country: Option<String>,
     /// Do not return solutions that cost more than this price. The alphabetical part of the price is in ISO 4217. The format, in regex, is [A-Z]{3}\d+(\.\d+)? Example: $102.07
     #[serde(rename="maxPrice")]
     pub max_price: Option<String>,

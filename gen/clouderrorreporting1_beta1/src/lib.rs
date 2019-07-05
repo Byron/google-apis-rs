@@ -525,7 +525,7 @@ pub struct ErrorGroupStats {
     /// implicitly affected, such as due to a crash of the whole service,
     /// this is not reflected here.
     #[serde(rename="affectedUsersCount")]
-    pub affected_users_count: Option<i64>,
+    pub affected_users_count: Option<String>,
     /// Service contexts with a non-zero error count for the given filter
     /// criteria. This list can be truncated if multiple services are affected.
     /// Refer to `num_affected_services` for the total count.
@@ -1297,7 +1297,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().group_stats_list("projectName")
-///              .timed_count_duration(-18)
+///              .timed_count_duration("dolores")
 ///              .time_range_period("kasd")
 ///              .service_filter_version("accusam")
 ///              .service_filter_service("takimata")
@@ -1316,7 +1316,7 @@ pub struct ProjectGroupStatListCall<'a, C, A>
 
     hub: &'a Clouderrorreporting<C, A>,
     _project_name: String,
-    _timed_count_duration: Option<i64>,
+    _timed_count_duration: Option<String>,
     _time_range_period: Option<String>,
     _service_filter_version: Option<String>,
     _service_filter_service: Option<String>,
@@ -1520,8 +1520,8 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// If not set, no timed counts are returned.
     ///
     /// Sets the *timed count duration* query property to the given value.
-    pub fn timed_count_duration(mut self, new_value: i64) -> ProjectGroupStatListCall<'a, C, A> {
-        self._timed_count_duration = Some(new_value);
+    pub fn timed_count_duration(mut self, new_value: &str) -> ProjectGroupStatListCall<'a, C, A> {
+        self._timed_count_duration = Some(new_value.to_string());
         self
     }
     /// Restricts the query to the specified time range.

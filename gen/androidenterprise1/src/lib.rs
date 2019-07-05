@@ -1704,7 +1704,7 @@ pub struct Product {
     pub small_icon_url: Option<String>,
     /// The countries which this app is available in.
     #[serde(rename="availableCountries")]
-    pub available_countries: Option<Vec<i64>>,
+    pub available_countries: Option<Vec<String>>,
     /// The localized promotional description, if available.
     pub description: Option<String>,
     /// A description of the recent changes made to the app.

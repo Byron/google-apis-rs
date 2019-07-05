@@ -911,7 +911,7 @@ pub struct ErrorSummary {
     pub error_log_entries: Option<Vec<ErrorLogEntry>>,
     /// Required. Count of this type of error.
     #[serde(rename="errorCount")]
-    pub error_count: Option<i64>,
+    pub error_count: Option<String>,
 }
 
 impl Part for ErrorSummary {}

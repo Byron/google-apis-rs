@@ -666,7 +666,7 @@ pub struct Group {
     pub admin_created: Option<bool>,
     /// Group direct members count
     #[serde(rename="directMembersCount")]
-    pub direct_members_count: Option<i64>,
+    pub direct_members_count: Option<String>,
     /// Email of Group
     pub email: Option<String>,
     /// ETag of the resource.

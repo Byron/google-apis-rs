@@ -399,7 +399,7 @@ pub struct Product {
     /// The target country of the product as a CLDR territory code (for example,
     /// US).
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// The status of the destinations.
     #[serde(rename="destinationStatuses")]
     pub destination_statuses: Option<Vec<DestinationStatus>>,

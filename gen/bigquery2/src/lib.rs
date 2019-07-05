@@ -456,7 +456,7 @@ impl Part for TableDataInsertAllRequestRows {}
 pub struct JobStatistics4 {
     /// [Output-only] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.
     #[serde(rename="destinationUriFileCounts")]
-    pub destination_uri_file_counts: Option<Vec<i64>>,
+    pub destination_uri_file_counts: Option<Vec<String>>,
     /// [Output-only] Number of user bytes extracted into the result. This is the byte count as computed by BigQuery for billing purposes.
     #[serde(rename="inputBytes")]
     pub input_bytes: Option<String>,
@@ -757,7 +757,7 @@ pub struct Entry {
     pub predicted_label: Option<String>,
     /// Number of items being predicted as this label.
     #[serde(rename="itemCount")]
-    pub item_count: Option<i64>,
+    pub item_count: Option<String>,
 }
 
 impl Part for Entry {}

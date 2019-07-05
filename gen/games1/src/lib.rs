@@ -691,7 +691,7 @@ pub struct EventUpdateRequest {
     pub kind: Option<String>,
     /// The number of times this event occurred in this time period.
     #[serde(rename="updateCount")]
-    pub update_count: Option<i64>,
+    pub update_count: Option<String>,
 }
 
 impl Part for EventUpdateRequest {}

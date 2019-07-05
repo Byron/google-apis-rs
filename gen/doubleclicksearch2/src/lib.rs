@@ -444,7 +444,7 @@ pub struct Conversion {
     pub currency_code: Option<String>,
     /// The country registered for the Merchant Center feed that contains the product. Use an ISO 3166 code to specify a country.
     #[serde(rename="productCountry")]
-    pub product_country: Option<i64>,
+    pub product_country: Option<String>,
     /// The state of the conversion, that is, either ACTIVE or REMOVED. Note: state DELETED is deprecated.
     pub state: Option<String>,
     /// The type of device on which the conversion occurred.
@@ -534,7 +534,7 @@ pub struct ReportFiles {
     pub url: Option<String>,
     /// The size of this report file in bytes.
     #[serde(rename="byteCount")]
-    pub byte_count: Option<i64>,
+    pub byte_count: Option<String>,
 }
 
 impl NestedType for ReportFiles {}

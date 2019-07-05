@@ -2211,7 +2211,7 @@ pub struct LiveBroadcastStatistics {
     pub concurrent_viewers: Option<String>,
     /// The total number of live chat messages currently on the broadcast. The property and its value will be present if the broadcast is public, has the live chat feature enabled, and has at least one message. Note that this field will not be filled after the broadcast ends. So this property would not identify the number of chat messages for an archived video of a completed live broadcast.
     #[serde(rename="totalChatCount")]
-    pub total_chat_count: Option<i64>,
+    pub total_chat_count: Option<String>,
 }
 
 impl Part for LiveBroadcastStatistics {}
@@ -3837,19 +3837,19 @@ impl Part for CommentSnippet {}
 pub struct VideoStatistics {
     /// The number of comments for the video.
     #[serde(rename="commentCount")]
-    pub comment_count: Option<i64>,
+    pub comment_count: Option<String>,
     /// The number of times the video has been viewed.
     #[serde(rename="viewCount")]
-    pub view_count: Option<i64>,
+    pub view_count: Option<String>,
     /// The number of users who currently have the video marked as a favorite video.
     #[serde(rename="favoriteCount")]
-    pub favorite_count: Option<i64>,
+    pub favorite_count: Option<String>,
     /// The number of users who have indicated that they disliked the video by giving it a negative rating.
     #[serde(rename="dislikeCount")]
-    pub dislike_count: Option<i64>,
+    pub dislike_count: Option<String>,
     /// The number of users who have indicated that they liked the video by giving it a positive rating.
     #[serde(rename="likeCount")]
-    pub like_count: Option<i64>,
+    pub like_count: Option<String>,
 }
 
 impl Part for VideoStatistics {}
@@ -5078,19 +5078,19 @@ impl Part for LiveStreamConfigurationIssue {}
 pub struct ChannelStatistics {
     /// The number of comments for the channel.
     #[serde(rename="commentCount")]
-    pub comment_count: Option<i64>,
+    pub comment_count: Option<String>,
     /// The number of subscribers that the channel has.
     #[serde(rename="subscriberCount")]
-    pub subscriber_count: Option<i64>,
+    pub subscriber_count: Option<String>,
     /// The number of videos uploaded to the channel.
     #[serde(rename="videoCount")]
-    pub video_count: Option<i64>,
+    pub video_count: Option<String>,
     /// Whether or not the number of subscribers is shown for this user.
     #[serde(rename="hiddenSubscriberCount")]
     pub hidden_subscriber_count: Option<bool>,
     /// The number of times the channel has been viewed.
     #[serde(rename="viewCount")]
-    pub view_count: Option<i64>,
+    pub view_count: Option<String>,
 }
 
 impl Part for ChannelStatistics {}

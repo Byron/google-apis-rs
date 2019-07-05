@@ -464,7 +464,7 @@ pub struct ReportData {
     /// [developer guide](/analytics/devguides/reporting/core/v4/basics#sampling)
     /// for details.
     #[serde(rename="samplesReadCounts")]
-    pub samples_read_counts: Option<Vec<i64>>,
+    pub samples_read_counts: Option<Vec<String>>,
 }
 
 impl Part for ReportData {}
@@ -1527,7 +1527,7 @@ pub struct EventData {
     pub event_category: Option<String>,
     /// Number of such events in this activity.
     #[serde(rename="eventCount")]
-    pub event_count: Option<i64>,
+    pub event_count: Option<String>,
 }
 
 impl Part for EventData {}

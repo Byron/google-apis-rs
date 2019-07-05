@@ -1122,7 +1122,7 @@ pub struct GooglePrivacyDlpV2CategoricalStatsHistogramBucket {
     pub bucket_values: Option<Vec<GooglePrivacyDlpV2ValueFrequency>>,
     /// Total number of distinct values in this bucket.
     #[serde(rename="bucketValueCount")]
-    pub bucket_value_count: Option<i64>,
+    pub bucket_value_count: Option<String>,
     /// Total number of values in this bucket.
     #[serde(rename="bucketSize")]
     pub bucket_size: Option<String>,
@@ -2616,7 +2616,7 @@ pub struct GooglePrivacyDlpV2KMapEstimationHistogramBucket {
     pub min_anonymity: Option<String>,
     /// Total number of distinct quasi-identifier tuple values in this bucket.
     #[serde(rename="bucketValueCount")]
-    pub bucket_value_count: Option<i64>,
+    pub bucket_value_count: Option<String>,
     /// Always greater than or equal to min_anonymity.
     #[serde(rename="maxAnonymity")]
     pub max_anonymity: Option<String>,
@@ -2693,7 +2693,7 @@ pub struct GooglePrivacyDlpV2KAnonymityHistogramBucket {
     pub bucket_values: Option<Vec<GooglePrivacyDlpV2KAnonymityEquivalenceClass>>,
     /// Total number of distinct equivalence classes in this bucket.
     #[serde(rename="bucketValueCount")]
-    pub bucket_value_count: Option<i64>,
+    pub bucket_value_count: Option<String>,
     /// Lower bound on the size of the equivalence classes in this bucket.
     #[serde(rename="equivalenceClassSizeLowerBound")]
     pub equivalence_class_size_lower_bound: Option<String>,
@@ -3307,7 +3307,7 @@ pub struct GooglePrivacyDlpV2DeltaPresenceEstimationHistogramBucket {
     pub bucket_values: Option<Vec<GooglePrivacyDlpV2DeltaPresenceEstimationQuasiIdValues>>,
     /// Total number of distinct quasi-identifier tuple values in this bucket.
     #[serde(rename="bucketValueCount")]
-    pub bucket_value_count: Option<i64>,
+    pub bucket_value_count: Option<String>,
     /// Number of records within these probability bounds.
     #[serde(rename="bucketSize")]
     pub bucket_size: Option<String>,
@@ -4351,7 +4351,7 @@ pub struct GooglePrivacyDlpV2LDiversityHistogramBucket {
     pub bucket_values: Option<Vec<GooglePrivacyDlpV2LDiversityEquivalenceClass>>,
     /// Total number of distinct equivalence classes in this bucket.
     #[serde(rename="bucketValueCount")]
-    pub bucket_value_count: Option<i64>,
+    pub bucket_value_count: Option<String>,
     /// Total number of equivalence classes in this bucket.
     #[serde(rename="bucketSize")]
     pub bucket_size: Option<String>,

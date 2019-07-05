@@ -607,7 +607,7 @@ pub struct Distribution {
     /// 
     /// Any suffix of trailing zeros may be omitted.
     #[serde(rename="bucketCounts")]
-    pub bucket_counts: Option<Vec<i64>>,
+    pub bucket_counts: Option<Vec<String>>,
     /// Buckets with exponentially growing width.
     #[serde(rename="exponentialBuckets")]
     pub exponential_buckets: Option<ExponentialBuckets>,

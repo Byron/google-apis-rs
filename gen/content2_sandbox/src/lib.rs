@@ -848,7 +848,7 @@ impl Part for OrderAddress {}
 pub struct OrderLineItemProduct {
     /// The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// URL to the cached image shown to the user when order was placed.
     #[serde(rename="shownImage")]
     pub shown_image: Option<String>,
@@ -2830,7 +2830,7 @@ impl Part for OrderLegacyPromotion {}
 pub struct TestOrderLineItemProduct {
     /// The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,

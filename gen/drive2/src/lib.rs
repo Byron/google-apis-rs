@@ -19254,7 +19254,7 @@ impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.about().get()
 ///              .start_change_id("clita")
-///              .max_change_id_count(-24)
+///              .max_change_id_count("eos")
 ///              .include_subscribed(false)
 ///              .doit();
 /// # }
@@ -19264,7 +19264,7 @@ pub struct AboutGetCall<'a, C, A>
 
     hub: &'a DriveHub<C, A>,
     _start_change_id: Option<String>,
-    _max_change_id_count: Option<i64>,
+    _max_change_id_count: Option<String>,
     _include_subscribed: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -19398,8 +19398,8 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Maximum number of remaining change IDs to count
     ///
     /// Sets the *max change id count* query property to the given value.
-    pub fn max_change_id_count(mut self, new_value: i64) -> AboutGetCall<'a, C, A> {
-        self._max_change_id_count = Some(new_value);
+    pub fn max_change_id_count(mut self, new_value: &str) -> AboutGetCall<'a, C, A> {
+        self._max_change_id_count = Some(new_value.to_string());
         self
     }
     /// Whether to count changes outside the My Drive hierarchy. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the maxChangeIdCount.

@@ -509,7 +509,7 @@ pub struct ListBeaconsResponse {
     /// Estimate of the total number of beacons matched by the query. Higher
     /// values may be less accurate.
     #[serde(rename="totalCount")]
-    pub total_count: Option<i64>,
+    pub total_count: Option<String>,
 }
 
 impl ResponseResult for ListBeaconsResponse {}

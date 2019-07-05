@@ -1229,7 +1229,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// 
     /// The default value is zero.
     #[serde(rename="workerCount")]
-    pub worker_count: Option<i64>,
+    pub worker_count: Option<String>,
     /// Optional. The maximum job running time. The default is 7 days.
     #[serde(rename="maxRunningTime")]
     pub max_running_time: Option<String>,
@@ -1242,7 +1242,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// 
     /// The default value is zero.
     #[serde(rename="parameterServerCount")]
-    pub parameter_server_count: Option<i64>,
+    pub parameter_server_count: Option<String>,
     /// Optional. Specifies the type of virtual machine to use for your training
     /// job's worker nodes.
     /// 
@@ -1521,10 +1521,10 @@ pub struct GoogleCloudMlV1__PredictionOutput {
     pub output_path: Option<String>,
     /// The number of generated predictions.
     #[serde(rename="predictionCount")]
-    pub prediction_count: Option<i64>,
+    pub prediction_count: Option<String>,
     /// The number of data instances which resulted in errors.
     #[serde(rename="errorCount")]
-    pub error_count: Option<i64>,
+    pub error_count: Option<String>,
 }
 
 impl Part for GoogleCloudMlV1__PredictionOutput {}
@@ -1539,7 +1539,7 @@ pub struct GoogleCloudMlV1__TrainingOutput {
     /// The number of hyperparameter tuning trials that completed successfully.
     /// Only set for hyperparameter tuning jobs.
     #[serde(rename="completedTrialCount")]
-    pub completed_trial_count: Option<i64>,
+    pub completed_trial_count: Option<String>,
     /// The amount of ML units consumed by the job.
     #[serde(rename="consumedMLUnits")]
     pub consumed_ml_units: Option<f64>,
@@ -1821,7 +1821,7 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// Optional. The maximum number of workers to be used for parallel processing.
     /// Defaults to 10 if not specified.
     #[serde(rename="maxWorkerCount")]
-    pub max_worker_count: Option<i64>,
+    pub max_worker_count: Option<String>,
     /// Required. The Cloud Storage location of the input data files. May contain
     /// <a href="/storage/docs/gsutil/addlhelp/WildcardNames">wildcards</a>.
     #[serde(rename="inputPaths")]

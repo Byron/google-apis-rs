@@ -1628,10 +1628,10 @@ pub struct ResultSetStats {
     /// Partitioned DML does not offer exactly-once semantics, so it
     /// returns a lower bound of the rows modified.
     #[serde(rename="rowCountLowerBound")]
-    pub row_count_lower_bound: Option<i64>,
+    pub row_count_lower_bound: Option<String>,
     /// Standard DML returns an exact count of rows that were modified.
     #[serde(rename="rowCountExact")]
-    pub row_count_exact: Option<i64>,
+    pub row_count_exact: Option<String>,
     /// QueryPlan for the query associated with this result.
     #[serde(rename="queryPlan")]
     pub query_plan: Option<QueryPlan>,

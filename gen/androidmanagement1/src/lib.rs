@@ -1780,7 +1780,7 @@ pub struct MemoryEvent {
     pub event_type: Option<String>,
     /// The number of free bytes in the medium, or for EXTERNAL_STORAGE_DETECTED, the total capacity in bytes of the storage medium.
     #[serde(rename="byteCount")]
-    pub byte_count: Option<i64>,
+    pub byte_count: Option<String>,
     /// The creation time of the event.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,

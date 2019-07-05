@@ -457,7 +457,7 @@ impl RequestValue for SetMaintenancePolicyRequest {}
 pub struct AcceleratorConfig {
     /// The number of the accelerator cards exposed to an instance.
     #[serde(rename="acceleratorCount")]
-    pub accelerator_count: Option<i64>,
+    pub accelerator_count: Option<String>,
     /// The accelerator type resource name. List of supported accelerators
     /// [here](/compute/docs/gpus/#Introduction)
     #[serde(rename="acceleratorType")]

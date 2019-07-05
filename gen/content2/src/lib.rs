@@ -743,7 +743,7 @@ pub struct OrderLineItemProduct {
     pub condition: Option<String>,
     /// The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// URL to the cached image shown to the user when order was placed.
     #[serde(rename="shownImage")]
     pub shown_image: Option<String>,
@@ -1236,7 +1236,7 @@ pub struct PosSaleResponse {
     pub price: Option<Price>,
     /// The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
     /// A unique ID to group items from the same sale event.
@@ -1470,7 +1470,7 @@ pub struct PosInventoryResponse {
     pub price: Option<Price>,
     /// The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
     /// The available quantity of the item.
@@ -1957,7 +1957,7 @@ pub struct PosInventoryRequest {
     pub store_code: Option<String>,
     /// The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
@@ -2218,7 +2218,7 @@ pub struct PosSale {
     pub price: Option<Price>,
     /// The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
     /// A unique ID to group items from the same sale event.
@@ -2834,7 +2834,7 @@ pub struct Datafeed {
     pub fetch_schedule: Option<DatafeedFetchSchedule>,
     /// [DEPRECATED] Please use targets[].country instead. The country where the items in the feed will be included in the search index, represented as a CLDR territory code.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// The filename of the feed. All feeds must have a unique file name.
     #[serde(rename="fileName")]
     pub file_name: Option<String>,
@@ -3054,7 +3054,7 @@ pub struct PosSaleRequest {
     pub store_code: Option<String>,
     /// The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
@@ -3980,7 +3980,7 @@ pub struct Service {
     pub eligibility: Option<String>,
     /// The CLDR territory code of the country to which the service applies. Required.
     #[serde(rename="deliveryCountry")]
-    pub delivery_country: Option<i64>,
+    pub delivery_country: Option<String>,
     /// Shipping rate group definitions. Only the last one is allowed to have an empty applicableShippingLabels, which means "everything else". The other applicableShippingLabels must not overlap.
     #[serde(rename="rateGroups")]
     pub rate_groups: Option<Vec<RateGroup>>,
@@ -5873,7 +5873,7 @@ impl Part for LocationIdSet {}
 pub struct GmbAccountsGmbAccount {
     /// Number of listings under this account.
     #[serde(rename="listingCount")]
-    pub listing_count: Option<i64>,
+    pub listing_count: Option<String>,
     /// The type of the GMB account (User or Business).
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -5941,7 +5941,7 @@ pub struct PosInventory {
     pub price: Option<Price>,
     /// The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
     /// The available quantity of the item.
@@ -6386,7 +6386,7 @@ impl Part for TransitTableTransitTimeRow {}
 pub struct TestOrderLineItemProduct {
     /// The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
@@ -6878,7 +6878,7 @@ pub struct Product {
     pub destinations: Option<Vec<ProductDestination>>,
     /// The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
+    pub target_country: Option<String>,
     /// Custom label 4 for custom grouping of items in a Shopping campaign.
     #[serde(rename="customLabel4")]
     pub custom_label4: Option<String>,

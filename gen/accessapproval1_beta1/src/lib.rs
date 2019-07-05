@@ -422,7 +422,7 @@ pub struct AccessLocations {
     ///   <li>ANY: Any location</li>
     /// </ol>
     #[serde(rename="principalOfficeCountry")]
-    pub principal_office_country: Option<i64>,
+    pub principal_office_country: Option<String>,
     /// Physical location of the principal at the time of the access. A
     /// two-letter country code (ISO 3166-1 alpha-2), such as "US", "DE" or "GB" or
     /// a region code. In some limited situations Google systems may refer refer to
@@ -439,7 +439,7 @@ pub struct AccessLocations {
     ///   <li>ANY: Any location</li>
     /// </ol>
     #[serde(rename="principalPhysicalLocationCountry")]
-    pub principal_physical_location_country: Option<i64>,
+    pub principal_physical_location_country: Option<String>,
 }
 
 impl Part for AccessLocations {}

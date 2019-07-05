@@ -1034,7 +1034,7 @@ pub struct CountryOfferInfo {
     pub spend_x_amount: Option<String>,
     /// Country code for which offer codes may be requested.
     #[serde(rename="offerCountryCode")]
-    pub offer_country_code: Option<i64>,
+    pub offer_country_code: Option<String>,
     /// Type of offer country is eligible for.
     #[serde(rename="offerType")]
     pub offer_type: Option<String>,
@@ -1205,7 +1205,7 @@ pub struct UserProfile {
     pub industries: Option<Vec<String>>,
     /// The user's primary country, an ISO 2-character code.
     #[serde(rename="primaryCountryCode")]
-    pub primary_country_code: Option<i64>,
+    pub primary_country_code: Option<String>,
     /// If the user has edit access to multiple accounts, the user can choose the
     /// preferred account and it is used when a personal account is needed. Can
     /// be empty.
@@ -1717,7 +1717,7 @@ pub struct CompanyRelation {
     pub segment: Option<Vec<String>>,
     /// The primary country code of the company.
     #[serde(rename="primaryCountryCode")]
-    pub primary_country_code: Option<i64>,
+    pub primary_country_code: Option<String>,
     /// The name (in the company's primary language) for the company.
     pub name: Option<String>,
     /// The ID of the company. There may be no id if this is a
@@ -1791,7 +1791,7 @@ pub struct HistoricalOffer {
     pub offer_code: Option<String>,
     /// Country Code for the offer country.
     #[serde(rename="offerCountryCode")]
-    pub offer_country_code: Option<i64>,
+    pub offer_country_code: Option<String>,
     /// Client's AdWords page URL.
     #[serde(rename="adwordsUrl")]
     pub adwords_url: Option<String>,

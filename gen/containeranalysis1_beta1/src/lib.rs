@@ -2323,7 +2323,7 @@ impl Part for AuditConfig {}
 pub struct FixableTotalByDigest {
     /// The total number of vulnerabilities associated with this resource.
     #[serde(rename="totalCount")]
-    pub total_count: Option<i64>,
+    pub total_count: Option<String>,
     /// The affected resource.
     pub resource: Option<ResourceType>,
     /// The severity for this count. SEVERITY_UNSPECIFIED indicates total across
@@ -2331,7 +2331,7 @@ pub struct FixableTotalByDigest {
     pub severity: Option<String>,
     /// The number of fixable vulnerabilities associated with this resource.
     #[serde(rename="fixableCount")]
-    pub fixable_count: Option<i64>,
+    pub fixable_count: Option<String>,
 }
 
 impl Part for FixableTotalByDigest {}

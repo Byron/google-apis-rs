@@ -1359,7 +1359,7 @@ impl Part for MarketplaceLabel {}
 pub struct CreativeFilteringReasonsReasons {
     /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.
     #[serde(rename="filteringCount")]
-    pub filtering_count: Option<i64>,
+    pub filtering_count: Option<String>,
     /// The filtering status code as defined in  creative-status-codes.txt.
     #[serde(rename="filteringStatus")]
     pub filtering_status: Option<i32>,

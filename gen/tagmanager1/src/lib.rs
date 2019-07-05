@@ -556,7 +556,7 @@ pub struct Container {
     pub enabled_built_in_variable: Option<Vec<String>>,
     /// Container Country ID.
     #[serde(rename="timeZoneCountryId")]
-    pub time_zone_country_id: Option<i64>,
+    pub time_zone_country_id: Option<String>,
     /// Container Public ID.
     #[serde(rename="publicId")]
     pub public_id: Option<String>,
