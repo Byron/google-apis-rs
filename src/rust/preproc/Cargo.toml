@@ -1,0 +1,12 @@
+[package]
+name = "preproc"
+version = "0.1.0"
+authors = ["Sebastian Thiel <sthiel@thoughtworks.com>"]
+edition = "2018"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pulldown-cmark-to-cmark = "1.2.2"
+pulldown-cmark = "0.5.2"
