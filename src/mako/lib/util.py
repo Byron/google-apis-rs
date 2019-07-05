@@ -133,8 +133,8 @@ def has_markdown_codeblock_with_indentation(s):
 
 def preprocess(s):
     p = subprocess.Popen([os.environ['PREPROC']], close_fds=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    res = p.communicate(s)
-    return res[0]
+    res = p.communicate(s.encode('utf-8'))
+    return res[0].decode('utf-8')
 
 # runs the preprocessor in case there is evidence for code blocks using indentation
 def rust_doc_sanitize(s):
