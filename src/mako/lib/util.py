@@ -285,6 +285,7 @@ def canonical_type_name(s):
     # can't use s.capitalize() as it will lower-case the remainder of the string
     s = ''.join(capitalize(t) for t in s.split(' '))
     s = ''.join(capitalize(t) for t in s.split('_'))
+    s = ''.join(capitalize(t) for t in s.split('-'))
     return capitalize(s)
 
 def nested_type_name(sn, pn):
