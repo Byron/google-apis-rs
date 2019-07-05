@@ -1,4 +1,4 @@
-site_name: Cloud Run v1.0.9+20190624
+site_name: Cloud Run v1.0.10+20190624
 site_url: http://byron.github.io/google-apis-rs/google-run1-cli
 site_description: A complete library to interact with Cloud Run (protocol v1)
 

@@ -1507,7 +1507,7 @@ fn main() {
     
     let mut app = App::new("binaryauthorization1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.9+20190628")
+           .version("1.0.10+20190628")
            .about("The management interface for Binary Authorization, a system providing policy control for images deployed to Kubernetes Engine clusters.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli")

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dlp2-cli"
-version = "1.0.9+20190629"
+version = "1.0.10+20190629"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DLP (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dlp2-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-dlp2]
 path = "../dlp2"
-version = "1.0.9+20190629"
+version = "1.0.10+20190629"

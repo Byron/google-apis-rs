@@ -4,12 +4,12 @@
 [package]
 
 name = "google-androidpublisher3"
-version = "1.0.9+20190702"
+version = "1.0.10+20190702"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Publisher (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidpublisher3"
 homepage = "https://developers.google.com/android-publisher"
-documentation = "https://docs.rs/google-androidpublisher3/1.0.9+20190702"
+documentation = "https://docs.rs/google-androidpublisher3/1.0.10+20190702"
 license = "MIT"
 keywords = ["androidpublisher", "google", "protocol", "web", "api"]
 autobins = false

@@ -1574,7 +1574,7 @@ fn main() {
     
     let mut app = App::new("redis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.9+20190628")
+           .version("1.0.10+20190628")
            .about("Creates and manages Redis instances on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_redis1_cli")
            .arg(Arg::with_name("url")

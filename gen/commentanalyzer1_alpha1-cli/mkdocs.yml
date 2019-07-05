@@ -1,4 +1,4 @@
-site_name: Comment Analyzer v1.0.9+20190616
+site_name: Comment Analyzer v1.0.10+20190616
 site_url: http://byron.github.io/google-apis-rs/google-commentanalyzer1_alpha1-cli
 site_description: A complete library to interact with Comment Analyzer (protocol v1alpha1)
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-fcm1-cli"
-version = "1.0.9+20190703"
+version = "1.0.10+20190703"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Cloud Messaging (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fcm1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-fcm1]
 path = "../fcm1"
-version = "1.0.9+20190703"
+version = "1.0.10+20190703"

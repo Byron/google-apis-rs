@@ -4,7 +4,7 @@
 [package]
 
 name = "google-youtubereporting1-cli"
-version = "1.0.9+20190703"
+version = "1.0.10+20190703"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube Reporting (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtubereporting1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-youtubereporting1]
 path = "../youtubereporting1"
-version = "1.0.9+20190703"
+version = "1.0.10+20190703"

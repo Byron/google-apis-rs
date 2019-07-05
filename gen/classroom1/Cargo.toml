@@ -4,12 +4,12 @@
 [package]
 
 name = "google-classroom1"
-version = "1.0.9+20190701"
+version = "1.0.10+20190701"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with classroom (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/classroom1"
 homepage = "https://developers.google.com/classroom/"
-documentation = "https://docs.rs/google-classroom1/1.0.9+20190701"
+documentation = "https://docs.rs/google-classroom1/1.0.10+20190701"
 license = "MIT"
 keywords = ["classroom", "google", "protocol", "web", "api"]
 autobins = false

@@ -1,4 +1,4 @@
-site_name: resourceviews v1.0.9+20160512
+site_name: resourceviews v1.0.10+20160512
 site_url: http://byron.github.io/google-apis-rs/google-resourceviews1_beta2-cli
 site_description: A complete library to interact with resourceviews (protocol v1beta2)
 

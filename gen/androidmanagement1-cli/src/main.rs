@@ -2766,7 +2766,7 @@ fn main() {
     
     let mut app = App::new("androidmanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.9+20190624")
+           .version("1.0.10+20190624")
            .about("The Android Management API provides remote enterprise management of Android devices and apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli")
            .arg(Arg::with_name("url")

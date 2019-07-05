@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Fact Check Tools* crate version *1.0.9+20190703*, where *20190703* is the exact revision of the *factchecktools:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.9*.
+//! This documentation was generated from *Fact Check Tools* crate version *1.0.10+20190703*, where *20190703* is the exact revision of the *factchecktools:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.10*.
 //! 
 //! Everything else about the *Fact Check Tools* *v1_alpha1* API can be found at the
 //! [official documentation site](https://developers.google.com/fact-check/tools/api/).
@@ -333,7 +333,7 @@ impl<'a, C, A> FactCheckTools<C, A>
         FactCheckTools {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.9".to_string(),
+            _user_agent: "google-api-rust-client/1.0.10".to_string(),
             _base_url: "https://factchecktools.googleapis.com/".to_string(),
             _root_url: "https://factchecktools.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> FactCheckTools<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.9`.
+    /// It defaults to `google-api-rust-client/1.0.10`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

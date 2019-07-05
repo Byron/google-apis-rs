@@ -4,7 +4,7 @@
 [package]
 
 name = "google-digitalassetlinks1-cli"
-version = "1.0.9+20190619"
+version = "1.0.10+20190619"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with digitalassetlinks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/digitalassetlinks1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-digitalassetlinks1]
 path = "../digitalassetlinks1"
-version = "1.0.9+20190619"
+version = "1.0.10+20190619"

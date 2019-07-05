@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Management* API at revision *20190703*. The CLI is at version *1.0.9*.
+This documentation was generated from the *Firebase Management* API at revision *20190703*. The CLI is at version *1.0.10*.
 
 ```bash
 firebase1-beta1 [options]

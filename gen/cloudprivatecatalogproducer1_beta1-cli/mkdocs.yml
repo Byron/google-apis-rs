@@ -1,4 +1,4 @@
-site_name: Cloud PrivateCatalog Producer v1.0.9+20190622
+site_name: Cloud PrivateCatalog Producer v1.0.10+20190622
 site_url: http://byron.github.io/google-apis-rs/google-cloudprivatecatalogproducer1_beta1-cli
 site_description: A complete library to interact with Cloud PrivateCatalog Producer (protocol v1beta1)
 

@@ -274,7 +274,7 @@ fn main() {
     
     let mut app = App::new("videointelligence1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.9+20171122")
+           .version("1.0.10+20171122")
            .about("Cloud Video Intelligence API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_videointelligence1_beta1_cli")
            .arg(Arg::with_name("url")

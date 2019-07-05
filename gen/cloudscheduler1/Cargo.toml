@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudscheduler1"
-version = "1.0.9+20190617"
+version = "1.0.10+20190617"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Scheduler (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudscheduler1"
 homepage = "https://cloud.google.com/scheduler/"
-documentation = "https://docs.rs/google-cloudscheduler1/1.0.9+20190617"
+documentation = "https://docs.rs/google-cloudscheduler1/1.0.10+20190617"
 license = "MIT"
 keywords = ["cloudscheduler", "google", "protocol", "web", "api"]
 autobins = false

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-driveactivity2-cli"
-version = "1.0.9+20190702"
+version = "1.0.10+20190702"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Drive Activity (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/driveactivity2-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-driveactivity2]
 path = "../driveactivity2"
-version = "1.0.9+20190702"
+version = "1.0.10+20190702"

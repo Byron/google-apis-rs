@@ -4,12 +4,12 @@
 [package]
 
 name = "google-plusdomains1"
-version = "1.0.9+20190616"
+version = "1.0.10+20190616"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plusDomains (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plusdomains1"
 homepage = "https://developers.google.com/+/domains/"
-documentation = "https://docs.rs/google-plusdomains1/1.0.9+20190616"
+documentation = "https://docs.rs/google-plusdomains1/1.0.10+20190616"
 license = "MIT"
 keywords = ["plusDomains", "google", "protocol", "web", "api"]
 autobins = false

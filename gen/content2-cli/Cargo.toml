@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2-cli"
-version = "1.0.9+20190702"
+version = "1.0.10+20190702"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Shopping Content (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-content2]
 path = "../content2"
-version = "1.0.9+20190702"
+version = "1.0.10+20190702"

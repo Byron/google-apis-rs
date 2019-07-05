@@ -1,4 +1,4 @@
-site_name: Deployment Manager v1.0.9+20160201
+site_name: Deployment Manager v1.0.10+20160201
 site_url: http://byron.github.io/google-apis-rs/google-deploymentmanager2_beta2-cli
 site_description: A complete library to interact with Deployment Manager (protocol v2beta2)
 

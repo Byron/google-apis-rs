@@ -4,7 +4,7 @@
 [package]
 
 name = "google-firestore1-cli"
-version = "1.0.9+20190419"
+version = "1.0.10+20190419"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firestore (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/firestore1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-firestore1]
 path = "../firestore1"
-version = "1.0.9+20190419"
+version = "1.0.10+20190419"

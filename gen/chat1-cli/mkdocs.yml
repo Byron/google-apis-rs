@@ -1,4 +1,4 @@
-site_name: Hangouts Chat v1.0.9+20190622
+site_name: Hangouts Chat v1.0.10+20190622
 site_url: http://byron.github.io/google-apis-rs/google-chat1-cli
 site_description: A complete library to interact with Hangouts Chat (protocol v1)
 

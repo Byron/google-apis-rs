@@ -4,7 +4,7 @@
 [package]
 
 name = "google-runtimeconfig1-cli"
-version = "1.0.9+20190624"
+version = "1.0.10+20190624"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud RuntimeConfig (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/runtimeconfig1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-runtimeconfig1]
 path = "../runtimeconfig1"
-version = "1.0.9+20190624"
+version = "1.0.10+20190624"

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *manager* API at revision *20140915*. The CLI is at version *1.0.9*.
+This documentation was generated from the *manager* API at revision *20140915*. The CLI is at version *1.0.10*.
 
 ```bash
 manager1-beta2 [options]

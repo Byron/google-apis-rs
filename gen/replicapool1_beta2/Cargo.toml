@@ -4,12 +4,12 @@
 [package]
 
 name = "google-replicapool1_beta2"
-version = "1.0.9+20160512"
+version = "1.0.10+20160512"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with replicapool (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/replicapool1_beta2"
 homepage = "https://developers.google.com/compute/docs/instance-groups/manager/v1beta2"
-documentation = "https://docs.rs/google-replicapool1_beta2/1.0.9+20160512"
+documentation = "https://docs.rs/google-replicapool1_beta2/1.0.10+20160512"
 license = "MIT"
 keywords = ["replicapool", "google", "protocol", "web", "api"]
 autobins = false

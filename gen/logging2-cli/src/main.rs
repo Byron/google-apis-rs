@@ -7617,7 +7617,7 @@ fn main() {
     
     let mut app = App::new("logging2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.9+20190629")
+           .version("1.0.10+20190629")
            .about("Writes log entries and manages your Stackdriver Logging configuration. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the Stackdriver Logging documentation.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_cli")
            .arg(Arg::with_name("url")

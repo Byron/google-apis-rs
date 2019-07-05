@@ -897,7 +897,7 @@ fn main() {
     
     let mut app = App::new("safebrowsing4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.9+20190702")
+           .version("1.0.10+20190702")
            .about("Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli")
            .arg(Arg::with_name("folder")

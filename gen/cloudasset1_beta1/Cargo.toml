@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudasset1_beta1"
-version = "1.0.9+20190625"
+version = "1.0.10+20190625"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Asset (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudasset1_beta1"
 homepage = "https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory"
-documentation = "https://docs.rs/google-cloudasset1_beta1/1.0.9+20190625"
+documentation = "https://docs.rs/google-cloudasset1_beta1/1.0.10+20190625"
 license = "MIT"
 keywords = ["cloudasset", "google", "protocol", "web", "api"]
 autobins = false

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-run1"
-version = "1.0.9+20190624"
+version = "1.0.10+20190624"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Run (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/run1"
 homepage = "https://cloud.google.com/run/"
-documentation = "https://docs.rs/google-run1/1.0.9+20190624"
+documentation = "https://docs.rs/google-run1/1.0.10+20190624"
 license = "MIT"
 keywords = ["run", "google", "protocol", "web", "api"]
 autobins = false
