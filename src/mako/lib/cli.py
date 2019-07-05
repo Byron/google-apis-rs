@@ -151,8 +151,6 @@ def docopt_mode(protocols):
 # Returns a possibly remapped type, based on its name.
 # Useful to map strings to more suitable types, i.e. counts
 def actual_json_type(name, type):
-    if type == 'string' and 'Count' in name:
-        return 'int64'
     return type
 
 # return a string representing property `p` suitable for docopt argument parsing

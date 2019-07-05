@@ -278,7 +278,7 @@ impl<'n> Engine<'n> {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "timed-count-duration" => {
-                    call = call.timed_count_duration(arg_from_str(value.unwrap_or("-0"), err, "timed-count-duration", "int64"));
+                    call = call.timed_count_duration(value.unwrap_or(""));
                 },
                 "time-range-period" => {
                     call = call.time_range_period(value.unwrap_or(""));

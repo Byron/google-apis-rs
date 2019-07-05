@@ -56,7 +56,7 @@ impl<'n> Engine<'n> {
                     call = call.start_change_id(value.unwrap_or(""));
                 },
                 "max-change-id-count" => {
-                    call = call.max_change_id_count(arg_from_str(value.unwrap_or("-0"), err, "max-change-id-count", "int64"));
+                    call = call.max_change_id_count(value.unwrap_or(""));
                 },
                 "include-subscribed" => {
                     call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
