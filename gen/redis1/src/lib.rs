@@ -508,7 +508,7 @@ pub struct Instance {
     pub display_name: Option<String>,
     /// Required. Unique name of the resource in this scope including project and
     /// location using the form:
-    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     /// 
     /// Note: Redis instances are managed and addressed at regional level so
     /// location_id here refers to a GCP region; however, users may choose which
@@ -590,7 +590,8 @@ pub struct Location {
     pub display_name: Option<String>,
     /// Cross-service attributes for the location. For example
     /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
+    /// ````text
+    /// {"cloud.googleapis.com/region": "us-east1"}````
     pub labels: Option<HashMap<String, String>>,
     /// Resource ID for the region. For example: "us-east1".
     #[serde(rename="locationId")]
@@ -708,9 +709,11 @@ impl Part for InputConfig {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -721,7 +724,6 @@ impl Part for InputConfig {}
 /// 
 /// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
 /// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1426,7 +1428,7 @@ impl<'a, C, A> ProjectLocationInstanceImportCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// Required. Redis instance resource name using the form:
-    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
@@ -1677,7 +1679,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
 
 
     /// Required. Redis instance resource name using the form:
-    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
@@ -1963,7 +1965,7 @@ impl<'a, C, A> ProjectLocationInstanceExportCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// Required. Redis instance resource name using the form:
-    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
@@ -2712,7 +2714,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
 
 
     /// Required. Redis instance resource name using the form:
-    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
@@ -2994,7 +2996,7 @@ impl<'a, C, A> ProjectLocationInstanceFailoverCall<'a, C, A> where C: BorrowMut<
         self
     }
     /// Required. Redis instance resource name using the form:
-    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *name* path property to the given value.
@@ -3285,7 +3287,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
     }
     /// Required. Unique name of the resource in this scope including project and
     /// location using the form:
-    ///     `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+    /// `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
     /// 
     /// Note: Redis instances are managed and addressed at regional level so
     /// location_id here refers to a GCP region; however, users may choose which
@@ -3885,7 +3887,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// Required. The resource name of the instance location using the form:
-    ///     `projects/{project_id}/locations/{location_id}`
+    /// `projects/{project_id}/locations/{location_id}`
     /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *parent* path property to the given value.
@@ -4709,7 +4711,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
 
 
     /// Required. The resource name of the instance location using the form:
-    ///     `projects/{project_id}/locations/{location_id}`
+    /// `projects/{project_id}/locations/{location_id}`
     /// where `location_id` refers to a GCP region.
     ///
     /// Sets the *parent* path property to the given value.

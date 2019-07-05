@@ -563,7 +563,6 @@ impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -571,37 +570,40 @@ impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -615,7 +617,6 @@ impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 /// * [jobs set iam policy projects](struct.ProjectJobSetIamPolicyCall.html) (response)
 /// * [models get iam policy projects](struct.ProjectModelGetIamPolicyCall.html) (response)
 /// * [jobs get iam policy projects](struct.ProjectJobGetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1__Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -646,7 +647,6 @@ impl ResponseResult for GoogleIamV1__Policy {}
 /// payload formats that can't be represented as JSON, such as raw binary or
 /// an HTML page.
 /// 
-/// 
 /// This message can be used both in streaming and non-streaming API methods in
 /// the request as well as the response.
 /// 
@@ -656,28 +656,32 @@ impl ResponseResult for GoogleIamV1__Policy {}
 /// 
 /// Example:
 /// 
-///     message GetResourceRequest {
-///       // A unique request id.
-///       string request_id = 1;
+/// ````text
+/// message GetResourceRequest {
+///   // A unique request id.
+///   string request_id = 1;
 /// 
-///       // The raw HTTP body is bound to this field.
-///       google.api.HttpBody http_body = 2;
-///     }
+///   // The raw HTTP body is bound to this field.
+///   google.api.HttpBody http_body = 2;
+/// }
 /// 
-///     service ResourceService {
-///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
-///       rpc UpdateResource(google.api.HttpBody) returns
-///       (google.protobuf.Empty);
-///     }
+/// service ResourceService {
+///   rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
+///   rpc UpdateResource(google.api.HttpBody) returns
+///   (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// Example with streaming methods:
 /// 
-///     service CaldavService {
-///       rpc GetCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///       rpc UpdateCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///     }
+/// ````text
+/// service CaldavService {
+///   rpc GetCalendar(stream google.api.HttpBody)
+///     returns (stream google.api.HttpBody);
+///   rpc UpdateCalendar(stream google.api.HttpBody)
+///     returns (stream google.api.HttpBody);
+/// }
+/// ````
 /// 
 /// Use of this type only changes how the request and response bodies are
 /// handled, all other features will continue to work unchanged.
@@ -688,7 +692,6 @@ impl ResponseResult for GoogleIamV1__Policy {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [predict projects](struct.ProjectPredictCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleApi__HttpBody {
     /// The HTTP Content-Type header value specifying the content type of the body.
@@ -708,9 +711,11 @@ impl ResponseResult for GoogleApi__HttpBody {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -721,7 +726,6 @@ impl ResponseResult for GoogleApi__HttpBody {}
 /// 
 /// * [jobs cancel projects](struct.ProjectJobCancelCall.html) (response)
 /// * [operations cancel projects](struct.ProjectOperationCancelCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobuf__Empty { _never_set: Option<bool> }
 
@@ -898,11 +902,12 @@ pub struct GoogleCloudMlV1__Model {
     /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
     /// for AI Platform services.
     /// Note:
-    /// *   No matter where a model is deployed, it can always be accessed by
-    ///     users from anywhere, both for online and batch prediction.
-    /// *   The region for a batch prediction job is set by the region field when
-    ///     submitting the batch prediction job and does not take its value from
-    ///     this field.
+    /// 
+    /// * No matter where a model is deployed, it can always be accessed by
+    ///   users from anywhere, both for online and batch prediction.
+    /// * The region for a batch prediction job is set by the region field when
+    ///   submitting the batch prediction job and does not take its value from
+    ///   this field.
     pub regions: Option<Vec<String>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a model from overwriting each other.
@@ -1017,48 +1022,49 @@ impl Part for GoogleCloudMlV1__ParameterSpec {}
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
+/// ````text
+/// {
+///   "audit_configs": [
 ///     {
-///       "audit_configs": [
+///       "service": "allServices"
+///       "audit_log_configs": [
 ///         {
-///           "service": "allServices"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///               "exempted_members": [
-///                 "user:foo@gmail.com"
-///               ]
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///             },
-///             {
-///               "log_type": "ADMIN_READ",
-///             }
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
 ///           ]
 ///         },
 ///         {
-///           "service": "fooservice.googleapis.com"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///               "exempted_members": [
-///                 "user:bar@gmail.com"
-///               ]
-///             }
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "fooservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:bar@gmail.com"
 ///           ]
 ///         }
 ///       ]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
 /// logging. It also exempts foo@gmail.com from DATA_READ logging, and
 /// bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1__AuditConfig {
     /// The configuration for logging of each type of permission.
@@ -1438,25 +1444,26 @@ impl Part for GoogleCloudMlV1__AcceleratorConfig {}
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
+/// ````text
+/// {
+///   "audit_log_configs": [
 ///     {
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         }
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:foo@gmail.com"
 ///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
 /// foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1__AuditLogConfig {
     /// Specifies the identities that do not cause logging for this type of
@@ -1642,12 +1649,13 @@ impl Part for GoogleIamV1__Binding {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleType__Expr {
     /// An optional description of the expression. This is a longer text which
@@ -1967,7 +1975,7 @@ pub struct GoogleCloudMlV1__Version {
     /// 
     /// The following code sample provides the Predictor interface:
     /// 
-    /// ```py
+    /// ````textpy
     /// class Predictor(object):
     /// """Interface for constructing custom predictors."""
     /// 
@@ -2003,7 +2011,7 @@ pub struct GoogleCloudMlV1__Version {
     ///         An instance implementing this Predictor class.
     ///     """
     ///     raise NotImplementedError()
-    /// ```
+    /// ````
     /// 
     /// Learn more about [the Predictor interface and custom prediction
     /// routines](/ml-engine/docs/tensorflow/custom-prediction-routines).
@@ -2123,6 +2131,7 @@ pub struct GoogleCloudMlV1__AutoScaling {
     /// 
     /// You can set `min_nodes` when creating the model version, and you can also
     /// update `min_nodes` for an existing version:
+    /// 
     /// <pre>
     /// update_body.json:
     /// {
@@ -2131,7 +2140,9 @@ pub struct GoogleCloudMlV1__AutoScaling {
     ///   }
     /// }
     /// </pre>
+    /// 
     /// HTTP request:
+    /// 
     /// <pre>
     /// PATCH
     /// https://ml.googleapis.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.minNodes
@@ -4753,12 +4764,12 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// default version to "version_1", the `update_mask` parameter would be
     /// specified as `description`, `default_version.name`, and the `PATCH`
     /// request body would specify the new value, as follows:
-    ///     {
-    ///       "description": "foo",
-    ///       "defaultVersion": {
-    ///         "name":"version_1"
-    ///       }
-    ///     }
+    /// {
+    /// "description": "foo",
+    /// "defaultVersion": {
+    /// "name":"version_1"
+    /// }
+    /// }
     /// 
     /// Currently the supported update masks are `description` and
     /// `default_version.name`.
@@ -6400,9 +6411,9 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     /// For example, to change the description of a version to "foo", the
     /// `update_mask` parameter would be specified as `description`, and the
     /// `PATCH` request body would specify the new value, as follows:
-    ///     {
-    ///       "description": "foo"
-    ///     }
+    /// {
+    /// "description": "foo"
+    /// }
     /// 
     /// Currently the only supported update mask fields are `description` and
     /// `autoScaling.minNodes`.
@@ -6958,13 +6969,13 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// For example, to change the labels of a job, the `update_mask` parameter
     /// would be specified as `labels`, `etag`, and the
     /// `PATCH` request body would specify the new value, as follows:
-    ///     {
-    ///       "labels": {
-    ///          "owner": "Google",
-    ///          "color": "Blue"
-    ///       }
-    ///       "etag": "33a64df551425fcc55e4d42a148795d9f25f89d4"
-    ///     }
+    /// {
+    /// "labels": {
+    /// "owner": "Google",
+    /// "color": "Blue"
+    /// }
+    /// "etag": "33a64df551425fcc55e4d42a148795d9f25f89d4"
+    /// }
     /// If `etag` matches the one on the server, the labels of the job will be
     /// replaced with the given ones, and the server end `etag` will be
     /// recalculated.

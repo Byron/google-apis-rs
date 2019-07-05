@@ -525,34 +525,35 @@ impl Part for YarnApplication {}
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to specify access control policies for Cloud Platform resources.A Policy consists of a list of bindings. A binding binds a list of members to a role, where the members can be user accounts, Google groups, Google domains, and service accounts. A role is a named list of permissions defined by IAM.JSON Example
 /// {
-///   "bindings": [
-///     {
-///       "role": "roles/owner",
-///       "members": [
-///         "user:mike@example.com",
-///         "group:admins@example.com",
-///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///       ]
-///     },
-///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
-///     }
-///   ]
+/// "bindings": [
+/// {
+/// "role": "roles/owner",
+/// "members": [
+/// "user:mike@example.com",
+/// "group:admins@example.com",
+/// "domain:google.com",
+/// "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+/// ]
+/// },
+/// {
+/// "role": "roles/viewer",
+/// "members": ["user:sean@example.com"]
+/// }
+/// ]
 /// }
 /// YAML Example
 /// bindings:
-/// - members:
-///   - user:mike@example.com
-///   - group:admins@example.com
-///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
-/// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
-/// For a description of IAM and its features, see the IAM developer's guide (https://cloud.google.com/iam/docs).
+/// 
+/// * members:
+///   * user:mike@example.com
+///   * group:admins@example.com
+///   * domain:google.com
+///   * serviceAccount:my-other-app@appspot.gserviceaccount.com
+///     role: roles/owner
+/// * members:
+///   * user:sean@example.com
+///     role: roles/viewer
+///     For a description of IAM and its features, see the IAM developer's guide (https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -573,7 +574,6 @@ impl Part for YarnApplication {}
 /// * [regions jobs set iam policy projects](struct.ProjectRegionJobSetIamPolicyCall.html) (response)
 /// * [locations workflow templates get iam policy projects](struct.ProjectLocationWorkflowTemplateGetIamPolicyCall.html) (response)
 /// * [regions autoscaling policies set iam policy projects](struct.ProjectRegionAutoscalingPolicySetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Associates a list of members to a role. bindings with no members will result in an error.
@@ -805,15 +805,14 @@ impl RequestValue for SubmitJobRequest {}
 pub struct QueryList {
     /// Required. The queries to execute. You do not need to terminate a query with a semicolon. Multiple queries can be specified in one string by separating each with a semicolon. Here is an example of an Cloud Dataproc API snippet that uses a QueryList to specify a HiveJob:
     /// "hiveJob": {
-    ///   "queryList": {
-    ///     "queries": [
-    ///       "query1",
-    ///       "query2",
-    ///       "query3;query4",
-    ///     ]
-    ///   }
+    /// "queryList": {
+    /// "queries": [
+    /// "query1",
+    /// "query2",
+    /// "query3;query4",
+    /// ]
     /// }
-    /// 
+    /// }
     pub queries: Option<Vec<String>>,
 }
 
@@ -7516,19 +7515,19 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
     }
     /// Required. Specifies the path, relative to Cluster, of the field to update. For example, to change the number of workers in a cluster to 5, the update_mask parameter would be specified as config.worker_config.num_instances, and the PATCH request body would specify the new value, as follows:
     /// {
-    ///   "config":{
-    ///     "workerConfig":{
-    ///       "numInstances":"5"
-    ///     }
-    ///   }
+    /// "config":{
+    /// "workerConfig":{
+    /// "numInstances":"5"
+    /// }
+    /// }
     /// }
     /// Similarly, to change the number of preemptible workers in a cluster to 5, the update_mask parameter would be config.secondary_worker_config.num_instances, and the PATCH request body would be set as follows:
     /// {
-    ///   "config":{
-    ///     "secondaryWorkerConfig":{
-    ///       "numInstances":"5"
-    ///     }
-    ///   }
+    /// "config":{
+    /// "secondaryWorkerConfig":{
+    /// "numInstances":"5"
+    /// }
+    /// }
     /// }
     /// <strong>Note:</strong> Currently, only the following fields can be updated:<table>  <tbody>  <tr>  <td><strong>Mask</strong></td>  <td><strong>Purpose</strong></td>  </tr>  <tr>  <td><strong><em>labels</em></strong></td>  <td>Update labels</td>  </tr>  <tr>  <td><strong><em>config.worker_config.num_instances</em></strong></td>  <td>Resize primary worker group</td>  </tr>  <tr>  <td><strong><em>config.secondary_worker_config.num_instances</em></strong></td>  <td>Resize secondary worker group</td>  </tr>  </tbody>  </table>
     ///

@@ -1397,14 +1397,13 @@ impl Part for DatasetAccess {}
 /// INT64: {type_kind="INT64"}
 /// ARRAY<STRING>: {type_kind="ARRAY", array_element_type="STRING"}
 /// STRUCT<x STRING, y ARRAY<DATE>>:
-///   {type_kind="STRUCT",
-///    struct_type={fields=[
-///      {name="x", type={type_kind="STRING"}},
-///      {name="y", type={type_kind="ARRAY", array_element_type="DATE"}}
-///    ]}}
+/// {type_kind="STRUCT",
+/// struct_type={fields=[
+/// {name="x", type={type_kind="STRING"}},
+/// {name="y", type={type_kind="ARRAY", array_element_type="DATE"}}
+/// ]}}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StandardSqlDataType {
     /// The fields of this struct, in order, if type_kind = "STRUCT".

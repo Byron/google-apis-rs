@@ -653,7 +653,8 @@ pub struct Location {
     pub display_name: Option<String>,
     /// Cross-service attributes for the location. For example
     /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
+    /// ````text
+    /// {"cloud.googleapis.com/region": "us-east1"}````
     pub labels: Option<HashMap<String, String>>,
     /// The canonical id for this location. For example: `"us-east1"`.
     #[serde(rename="locationId")]
@@ -734,9 +735,11 @@ impl ResponseResult for GenerateConsistencyTokenResponse {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -752,7 +755,6 @@ impl ResponseResult for GenerateConsistencyTokenResponse {}
 /// * [cancel operations](struct.OperationCancelCall.html) (response)
 /// * [instances delete projects](struct.ProjectInstanceDeleteCall.html) (response)
 /// * [instances tables delete projects](struct.ProjectInstanceTableDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -776,8 +778,8 @@ impl Part for MultiClusterRoutingUseAny {}
 /// different programming environments, including REST APIs and RPC APIs. It is
 /// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
+/// * Simple to use and understand for most users
+/// * Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
@@ -807,26 +809,25 @@ impl Part for MultiClusterRoutingUseAny {}
 /// 
 /// Example uses of this error model include:
 /// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
+/// * Partial errors. If a service needs to return partial errors to the client,
+///   it may embed the `Status` in the normal response to indicate the partial
+///   errors.
 /// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
+/// * Workflow errors. A typical workflow has multiple steps. Each step may
+///   have a `Status` message for error reporting.
 /// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
+/// * Batch operations. If a client uses batch request and batch response, the
+///   `Status` message should be used directly inside batch response, one for
+///   each error sub-response.
 /// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
+/// * Asynchronous operations. If an API call embeds asynchronous operation
+///   results in its response, the status of those operations should be
+///   represented directly using the `Status` message.
 /// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// * Logging. If some API errors are stored in logs, the message `Status` could
+///   be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
     /// A developer-facing error message, which should be in English. Any
@@ -846,7 +847,6 @@ impl Part for Status {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -854,37 +854,40 @@ impl Part for Status {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -898,7 +901,6 @@ impl Part for Status {}
 /// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (response)
 /// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (response)
 /// * [instances tables get iam policy projects](struct.ProjectInstanceTableGetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -1062,25 +1064,26 @@ impl Part for Intersection {}
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
+/// ````text
+/// {
+///   "audit_log_configs": [
 ///     {
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         }
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:foo@gmail.com"
 ///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
 /// foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
     /// Specifies the identities that do not cause logging for this type of
@@ -1136,12 +1139,13 @@ impl RequestValue for TestIamPermissionsRequest {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
     /// An optional description of the expression. This is a longer text which
@@ -1278,14 +1282,14 @@ pub struct CreateTableRequest {
     /// Example:
     /// 
     /// * Row keys := `["a", "apple", "custom", "customer_1", "customer_2",`
-    ///                `"other", "zz"]`
+    ///   `"other", "zz"]`
     /// * initial_split_keys := `["apple", "customer_1", "customer_2", "other"]`
     /// * Key assignment:
-    ///     - Tablet 1 `[, apple)                => {"a"}.`
-    ///     - Tablet 2 `[apple, customer_1)      => {"apple", "custom"}.`
-    ///     - Tablet 3 `[customer_1, customer_2) => {"customer_1"}.`
-    ///     - Tablet 4 `[customer_2, other)      => {"customer_2"}.`
-    ///     - Tablet 5 `[other, )                => {"other", "zz"}.`
+    ///   * Tablet 1 `[, apple)                => {"a"}.`
+    ///   * Tablet 2 `[apple, customer_1)      => {"apple", "custom"}.`
+    ///   * Tablet 3 `[customer_1, customer_2) => {"customer_1"}.`
+    ///   * Tablet 4 `[customer_2, other)      => {"customer_2"}.`
+    ///   * Tablet 5 `[other, )                => {"other", "zz"}.`
     #[serde(rename="initialSplits")]
     pub initial_splits: Option<Vec<Split>>,
     /// The name by which the new table should be referred to within the parent
@@ -1427,48 +1431,49 @@ impl Part for ClusterState {}
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
+/// ````text
+/// {
+///   "audit_configs": [
 ///     {
-///       "audit_configs": [
+///       "service": "allServices"
+///       "audit_log_configs": [
 ///         {
-///           "service": "allServices"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///               "exempted_members": [
-///                 "user:foo@gmail.com"
-///               ]
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///             },
-///             {
-///               "log_type": "ADMIN_READ",
-///             }
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
 ///           ]
 ///         },
 ///         {
-///           "service": "fooservice.googleapis.com"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///               "exempted_members": [
-///                 "user:bar@gmail.com"
-///               ]
-///             }
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "fooservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:bar@gmail.com"
 ///           ]
 ///         }
 ///       ]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
 /// logging. It also exempts foo@gmail.com from DATA_READ logging, and
 /// bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
     /// The configuration for logging of each type of permission.

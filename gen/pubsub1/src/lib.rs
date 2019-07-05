@@ -589,7 +589,6 @@ impl ResponseResult for ListSnapshotsResponse {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -597,37 +596,40 @@ impl ResponseResult for ListSnapshotsResponse {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -643,7 +645,6 @@ impl ResponseResult for ListSnapshotsResponse {}
 /// * [topics set iam policy projects](struct.ProjectTopicSetIamPolicyCall.html) (response)
 /// * [subscriptions get iam policy projects](struct.ProjectSubscriptionGetIamPolicyCall.html) (response)
 /// * [subscriptions set iam policy projects](struct.ProjectSubscriptionSetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Associates a list of `members` to a `role`.
@@ -740,9 +741,11 @@ impl RequestValue for ModifyPushConfigRequest {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -757,7 +760,6 @@ impl RequestValue for ModifyPushConfigRequest {}
 /// * [snapshots delete projects](struct.ProjectSnapshotDeleteCall.html) (response)
 /// * [subscriptions acknowledge projects](struct.ProjectSubscriptionAcknowledgeCall.html) (response)
 /// * [subscriptions delete projects](struct.ProjectSubscriptionDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1049,12 +1051,13 @@ impl RequestValue for TestIamPermissionsRequest {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
     /// An optional description of the expression. This is a longer text which
@@ -1238,12 +1241,12 @@ pub struct CreateSnapshotRequest {
     pub labels: Option<HashMap<String, String>>,
     /// The subscription whose backlog the snapshot retains.
     /// Specifically, the created snapshot is guaranteed to retain:
-    ///  (a) The existing backlog on the subscription. More precisely, this is
-    ///      defined as the messages in the subscription's backlog that are
-    ///      unacknowledged upon the successful completion of the
-    ///      `CreateSnapshot` request; as well as:
-    ///  (b) Any messages published to the subscription's topic following the
-    ///      successful completion of the CreateSnapshot request.
+    /// (a) The existing backlog on the subscription. More precisely, this is
+    /// defined as the messages in the subscription's backlog that are
+    /// unacknowledged upon the successful completion of the
+    /// `CreateSnapshot` request; as well as:
+    /// (b) Any messages published to the subscription's topic following the
+    /// successful completion of the CreateSnapshot request.
     /// Format is `projects/{project}/subscriptions/{sub}`.
     pub subscription: Option<String>,
 }

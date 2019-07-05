@@ -576,9 +576,11 @@ impl Part for AliasContext {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -589,7 +591,6 @@ impl Part for AliasContext {}
 /// 
 /// * [notes delete projects](struct.ProjectNoteDeleteCall.html) (response)
 /// * [occurrences delete projects](struct.ProjectOccurrenceDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1284,13 +1285,15 @@ pub struct PgpSignedAttestation {
     /// abbreviated key IDs, but only the full fingerprint is guaranteed to work.
     /// In gpg, the full fingerprint can be retrieved from the `fpr` field
     /// returned when calling --list-keys with --with-colons.  For example:
-    /// ```
+    /// 
+    /// ````text
     /// gpg --with-colons --with-fingerprint --force-v4-certs \
     ///     --list-keys attester@example.com
     /// tru::1:1513631572:0:3:1:5
     /// pub:...<SNIP>...
     /// fpr:::::::::24FF6481B76AC91E66A00AC657A93A81EF3AE6FB:
-    /// ```
+    /// ````
+    /// 
     /// Above, the fingerprint is `24FF6481B76AC91E66A00AC657A93A81EF3AE6FB`.
     #[serde(rename="pgpKeyId")]
     pub pgp_key_id: Option<String>,
@@ -1422,7 +1425,6 @@ impl Part for Details {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -1430,37 +1432,40 @@ impl Part for Details {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -1474,7 +1479,6 @@ impl Part for Details {}
 /// * [occurrences set iam policy projects](struct.ProjectOccurrenceSetIamPolicyCall.html) (response)
 /// * [notes set iam policy projects](struct.ProjectNoteSetIamPolicyCall.html) (response)
 /// * [occurrences get iam policy projects](struct.ProjectOccurrenceGetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -1745,25 +1749,26 @@ impl Part for BuildSignature {}
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
+/// ````text
+/// {
+///   "audit_log_configs": [
 ///     {
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         }
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:foo@gmail.com"
 ///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
 /// foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
     /// Specifies the identities that do not cause logging for this type of
@@ -1844,12 +1849,13 @@ impl Part for Package {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
     /// An optional description of the expression. This is a longer text which
@@ -1987,9 +1993,10 @@ impl Part for PackageIssue {}
 /// for quickly selecting a public key ALREADY CONFIGURED on the verifier through
 /// a trusted channel. Verification implementations MUST reject signatures in any
 /// of the following circumstances:
-///   * The `public_key_id` is not recognized by the verifier.
-///   * The public key that `public_key_id` refers to does not verify the
-///     signature with respect to the payload.
+/// 
+/// * The `public_key_id` is not recognized by the verifier.
+/// * The public key that `public_key_id` refers to does not verify the
+///   signature with respect to the payload.
 /// 
 /// The `signature` contents SHOULD NOT be "attached" (where the payload is
 /// included with the serialized `signature` bytes). Verifiers MUST ignore any
@@ -1999,26 +2006,28 @@ impl Part for PackageIssue {}
 /// holds this signature).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Signature {
     /// The identifier for the public key that verifies this signature.
-    ///   * The `public_key_id` is required.
-    ///   * The `public_key_id` MUST be an RFC3986 conformant URI.
-    ///   * When possible, the `public_key_id` SHOULD be an immutable reference,
-    ///     such as a cryptographic digest.
+    /// 
+    /// * The `public_key_id` is required.
+    /// * The `public_key_id` MUST be an RFC3986 conformant URI.
+    /// * When possible, the `public_key_id` SHOULD be an immutable reference,
+    ///   such as a cryptographic digest.
     /// 
     /// Examples of valid `public_key_id`s:
     /// 
     /// OpenPGP V4 public key fingerprint:
-    ///   * "openpgp4fpr:74FAF3B861BDA0870C7B6DEF607E48D2A663AEEA"
-    /// See https://www.iana.org/assignments/uri-schemes/prov/openpgp4fpr for more
-    /// details on this scheme.
+    /// 
+    /// * "openpgp4fpr:74FAF3B861BDA0870C7B6DEF607E48D2A663AEEA"
+    ///   See https://www.iana.org/assignments/uri-schemes/prov/openpgp4fpr for more
+    ///   details on this scheme.
     /// 
     /// RFC6920 digest-named SubjectPublicKeyInfo (digest of the DER
     /// serialization):
-    ///   * "ni:///sha-256;cD9o9Cq6LG3jD0iKXqEi_vdjJGecm_iXkbqVoScViaU"
-    ///   * "nih:///sha-256;703f68f42aba2c6de30f488a5ea122fef76324679c9bf89791ba95a1271589a5"
+    /// 
+    /// * "ni:///sha-256;cD9o9Cq6LG3jD0iKXqEi_vdjJGecm_iXkbqVoScViaU"
+    /// * "nih:///sha-256;703f68f42aba2c6de30f488a5ea122fef76324679c9bf89791ba95a1271589a5"
     #[serde(rename="publicKeyId")]
     pub public_key_id: Option<String>,
     /// The content of the signature, an opaque bytestring.
@@ -2259,48 +2268,49 @@ impl Part for Deployable {}
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
+/// ````text
+/// {
+///   "audit_configs": [
 ///     {
-///       "audit_configs": [
+///       "service": "allServices"
+///       "audit_log_configs": [
 ///         {
-///           "service": "allServices"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///               "exempted_members": [
-///                 "user:foo@gmail.com"
-///               ]
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///             },
-///             {
-///               "log_type": "ADMIN_READ",
-///             }
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
 ///           ]
 ///         },
 ///         {
-///           "service": "fooservice.googleapis.com"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///               "exempted_members": [
-///                 "user:bar@gmail.com"
-///               ]
-///             }
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "fooservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:bar@gmail.com"
 ///           ]
 ///         }
 ///       ]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
 /// logging. It also exempts foo@gmail.com from DATA_READ logging, and
 /// bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
     /// The configuration for logging of each type of permission.

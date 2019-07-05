@@ -749,6 +749,7 @@ pub struct RecognitionConfig {
     /// best suited to your domain to get best results. If a model is not
     /// explicitly specified, then we auto-select a model based on the parameters
     /// in the RecognitionConfig.
+    /// 
     /// <table>
     ///   <tr>
     ///     <td><b>Model</b></td>

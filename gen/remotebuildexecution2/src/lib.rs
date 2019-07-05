@@ -451,7 +451,7 @@ impl Part for BuildBazelRemoteExecutionV2SymlinkNode {}
 /// directory named `foo` with an executable file named `baz` (hashes shortened
 /// for readability):
 /// 
-/// ```json
+/// ````textjson
 /// // (Directory proto)
 /// {
 ///   files: [
@@ -487,10 +487,9 @@ impl Part for BuildBazelRemoteExecutionV2SymlinkNode {}
 ///     }
 ///   ]
 /// }
-/// ```
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildBazelRemoteExecutionV2Directory {
     /// The files in the directory.
@@ -713,7 +712,7 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// and a directory named `foo` with an executable file named `baz`. Then,
     /// output_directory will contain (hashes shortened for readability):
     /// 
-    /// ```json
+    /// ````textjson
     /// // OutputDirectory proto:
     /// {
     ///   path: "a/b/dir"
@@ -758,7 +757,8 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     ///     ]
     ///   }
     /// }
-    /// ```
+    /// ````
+    /// 
     /// If an output of the same name was found, but was not a directory, the
     /// server will return a FAILED_PRECONDITION.
     #[serde(rename="outputDirectories")]

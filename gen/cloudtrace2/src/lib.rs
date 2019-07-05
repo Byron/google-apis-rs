@@ -430,7 +430,10 @@ pub struct Span {
     pub display_name: Option<TruncatableString>,
     /// The resource name of the span in the following format:
     /// 
-    ///     projects/[PROJECT_ID]/traces/[TRACE_ID]/spans/SPAN_ID is a unique identifier for a trace within a project;
+    /// ````text
+    /// projects/[PROJECT_ID]/traces/[TRACE_ID]/spans/SPAN_ID is a unique identifier for a trace within a project;
+    /// ````
+    /// 
     /// it is a 32-character hexadecimal encoding of a 16-byte array.
     /// 
     /// [SPAN_ID] is a unique identifier for a span within a trace; it
@@ -552,10 +555,11 @@ pub struct Attributes {
     /// long. The value can be a string up to 256 bytes, a signed 64-bit integer,
     /// or the Boolean values `true` and `false`. For example:
     /// 
-    ///     "/instance_id": "my-instance"
-    ///     "/http/user_agent": ""
-    ///     "/http/request_bytes": 300
-    ///     "abc.com/myattribute": true
+    /// ````text
+    /// "/instance_id": "my-instance"
+    /// "/http/user_agent": ""
+    /// "/http/request_bytes": 300
+    /// "abc.com/myattribute": true````
     #[serde(rename="attributeMap")]
     pub attribute_map: Option<HashMap<String, AttributeValue>>,
 }
@@ -636,9 +640,11 @@ impl RequestValue for BatchWriteSpansRequest {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -648,7 +654,6 @@ impl RequestValue for BatchWriteSpansRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [traces batch write projects](struct.ProjectTraceBatchWriteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1121,7 +1126,10 @@ impl<'a, C, A> ProjectTraceSpanCreateSpanCall<'a, C, A> where C: BorrowMut<hyper
     }
     /// The resource name of the span in the following format:
     /// 
-    ///     projects/[PROJECT_ID]/traces/[TRACE_ID]/spans/SPAN_ID is a unique identifier for a trace within a project;
+    /// ````text
+    /// projects/[PROJECT_ID]/traces/[TRACE_ID]/spans/SPAN_ID is a unique identifier for a trace within a project;
+    /// ````
+    /// 
     /// it is a 32-character hexadecimal encoding of a 16-byte array.
     /// 
     /// [SPAN_ID] is a unique identifier for a span within a trace; it

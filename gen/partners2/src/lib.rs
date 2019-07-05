@@ -740,9 +740,11 @@ impl Part for EventData {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -752,7 +754,6 @@ impl Part for EventData {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete company relation users](struct.UserDeleteCompanyRelationCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -5969,8 +5970,8 @@ impl<'a, C, A> OfferHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Comma-separated list of fields to order by, e.g.: "foo,bar,baz".
     /// Use "foo desc" to sort descending.
     /// List of valid field names is: name, offer_code, expiration_time, status,
-    ///     last_modified_time, sender_name, creation_time, country_code,
-    ///     offer_type.
+    /// last_modified_time, sender_name, creation_time, country_code,
+    /// offer_type.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> OfferHistoryListCall<'a, C, A> {

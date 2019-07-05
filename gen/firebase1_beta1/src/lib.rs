@@ -824,9 +824,11 @@ impl Part for FirebaseAppInfo {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -836,7 +838,6 @@ impl Part for FirebaseAppInfo {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [android apps sha delete projects](struct.ProjectAndroidAppShaDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1322,6 +1323,7 @@ impl<'a, C, A> AvailableProjectMethods<'a, C, A> {
     /// that are available to have Firebase resources added to them.
     /// <br>
     /// <br>A GCP `Project` will only be returned if:
+    /// 
     /// <ol>
     ///   <li><p>The caller has sufficient
     ///          [Google IAM](https://cloud.google.com/iam) permissions to call
@@ -2316,6 +2318,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// that are available to have Firebase resources added to them.
 /// <br>
 /// <br>A GCP `Project` will only be returned if:
+/// 
 /// <ol>
 ///   <li><p>The caller has sufficient
 ///          [Google IAM](https://cloud.google.com/iam) permissions to call

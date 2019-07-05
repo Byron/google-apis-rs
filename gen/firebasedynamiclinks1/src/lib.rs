@@ -1306,11 +1306,12 @@ impl<'a, C, A> ManagedShortLinkMethods<'a, C, A> {
     /// The created short Dynamic Link will not expire.
     /// 
     /// This differs from CreateShortDynamicLink in the following ways:
-    ///   - The request will also contain a name for the link (non unique name
-    ///     for the front end).
-    ///   - The response must be authenticated with an auth token (generated with
-    ///     the admin service account).
-    ///   - The link will appear in the FDL list of links in the console front end.
+    /// 
+    /// * The request will also contain a name for the link (non unique name
+    ///   for the front end).
+    /// * The response must be authenticated with an auth token (generated with
+    ///   the admin service account).
+    /// * The link will appear in the FDL list of links in the console front end.
     /// 
     /// The Dynamic Link domain in the request must be owned by requester's
     /// Firebase project.
@@ -2346,11 +2347,12 @@ impl<'a, C, A> MethodReopenAttributionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// The created short Dynamic Link will not expire.
 /// 
 /// This differs from CreateShortDynamicLink in the following ways:
-///   - The request will also contain a name for the link (non unique name
-///     for the front end).
-///   - The response must be authenticated with an auth token (generated with
-///     the admin service account).
-///   - The link will appear in the FDL list of links in the console front end.
+/// 
+/// * The request will also contain a name for the link (non unique name
+///   for the front end).
+/// * The response must be authenticated with an auth token (generated with
+///   the admin service account).
+/// * The link will appear in the FDL list of links in the console front end.
 /// 
 /// The Dynamic Link domain in the request must be owned by requester's
 /// Firebase project.

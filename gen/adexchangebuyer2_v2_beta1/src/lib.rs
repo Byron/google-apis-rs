@@ -2278,9 +2278,11 @@ impl Part for ContactInformation {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -2295,7 +2297,6 @@ impl Part for ContactInformation {}
 /// * [creatives watch accounts](struct.AccountCreativeWatchCall.html) (response)
 /// * [filter sets delete bidders](struct.BidderFilterSetDeleteCall.html) (response)
 /// * [creatives stop watching accounts](struct.AccountCreativeStopWatchingCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -14035,6 +14036,7 @@ impl<'a, C, A> AccountCreativeListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
     /// An optional query string to filter creatives. If no filter is specified,
     /// all active creatives will be returned.
+    /// 
     /// <p>Supported queries are:
     /// <ul>
     /// <li>accountId=<i>account_id_string</i>
@@ -20819,6 +20821,7 @@ impl<'a, C, A> AccountCreativeDealAssociationListCall<'a, C, A> where C: BorrowM
     /// An optional query string to filter deal associations. If no filter is
     /// specified, all associations will be returned.
     /// Supported queries are:
+    /// 
     /// <ul>
     /// <li>accountId=<i>account_id_string</i>
     /// <li>creativeId=<i>creative_id_string</i>

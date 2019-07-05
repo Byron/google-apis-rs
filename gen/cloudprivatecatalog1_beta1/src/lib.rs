@@ -429,7 +429,7 @@ pub struct GoogleCloudPrivatecatalogV1beta1Product {
     /// When the type is `google.deploymentmanager.Template`, the schema is as
     /// follows:
     /// 
-    /// ```
+    /// ````text
     /// "$schema": http://json-schema.org/draft-04/schema#
     /// type: object
     /// properties:
@@ -475,12 +475,12 @@ pub struct GoogleCloudPrivatecatalogV1beta1Product {
     /// - description
     /// additionalProperties: false
     /// 
-    /// ```
+    /// ````
     /// 
     /// When the asset type is `google.cloudprivatecatalog.ListingOnly`, the schema
     /// is as follows:
     /// 
-    /// ```
+    /// ````text
     /// "$schema": http://json-schema.org/draft-04/schema#
     /// type: object
     /// properties:
@@ -530,7 +530,7 @@ pub struct GoogleCloudPrivatecatalogV1beta1Product {
     /// - description
     /// - signup_url
     /// additionalProperties: false
-    /// ```
+    /// ````
     #[serde(rename="displayMetadata")]
     pub display_metadata: Option<HashMap<String, String>>,
     /// Output only. The time when the product was created.

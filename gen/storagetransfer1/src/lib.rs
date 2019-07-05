@@ -472,29 +472,29 @@ pub struct ObjectConditions {
     /// 
     /// Requirements:
     /// 
-    ///   * Each include-prefix and exclude-prefix can contain any sequence of
-    ///     Unicode characters, of max length 1024 bytes when UTF8-encoded, and
-    ///     must not contain Carriage Return or Line Feed characters.  Wildcard
-    ///     matching and regular expression matching are not supported.
+    /// * Each include-prefix and exclude-prefix can contain any sequence of
+    ///   Unicode characters, of max length 1024 bytes when UTF8-encoded, and
+    ///   must not contain Carriage Return or Line Feed characters.  Wildcard
+    ///   matching and regular expression matching are not supported.
     /// 
-    ///   * Each include-prefix and exclude-prefix must omit the leading slash.
-    ///     For example, to include the `requests.gz` object in a transfer from
-    ///     `s3://my-aws-bucket/logs/y=2015/requests.gz`, specify the include
-    ///     prefix as `logs/y=2015/requests.gz`.
+    /// * Each include-prefix and exclude-prefix must omit the leading slash.
+    ///   For example, to include the `requests.gz` object in a transfer from
+    ///   `s3://my-aws-bucket/logs/y=2015/requests.gz`, specify the include
+    ///   prefix as `logs/y=2015/requests.gz`.
     /// 
-    ///   * None of the include-prefix or the exclude-prefix values can be empty,
-    ///     if specified.
+    /// * None of the include-prefix or the exclude-prefix values can be empty,
+    ///   if specified.
     /// 
-    ///   * Each include-prefix must include a distinct portion of the object
-    ///     namespace, i.e., no include-prefix may be a prefix of another
-    ///     include-prefix.
+    /// * Each include-prefix must include a distinct portion of the object
+    ///   namespace, i.e., no include-prefix may be a prefix of another
+    ///   include-prefix.
     /// 
-    ///   * Each exclude-prefix must exclude a distinct portion of the object
-    ///     namespace, i.e., no exclude-prefix may be a prefix of another
-    ///     exclude-prefix.
+    /// * Each exclude-prefix must exclude a distinct portion of the object
+    ///   namespace, i.e., no exclude-prefix may be a prefix of another
+    ///   exclude-prefix.
     /// 
-    ///   * If `includePrefixes` is specified, then each exclude-prefix must start
-    ///     with the value of a path explicitly included by `includePrefixes`.
+    /// * If `includePrefixes` is specified, then each exclude-prefix must start
+    ///   with the value of a path explicitly included by `includePrefixes`.
     /// 
     /// The max size of `includePrefixes` is 1000.
     #[serde(rename="includePrefixes")]
@@ -774,9 +774,11 @@ impl Part for TimeOfDay {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -789,7 +791,6 @@ impl Part for TimeOfDay {}
 /// * [cancel transfer operations](struct.TransferOperationCancelCall.html) (response)
 /// * [delete transfer operations](struct.TransferOperationDeleteCall.html) (response)
 /// * [resume transfer operations](struct.TransferOperationResumeCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 

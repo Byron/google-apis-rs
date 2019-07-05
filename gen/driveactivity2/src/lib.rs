@@ -1116,19 +1116,20 @@ pub struct QueryDriveActivityRequest {
     /// 
     /// Supported fields:
     /// 
-    ///   - <tt>time</tt>: Uses numerical operators on date values either in
-    ///     terms of milliseconds since Jan 1, 1970 or in RFC 3339 format.
-    ///     Examples:
-    ///       - <tt>time > 1452409200000 AND time <= 1492812924310</tt>
-    ///       - <tt>time >= "2016-01-10T01:02:03-05:00"</tt>
-    /// 
-    ///   - <tt>detail.action_detail_case</tt>: Uses the "has" operator (:) and
-    ///     either a singular value or a list of allowed action types enclosed in
-    ///     parentheses.
-    ///     Examples:
-    ///       - <tt>detail.action_detail_case: RENAME</tt>
-    ///       - <tt>detail.action_detail_case:(CREATE UPLOAD)</tt>
-    ///       - <tt>-detail.action_detail_case:MOVE</tt>
+    /// * <tt>time</tt>: Uses numerical operators on date values either in
+    ///   terms of milliseconds since Jan 1, 1970 or in RFC 3339 format.
+    ///   Examples:
+    ///   
+    ///   * <tt>time > 1452409200000 AND time <= 1492812924310</tt>
+    ///   * <tt>time >= "2016-01-10T01:02:03-05:00"</tt>
+    /// * <tt>detail.action_detail_case</tt>: Uses the "has" operator (:) and
+    ///   either a singular value or a list of allowed action types enclosed in
+    ///   parentheses.
+    ///   Examples:
+    ///   
+    ///   * <tt>detail.action_detail_case: RENAME</tt>
+    ///   * <tt>detail.action_detail_case:(CREATE UPLOAD)</tt>
+    ///   * <tt>-detail.action_detail_case:MOVE</tt>
     pub filter: Option<String>,
     /// The next_page_token value returned from a previous QueryDriveActivity
     /// request, if any.

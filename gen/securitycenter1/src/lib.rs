@@ -419,7 +419,6 @@ impl RequestValue for SetIamPolicyRequest {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -427,37 +426,40 @@ impl RequestValue for SetIamPolicyRequest {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -469,7 +471,6 @@ impl RequestValue for SetIamPolicyRequest {}
 /// 
 /// * [sources get iam policy organizations](struct.OrganizationSourceGetIamPolicyCall.html) (response)
 /// * [sources set iam policy organizations](struct.OrganizationSourceSetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -609,11 +610,11 @@ pub struct GroupFindingsRequest {
     /// Possible "state_change" values when compare_duration is specified:
     /// 
     /// * "CHANGED":   indicates that the finding was present at the start of
-    ///                  compare_duration, but changed its state at read_time.
+    ///   compare_duration, but changed its state at read_time.
     /// * "UNCHANGED": indicates that the finding was present at the start of
-    ///                  compare_duration and did not change state at read_time.
+    ///   compare_duration and did not change state at read_time.
     /// * "ADDED":     indicates that the finding was not present at the start
-    ///                  of compare_duration, but was present at read_time.
+    ///   of compare_duration, but was present at read_time.
     /// 
     /// If compare_duration is not specified, then the only possible state_change
     /// is "UNUSED",  which will be the state_change set for all findings present
@@ -758,9 +759,11 @@ impl ResponseResult for ListAssetsResponse {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -771,7 +774,6 @@ impl ResponseResult for ListAssetsResponse {}
 /// 
 /// * [operations cancel organizations](struct.OrganizationOperationCancelCall.html) (response)
 /// * [operations delete organizations](struct.OrganizationOperationDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1007,11 +1009,12 @@ pub struct SecurityMarks {
     pub name: Option<String>,
     /// Mutable user specified security marks belonging to the parent resource.
     /// Constraints are as follows:
-    ///   - Keys and values are treated as case insensitive
-    ///   - Keys must be between 1 - 256 characters (inclusive)
-    ///   - Keys must be letters, numbers, underscores, or dashes
-    ///   - Values have leading and trailing whitespace trimmed, remaining
-    ///     characters must be between 1 - 4096 characters (inclusive)
+    /// 
+    /// * Keys and values are treated as case insensitive
+    /// * Keys must be between 1 - 256 characters (inclusive)
+    /// * Keys must be letters, numbers, underscores, or dashes
+    /// * Values have leading and trailing whitespace trimmed, remaining
+    ///   characters must be between 1 - 4096 characters (inclusive)
     pub marks: Option<HashMap<String, String>>,
 }
 
@@ -1022,25 +1025,26 @@ impl ResponseResult for SecurityMarks {}
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
+/// ````text
+/// {
+///   "audit_log_configs": [
 ///     {
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         }
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:foo@gmail.com"
 ///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
 /// foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
     /// Specifies the identities that do not cause logging for this type of
@@ -1098,12 +1102,13 @@ impl RequestValue for TestIamPermissionsRequest {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
     /// An optional description of the expression. This is a longer text which
@@ -1232,12 +1237,12 @@ pub struct GroupAssetsRequest {
     /// Possible "state_change" values when compare_duration is specified:
     /// 
     /// * "ADDED":   indicates that the asset was not present at the start of
-    ///                compare_duration, but present at reference_time.
+    ///   compare_duration, but present at reference_time.
     /// * "REMOVED": indicates that the asset was present at the start of
-    ///                compare_duration, but not present at reference_time.
+    ///   compare_duration, but not present at reference_time.
     /// * "ACTIVE":  indicates that the asset was present at both the
-    ///                start and the end of the time period defined by
-    ///                compare_duration and reference_time.
+    ///   start and the end of the time period defined by
+    ///   compare_duration and reference_time.
     /// 
     /// If compare_duration is not specified, then the only possible state_change
     /// is "UNUSED", which will be the state_change set for all assets present at
@@ -1444,48 +1449,49 @@ impl Part for Binding {}
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
+/// ````text
+/// {
+///   "audit_configs": [
 ///     {
-///       "audit_configs": [
+///       "service": "allServices"
+///       "audit_log_configs": [
 ///         {
-///           "service": "allServices"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///               "exempted_members": [
-///                 "user:foo@gmail.com"
-///               ]
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///             },
-///             {
-///               "log_type": "ADMIN_READ",
-///             }
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
 ///           ]
 ///         },
 ///         {
-///           "service": "fooservice.googleapis.com"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///               "exempted_members": [
-///                 "user:bar@gmail.com"
-///               ]
-///             }
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "fooservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:bar@gmail.com"
 ///           ]
 ///         }
 ///       ]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
 /// logging. It also exempts foo@gmail.com from DATA_READ logging, and
 /// bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
     /// The configuration for logging of each type of permission.
@@ -5007,11 +5013,11 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// Possible "state_change" values when compare_duration is specified:
     /// 
     /// * "CHANGED":   indicates that the finding was present at the start of
-    ///                  compare_duration, but changed its state at read_time.
+    ///   compare_duration, but changed its state at read_time.
     /// * "UNCHANGED": indicates that the finding was present at the start of
-    ///                  compare_duration and did not change state at read_time.
+    ///   compare_duration and did not change state at read_time.
     /// * "ADDED":     indicates that the finding was not present at the start
-    ///                  of compare_duration, but was present at read_time.
+    ///   of compare_duration, but was present at read_time.
     /// 
     /// If compare_duration is not specified, then the only possible state_change
     /// is "UNUSED", which will be the state_change set for all findings present at
@@ -6617,12 +6623,12 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Possible "state_change" values when compare_duration is specified:
     /// 
     /// * "ADDED":   indicates that the asset was not present at the start of
-    ///                compare_duration, but present at read_time.
+    ///   compare_duration, but present at read_time.
     /// * "REMOVED": indicates that the asset was present at the start of
-    ///                compare_duration, but not present at read_time.
+    ///   compare_duration, but not present at read_time.
     /// * "ACTIVE":  indicates that the asset was present at both the
-    ///                start and the end of the time period defined by
-    ///                compare_duration and read_time.
+    ///   start and the end of the time period defined by
+    ///   compare_duration and read_time.
     /// 
     /// If compare_duration is not specified, then the only possible state_change
     /// is "UNUSED",  which will be the state_change set for all assets present at

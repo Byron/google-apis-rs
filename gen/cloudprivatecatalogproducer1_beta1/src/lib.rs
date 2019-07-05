@@ -478,7 +478,6 @@ impl RequestValue for GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogReq
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -486,37 +485,40 @@ impl RequestValue for GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogReq
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -528,7 +530,6 @@ impl RequestValue for GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogReq
 /// 
 /// * [get iam policy catalogs](struct.CatalogGetIamPolicyCall.html) (response)
 /// * [set iam policy catalogs](struct.CatalogSetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -654,7 +655,7 @@ pub struct GoogleCloudPrivatecatalogproducerV1beta1Version {
     /// The user-supplied asset payload. The maximum size of the payload is 2MB.
     /// The JSON schema of the payload is defined as:
     /// 
-    /// ```
+    /// ````text
     /// type: object
     /// properties:
     ///   mainTemplate:
@@ -675,7 +676,7 @@ pub struct GoogleCloudPrivatecatalogproducerV1beta1Version {
     ///           type: string
     ///         content:
     ///           type: string
-    /// ```
+    /// ````
     #[serde(rename="originalAsset")]
     pub original_asset: Option<HashMap<String, String>>,
     /// Output only. The asset which has been validated and is ready to be
@@ -783,7 +784,6 @@ impl ResponseResult for GoogleIamV1TestIamPermissionsResponse {}
 /// 
 /// * [associations create catalogs](struct.CatalogAssociationCreateCall.html) (response)
 /// * [associations get catalogs](struct.CatalogAssociationGetCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPrivatecatalogproducerV1beta1Association {
     /// Required. The user-supplied fully qualified name of the `Resource`
@@ -835,9 +835,11 @@ impl ResponseResult for GoogleCloudPrivatecatalogproducerV1beta1ListProductsResp
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -852,7 +854,6 @@ impl ResponseResult for GoogleCloudPrivatecatalogproducerV1beta1ListProductsResp
 /// * [associations delete catalogs](struct.CatalogAssociationDeleteCall.html) (response)
 /// * [delete operations](struct.OperationDeleteCall.html) (response)
 /// * [products delete catalogs](struct.CatalogProductDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
 
@@ -981,7 +982,7 @@ pub struct GoogleCloudPrivatecatalogproducerV1beta1Product {
     /// When the type is `google.deploymentmanager.Template`, the schema is as
     /// follows:
     /// 
-    /// ```
+    /// ````text
     /// "$schema": http://json-schema.org/draft-04/schema#
     /// type: object
     /// properties:
@@ -1027,12 +1028,12 @@ pub struct GoogleCloudPrivatecatalogproducerV1beta1Product {
     /// - description
     /// additionalProperties: false
     /// 
-    /// ```
+    /// ````
     /// 
     /// When the asset type is `google.cloudprivatecatalog.ListingOnly`, the schema
     /// is as follows:
     /// 
-    /// ```
+    /// ````text
     /// "$schema": http://json-schema.org/draft-04/schema#
     /// type: object
     /// properties:
@@ -1082,7 +1083,7 @@ pub struct GoogleCloudPrivatecatalogproducerV1beta1Product {
     /// - description
     /// - signup_url
     /// additionalProperties: false
-    /// ```
+    /// ````
     #[serde(rename="displayMetadata")]
     pub display_metadata: Option<HashMap<String, String>>,
     /// Output only. The time when the product was created.
@@ -1096,12 +1097,13 @@ impl ResponseResult for GoogleCloudPrivatecatalogproducerV1beta1Product {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeExpr {
     /// An optional description of the expression. This is a longer text which
@@ -1246,48 +1248,49 @@ impl Part for GoogleRpcStatus {}
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
+/// ````text
+/// {
+///   "audit_configs": [
 ///     {
-///       "audit_configs": [
+///       "service": "allServices"
+///       "audit_log_configs": [
 ///         {
-///           "service": "allServices"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///               "exempted_members": [
-///                 "user:foo@gmail.com"
-///               ]
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///             },
-///             {
-///               "log_type": "ADMIN_READ",
-///             }
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
 ///           ]
 ///         },
 ///         {
-///           "service": "fooservice.googleapis.com"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///               "exempted_members": [
-///                 "user:bar@gmail.com"
-///               ]
-///             }
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "fooservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:bar@gmail.com"
 ///           ]
 ///         }
 ///       ]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
 /// logging. It also exempts foo@gmail.com from DATA_READ logging, and
 /// bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1AuditConfig {
     /// The configuration for logging of each type of permission.
@@ -1305,25 +1308,26 @@ impl Part for GoogleIamV1AuditConfig {}
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
+/// ````text
+/// {
+///   "audit_log_configs": [
 ///     {
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         }
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:foo@gmail.com"
 ///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
 /// foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1AuditLogConfig {
     /// Specifies the identities that do not cause logging for this type of

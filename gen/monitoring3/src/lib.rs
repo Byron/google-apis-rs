@@ -506,12 +506,10 @@ impl Part for BucketOptions {}
 
 /// An object representing a resource that can be used for monitoring, logging, billing, or other purposes. Examples include virtual machine instances, databases, and storage devices such as disks. The type field identifies a MonitoredResourceDescriptor object that describes the resource's schema. Information in the labels field identifies the actual resource and its attributes according to the schema. For example, a particular Compute Engine VM instance could be represented by the following object, because the MonitoredResourceDescriptor for "gce_instance" has labels "instance_id" and "zone":
 /// { "type": "gce_instance",
-///   "labels": { "instance_id": "12345678901234",
-///               "zone": "us-central1-a" }}
-/// 
+/// "labels": { "instance_id": "12345678901234",
+/// "zone": "us-central1-a" }}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitoredResource {
     /// Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Compute Engine VM instances use the labels "project_id", "instance_id", and "zone".
@@ -1343,9 +1341,9 @@ pub struct MetricDescriptor {
     /// Expression = Component { "." Component } { "/" Component } ;
     /// 
     /// Component = ( [ PREFIX ] UNIT | "%" ) [ Annotation ]
-    ///           | Annotation
-    ///           | "1"
-    ///           ;
+    /// | Annotation
+    /// | "1"
+    /// ;
     /// 
     /// Annotation = "{" NAME "}" ;
     /// Notes:
@@ -6912,8 +6910,7 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
     /// A monitoring filter that specifies which time series should be returned. The filter must specify a single metric type, and can additionally specify metric labels and other information. For example:
     /// metric.type = "compute.googleapis.com/instance/cpu/usage_time" AND
-    ///     metric.labels.instance_name = "my-instance-name"
-    /// 
+    /// metric.labels.instance_name = "my-instance-name"
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectTimeSeryListCall<'a, C, A> {

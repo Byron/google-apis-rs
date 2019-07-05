@@ -1267,21 +1267,20 @@ impl Part for InsertTextRequest {}
 /// Inherited text styles are represented as unset fields in this message. A
 /// text style's parent depends on where the text style is defined:
 /// 
-///   * The TextStyle of text in a Paragraph
-///     inherits from the paragraph's corresponding named style type.
-///   * The TextStyle on a named style
-///     inherits from the normal text named style.
-///   * The TextStyle of the normal text named style inherits
-///     from the default text style in the Docs editor.
-///   * The TextStyle on a Paragraph element
-///     that is contained in a table may inherit its text style from the table
-///     style.
+/// * The TextStyle of text in a Paragraph
+///   inherits from the paragraph's corresponding named style type.
+/// * The TextStyle on a named style
+///   inherits from the normal text named style.
+/// * The TextStyle of the normal text named style inherits
+///   from the default text style in the Docs editor.
+/// * The TextStyle on a Paragraph element
+///   that is contained in a table may inherit its text style from the table
+///   style.
 /// 
 /// If the text style does not inherit from a parent, unsetting fields will
 /// revert the style to a value matching the defaults in the Docs editor.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TextStyle {
     /// The foreground color of the text. If set, the color is either an RGB color
@@ -2732,21 +2731,20 @@ impl Part for Response {}
 /// Inherited paragraph styles are represented as unset fields in this message.
 /// A paragraph style's parent depends on where the paragraph style is defined:
 /// 
-///   * The ParagraphStyle on a Paragraph
-///     inherits from the paragraph's corresponding named style type.
-///   * The ParagraphStyle on a named style
-///     inherits from the normal text named style.
-///   * The ParagraphStyle of the normal text named style inherits
-///     from the default paragraph style in the Docs editor.
-///   * The ParagraphStyle on a Paragraph
-///     element that is contained in a table may inherit its paragraph style from
-///     the table style.
+/// * The ParagraphStyle on a Paragraph
+///   inherits from the paragraph's corresponding named style type.
+/// * The ParagraphStyle on a named style
+///   inherits from the normal text named style.
+/// * The ParagraphStyle of the normal text named style inherits
+///   from the default paragraph style in the Docs editor.
+/// * The ParagraphStyle on a Paragraph
+///   element that is contained in a table may inherit its paragraph style from
+///   the table style.
 /// 
 /// If the paragraph style does not inherit from a parent, unsetting fields will
 /// revert the style to a value matching the defaults in the Docs editor.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParagraphStyle {
     /// The spacing mode for the paragraph.

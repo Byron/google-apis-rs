@@ -541,9 +541,11 @@ impl Part for ReplaceWithInfoTypeConfig {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -562,7 +564,6 @@ impl Part for ReplaceWithInfoTypeConfig {}
 /// * [locations datasets hl7 v2 stores messages delete projects](struct.ProjectLocationDatasetHl7V2StoreMessageDeleteCall.html) (response)
 /// * [locations datasets fhir stores delete projects](struct.ProjectLocationDatasetFhirStoreDeleteCall.html) (response)
 /// * [locations datasets hl7 v2 stores delete projects](struct.ProjectLocationDatasetHl7V2StoreDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1077,7 +1078,6 @@ impl RequestValue for SetIamPolicyRequest {}
 /// payload formats that can't be represented as JSON, such as raw binary or
 /// an HTML page.
 /// 
-/// 
 /// This message can be used both in streaming and non-streaming API methods in
 /// the request as well as the response.
 /// 
@@ -1087,28 +1087,32 @@ impl RequestValue for SetIamPolicyRequest {}
 /// 
 /// Example:
 /// 
-///     message GetResourceRequest {
-///       // A unique request id.
-///       string request_id = 1;
+/// ````text
+/// message GetResourceRequest {
+///   // A unique request id.
+///   string request_id = 1;
 /// 
-///       // The raw HTTP body is bound to this field.
-///       google.api.HttpBody http_body = 2;
-///     }
+///   // The raw HTTP body is bound to this field.
+///   google.api.HttpBody http_body = 2;
+/// }
 /// 
-///     service ResourceService {
-///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
-///       rpc UpdateResource(google.api.HttpBody) returns
-///       (google.protobuf.Empty);
-///     }
+/// service ResourceService {
+///   rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
+///   rpc UpdateResource(google.api.HttpBody) returns
+///   (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// Example with streaming methods:
 /// 
-///     service CaldavService {
-///       rpc GetCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///       rpc UpdateCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///     }
+/// ````text
+/// service CaldavService {
+///   rpc GetCalendar(stream google.api.HttpBody)
+///     returns (stream google.api.HttpBody);
+///   rpc UpdateCalendar(stream google.api.HttpBody)
+///     returns (stream google.api.HttpBody);
+/// }
+/// ````
 /// 
 /// Use of this type only changes how the request and response bodies are
 /// handled, all other features will continue to work unchanged.
@@ -1149,7 +1153,6 @@ impl RequestValue for SetIamPolicyRequest {}
 /// * [locations datasets fhir stores fhir read projects](struct.ProjectLocationDatasetFhirStoreFhirReadCall.html) (response)
 /// * [locations datasets fhir stores fhir capabilities projects](struct.ProjectLocationDatasetFhirStoreFhirCapabilityCall.html) (response)
 /// * [locations datasets dicom stores store instances projects](struct.ProjectLocationDatasetDicomStoreStoreInstanceCall.html) (request|response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HttpBody {
     /// The HTTP Content-Type header value specifying the content type of the body.
@@ -1204,7 +1207,8 @@ pub struct Location {
     pub display_name: Option<String>,
     /// Cross-service attributes for the location. For example
     /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
+    /// ````text
+    /// {"cloud.googleapis.com/region": "us-east1"}````
     pub labels: Option<HashMap<String, String>>,
     /// The canonical id for this location. For example: `"us-east1"`.
     #[serde(rename="locationId")]
@@ -1223,7 +1227,6 @@ impl ResponseResult for Location {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -1231,37 +1234,40 @@ impl ResponseResult for Location {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
@@ -1279,7 +1285,6 @@ impl ResponseResult for Location {}
 /// * [locations datasets set iam policy projects](struct.ProjectLocationDatasetSetIamPolicyCall.html) (response)
 /// * [locations datasets fhir stores get iam policy projects](struct.ProjectLocationDatasetFhirStoreGetIamPolicyCall.html) (response)
 /// * [locations datasets hl7 v2 stores get iam policy projects](struct.ProjectLocationDatasetHl7V2StoreGetIamPolicyCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -1316,15 +1321,15 @@ pub struct GoogleCloudHealthcareV1beta1DicomGcsSource {
     /// content only. The URI must be in the following format:
     /// `gs://{bucket_id}/{object_id}`. The URI can include wildcards in
     /// `object_id` and thus identify multiple files. Supported wildcards:
-    ///  '*' to match 0 or more non-separator characters
-    ///  '**' to match 0 or more characters (including separators). Must be used at
-    ///       the end of a path and with no other wildcards in the
-    ///       path. Can also be used with a file extension (such as .dcm), which
-    ///       imports all files with the extension in the specified directory and
-    ///       its sub-directories. For example,
-    ///       `gs://my-bucket/my-directory/**.dcm` imports all files with .dcm
-    ///       extensions in `my-directory/` and its sub-directories.
-    ///  '?' to match 1 character
+    /// '*' to match 0 or more non-separator characters
+    /// '**' to match 0 or more characters (including separators). Must be used at
+    /// the end of a path and with no other wildcards in the
+    /// path. Can also be used with a file extension (such as .dcm), which
+    /// imports all files with the extension in the specified directory and
+    /// its sub-directories. For example,
+    /// `gs://my-bucket/my-directory/**.dcm` imports all files with .dcm
+    /// extensions in `my-directory/` and its sub-directories.
+    /// '?' to match 1 character
     /// All other URI formats are invalid.
     /// Files matching the wildcard are expected to contain content only, no
     /// metadata.
@@ -1541,25 +1546,26 @@ impl Part for TextConfig {}
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
+/// ````text
+/// {
+///   "audit_log_configs": [
 ///     {
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         }
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:foo@gmail.com"
 ///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
 /// foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
     /// Specifies the identities that do not cause logging for this type of
@@ -1577,12 +1583,13 @@ impl Part for AuditLogConfig {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
     /// An optional description of the expression. This is a longer text which
@@ -1989,48 +1996,49 @@ impl ResponseResult for ListMessagesResponse {}
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
+/// ````text
+/// {
+///   "audit_configs": [
 ///     {
-///       "audit_configs": [
+///       "service": "allServices"
+///       "audit_log_configs": [
 ///         {
-///           "service": "allServices"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///               "exempted_members": [
-///                 "user:foo@gmail.com"
-///               ]
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///             },
-///             {
-///               "log_type": "ADMIN_READ",
-///             }
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
 ///           ]
 ///         },
 ///         {
-///           "service": "fooservice.googleapis.com"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///               "exempted_members": [
-///                 "user:bar@gmail.com"
-///               ]
-///             }
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "fooservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:bar@gmail.com"
 ///           ]
 ///         }
 ///       ]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
 /// logging. It also exempts foo@gmail.com from DATA_READ logging, and
 /// bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
     /// The configuration for logging of each type of permission.

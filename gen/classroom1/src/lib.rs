@@ -723,9 +723,11 @@ impl RequestValue for ReturnStudentSubmissionRequest {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -748,7 +750,6 @@ impl RequestValue for ReturnStudentSubmissionRequest {}
 /// * [delete registrations](struct.RegistrationDeleteCall.html) (response)
 /// * [announcements delete courses](struct.CourseAnnouncementDeleteCall.html) (response)
 /// * [accept invitations](struct.InvitationAcceptCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -2526,10 +2527,10 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not permitted to modify the
-    /// requested course or for access errors.
+    ///   requested course or for access errors.
     /// * `NOT_FOUND` if no course exists with the requested ID.
     /// * `FAILED_PRECONDITION` for the following request errors:
-    ///     * CourseNotModifiable
+    ///   * CourseNotModifiable
     /// 
     /// # Arguments
     ///
@@ -2988,12 +2989,12 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-    /// requested course, create course work in the requested course, share a
-    /// Drive attachment, or for access errors.
+    ///   requested course, create course work in the requested course, share a
+    ///   Drive attachment, or for access errors.
     /// * `INVALID_ARGUMENT` if the request is malformed.
     /// * `NOT_FOUND` if the requested course does not exist.
     /// * `FAILED_PRECONDITION` for the following request error:
-    ///     * AttachmentNotVisible
+    ///   * AttachmentNotVisible
     /// 
     /// # Arguments
     ///
@@ -3044,12 +3045,12 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-    /// requested course, create announcements in the requested course, share a
-    /// Drive attachment, or for access errors.
+    ///   requested course, create announcements in the requested course, share a
+    ///   Drive attachment, or for access errors.
     /// * `INVALID_ARGUMENT` if the request is malformed.
     /// * `NOT_FOUND` if the requested course does not exist.
     /// * `FAILED_PRECONDITION` for the following request error:
-    ///     * AttachmentNotVisible
+    ///   * AttachmentNotVisible
     /// 
     /// # Arguments
     ///
@@ -3170,15 +3171,15 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not permitted to create
-    /// students in this course or for access errors.
+    ///   students in this course or for access errors.
     /// * `NOT_FOUND` if the requested course ID does not exist.
     /// * `FAILED_PRECONDITION` if the requested user's account is disabled,
-    /// for the following request errors:
-    ///     * CourseMemberLimitReached
-    ///     * CourseNotModifiable
-    ///     * UserGroupsMembershipLimitReached
+    ///   for the following request errors:
+    ///   * CourseMemberLimitReached
+    ///   * CourseNotModifiable
+    ///   * UserGroupsMembershipLimitReached
     /// * `ALREADY_EXISTS` if the user is already a student or teacher in the
-    /// course.
+    ///   course.
     /// 
     /// # Arguments
     ///
@@ -3307,13 +3308,13 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not permitted to create
-    /// courses or for access errors.
+    ///   courses or for access errors.
     /// * `NOT_FOUND` if the primary teacher is not a valid user.
     /// * `FAILED_PRECONDITION` if the course owner's account is disabled or for
-    /// the following request errors:
-    ///     * UserGroupsMembershipLimitReached
+    ///   the following request errors:
+    ///   * UserGroupsMembershipLimitReached
     /// * `ALREADY_EXISTS` if an alias was specified in the `id` and
-    /// already exists.
+    ///   already exists.
     /// 
     /// # Arguments
     ///
@@ -3459,12 +3460,12 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not permitted to modify the
-    /// requested course or for access errors.
+    ///   requested course or for access errors.
     /// * `NOT_FOUND` if no course exists with the requested ID.
     /// * `INVALID_ARGUMENT` if invalid fields are specified in the update mask or
-    /// if no update mask is supplied.
+    ///   if no update mask is supplied.
     /// * `FAILED_PRECONDITION` for the following request errors:
-    ///     * CourseNotModifiable
+    ///   * CourseNotModifiable
     /// 
     /// # Arguments
     ///
@@ -3557,16 +3558,16 @@ impl<'a, C, A> CourseMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not  permitted to create
-    /// teachers in this course or for access errors.
+    ///   teachers in this course or for access errors.
     /// * `NOT_FOUND` if the requested course ID does not exist.
     /// * `FAILED_PRECONDITION` if the requested user's account is disabled,
-    /// for the following request errors:
-    ///     * CourseMemberLimitReached
-    ///     * CourseNotModifiable
-    ///     * CourseTeacherLimitReached
-    ///     * UserGroupsMembershipLimitReached
+    ///   for the following request errors:
+    ///   * CourseMemberLimitReached
+    ///   * CourseNotModifiable
+    ///   * CourseTeacherLimitReached
+    ///   * UserGroupsMembershipLimitReached
     /// * `ALREADY_EXISTS` if the user is already a teacher or student in the
-    /// course.
+    ///   course.
     /// 
     /// # Arguments
     ///
@@ -4117,20 +4118,20 @@ impl<'a, C, A> RegistrationMethods<'a, C, A> {
     /// This method may return the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if:
-    ///     * the authenticated user does not have permission to receive
-    ///       notifications from the requested field; or
-    ///     * the credential provided does not include the appropriate scope for
-    ///       the requested feed.
-    ///     * another access error is encountered.
+    ///   * the authenticated user does not have permission to receive
+    ///     notifications from the requested field; or
+    ///   * the credential provided does not include the appropriate scope for
+    ///     the requested feed.
+    ///   * another access error is encountered.
     /// * `INVALID_ARGUMENT` if:
-    ///     * no `cloudPubsubTopic` is specified, or the specified
-    ///       `cloudPubsubTopic` is not valid; or
-    ///     * no `feed` is specified, or the specified `feed` is not valid.
+    ///   * no `cloudPubsubTopic` is specified, or the specified
+    ///     `cloudPubsubTopic` is not valid; or
+    ///   * no `feed` is specified, or the specified `feed` is not valid.
     /// * `NOT_FOUND` if:
-    ///     * the specified `feed` cannot be located, or the requesting user does
-    ///       not have permission to determine whether or not it exists; or
-    ///     * the specified `cloudPubsubTopic` cannot be located, or Classroom has
-    ///       not been granted permission to publish to it.
+    ///   * the specified `feed` cannot be located, or the requesting user does
+    ///     not have permission to determine whether or not it exists; or
+    ///   * the specified `cloudPubsubTopic` cannot be located, or Classroom has
+    ///     not been granted permission to publish to it.
     /// 
     /// # Arguments
     ///
@@ -4312,12 +4313,12 @@ impl<'a, C, A> InvitationMethods<'a, C, A> {
     /// This method returns the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if the requesting user is not permitted to accept the
-    /// requested invitation or for access errors.
+    ///   requested invitation or for access errors.
     /// * `FAILED_PRECONDITION` for the following request errors:
-    ///     * CourseMemberLimitReached
-    ///     * CourseNotModifiable
-    ///     * CourseTeacherLimitReached
-    ///     * UserGroupsMembershipLimitReached
+    ///   * CourseMemberLimitReached
+    ///   * CourseNotModifiable
+    ///   * CourseTeacherLimitReached
+    ///   * UserGroupsMembershipLimitReached
     /// * `NOT_FOUND` if no invitation exists with the requested ID.
     /// 
     /// # Arguments
@@ -5840,10 +5841,10 @@ impl<'a, C, A> CourseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not permitted to modify the
-/// requested course or for access errors.
+///   requested course or for access errors.
 /// * `NOT_FOUND` if no course exists with the requested ID.
 /// * `FAILED_PRECONDITION` for the following request errors:
-///     * CourseNotModifiable
+///   * CourseNotModifiable
 ///
 /// A builder for the *update* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
@@ -9730,12 +9731,12 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-/// requested course, create course work in the requested course, share a
-/// Drive attachment, or for access errors.
+///   requested course, create course work in the requested course, share a
+///   Drive attachment, or for access errors.
 /// * `INVALID_ARGUMENT` if the request is malformed.
 /// * `NOT_FOUND` if the requested course does not exist.
 /// * `FAILED_PRECONDITION` for the following request error:
-///     * AttachmentNotVisible
+///   * AttachmentNotVisible
 ///
 /// A builder for the *courseWork.create* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
@@ -10319,12 +10320,12 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not permitted to access the
-/// requested course, create announcements in the requested course, share a
-/// Drive attachment, or for access errors.
+///   requested course, create announcements in the requested course, share a
+///   Drive attachment, or for access errors.
 /// * `INVALID_ARGUMENT` if the request is malformed.
 /// * `NOT_FOUND` if the requested course does not exist.
 /// * `FAILED_PRECONDITION` for the following request error:
-///     * AttachmentNotVisible
+///   * AttachmentNotVisible
 ///
 /// A builder for the *announcements.create* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
@@ -11533,15 +11534,15 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not permitted to create
-/// students in this course or for access errors.
+///   students in this course or for access errors.
 /// * `NOT_FOUND` if the requested course ID does not exist.
 /// * `FAILED_PRECONDITION` if the requested user's account is disabled,
-/// for the following request errors:
-///     * CourseMemberLimitReached
-///     * CourseNotModifiable
-///     * UserGroupsMembershipLimitReached
+///   for the following request errors:
+///   * CourseMemberLimitReached
+///   * CourseNotModifiable
+///   * UserGroupsMembershipLimitReached
 /// * `ALREADY_EXISTS` if the user is already a student or teacher in the
-/// course.
+///   course.
 ///
 /// A builder for the *students.create* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
@@ -12680,13 +12681,13 @@ impl<'a, C, A> CourseCourseWorkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not permitted to create
-/// courses or for access errors.
+///   courses or for access errors.
 /// * `NOT_FOUND` if the primary teacher is not a valid user.
 /// * `FAILED_PRECONDITION` if the course owner's account is disabled or for
-/// the following request errors:
-///     * UserGroupsMembershipLimitReached
+///   the following request errors:
+///   * UserGroupsMembershipLimitReached
 /// * `ALREADY_EXISTS` if an alias was specified in the `id` and
-/// already exists.
+///   already exists.
 ///
 /// A builder for the *create* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
@@ -14073,12 +14074,12 @@ impl<'a, C, A> CourseTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not permitted to modify the
-/// requested course or for access errors.
+///   requested course or for access errors.
 /// * `NOT_FOUND` if no course exists with the requested ID.
 /// * `INVALID_ARGUMENT` if invalid fields are specified in the update mask or
-/// if no update mask is supplied.
+///   if no update mask is supplied.
 /// * `FAILED_PRECONDITION` for the following request errors:
-///     * CourseNotModifiable
+///   * CourseNotModifiable
 ///
 /// A builder for the *patch* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
@@ -14932,16 +14933,16 @@ impl<'a, C, A> CourseTeacherDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not  permitted to create
-/// teachers in this course or for access errors.
+///   teachers in this course or for access errors.
 /// * `NOT_FOUND` if the requested course ID does not exist.
 /// * `FAILED_PRECONDITION` if the requested user's account is disabled,
-/// for the following request errors:
-///     * CourseMemberLimitReached
-///     * CourseNotModifiable
-///     * CourseTeacherLimitReached
-///     * UserGroupsMembershipLimitReached
+///   for the following request errors:
+///   * CourseMemberLimitReached
+///   * CourseNotModifiable
+///   * CourseTeacherLimitReached
+///   * UserGroupsMembershipLimitReached
 /// * `ALREADY_EXISTS` if the user is already a teacher or student in the
-/// course.
+///   course.
 ///
 /// A builder for the *teachers.create* method supported by a *course* resource.
 /// It is not used directly, but through a `CourseMethods` instance.
@@ -18681,20 +18682,20 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
 /// This method may return the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if:
-///     * the authenticated user does not have permission to receive
-///       notifications from the requested field; or
-///     * the credential provided does not include the appropriate scope for
-///       the requested feed.
-///     * another access error is encountered.
+///   * the authenticated user does not have permission to receive
+///     notifications from the requested field; or
+///   * the credential provided does not include the appropriate scope for
+///     the requested feed.
+///   * another access error is encountered.
 /// * `INVALID_ARGUMENT` if:
-///     * no `cloudPubsubTopic` is specified, or the specified
-///       `cloudPubsubTopic` is not valid; or
-///     * no `feed` is specified, or the specified `feed` is not valid.
+///   * no `cloudPubsubTopic` is specified, or the specified
+///     `cloudPubsubTopic` is not valid; or
+///   * no `feed` is specified, or the specified `feed` is not valid.
 /// * `NOT_FOUND` if:
-///     * the specified `feed` cannot be located, or the requesting user does
-///       not have permission to determine whether or not it exists; or
-///     * the specified `cloudPubsubTopic` cannot be located, or Classroom has
-///       not been granted permission to publish to it.
+///   * the specified `feed` cannot be located, or the requesting user does
+///     not have permission to determine whether or not it exists; or
+///   * the specified `cloudPubsubTopic` cannot be located, or Classroom has
+///     not been granted permission to publish to it.
 ///
 /// A builder for the *create* method supported by a *registration* resource.
 /// It is not used directly, but through a `RegistrationMethods` instance.
@@ -20222,12 +20223,12 @@ impl<'a, C, A> InvitationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// This method returns the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if the requesting user is not permitted to accept the
-/// requested invitation or for access errors.
+///   requested invitation or for access errors.
 /// * `FAILED_PRECONDITION` for the following request errors:
-///     * CourseMemberLimitReached
-///     * CourseNotModifiable
-///     * CourseTeacherLimitReached
-///     * UserGroupsMembershipLimitReached
+///   * CourseMemberLimitReached
+///   * CourseNotModifiable
+///   * CourseTeacherLimitReached
+///   * UserGroupsMembershipLimitReached
 /// * `NOT_FOUND` if no invitation exists with the requested ID.
 ///
 /// A builder for the *accept* method supported by a *invitation* resource.

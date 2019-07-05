@@ -373,7 +373,8 @@ pub struct Location {
     pub display_name: Option<String>,
     /// Cross-service attributes for the location. For example
     /// 
-    ///     {"cloud.googleapis.com/region": "us-east1"}
+    /// ````text
+    /// {"cloud.googleapis.com/region": "us-east1"}````
     pub labels: Option<HashMap<String, String>>,
     /// The canonical id for this location. For example: `"us-east1"`.
     #[serde(rename="locationId")]

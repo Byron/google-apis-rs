@@ -579,9 +579,11 @@ impl ResponseResult for ListAccessLevelsResponse {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -592,7 +594,6 @@ impl ResponseResult for ListAccessLevelsResponse {}
 /// 
 /// * [delete operations](struct.OperationDeleteCall.html) (response)
 /// * [cancel operations](struct.OperationCancelCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 

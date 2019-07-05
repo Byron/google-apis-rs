@@ -4268,9 +4268,11 @@ impl Part for GooglePrivacyDlpV2TransientCryptoKey {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -4288,7 +4290,6 @@ impl Part for GooglePrivacyDlpV2TransientCryptoKey {}
 /// * [deidentify templates delete organizations](struct.OrganizationDeidentifyTemplateDeleteCall.html) (response)
 /// * [dlp jobs delete projects](struct.ProjectDlpJobDeleteCall.html) (response)
 /// * [inspect templates delete organizations](struct.OrganizationInspectTemplateDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
 
@@ -14761,18 +14762,18 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// 
     /// * Filter expressions are made up of one or more restrictions.
     /// * Restrictions can be combined by `AND` or `OR` logical operators. A
-    /// sequence of restrictions implicitly uses `AND`.
+    ///   sequence of restrictions implicitly uses `AND`.
     /// * A restriction has the form of `<field> <operator> <value>`.
     /// * Supported fields/values for inspect jobs:
-    ///     - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED
-    ///     - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
-    ///     - `trigger_name` - The resource name of the trigger that created job.
-    ///     - 'end_time` - Corresponds to time the job finished.
-    ///     - 'start_time` - Corresponds to time the job finished.
+    ///   * `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED
+    ///   * `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
+    ///   * `trigger_name` - The resource name of the trigger that created job.
+    ///   * 'end_time` - Corresponds to time the job finished.
+    ///   * 'start_time` - Corresponds to time the job finished.
     /// * Supported fields for risk analysis jobs:
-    ///     - `state` - RUNNING|CANCELED|FINISHED|FAILED
-    ///     - 'end_time` - Corresponds to time the job finished.
-    ///     - 'start_time` - Corresponds to time the job finished.
+    ///   * `state` - RUNNING|CANCELED|FINISHED|FAILED
+    ///   * 'end_time` - Corresponds to time the job finished.
+    ///   * 'start_time` - Corresponds to time the job finished.
     /// * The operator must be `=` or `!=`.
     /// 
     /// Examples:
@@ -14780,7 +14781,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * inspected_storage = cloud_storage AND state = done
     /// * inspected_storage = cloud_storage OR inspected_storage = bigquery
     /// * inspected_storage = cloud_storage AND (state = done OR state = canceled)
-    /// * end_time > \"2017-12-12T00:00:00+00:00\"
+    /// * end_time > "2017-12-12T00:00:00+00:00"
     /// 
     /// The length of this field should be no more than 500 characters.
     ///
@@ -17868,14 +17869,14 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// 
     /// * Filter expressions are made up of one or more restrictions.
     /// * Restrictions can be combined by `AND` or `OR` logical operators. A
-    /// sequence of restrictions implicitly uses `AND`.
+    ///   sequence of restrictions implicitly uses `AND`.
     /// * A restriction has the form of `<field> <operator> <value>`.
     /// * Supported fields/values for inspect jobs:
-    ///     - `status` - HEALTHY|PAUSED|CANCELLED
-    ///     - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
-    ///     - 'last_run_time` - RFC 3339 formatted timestamp, surrounded by
+    ///   * `status` - HEALTHY|PAUSED|CANCELLED
+    ///   * `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
+    ///   * 'last_run_time` - RFC 3339 formatted timestamp, surrounded by
     ///     quotation marks. Nanoseconds are ignored.
-    ///     - 'error_count' - Number of errors that have occurred while running.
+    ///   * 'error_count' - Number of errors that have occurred while running.
     /// * The operator must be `=` or `!=` for status and inspected_storage.
     /// 
     /// Examples:
@@ -17883,7 +17884,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * inspected_storage = cloud_storage AND status = HEALTHY
     /// * inspected_storage = cloud_storage OR inspected_storage = bigquery
     /// * inspected_storage = cloud_storage AND (state = PAUSED OR state = HEALTHY)
-    /// * last_run_time > \"2017-12-12T00:00:00+00:00\"
+    /// * last_run_time > "2017-12-12T00:00:00+00:00"
     /// 
     /// The length of this field should be no more than 500 characters.
     ///

@@ -684,9 +684,11 @@ impl Part for NodeConfig {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -696,7 +698,6 @@ impl Part for NodeConfig {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1558,15 +1559,17 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
     /// "config.softwareConfig.pypiPackages.numpy". The included patch
     /// environment would specify the scikit-learn version as follows:
     /// 
-    ///     {
-    ///       "config":{
-    ///         "softwareConfig":{
-    ///           "pypiPackages":{
-    ///             "scikit-learn":"==0.19.0"
-    ///           }
-    ///         }
+    /// ````text
+    /// {
+    ///   "config":{
+    ///     "softwareConfig":{
+    ///       "pypiPackages":{
+    ///         "scikit-learn":"==0.19.0"
     ///       }
     ///     }
+    ///   }
+    /// }
+    /// ````
     /// 
     /// Note that in the above example, any existing PyPI packages
     /// other than scikit-learn and numpy will be unaffected.
@@ -1580,12 +1583,14 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
     /// provide the paths "labels.label1", "labels.label2", and "labels.label3"
     /// and populate the patch environment as follows:
     /// 
-    ///     {
-    ///       "labels":{
-    ///         "label1":"new-label1-value"
-    ///         "label2":"new-label2-value"
-    ///       }
-    ///     }
+    /// ````text
+    /// {
+    ///   "labels":{
+    ///     "label1":"new-label1-value"
+    ///     "label2":"new-label2-value"
+    ///   }
+    /// }
+    /// ````
     /// 
     /// Note that in the above example, any existing labels that are not
     /// included in the `updateMask` will be unaffected.
@@ -1598,19 +1603,21 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
     /// the path "config.softwareConfig.pypiPackages", and
     /// the patch environment would be the following:
     /// 
-    ///     {
-    ///       "config":{
-    ///         "softwareConfig":{
-    ///           "pypiPackages":{
-    ///             "botocore":"==1.7.14"
-    ///           }
-    ///         }
+    /// ````text
+    /// {
+    ///   "config":{
+    ///     "softwareConfig":{
+    ///       "pypiPackages":{
+    ///         "botocore":"==1.7.14"
     ///       }
     ///     }
+    ///   }
+    /// }
+    /// ````
     /// 
     /// **Note:** Only the following fields can be updated:
     /// 
-    ///  <table>
+    /// <table>
     ///  <tbody>
     ///  <tr>
     ///  <td><strong>Mask</strong></td>

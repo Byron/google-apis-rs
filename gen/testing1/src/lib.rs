@@ -2030,9 +2030,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// May return any of the following canonical error codes:
     /// 
-    /// - PERMISSION_DENIED - if the user is not authorized to write to project
-    /// - INVALID_ARGUMENT - if the request is malformed or if the matrix expands
-    ///                      to more than 200 supported executions
+    /// * PERMISSION_DENIED - if the user is not authorized to write to project
+    /// * INVALID_ARGUMENT - if the request is malformed or if the matrix expands
+    ///   to more than 200 supported executions
     /// 
     /// # Arguments
     ///
@@ -2621,9 +2621,9 @@ impl<'a, C, A> ApplicationDetailServiceGetApkDetailCall<'a, C, A> where C: Borro
 /// 
 /// May return any of the following canonical error codes:
 /// 
-/// - PERMISSION_DENIED - if the user is not authorized to write to project
-/// - INVALID_ARGUMENT - if the request is malformed or if the matrix expands
-///                      to more than 200 supported executions
+/// * PERMISSION_DENIED - if the user is not authorized to write to project
+/// * INVALID_ARGUMENT - if the request is malformed or if the matrix expands
+///   to more than 200 supported executions
 ///
 /// A builder for the *testMatrices.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

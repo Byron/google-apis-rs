@@ -439,21 +439,23 @@ impl ResponseResult for ListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CertificateInfo {
     /// The uppercase SHA-265 fingerprint of the certificate.  From the PEM
-    ///  certificate, it can be acquired like this:
+    /// certificate, it can be acquired like this:
     /// 
-    ///     $ keytool -printcert -file $CERTFILE | grep SHA256:
-    ///     SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
-    ///         42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ keytool -printcert -file $CERTFILE | grep SHA256:
+    /// SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
+    ///     42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
     /// or like this:
     /// 
-    ///     $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
-    ///     SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
-    ///         16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
+    /// SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
+    ///     16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
-    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73:
-    /// 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:
-    /// 44:E5`.
+    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`.
     /// 
     /// If these tools are not available to you, you can convert the PEM
     /// certificate into the DER format, compute the SHA-256 hash of that string
@@ -573,7 +575,9 @@ pub struct WebAsset {
     /// Web assets are identified by a URL that contains only the scheme, hostname
     /// and port parts.  The format is
     /// 
-    ///     http[s]://<hostname>[:<port>]
+    /// ````text
+    /// http[s]://<hostname>[:<port>]
+    /// ````
     /// 
     /// Hostnames must be fully qualified: they must end in a single period
     /// ("`.`").
@@ -590,19 +594,19 @@ pub struct WebAsset {
     /// Example: the asset with the site `https://www.google.com` contains all
     /// these URLs:
     /// 
-    ///   *   `https://www.google.com/`
-    ///   *   `https://www.google.com:443/`
-    ///   *   `https://www.google.com/foo`
-    ///   *   `https://www.google.com/foo?bar`
-    ///   *   `https://www.google.com/foo#bar`
-    ///   *   `https://user@password:www.google.com/`
+    /// * `https://www.google.com/`
+    /// * `https://www.google.com:443/`
+    /// * `https://www.google.com/foo`
+    /// * `https://www.google.com/foo?bar`
+    /// * `https://www.google.com/foo#bar`
+    /// * `https://user@password:www.google.com/`
     /// 
     /// But it does not contain these URLs:
     /// 
-    ///   *   `http://www.google.com/`       (wrong scheme)
-    ///   *   `https://google.com/`          (hostname does not match)
-    ///   *   `https://www.google.com:444/`  (port does not match)
-    /// REQUIRED
+    /// * `http://www.google.com/`       (wrong scheme)
+    /// * `https://google.com/`          (hostname does not match)
+    /// * `https://www.google.com:444/`  (port does not match)
+    ///   REQUIRED
     pub site: Option<String>,
 }
 
@@ -977,7 +981,9 @@ impl<'a, C, A> AssetlinkCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Web assets are identified by a URL that contains only the scheme, hostname
     /// and port parts.  The format is
     /// 
-    ///     http[s]://<hostname>[:<port>]
+    /// ````text
+    /// http[s]://<hostname>[:<port>]
+    /// ````
     /// 
     /// Hostnames must be fully qualified: they must end in a single period
     /// ("`.`").
@@ -994,19 +1000,19 @@ impl<'a, C, A> AssetlinkCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Example: the asset with the site `https://www.google.com` contains all
     /// these URLs:
     /// 
-    ///   *   `https://www.google.com/`
-    ///   *   `https://www.google.com:443/`
-    ///   *   `https://www.google.com/foo`
-    ///   *   `https://www.google.com/foo?bar`
-    ///   *   `https://www.google.com/foo#bar`
-    ///   *   `https://user@password:www.google.com/`
+    /// * `https://www.google.com/`
+    /// * `https://www.google.com:443/`
+    /// * `https://www.google.com/foo`
+    /// * `https://www.google.com/foo?bar`
+    /// * `https://www.google.com/foo#bar`
+    /// * `https://user@password:www.google.com/`
     /// 
     /// But it does not contain these URLs:
     /// 
-    ///   *   `http://www.google.com/`       (wrong scheme)
-    ///   *   `https://google.com/`          (hostname does not match)
-    ///   *   `https://www.google.com:444/`  (port does not match)
-    /// REQUIRED
+    /// * `http://www.google.com/`       (wrong scheme)
+    /// * `https://google.com/`          (hostname does not match)
+    /// * `https://www.google.com:444/`  (port does not match)
+    ///   REQUIRED
     ///
     /// Sets the *target.web.site* query property to the given value.
     pub fn target_web_site(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C, A> {
@@ -1024,21 +1030,23 @@ impl<'a, C, A> AssetlinkCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self
     }
     /// The uppercase SHA-265 fingerprint of the certificate.  From the PEM
-    ///  certificate, it can be acquired like this:
+    /// certificate, it can be acquired like this:
     /// 
-    ///     $ keytool -printcert -file $CERTFILE | grep SHA256:
-    ///     SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
-    ///         42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ keytool -printcert -file $CERTFILE | grep SHA256:
+    /// SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
+    ///     42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
     /// or like this:
     /// 
-    ///     $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
-    ///     SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
-    ///         16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
+    /// SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
+    ///     16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
-    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73:
-    /// 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:
-    /// 44:E5`.
+    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`.
     /// 
     /// If these tools are not available to you, you can convert the PEM
     /// certificate into the DER format, compute the SHA-256 hash of that string
@@ -1053,7 +1061,9 @@ impl<'a, C, A> AssetlinkCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Web assets are identified by a URL that contains only the scheme, hostname
     /// and port parts.  The format is
     /// 
-    ///     http[s]://<hostname>[:<port>]
+    /// ````text
+    /// http[s]://<hostname>[:<port>]
+    /// ````
     /// 
     /// Hostnames must be fully qualified: they must end in a single period
     /// ("`.`").
@@ -1070,19 +1080,19 @@ impl<'a, C, A> AssetlinkCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Example: the asset with the site `https://www.google.com` contains all
     /// these URLs:
     /// 
-    ///   *   `https://www.google.com/`
-    ///   *   `https://www.google.com:443/`
-    ///   *   `https://www.google.com/foo`
-    ///   *   `https://www.google.com/foo?bar`
-    ///   *   `https://www.google.com/foo#bar`
-    ///   *   `https://user@password:www.google.com/`
+    /// * `https://www.google.com/`
+    /// * `https://www.google.com:443/`
+    /// * `https://www.google.com/foo`
+    /// * `https://www.google.com/foo?bar`
+    /// * `https://www.google.com/foo#bar`
+    /// * `https://user@password:www.google.com/`
     /// 
     /// But it does not contain these URLs:
     /// 
-    ///   *   `http://www.google.com/`       (wrong scheme)
-    ///   *   `https://google.com/`          (hostname does not match)
-    ///   *   `https://www.google.com:444/`  (port does not match)
-    /// REQUIRED
+    /// * `http://www.google.com/`       (wrong scheme)
+    /// * `https://google.com/`          (hostname does not match)
+    /// * `https://www.google.com:444/`  (port does not match)
+    ///   REQUIRED
     ///
     /// Sets the *source.web.site* query property to the given value.
     pub fn source_web_site(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C, A> {
@@ -1100,21 +1110,23 @@ impl<'a, C, A> AssetlinkCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self
     }
     /// The uppercase SHA-265 fingerprint of the certificate.  From the PEM
-    ///  certificate, it can be acquired like this:
+    /// certificate, it can be acquired like this:
     /// 
-    ///     $ keytool -printcert -file $CERTFILE | grep SHA256:
-    ///     SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
-    ///         42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ keytool -printcert -file $CERTFILE | grep SHA256:
+    /// SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
+    ///     42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
     /// or like this:
     /// 
-    ///     $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
-    ///     SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
-    ///         16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
+    /// SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
+    ///     16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
-    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73:
-    /// 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:
-    /// 44:E5`.
+    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`.
     /// 
     /// If these tools are not available to you, you can convert the PEM
     /// certificate into the DER format, compute the SHA-256 hash of that string
@@ -1369,7 +1381,9 @@ impl<'a, C, A> StatementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Web assets are identified by a URL that contains only the scheme, hostname
     /// and port parts.  The format is
     /// 
-    ///     http[s]://<hostname>[:<port>]
+    /// ````text
+    /// http[s]://<hostname>[:<port>]
+    /// ````
     /// 
     /// Hostnames must be fully qualified: they must end in a single period
     /// ("`.`").
@@ -1386,19 +1400,19 @@ impl<'a, C, A> StatementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Example: the asset with the site `https://www.google.com` contains all
     /// these URLs:
     /// 
-    ///   *   `https://www.google.com/`
-    ///   *   `https://www.google.com:443/`
-    ///   *   `https://www.google.com/foo`
-    ///   *   `https://www.google.com/foo?bar`
-    ///   *   `https://www.google.com/foo#bar`
-    ///   *   `https://user@password:www.google.com/`
+    /// * `https://www.google.com/`
+    /// * `https://www.google.com:443/`
+    /// * `https://www.google.com/foo`
+    /// * `https://www.google.com/foo?bar`
+    /// * `https://www.google.com/foo#bar`
+    /// * `https://user@password:www.google.com/`
     /// 
     /// But it does not contain these URLs:
     /// 
-    ///   *   `http://www.google.com/`       (wrong scheme)
-    ///   *   `https://google.com/`          (hostname does not match)
-    ///   *   `https://www.google.com:444/`  (port does not match)
-    /// REQUIRED
+    /// * `http://www.google.com/`       (wrong scheme)
+    /// * `https://google.com/`          (hostname does not match)
+    /// * `https://www.google.com:444/`  (port does not match)
+    ///   REQUIRED
     ///
     /// Sets the *source.web.site* query property to the given value.
     pub fn source_web_site(mut self, new_value: &str) -> StatementListCall<'a, C, A> {
@@ -1416,21 +1430,23 @@ impl<'a, C, A> StatementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self
     }
     /// The uppercase SHA-265 fingerprint of the certificate.  From the PEM
-    ///  certificate, it can be acquired like this:
+    /// certificate, it can be acquired like this:
     /// 
-    ///     $ keytool -printcert -file $CERTFILE | grep SHA256:
-    ///     SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
-    ///         42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ keytool -printcert -file $CERTFILE | grep SHA256:
+    /// SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \
+    ///     42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
     /// or like this:
     /// 
-    ///     $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
-    ///     SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
-    ///         16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````text
+    /// $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256
+    /// SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \
+    ///     16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5
+    /// ````
     /// 
-    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73:
-    /// 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:
-    /// 44:E5`.
+    /// In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`.
     /// 
     /// If these tools are not available to you, you can convert the PEM
     /// certificate into the DER format, compute the SHA-256 hash of that string
@@ -1449,9 +1465,9 @@ impl<'a, C, A> StatementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// 
     /// For a query to match a statement, one of the following must be true:
     /// 
-    /// *    both the query's and the statement's relation strings match exactly,
-    ///      or
-    /// *    the query's relation string is empty or missing.
+    /// * both the query's and the statement's relation strings match exactly,
+    ///   or
+    /// * the query's relation string is empty or missing.
     /// 
     /// Example: A query with relation `delegate_permission/common.handle_all_urls`
     /// matches an asset link with relation

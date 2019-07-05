@@ -406,12 +406,12 @@ pub struct GoogleCloudDialogflowV2DetectIntentRequest {
     pub output_audio_config: Option<GoogleCloudDialogflowV2OutputAudioConfig>,
     /// Required. The input specification. It can be set to:
     /// 
-    /// 1.  an audio config
-    ///     which instructs the speech recognizer how to process the speech audio,
+    /// 1. an audio config
+    ///    which instructs the speech recognizer how to process the speech audio,
     /// 
-    /// 2.  a conversational query in the form of text, or
+    /// 1. a conversational query in the form of text, or
     /// 
-    /// 3.  an event that specifies which intent to trigger.
+    /// 1. an event that specifies which intent to trigger.
     #[serde(rename="queryInput")]
     pub query_input: Option<GoogleCloudDialogflowV2QueryInput>,
     /// Optional. The parameters of this query.
@@ -484,15 +484,14 @@ impl Part for GoogleCloudDialogflowV2IntentMessageSimpleResponses {}
 
 /// Represents the query input. It can contain either:
 /// 
-/// 1.  An audio config which
-///     instructs the speech recognizer how to process the speech audio.
+/// 1. An audio config which
+///    instructs the speech recognizer how to process the speech audio.
 /// 
-/// 2.  A conversational query in the form of text,.
+/// 1. A conversational query in the form of text,.
 /// 
-/// 3.  An event that specifies which intent to trigger.
+/// 1. An event that specifies which intent to trigger.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2QueryInput {
     /// The natural language text to be processed.
@@ -746,12 +745,12 @@ pub struct GoogleCloudDialogflowV2EntityTypeEntity {
     /// 
     /// For `KIND_MAP` entity types:
     /// 
-    /// *   A canonical value to be used in place of synonyms.
+    /// * A canonical value to be used in place of synonyms.
     /// 
     /// For `KIND_LIST` entity types:
     /// 
-    /// *   A string that can contain references to other entity types (with or
-    ///     without aliases).
+    /// * A string that can contain references to other entity types (with or
+    ///   without aliases).
     pub value: Option<String>,
 }
 
@@ -1055,9 +1054,11 @@ impl Part for GoogleCloudDialogflowV2SynthesizeSpeechConfig {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -1072,7 +1073,6 @@ impl Part for GoogleCloudDialogflowV2SynthesizeSpeechConfig {}
 /// * [agent sessions contexts delete projects](struct.ProjectAgentSessionContextDeleteCall.html) (response)
 /// * [agent sessions entity types delete projects](struct.ProjectAgentSessionEntityTypeDeleteCall.html) (response)
 /// * [agent intents delete projects](struct.ProjectAgentIntentDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
 
@@ -1133,6 +1133,7 @@ pub struct GoogleCloudDialogflowV2ImportAgentRequest {
     /// The agent to import.
     /// 
     /// Example for how to import an agent via the command line:
+    /// 
     /// <pre>curl \
     ///   'https://dialogflow.googleapis.com/v2/projects/&lt;project_name&gt;/agent:import\
     ///    -X POST \
@@ -1253,6 +1254,7 @@ pub struct GoogleCloudDialogflowV2RestoreAgentRequest {
     /// The agent to restore.
     /// 
     /// Example for how to restore an agent via the command line:
+    /// 
     /// <pre>curl \
     ///   'https://dialogflow.googleapis.com/v2/projects/&lt;project_name&gt;/agent:restore\
     ///    -X POST \
@@ -1893,10 +1895,10 @@ pub struct GoogleCloudDialogflowV2IntentTrainingPhrase {
     /// If you want to annotate the training phrase, you must create multiple
     /// parts, where the fields of each part are populated in one of two ways:
     /// 
-    /// -   `Part.text` is set to a part of the phrase that has no parameters.
-    /// -   `Part.text` is set to a part of the phrase that you want to annotate,
-    ///     and the `entity_type`, `alias`, and `user_defined` fields are all
-    ///     set.
+    /// * `Part.text` is set to a part of the phrase that has no parameters.
+    /// * `Part.text` is set to a part of the phrase that you want to annotate,
+    ///   and the `entity_type`, `alias`, and `user_defined` fields are all
+    ///   set.
     pub parts: Option<Vec<GoogleCloudDialogflowV2IntentTrainingPhrasePart>>,
     /// Required. The type of the training phrase.
     #[serde(rename="type")]

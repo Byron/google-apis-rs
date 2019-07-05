@@ -638,8 +638,8 @@ impl ResponseResult for BatchGetDocumentsResponse {}
 /// different programming environments, including REST APIs and RPC APIs. It is
 /// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
+/// * Simple to use and understand for most users
+/// * Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
@@ -669,26 +669,25 @@ impl ResponseResult for BatchGetDocumentsResponse {}
 /// 
 /// Example uses of this error model include:
 /// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
+/// * Partial errors. If a service needs to return partial errors to the client,
+///   it may embed the `Status` in the normal response to indicate the partial
+///   errors.
 /// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
+/// * Workflow errors. A typical workflow has multiple steps. Each step may
+///   have a `Status` message for error reporting.
 /// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
+/// * Batch operations. If a client uses batch request and batch response, the
+///   `Status` message should be used directly inside batch response, one for
+///   each error sub-response.
 /// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
+/// * Asynchronous operations. If an API call embeds asynchronous operation
+///   results in its response, the status of those operations should be
+///   represented directly using the `Status` message.
 /// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// * Logging. If some API errors are stored in logs, the message `Status` could
+///   be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
     /// A developer-facing error message, which should be in English. Any
@@ -847,9 +846,11 @@ impl Part for CompositeFilter {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -861,7 +862,6 @@ impl Part for CompositeFilter {}
 /// * [databases documents delete projects](struct.ProjectDatabaseDocumentDeleteCall.html) (response)
 /// * [databases indexes delete projects](struct.ProjectDatabaseIndexeDeleteCall.html) (response)
 /// * [databases documents rollback projects](struct.ProjectDatabaseDocumentRollbackCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 

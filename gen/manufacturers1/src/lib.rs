@@ -410,13 +410,13 @@ pub struct Product {
     /// Name in the format `{target_country}:{content_language}:{product_id}`.
     /// 
     /// `target_country`   - The target country of the product as a CLDR territory
-    ///                      code (for example, US).
+    /// code (for example, US).
     /// 
     /// `content_language` - The content language of the product as a two-letter
-    ///                      ISO 639-1 language code (for example, en).
+    /// ISO 639-1 language code (for example, en).
     /// 
     /// `product_id`     -   The ID of the product. For more information, see
-    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    /// https://support.google.com/manufacturers/answer/6124116#id.
     pub name: Option<String>,
     /// Attributes of the product uploaded to the Manufacturer Center. Manually
     /// edited attributes are taken into account.
@@ -740,9 +740,11 @@ impl Part for Price {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -753,7 +755,6 @@ impl Part for Price {}
 /// 
 /// * [products update accounts](struct.AccountProductUpdateCall.html) (response)
 /// * [products delete accounts](struct.AccountProductDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -1463,13 +1464,13 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Name in the format `{target_country}:{content_language}:{product_id}`.
     /// 
     /// `target_country`   - The target country of the product as a CLDR territory
-    ///                      code (for example, US).
+    /// code (for example, US).
     /// 
     /// `content_language` - The content language of the product as a two-letter
-    ///                      ISO 639-1 language code (for example, en).
+    /// ISO 639-1 language code (for example, en).
     /// 
     /// `product_id`     -   The ID of the product. For more information, see
-    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    /// https://support.google.com/manufacturers/answer/6124116#id.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1734,13 +1735,13 @@ impl<'a, C, A> AccountProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Name in the format `{target_country}:{content_language}:{product_id}`.
     /// 
     /// `target_country`   - The target country of the product as a CLDR territory
-    ///                      code (for example, US).
+    /// code (for example, US).
     /// 
     /// `content_language` - The content language of the product as a two-letter
-    ///                      ISO 639-1 language code (for example, en).
+    /// ISO 639-1 language code (for example, en).
     /// 
     /// `product_id`     -   The ID of the product. For more information, see
-    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    /// https://support.google.com/manufacturers/answer/6124116#id.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2018,13 +2019,13 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Name in the format `{target_country}:{content_language}:{product_id}`.
     /// 
     /// `target_country`   - The target country of the product as a CLDR territory
-    ///                      code (for example, US).
+    /// code (for example, US).
     /// 
     /// `content_language` - The content language of the product as a two-letter
-    ///                      ISO 639-1 language code (for example, en).
+    /// ISO 639-1 language code (for example, en).
     /// 
     /// `product_id`     -   The ID of the product. For more information, see
-    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    /// https://support.google.com/manufacturers/answer/6124116#id.
     ///
     /// Sets the *name* path property to the given value.
     ///

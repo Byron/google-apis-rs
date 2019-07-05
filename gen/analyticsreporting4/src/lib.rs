@@ -812,21 +812,22 @@ pub struct SegmentFilter {
     /// For example, to match all visits not from "New York", we can define the
     /// segment as follows:
     /// 
-    ///       "sessionSegment": {
-    ///         "segmentFilters": [{
-    ///           "simpleSegment" :{
-    ///             "orFiltersForSegment": [{
-    ///               "segmentFilterClauses":[{
-    ///                 "dimensionFilter": {
-    ///                   "dimensionName": "ga:city",
-    ///                   "expressions": ["New York"]
-    ///                 }
-    ///               }]
-    ///             }]
-    ///           },
-    ///           "not": "True"
+    /// ````text
+    ///   "sessionSegment": {
+    ///     "segmentFilters": [{
+    ///       "simpleSegment" :{
+    ///         "orFiltersForSegment": [{
+    ///           "segmentFilterClauses":[{
+    ///             "dimensionFilter": {
+    ///               "dimensionName": "ga:city",
+    ///               "expressions": ["New York"]
+    ///             }
+    ///           }]
     ///         }]
     ///       },
+    ///       "not": "True"
+    ///     }]
+    ///   },````
     pub not: Option<bool>,
     /// A Simple segment conditions consist of one or more dimension/metric
     /// conditions that can be combined
@@ -1221,20 +1222,21 @@ impl Part for DateRangeValues {}
 /// Defines a cohort group.
 /// For example:
 /// 
-///     "cohortGroup": {
-///       "cohorts": [{
-///         "name": "cohort 1",
-///         "type": "FIRST_VISIT_DATE",
-///         "dateRange": { "startDate": "2015-08-01", "endDate": "2015-08-01" }
-///       },{
-///         "name": "cohort 2"
-///          "type": "FIRST_VISIT_DATE"
-///          "dateRange": { "startDate": "2015-07-01", "endDate": "2015-07-01" }
-///       }]
-///     }
+/// ````text
+/// "cohortGroup": {
+///   "cohorts": [{
+///     "name": "cohort 1",
+///     "type": "FIRST_VISIT_DATE",
+///     "dateRange": { "startDate": "2015-08-01", "endDate": "2015-08-01" }
+///   },{
+///     "name": "cohort 2"
+///      "type": "FIRST_VISIT_DATE"
+///      "dateRange": { "startDate": "2015-07-01", "endDate": "2015-07-01" }
+///   }]
+/// }
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CohortGroup {
     /// The definition for the cohort.

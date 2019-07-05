@@ -432,9 +432,11 @@ impl ResponseResult for ImportSshPublicKeyResponse {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -445,7 +447,6 @@ impl ResponseResult for ImportSshPublicKeyResponse {}
 /// 
 /// * [ssh public keys delete users](struct.UserSshPublicKeyDeleteCall.html) (response)
 /// * [projects delete users](struct.UserProjectDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 

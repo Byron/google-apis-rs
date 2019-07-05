@@ -509,12 +509,10 @@ impl Part for BucketOptions {}
 
 /// An object representing a resource that can be used for monitoring, logging, billing, or other purposes. Examples include virtual machine instances, databases, and storage devices such as disks. The type field identifies a MonitoredResourceDescriptor object that describes the resource's schema. Information in the labels field identifies the actual resource and its attributes according to the schema. For example, a particular Compute Engine VM instance could be represented by the following object, because the MonitoredResourceDescriptor for "gce_instance" has labels "instance_id" and "zone":
 /// { "type": "gce_instance",
-///   "labels": { "instance_id": "12345678901234",
-///               "zone": "us-central1-a" }}
-/// 
+/// "labels": { "instance_id": "12345678901234",
+/// "zone": "us-central1-a" }}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitoredResource {
     /// Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Compute Engine VM instances use the labels "project_id", "instance_id", and "zone".
@@ -847,9 +845,9 @@ pub struct MetricDescriptor {
     /// Expression = Component { "." Component } { "/" Component } ;
     /// 
     /// Component = ( [ PREFIX ] UNIT | "%" ) [ Annotation ]
-    ///           | Annotation
-    ///           | "1"
-    ///           ;
+    /// | Annotation
+    /// | "1"
+    /// ;
     /// 
     /// Annotation = "{" NAME "}" ;
     /// Notes:
@@ -914,8 +912,8 @@ impl ResponseResult for WriteLogEntriesResponse {}
 pub struct WriteLogEntriesRequest {
     /// Optional. A default monitored resource object that is assigned to all log entries in entries that do not specify a value for resource. Example:
     /// { "type": "gce_instance",
-    ///   "labels": {
-    ///     "zone": "us-central1-a", "instance_id": "00000000000000000000" }}
+    /// "labels": {
+    /// "zone": "us-central1-a", "instance_id": "00000000000000000000" }}
     /// See LogEntry.
     pub resource: Option<MonitoredResource>,
     /// Optional. If true, the request should expect normal response, but the entries won't be persisted nor exported. Useful for checking whether the logging API endpoints are working properly before sending valuable data.

@@ -621,9 +621,11 @@ impl Part for RepoId {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -633,7 +635,6 @@ impl Part for RepoId {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [debuggees breakpoints delete debugger](struct.DebuggerDebuggeeBreakpointDeleteCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -824,9 +825,8 @@ pub struct FormatMessage {
     /// 
     /// Examples:
     /// 
-    /// *   `Failed to load '$0' which helps debug $1 the first time it
-    ///     is loaded.  Again, $0 is very important.`
-    /// *   `Please pay $$10 to use $0 instead of $1.`
+    /// * `Failed to load '$0' which helps debug $1 the first time it is loaded.  Again, $0 is very important.`
+    /// * `Please pay $$10 to use $0 instead of $1.`
     pub format: Option<String>,
 }
 
@@ -978,84 +978,84 @@ impl RequestValue for Breakpoint {}
 /// Represents a variable or an argument possibly of a compound object type.
 /// Note how the following variables are represented:
 /// 
-/// 1) A simple variable:
+/// 1. A simple variable:
+///    
+///    int x = 5
+///    
+///    { name: "x", value: "5", type: "int" }  // Captured variable
 /// 
-///     int x = 5
+/// 1. A compound object:
+///    
+///    struct T {
+///    int m1;
+///    int m2;
+///    };
+///    T x = { 3, 7 };
+///    
+///    {  // Captured variable
+///    name: "x",
+///    type: "T",
+///    members { name: "m1", value: "3", type: "int" },
+///    members { name: "m2", value: "7", type: "int" }
+///    }
 /// 
-///     { name: "x", value: "5", type: "int" }  // Captured variable
+/// 1. A pointer where the pointee was captured:
+///    
+///    T x = { 3, 7 };
+///    T* p = &x;
+///    
+///    {   // Captured variable
+///    name: "p",
+///    type: "T*",
+///    value: "0x00500500",
+///    members { name: "m1", value: "3", type: "int" },
+///    members { name: "m2", value: "7", type: "int" }
+///    }
 /// 
-/// 2) A compound object:
-/// 
-///     struct T {
-///         int m1;
-///         int m2;
-///     };
-///     T x = { 3, 7 };
-/// 
-///     {  // Captured variable
-///         name: "x",
-///         type: "T",
-///         members { name: "m1", value: "3", type: "int" },
-///         members { name: "m2", value: "7", type: "int" }
-///     }
-/// 
-/// 3) A pointer where the pointee was captured:
-/// 
-///     T x = { 3, 7 };
-///     T* p = &x;
-/// 
-///     {   // Captured variable
-///         name: "p",
-///         type: "T*",
-///         value: "0x00500500",
-///         members { name: "m1", value: "3", type: "int" },
-///         members { name: "m2", value: "7", type: "int" }
-///     }
-/// 
-/// 4) A pointer where the pointee was not captured:
-/// 
-///     T* p = new T;
-/// 
-///     {   // Captured variable
-///         name: "p",
-///         type: "T*",
-///         value: "0x00400400"
-///         status { is_error: true, description { format: "unavailable" } }
-///     }
+/// 1. A pointer where the pointee was not captured:
+///    
+///    T* p = new T;
+///    
+///    {   // Captured variable
+///    name: "p",
+///    type: "T*",
+///    value: "0x00400400"
+///    status { is_error: true, description { format: "unavailable" } }
+///    }
 /// 
 /// The status should describe the reason for the missing value,
 /// such as `<optimized out>`, `<inaccessible>`, `<pointers limit reached>`.
 /// 
 /// Note that a null pointer should not have members.
 /// 
-/// 5) An unnamed value:
+/// 5. An unnamed value:
+///    
+///    int* p = new int(7);
+///    
+///    {   // Captured variable
+///    name: "p",
+///    value: "0x00500500",
+///    type: "int*",
+///    members { value: "7", type: "int" } }
 /// 
-///     int* p = new int(7);
-/// 
-///     {   // Captured variable
-///         name: "p",
-///         value: "0x00500500",
-///         type: "int*",
-///         members { value: "7", type: "int" } }
-/// 
-/// 6) An unnamed pointer where the pointee was not captured:
-/// 
-///     int* p = new int(7);
-///     int** pp = &p;
-/// 
-///     {  // Captured variable
-///         name: "pp",
-///         value: "0x00500500",
-///         type: "int**",
-///         members {
-///             value: "0x00400400",
-///             type: "int*"
-///             status {
-///                 is_error: true,
-///                 description: { format: "unavailable" } }
-///             }
-///         }
-///     }
+/// 5. An unnamed pointer where the pointee was not captured:
+///    
+///    int* p = new int(7);
+///    int** pp = &p;
+///    
+///    {  // Captured variable
+///    name: "pp",
+///    value: "0x00500500",
+///    type: "int**",
+///    members {
+///    value: "0x00400400",
+///    type: "int*"
+///    status {
+///    is_error: true,
+///    description: { format: "unavailable" } }
+///    }
+///    }
+///    }
 /// 
 /// To optimize computation, memory and network traffic, variables that
 /// repeat in the output multiple times can be stored once in a shared
@@ -1066,18 +1066,20 @@ impl RequestValue for Breakpoint {}
 /// 
 /// When using the shared variable table, the following variables:
 /// 
-///     T x = { 3, 7 };
-///     T* p = &x;
-///     T& r = x;
+/// ````text
+/// T x = { 3, 7 };
+/// T* p = &x;
+/// T& r = x;
 /// 
-///     { name: "x", var_table_index: 3, type: "T" }  // Captured variables
-///     { name: "p", value "0x00500500", type="T*", var_table_index: 3 }
-///     { name: "r", type="T&", var_table_index: 3 }
+/// { name: "x", var_table_index: 3, type: "T" }  // Captured variables
+/// { name: "p", value "0x00500500", type="T*", var_table_index: 3 }
+/// { name: "r", type="T&", var_table_index: 3 }
 /// 
-///     {  // Shared variable table entry #3:
-///         members { name: "m1", value: "3", type: "int" },
-///         members { name: "m2", value: "7", type: "int" }
-///     }
+/// {  // Shared variable table entry #3:
+///     members { name: "m1", value: "3", type: "int" },
+///     members { name: "m2", value: "7", type: "int" }
+/// }
+/// ````
 /// 
 /// Note that the pointer address is stored with the referencing variable
 /// and not with the referenced variable. This allows the referenced variable
@@ -1086,7 +1088,6 @@ impl RequestValue for Breakpoint {}
 /// The type field is optional. The debugger agent may or may not support it.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variable {
     /// Status associated with the variable. This field will usually stay

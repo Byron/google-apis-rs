@@ -537,10 +537,10 @@ pub struct AnalyzeCommentResponse {
     /// The language(s) used by CommentAnalyzer service to choose which Model to
     /// use when analyzing the comment. Might better be called
     /// "effective_languages". The logic used to make the choice is as follows:
-    ///   if Request.languages.empty()
-    ///     effective_languages = detected_languages
-    ///   else
-    ///     effective_languages = Request.languages
+    /// if Request.languages.empty()
+    /// effective_languages = detected_languages
+    /// else
+    /// effective_languages = Request.languages
     pub languages: Option<Vec<String>>,
     /// Scores for the requested attributes. The map keys are attribute names (same
     /// as the requested_attribute field in AnalyzeCommentRequest, for example

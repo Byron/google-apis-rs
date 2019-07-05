@@ -549,9 +549,11 @@ impl RequestValue for ClaimDeviceRequest {}
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
 /// 
 /// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
@@ -565,7 +567,6 @@ impl RequestValue for ClaimDeviceRequest {}
 /// * [configurations delete customers](struct.CustomerConfigurationDeleteCall.html) (response)
 /// * [devices remove configuration customers](struct.CustomerDeviceRemoveConfigurationCall.html) (response)
 /// * [devices unclaim partners](struct.PartnerDeviceUnclaimCall.html) (response)
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
