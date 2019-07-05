@@ -389,9 +389,9 @@ pub struct CheckError {
     pub detail: Option<String>,
     /// Subject to whom this error applies. See the specific code enum for more
     /// details on this field. For example:
-    ///     - “project:<project-id or project-number>”
-    ///     - “folder:<folder-id>”
-    ///     - “organization:<organization-id>”
+    /// - “project:<project-id or project-number>”
+    /// - “folder:<folder-id>”
+    /// - “organization:<organization-id>”
     pub subject: Option<String>,
 }
 
@@ -481,7 +481,7 @@ pub struct QuotaOperation {
     /// (2) quota_metrics is set because the caller is doing quota override.
     /// 
     /// Example of an RPC method name:
-    ///     google.example.library.v1.LibraryService.CreateShelf
+    /// google.example.library.v1.LibraryService.CreateShelf
     #[serde(rename="methodName")]
     pub method_name: Option<String>,
     /// Labels describing the operation.
@@ -862,9 +862,9 @@ impl Part for QuotaError {}
 pub struct ResourceInfo {
     /// The identifier of the parent of this resource instance.
     /// Must be in one of the following formats:
-    ///     - “projects/<project-id or project-number>”
-    ///     - “folders/<folder-id>”
-    ///     - “organizations/<organization-id>”
+    /// - “projects/<project-id or project-number>”
+    /// - “folders/<folder-id>”
+    /// - “organizations/<organization-id>”
     #[serde(rename="resourceContainer")]
     pub resource_container: Option<String>,
     /// The location of the resource. If not empty, the resource will be checked
@@ -1079,12 +1079,12 @@ pub struct Exemplar {
     pub timestamp: Option<String>,
     /// Contextual information about the example value. Examples are:
     /// 
-    ///   Trace: type.googleapis.com/google.monitoring.v3.SpanContext
+    /// Trace: type.googleapis.com/google.monitoring.v3.SpanContext
     /// 
-    ///   Literal string: type.googleapis.com/google.protobuf.StringValue
+    /// Literal string: type.googleapis.com/google.protobuf.StringValue
     /// 
-    ///   Labels dropped during aggregation:
-    ///     type.googleapis.com/google.monitoring.v3.DroppedLabels
+    /// Labels dropped during aggregation:
+    /// type.googleapis.com/google.monitoring.v3.DroppedLabels
     /// 
     /// There may be only a single attachment of any given message type in a
     /// single exemplar, and this is enforced by the system.
@@ -1303,20 +1303,20 @@ pub struct Operation {
     pub importance: Option<String>,
     /// Labels describing the operation. Only the following labels are allowed:
     /// 
-    /// - Labels describing monitored resources as defined in
+    /// * Labels describing monitored resources as defined in
     ///   the service configuration.
-    /// - Default labels of metric values. When specified, labels defined in the
+    /// * Default labels of metric values. When specified, labels defined in the
     ///   metric value override these default.
-    /// - The following labels defined by Google Cloud Platform:
-    ///     - `cloud.googleapis.com/location` describing the location where the
-    ///        operation happened,
-    ///     - `servicecontrol.googleapis.com/user_agent` describing the user agent
-    ///        of the API request,
-    ///     - `servicecontrol.googleapis.com/service_agent` describing the service
-    ///        used to handle the API request (e.g. ESP),
-    ///     - `servicecontrol.googleapis.com/platform` describing the platform
-    ///        where the API is served, such as App Engine, Compute Engine, or
-    ///        Kubernetes Engine.
+    /// * The following labels defined by Google Cloud Platform:
+    ///   * `cloud.googleapis.com/location` describing the location where the
+    ///     operation happened,
+    ///   * `servicecontrol.googleapis.com/user_agent` describing the user agent
+    ///     of the API request,
+    ///   * `servicecontrol.googleapis.com/service_agent` describing the service
+    ///     used to handle the API request (e.g. ESP),
+    ///   * `servicecontrol.googleapis.com/platform` describing the platform
+    ///     where the API is served, such as App Engine, Compute Engine, or
+    ///     Kubernetes Engine.
     pub labels: Option<HashMap<String, String>>,
     /// Represents the properties needed for quota check. Applicable only if this
     /// operation is for a quota check request. If this is not specified, no quota
@@ -1327,9 +1327,9 @@ pub struct Operation {
     /// The resource name of the parent of a resource in the resource hierarchy.
     /// 
     /// This can be in one of the following formats:
-    ///     - “projects/<project-id or project-number>”
-    ///     - “folders/<folder-id>”
-    ///     - “organizations/<organization-id>”
+    /// - “projects/<project-id or project-number>”
+    /// - “folders/<folder-id>”
+    /// - “organizations/<organization-id>”
     #[serde(rename="resourceContainer")]
     pub resource_container: Option<String>,
     /// User defined labels for the resource that this operation is associated
@@ -1353,13 +1353,13 @@ pub struct Operation {
     /// consumer, but not for service-initiated operations that are
     /// not related to a specific consumer.
     /// 
-    /// - This can be in one of the following formats:
-    ///     - project:PROJECT_ID,
-    ///     - project`_`number:PROJECT_NUMBER,
-    ///     - projects/PROJECT_ID or PROJECT_NUMBER,
-    ///     - folders/FOLDER_NUMBER,
-    ///     - organizations/ORGANIZATION_NUMBER,
-    ///     - api`_`key:API_KEY.
+    /// * This can be in one of the following formats:
+    ///   * project:PROJECT_ID,
+    ///   * project`_`number:PROJECT_NUMBER,
+    ///   * projects/PROJECT_ID or PROJECT_NUMBER,
+    ///   * folders/FOLDER_NUMBER,
+    ///   * organizations/ORGANIZATION_NUMBER,
+    ///   * api`_`key:API_KEY.
     #[serde(rename="consumerId")]
     pub consumer_id: Option<String>,
     /// The resources that are involved in the operation.

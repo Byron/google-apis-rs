@@ -379,25 +379,26 @@ impl<'a, C, A> CloudAsset<C, A>
 /// Provides the configuration for logging a type of permissions.
 /// Example:
 /// 
+/// ````text
+/// {
+///   "audit_log_configs": [
 ///     {
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         }
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:foo@gmail.com"
 ///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
 /// foo@gmail.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
     /// Specifies the identities that do not cause logging for this type of
@@ -521,12 +522,13 @@ impl RequestValue for ExportAssetsRequest {}
 
 /// Represents an expression text. Example:
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// ````text
+/// title: "User account presence"
+/// description: "Determines whether the request has a user account"
+/// expression: "size(request.user) > 0"
+/// ````
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
     /// An optional description of the expression. This is a longer text which
@@ -617,7 +619,6 @@ impl Part for OutputConfig {}
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
-/// 
 /// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
@@ -625,43 +626,45 @@ impl Part for OutputConfig {}
 /// 
 /// **JSON Example**
 /// 
+/// ````text
+/// {
+///   "bindings": [
 ///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
+///       "role": "roles/owner",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///       ]
+///     },
+///     {
+///       "role": "roles/viewer",
+///       "members": ["user:sean@example.com"]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// **YAML Example**
 /// 
-///     bindings:
-///     - members:
-///       - user:mike@example.com
-///       - group:admins@example.com
-///       - domain:google.com
-///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///       role: roles/owner
-///     - members:
-///       - user:sean@example.com
-///       role: roles/viewer
-/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///   role: roles/owner
+/// - members:
+///   - user:sean@example.com
+///   role: roles/viewer
+/// ````
 /// 
 /// For a description of IAM and its features, see the
 /// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -700,9 +703,9 @@ impl Part for Policy {}
 /// if the value contains a ":". Values prefixed with "is:" are treated the
 /// same as values with no prefix.
 /// Ancestry subtrees must be in one of the following formats:
-///     - “projects/<project-id>”, e.g. “projects/tokyo-rain-123”
-///     - “folders/<folder-id>”, e.g. “folders/1234”
-///     - “organizations/<organization-id>”, e.g. “organizations/1234”
+/// - “projects/<project-id>”, e.g. “projects/tokyo-rain-123”
+/// - “folders/<folder-id>”, e.g. “folders/1234”
+/// - “organizations/<organization-id>”, e.g. “organizations/1234”
 /// The `supports_under` field of the associated `Constraint`  defines whether
 /// ancestry prefixes can be used. You can set `allowed_values` and
 /// `denied_values` in the same `Policy` if `all_values` is
@@ -711,7 +714,6 @@ impl Part for Policy {}
 /// `allowed_values` and `denied_values` must be unset.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudOrgpolicyV1ListPolicy {
     /// The policy all_values state.
@@ -749,75 +751,73 @@ pub struct GoogleCloudOrgpolicyV1ListPolicy {
     /// `projects/bar` parented by `organizations/foo`:
     /// 
     /// Example 1 (no inherited values):
-    ///   `organizations/foo` has a `Policy` with values:
-    ///     {allowed_values: “E1” allowed_values:”E2”}
-    ///   `projects/bar` has `inherit_from_parent` `false` and values:
-    ///     {allowed_values: "E3" allowed_values: "E4"}
+    /// `organizations/foo` has a `Policy` with values:
+    /// {allowed_values: “E1” allowed_values:”E2”}
+    /// `projects/bar` has `inherit_from_parent` `false` and values:
+    /// {allowed_values: "E3" allowed_values: "E4"}
     /// The accepted values at `organizations/foo` are `E1`, `E2`.
     /// The accepted values at `projects/bar` are `E3`, and `E4`.
     /// 
     /// Example 2 (inherited values):
-    ///   `organizations/foo` has a `Policy` with values:
-    ///     {allowed_values: “E1” allowed_values:”E2”}
-    ///   `projects/bar` has a `Policy` with values:
-    ///     {value: “E3” value: ”E4” inherit_from_parent: true}
+    /// `organizations/foo` has a `Policy` with values:
+    /// {allowed_values: “E1” allowed_values:”E2”}
+    /// `projects/bar` has a `Policy` with values:
+    /// {value: “E3” value: ”E4” inherit_from_parent: true}
     /// The accepted values at `organizations/foo` are `E1`, `E2`.
     /// The accepted values at `projects/bar` are `E1`, `E2`, `E3`, and `E4`.
     /// 
     /// Example 3 (inheriting both allowed and denied values):
-    ///   `organizations/foo` has a `Policy` with values:
-    ///     {allowed_values: "E1" allowed_values: "E2"}
-    ///   `projects/bar` has a `Policy` with:
-    ///     {denied_values: "E1"}
+    /// `organizations/foo` has a `Policy` with values:
+    /// {allowed_values: "E1" allowed_values: "E2"}
+    /// `projects/bar` has a `Policy` with:
+    /// {denied_values: "E1"}
     /// The accepted values at `organizations/foo` are `E1`, `E2`.
     /// The value accepted at `projects/bar` is `E2`.
     /// 
     /// Example 4 (RestoreDefault):
-    ///   `organizations/foo` has a `Policy` with values:
-    ///     {allowed_values: “E1” allowed_values:”E2”}
-    ///   `projects/bar` has a `Policy` with values:
-    ///     {RestoreDefault: {}}
+    /// `organizations/foo` has a `Policy` with values:
+    /// {allowed_values: “E1” allowed_values:”E2”}
+    /// `projects/bar` has a `Policy` with values:
+    /// {RestoreDefault: {}}
     /// The accepted values at `organizations/foo` are `E1`, `E2`.
     /// The accepted values at `projects/bar` are either all or none depending on
     /// the value of `constraint_default` (if `ALLOW`, all; if
     /// `DENY`, none).
     /// 
     /// Example 5 (no policy inherits parent policy):
-    ///   `organizations/foo` has no `Policy` set.
-    ///   `projects/bar` has no `Policy` set.
+    /// `organizations/foo` has no `Policy` set.
+    /// `projects/bar` has no `Policy` set.
     /// The accepted values at both levels are either all or none depending on
     /// the value of `constraint_default` (if `ALLOW`, all; if
     /// `DENY`, none).
     /// 
     /// Example 6 (ListConstraint allowing all):
-    ///   `organizations/foo` has a `Policy` with values:
-    ///     {allowed_values: “E1” allowed_values: ”E2”}
-    ///   `projects/bar` has a `Policy` with:
-    ///     {all: ALLOW}
-    /// The accepted values at `organizations/foo` are `E1`, E2`.
-    /// Any value is accepted at `projects/bar`.
+    /// `organizations/foo` has a `Policy` with values:
+    /// {allowed_values: “E1” allowed_values: ”E2”}
+    /// `projects/bar` has a `Policy` with:
+    /// {all: ALLOW}
+    /// The accepted values at `organizations/foo` are `E1`, E2`. Any value is accepted at `projects/bar`.
     /// 
     /// Example 7 (ListConstraint allowing none):
-    ///   `organizations/foo` has a `Policy` with values:
-    ///     {allowed_values: “E1” allowed_values: ”E2”}
-    ///   `projects/bar` has a `Policy` with:
-    ///     {all: DENY}
-    /// The accepted values at `organizations/foo` are `E1`, E2`.
-    /// No value is accepted at `projects/bar`.
+    /// `organizations/foo` has a `Policy` with values:
+    /// {allowed_values: “E1” allowed_values: ”E2”}
+    /// `projects/bar` has a `Policy` with:
+    /// {all: DENY}
+    /// The accepted values at `organizations/foo` are `E1`, E2`. No value is accepted at `projects/bar`.
     /// 
     /// Example 10 (allowed and denied subtrees of Resource Manager hierarchy):
     /// Given the following resource hierarchy
-    ///   O1->{F1, F2}; F1->{P1}; F2->{P2, P3},
-    ///   `organizations/foo` has a `Policy` with values:
-    ///     {allowed_values: "under:organizations/O1"}
-    ///   `projects/bar` has a `Policy` with:
-    ///     {allowed_values: "under:projects/P3"}
-    ///     {denied_values: "under:folders/F2"}
+    /// O1->{F1, F2}; F1->{P1}; F2->{P2, P3},
+    /// `organizations/foo` has a `Policy` with values:
+    /// {allowed_values: "under:organizations/O1"}
+    /// `projects/bar` has a `Policy` with:
+    /// {allowed_values: "under:projects/P3"}
+    /// {denied_values: "under:folders/F2"}
     /// The accepted values at `organizations/foo` are `organizations/O1`,
-    ///   `folders/F1`, `folders/F2`, `projects/P1`, `projects/P2`,
-    ///   `projects/P3`.
+    /// `folders/F1`, `folders/F2`, `projects/P1`, `projects/P2`,
+    /// `projects/P3`.
     /// The accepted values at `projects/bar` are `organizations/O1`,
-    ///   `folders/F1`, `projects/P1`.
+    /// `folders/F1`, `projects/P1`.
     #[serde(rename="inheritFromParent")]
     pub inherit_from_parent: Option<bool>,
     /// Optional. The Google Cloud Console will try to default to a configuration
@@ -875,40 +875,41 @@ pub struct GoogleCloudOrgpolicyV1BooleanPolicy {
     /// `constraints/compute.disableSerialPortAccess` with `constraint_default`
     /// set to `ALLOW`. A `Policy` for that `Constraint` exhibits the following
     /// behavior:
-    ///   - If the `Policy` at this resource has enforced set to `false`, serial
-    ///     port connection attempts will be allowed.
-    ///   - If the `Policy` at this resource has enforced set to `true`, serial
-    ///     port connection attempts will be refused.
-    ///   - If the `Policy` at this resource is `RestoreDefault`, serial port
-    ///     connection attempts will be allowed.
-    ///   - If no `Policy` is set at this resource or anywhere higher in the
-    ///     resource hierarchy, serial port connection attempts will be allowed.
-    ///   - If no `Policy` is set at this resource, but one exists higher in the
-    ///     resource hierarchy, the behavior is as if the`Policy` were set at
-    ///     this resource.
+    /// 
+    /// * If the `Policy` at this resource has enforced set to `false`, serial
+    ///   port connection attempts will be allowed.
+    /// * If the `Policy` at this resource has enforced set to `true`, serial
+    ///   port connection attempts will be refused.
+    /// * If the `Policy` at this resource is `RestoreDefault`, serial port
+    ///   connection attempts will be allowed.
+    /// * If no `Policy` is set at this resource or anywhere higher in the
+    ///   resource hierarchy, serial port connection attempts will be allowed.
+    /// * If no `Policy` is set at this resource, but one exists higher in the
+    ///   resource hierarchy, the behavior is as if the`Policy` were set at
+    ///   this resource.
     /// 
     /// The following examples demonstrate the different possible layerings:
     /// 
     /// Example 1 (nearest `Constraint` wins):
-    ///   `organizations/foo` has a `Policy` with:
-    ///     {enforced: false}
-    ///   `projects/bar` has no `Policy` set.
+    /// `organizations/foo` has a `Policy` with:
+    /// {enforced: false}
+    /// `projects/bar` has no `Policy` set.
     /// The constraint at `projects/bar` and `organizations/foo` will not be
     /// enforced.
     /// 
     /// Example 2 (enforcement gets replaced):
-    ///   `organizations/foo` has a `Policy` with:
-    ///     {enforced: false}
-    ///   `projects/bar` has a `Policy` with:
-    ///     {enforced: true}
+    /// `organizations/foo` has a `Policy` with:
+    /// {enforced: false}
+    /// `projects/bar` has a `Policy` with:
+    /// {enforced: true}
     /// The constraint at `organizations/foo` is not enforced.
     /// The constraint at `projects/bar` is enforced.
     /// 
     /// Example 3 (RestoreDefault):
-    ///   `organizations/foo` has a `Policy` with:
-    ///     {enforced: true}
-    ///   `projects/bar` has a `Policy` with:
-    ///     {RestoreDefault: {}}
+    /// `organizations/foo` has a `Policy` with:
+    /// {enforced: true}
+    /// `projects/bar` has a `Policy` with:
+    /// {RestoreDefault: {}}
     /// The constraint at `organizations/foo` is enforced.
     /// The constraint at `projects/bar` is not enforced, because
     /// `constraint_default` for the `Constraint` is `ALLOW`.
@@ -1043,48 +1044,49 @@ impl ResponseResult for BatchGetAssetsHistoryResponse {}
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
+/// ````text
+/// {
+///   "audit_configs": [
 ///     {
-///       "audit_configs": [
+///       "service": "allServices"
+///       "audit_log_configs": [
 ///         {
-///           "service": "allServices"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///               "exempted_members": [
-///                 "user:foo@gmail.com"
-///               ]
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///             },
-///             {
-///               "log_type": "ADMIN_READ",
-///             }
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
 ///           ]
 ///         },
 ///         {
-///           "service": "fooservice.googleapis.com"
-///           "audit_log_configs": [
-///             {
-///               "log_type": "DATA_READ",
-///             },
-///             {
-///               "log_type": "DATA_WRITE",
-///               "exempted_members": [
-///                 "user:bar@gmail.com"
-///               ]
-///             }
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "fooservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:bar@gmail.com"
 ///           ]
 ///         }
 ///       ]
 ///     }
+///   ]
+/// }
+/// ````
 /// 
 /// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
 /// logging. It also exempts foo@gmail.com from DATA_READ logging, and
 /// bar@gmail.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
     /// The configuration for logging of each type of permission.
