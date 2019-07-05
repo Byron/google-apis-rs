@@ -753,7 +753,7 @@ impl<'n> Engine<'n> {
                     "statistics.query.ddl-target-table.dataset-id" => Some(("statistics.query.ddlTargetTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.num-dml-affected-rows" => Some(("statistics.query.numDmlAffectedRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.end-time" => Some(("statistics.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "statistics.extract.destination-uri-file-counts" => Some(("statistics.extract.destinationUriFileCounts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "statistics.extract.destination-uri-file-counts" => Some(("statistics.extract.destinationUriFileCounts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "statistics.extract.input-bytes" => Some(("statistics.extract.inputBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-reference.project-id" => Some(("jobReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-reference.location" => Some(("jobReference.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
