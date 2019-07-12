@@ -11,7 +11,7 @@
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope,
-                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize)
+                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize, FnArg)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -399,13 +399,13 @@ match result {
 <%def name="_action_fn(c, resource, method, m, params, request_value, parts)">\
 <%
     import os.path
+    import collections
     join_url = lambda b, e: b.strip('/') + e
     media_params = method_media_params(m)
 
-    type_params = ''
-    where = ''
+    into_types = collections.defaultdict(list)
     qualifier = 'pub '
-    add_args = ''
+    args = [FnArg('mut', 'self', 'Self')]
     rtype = 'Result<hyper::client::Response>'
     response_schema = method_response(c, m)
 
@@ -414,6 +414,7 @@ match result {
     if response_schema:
         if not supports_download:
             reserved_params = ['alt']
+        into_types['T'].extend(['Default', 'serde::de::DeserializeOwned'])
         rtype = 'Result<(hyper::client::Response, %s)>' % (unique_type_name(response_schema.id))
 
     mtype_param = 'RS'
@@ -422,10 +423,13 @@ match result {
     simple_media_param = None
     resumable_media_param = None
     if media_params:
-        type_params = '<%s>' % mtype_param
+        into_types[mtype_param].append('ReadSeek')
         qualifier = ''
-        where = '\n\t\twhere ' + mtype_param + ': ReadSeek'
-        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: &'static str"
+        args.extend([
+            FnArg('mut', 'reader', mtype_param),
+            FnArg('', 'reader_mime_type', 'mime::Mime'),
+            FnArg('', 'protocol', "&'static str"),
+        ])
         for p in media_params:
             if p.protocol == 'simple':
                 simple_media_param = p
@@ -433,7 +437,16 @@ match result {
                 resumable_media_param = p
     # end handle media params
 
-    action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
+    args_for_media_param = lambda mp: [
+        FnArg('', 'self', 'Self'),
+        FnArg('', mp.type.arg_name, mtype_param),
+        FnArg('', 'mime_type', 'mime::Mime'),
+    ]
+
+    default_types = {k: v for k, v in into_types.items() if k != 'T'}
+
+    where_clause = lambda types: ",\n\t\t".join(["%s: %s" %(type, " + ".join(bounds)) for type, bounds in types.items()])
+    format_args = lambda args: ", ".join(["%s %s: %s" % (arg.binding, arg.name, arg.typ) for arg in args])
 
     field_params = [p for p in params if p.get('is_query_param', True)]
 
@@ -486,7 +499,23 @@ match result {
     del seen
 %>
     /// Perform the operation you have build so far.
-    ${action_fn} {
+    %if response_schema:
+    ${qualifier}fn ${api.terms.action}<${", ".join(default_types.keys())}>(${format_args(args)}) -> ${rtype}
+    where
+        ${where_clause(default_types)}
+    {
+        Self::doit_into(${', '.join([arg.name for arg in args])})
+    }
+
+    ${qualifier}fn ${api.terms.action}_into<${", ".join(into_types.keys())}>(${format_args(args)}) -> Result<(hyper::client::Response, T)>
+    where
+        ${where_clause(into_types)}
+    % else:
+    ${qualifier}fn ${api.terms.action}<${", ".join(default_types.keys())}>(${format_args(args)}) -> ${rtype}
+    where
+        ${where_clause(default_types)}
+    % endif:
+    {
         % if URL_ENCODE in special_cases:
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         % endif
@@ -880,9 +909,28 @@ if enable_resource_parsing \
     % for item_name, item in p.info.iteritems():
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
-    pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
-                where ${mtype_param}: ReadSeek {
-        self.${api.terms.action}(${p.type.arg_name}, mime_type, "${p.protocol}")
+    %if response_schema:
+    pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}_into<${", ".join(into_types.keys())}>(${format_args(args_for_media_param(p))}) -> Result<(hyper::client::Response, T)>
+    where
+        ${where_clause(into_types)}
+    {
+        Self::${api.terms.action}_into(${", ".join([arg.name for arg in args_for_media_param(p)])}, "${p.protocol}")
     }
+
+    pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${", ".join(default_types.keys())}>(${format_args(args_for_media_param(p))}) -> ${rtype}
+    where
+        ${where_clause(default_types)}
+    {
+        Self::${api.terms.action}(${", ".join([arg.name for arg in args_for_media_param(p)])}, "${p.protocol}")
+    }
+    % else:
+    pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${", ".join(default_types.keys())}>(${format_args(args_for_media_param(p))}) -> ${rtype}
+    where
+        ${where_clause(default_types)}
+    {
+        Self::${api.terms.action}(${", ".join([arg.name for arg in args_for_media_param(p)])}, "${p.protocol}")
+    }
+
+    % endif
     % endfor
 </%def>

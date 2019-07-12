@@ -1056,6 +1056,12 @@ def size_to_bytes(size):
         raise ValueError("Invalid unit: '%s'" % unit)
     # end handle errors gracefully
 
+class FnArg(object):
+    def __init__(self, binding, name, typ):
+        self.binding = binding
+        self.name = name
+        self.typ = typ
+
 
 if __name__ == '__main__':
     raise AssertionError('For import only')
