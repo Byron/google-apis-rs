@@ -35,6 +35,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
+google_field_selector = { version = "0.1.0", path = "../../google_field_selector" }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor

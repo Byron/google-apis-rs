@@ -127,6 +127,11 @@ impl ${TO_PARTS_MARKER} for ${s_type} {
     }
 }
 % endif
+
+impl FieldSelector for ${s_type} {
+    // The default types specify an empty field selector.
+    fn field_selector_with_ident(_ident: &str, _selector: &mut String) {}
+}
 </%def>
 
 #########################################################################################################

@@ -1,5 +1,9 @@
 # DO NOT PUBLISH
 # This library is just to try out the code that should ultimately go into the code generator !
+
+[workspace]
+members = ["google_field_selector", "google_field_selector_derive", "gen/*"]
+
 [package]
 
 name = "cmn"

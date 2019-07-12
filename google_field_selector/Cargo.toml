@@ -1,0 +1,12 @@
+[package]
+name = "google_field_selector"
+version = "0.1.0"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+google_field_selector_derive = { version = "0.1.0", path = "../google_field_selector_derive" }
+
+[dev-dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }

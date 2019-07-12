@@ -43,6 +43,9 @@ ${lib.docs(c)}
 #[macro_use]
 extern crate serde_derive;
 
+#[macro_use]
+extern crate google_field_selector;
+
 extern crate hyper;
 extern crate serde;
 extern crate serde_json;

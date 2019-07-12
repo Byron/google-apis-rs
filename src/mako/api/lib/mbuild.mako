@@ -414,7 +414,7 @@ match result {
     if response_schema:
         if not supports_download:
             reserved_params = ['alt']
-        into_types['T'].extend(['Default', 'serde::de::DeserializeOwned'])
+        into_types['T'].extend(['Default', 'serde::de::DeserializeOwned', 'FieldSelector'])
         rtype = 'Result<(hyper::client::Response, %s)>' % (unique_type_name(response_schema.id))
 
     mtype_param = 'RS'
@@ -581,6 +581,14 @@ match result {
         }
 
         % if response_schema:
+        % if "fields" in parameters:
+        if !params.iter().any(|&(ref k, ref _v)| *k == "fields") {
+	    let fields = T::field_selector();
+	    if !fields.is_empty() {
+	        params.push(("fields", T::field_selector()));
+	    }
+        }
+        % endif ## fields in parameters
         % if supports_download:
         let (json_field_missing, enable_resource_parsing) = {
             let mut enable = true;

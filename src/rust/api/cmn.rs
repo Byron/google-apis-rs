@@ -17,6 +17,8 @@ use hyper::status::StatusCode;
 
 use serde_json as json;
 
+pub use google_field_selector::FieldSelector;
+
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
 /// The hub allows to access all resource methods more easily.
