@@ -2,7 +2,7 @@
 # This library is just to try out the code that should ultimately go into the code generator !
 
 [workspace]
-members = ["google_field_selector", "google_field_selector_derive", "gen/*"]
+members = ["google_field_selector", "google_field_selector_derive", "gen/*", "src/rust/preproc"]
 
 [package]
 
