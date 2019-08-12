@@ -585,7 +585,7 @@ match result {
         if !params.iter().any(|&(ref k, ref _v)| *k == "fields") {
 	    let fields = T::field_selector();
 	    if !fields.is_empty() {
-	        params.push(("fields", T::field_selector()));
+	        params.push(("fields", fields));
 	    }
         }
         % endif ## fields in parameters
