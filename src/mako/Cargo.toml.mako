@@ -34,12 +34,15 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 1.0"
+yup-oauth2 = { version = "^ 1.0", default-features = false }
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
 
 [features]
+default = ["openssl"]
+openssl = ["yup-oauth2/default"]
+rustls = ["yup-oauth2/no-openssl"]
 <%
   api_name = util.library_name()
   crate_name_we_depend_on = None
