@@ -13,7 +13,6 @@ matrix:
     - rust: nightly
 
 before_install:
-  - curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
   - pyenv versions
   - pyenv install --skip-existing "${PYENV_VERSION}"
   - pyenv versions
