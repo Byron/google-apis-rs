@@ -5,44 +5,44 @@ DO NOT EDIT !
 -->
 The `google-storage1` library allows access to all features of the *Google storage* service.
 
-This documentation was generated from *storage* crate version *1.0.10+20190624*, where *20190624* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.10*.
+This documentation was generated from *storage* crate version *1.0.11+20190624*, where *20190624* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.11*.
 
 Everything else about the *storage* *v1* API can be found at the
 [official documentation site](https://developers.google.com/storage/docs/json_api/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.Storage.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.Storage.html) ... 
 
-* [bucket access controls](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketAccessControl.html)
- * [*delete*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketAccessControlDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketAccessControlGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketAccessControlInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketAccessControlListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketAccessControlPatchCall.html) and [*update*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketAccessControlUpdateCall.html)
-* [buckets](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.Bucket.html)
- * [*delete*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketGetCall.html), [*get iam policy*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketGetIamPolicyCall.html), [*insert*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketListCall.html), [*lock retention policy*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketLockRetentionPolicyCall.html), [*patch*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketPatchCall.html), [*set iam policy*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketSetIamPolicyCall.html), [*test iam permissions*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketTestIamPermissionCall.html) and [*update*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.BucketUpdateCall.html)
-* [channels](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.Channel.html)
- * [*stop*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ChannelStopCall.html)
+* [bucket access controls](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketAccessControl.html)
+ * [*delete*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketAccessControlDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketAccessControlGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketAccessControlInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketAccessControlListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketAccessControlPatchCall.html) and [*update*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketAccessControlUpdateCall.html)
+* [buckets](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.Bucket.html)
+ * [*delete*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketGetCall.html), [*get iam policy*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketGetIamPolicyCall.html), [*insert*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketListCall.html), [*lock retention policy*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketLockRetentionPolicyCall.html), [*patch*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketPatchCall.html), [*set iam policy*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketSetIamPolicyCall.html), [*test iam permissions*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketTestIamPermissionCall.html) and [*update*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.BucketUpdateCall.html)
+* [channels](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.Channel.html)
+ * [*stop*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ChannelStopCall.html)
 * default object access controls
- * [*delete*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.DefaultObjectAccessControlDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.DefaultObjectAccessControlGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.DefaultObjectAccessControlInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.DefaultObjectAccessControlListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.DefaultObjectAccessControlPatchCall.html) and [*update*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.DefaultObjectAccessControlUpdateCall.html)
-* [notifications](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.Notification.html)
- * [*delete*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.NotificationDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.NotificationGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.NotificationInsertCall.html) and [*list*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.NotificationListCall.html)
-* [object access controls](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectAccessControl.html)
- * [*delete*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectAccessControlDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectAccessControlGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectAccessControlInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectAccessControlListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectAccessControlPatchCall.html) and [*update*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectAccessControlUpdateCall.html)
-* [objects](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.Object.html)
- * [*compose*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectComposeCall.html), [*copy*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectCopyCall.html), [*delete*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectGetCall.html), [*get iam policy*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectGetIamPolicyCall.html), [*insert*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectPatchCall.html), [*rewrite*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectRewriteCall.html), [*set iam policy*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectSetIamPolicyCall.html), [*test iam permissions*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectTestIamPermissionCall.html), [*update*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectUpdateCall.html) and [*watch all*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectWatchAllCall.html)
+ * [*delete*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.DefaultObjectAccessControlDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.DefaultObjectAccessControlGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.DefaultObjectAccessControlInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.DefaultObjectAccessControlListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.DefaultObjectAccessControlPatchCall.html) and [*update*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.DefaultObjectAccessControlUpdateCall.html)
+* [notifications](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.Notification.html)
+ * [*delete*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.NotificationDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.NotificationGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.NotificationInsertCall.html) and [*list*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.NotificationListCall.html)
+* [object access controls](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectAccessControl.html)
+ * [*delete*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectAccessControlDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectAccessControlGetCall.html), [*insert*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectAccessControlInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectAccessControlListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectAccessControlPatchCall.html) and [*update*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectAccessControlUpdateCall.html)
+* [objects](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.Object.html)
+ * [*compose*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectComposeCall.html), [*copy*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectCopyCall.html), [*delete*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectDeleteCall.html), [*get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectGetCall.html), [*get iam policy*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectGetIamPolicyCall.html), [*insert*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectInsertCall.html), [*list*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectListCall.html), [*patch*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectPatchCall.html), [*rewrite*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectRewriteCall.html), [*set iam policy*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectSetIamPolicyCall.html), [*test iam permissions*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectTestIamPermissionCall.html), [*update*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectUpdateCall.html) and [*watch all*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectWatchAllCall.html)
 * projects
- * [*hmac keys create*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ProjectHmacKeyCreateCall.html), [*hmac keys delete*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ProjectHmacKeyDeleteCall.html), [*hmac keys get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ProjectHmacKeyGetCall.html), [*hmac keys list*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ProjectHmacKeyListCall.html), [*hmac keys update*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ProjectHmacKeyUpdateCall.html) and [*service account get*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ProjectServiceAccountGetCall.html)
+ * [*hmac keys create*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ProjectHmacKeyCreateCall.html), [*hmac keys delete*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ProjectHmacKeyDeleteCall.html), [*hmac keys get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ProjectHmacKeyGetCall.html), [*hmac keys list*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ProjectHmacKeyListCall.html), [*hmac keys update*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ProjectHmacKeyUpdateCall.html) and [*service account get*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ProjectServiceAccountGetCall.html)
 
 
 Upload supported by ...
 
-* [*insert objects*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectInsertCall.html)
+* [*insert objects*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectInsertCall.html)
 
 Download supported by ...
 
-* [*get objects*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectGetCall.html)
+* [*get objects*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectGetCall.html)
 
 Subscription supported by ...
 
-* [*watch all objects*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectWatchAllCall.html)
-* [*list objects*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.ObjectListCall.html)
+* [*watch all objects*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectWatchAllCall.html)
+* [*list objects*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.ObjectListCall.html)
 
 
 
@@ -50,17 +50,17 @@ Subscription supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/struct.Storage.html)**
+* **[Hub](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/struct.Storage.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.CallBuilder.html)
+* **[Resources](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -185,17 +185,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -205,29 +205,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.Delegate.html) to the 
+[Method Builder](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.RequestValue.html) and 
+[decodable](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-storage1/1.0.10+20190624/google_storage1/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-storage1/1.0.11+20190624/google_storage1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
