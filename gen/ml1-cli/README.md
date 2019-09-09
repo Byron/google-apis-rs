@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20190621*. The CLI is at version *1.0.10*.
+This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20190621*. The CLI is at version *1.0.11*.
 
 ```bash
 ml1 [options]

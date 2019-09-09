@@ -431,7 +431,7 @@ fn main() {
     
     let mut app = App::new("urlshortener1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20150519")
+           .version("1.0.11+20150519")
            .about("Lets you create, inspect, and manage goo.gl short URLs")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_urlshortener1_cli")
            .arg(Arg::with_name("url")

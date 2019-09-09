@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Comment Analyzer* API at revision *20190616*. The CLI is at version *1.0.10*.
+This documentation was generated from the *Comment Analyzer* API at revision *20190616*. The CLI is at version *1.0.11*.
 
 ```bash
 commentanalyzer1-alpha1 [options]

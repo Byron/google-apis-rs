@@ -4,12 +4,12 @@
 [package]
 
 name = "google-urlshortener1"
-version = "1.0.10+20150519"
+version = "1.0.11+20150519"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with urlshortener (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/urlshortener1"
 homepage = "https://developers.google.com/url-shortener/v1/getting_started"
-documentation = "https://docs.rs/google-urlshortener1/1.0.10+20150519"
+documentation = "https://docs.rs/google-urlshortener1/1.0.11+20150519"
 license = "MIT"
 keywords = ["urlshortener", "google", "protocol", "web", "api"]
 autobins = false
@@ -24,9 +24,12 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 1.0"
+yup-oauth2 = { version = "^ 1.0", default-features = false }
 url = "= 1.7"
 
 [features]
+default = ["openssl"]
+openssl = ["yup-oauth2/default"]
+rustls = ["yup-oauth2/no-openssl"]
 
 

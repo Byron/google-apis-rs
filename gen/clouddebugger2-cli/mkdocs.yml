@@ -1,4 +1,4 @@
-site_name: Cloud Debugger v1.0.10+20190614
+site_name: Cloud Debugger v1.0.11+20190614
 site_url: http://byron.github.io/google-apis-rs/google-clouddebugger2-cli
 site_description: A complete library to interact with Cloud Debugger (protocol v2)
 

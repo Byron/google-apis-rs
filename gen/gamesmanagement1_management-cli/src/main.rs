@@ -2079,7 +2079,7 @@ fn main() {
     
     let mut app = App::new("gamesmanagement1-management")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20190627")
+           .version("1.0.11+20190627")
            .about("The Management API for Google Play Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli")
            .arg(Arg::with_name("url")

@@ -72,24 +72,24 @@ pub struct JsonServerError {
 /// The latter happen if the sent parameters or request structures are unsound
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ErrorResponse {
-    error: ServerError,
+    pub error: ServerError,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ServerError {
-    errors: Vec<ServerMessage>,
-    code: u16,
-    message: String,
+    pub errors: Vec<ServerMessage>,
+    pub code: u16,
+    pub message: String,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ServerMessage {
-    domain: String,
-    reason: String,
-    message: String,
+    pub domain: String,
+    pub reason: String,
+    pub message: String,
     #[serde(rename="locationType")]
-    location_type: Option<String>,
-    location: Option<String>
+    pub location_type: Option<String>,
+    pub location: Option<String>
 }
 
 #[derive(Copy, Clone)]

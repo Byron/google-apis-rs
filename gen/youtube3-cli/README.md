@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20190513*. The CLI is at version *1.0.10*.
+This documentation was generated from the *YouTube* API at revision *20190513*. The CLI is at version *1.0.11*.
 
 ```bash
 youtube3 [options]

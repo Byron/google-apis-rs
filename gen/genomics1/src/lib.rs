@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *1.0.10+20190704*, where *20190704* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.10*.
+//! This documentation was generated from *genomics* crate version *1.0.11+20190704*, where *20190704* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.11*.
 //! 
 //! Everything else about the *genomics* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/genomics).
@@ -329,7 +329,7 @@ impl<'a, C, A> Genomics<C, A>
         Genomics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.10".to_string(),
+            _user_agent: "google-api-rust-client/1.0.11".to_string(),
             _base_url: "https://genomics.googleapis.com/".to_string(),
             _root_url: "https://genomics.googleapis.com/".to_string(),
         }
@@ -340,7 +340,7 @@ impl<'a, C, A> Genomics<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.10`.
+    /// It defaults to `google-api-rust-client/1.0.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

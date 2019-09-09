@@ -1,4 +1,4 @@
-site_name: Cloud RuntimeConfig v1.0.10+20190624
+site_name: Cloud RuntimeConfig v1.0.11+20190624
 site_url: http://byron.github.io/google-apis-rs/google-runtimeconfig1_beta1-cli
 site_description: A complete library to interact with Cloud RuntimeConfig (protocol v1beta1)
 

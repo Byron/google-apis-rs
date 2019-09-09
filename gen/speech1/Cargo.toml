@@ -4,12 +4,12 @@
 [package]
 
 name = "google-speech1"
-version = "1.0.10+20190627"
+version = "1.0.11+20190627"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Speech (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/speech1"
 homepage = "https://cloud.google.com/speech-to-text/docs/quickstart-protocol"
-documentation = "https://docs.rs/google-speech1/1.0.10+20190627"
+documentation = "https://docs.rs/google-speech1/1.0.11+20190627"
 license = "MIT"
 keywords = ["speech", "google", "protocol", "web", "api"]
 autobins = false
@@ -24,9 +24,12 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 1.0"
+yup-oauth2 = { version = "^ 1.0", default-features = false }
 url = "= 1.7"
 
 [features]
+default = ["openssl"]
+openssl = ["yup-oauth2/default"]
+rustls = ["yup-oauth2/no-openssl"]
 
 

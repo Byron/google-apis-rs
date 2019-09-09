@@ -228,7 +228,7 @@ fn main() {
     
     let mut app = App::new("run1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20190624")
+           .version("1.0.11+20190624")
            .about("Deploy and manage user provided container images that scale automatically based on HTTP traffic.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_run1_cli")
            .arg(Arg::with_name("url")

@@ -1177,7 +1177,7 @@ fn main() {
     
     let mut app = App::new("videointelligence1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20190626")
+           .version("1.0.11+20190626")
            .about("Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_videointelligence1_cli")
            .arg(Arg::with_name("url")

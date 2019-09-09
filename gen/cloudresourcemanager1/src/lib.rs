@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.10+20190701*, where *20190701* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.10*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.11+20190701*, where *20190701* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.11*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -350,7 +350,7 @@ impl<'a, C, A> CloudResourceManager<C, A>
         CloudResourceManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.10".to_string(),
+            _user_agent: "google-api-rust-client/1.0.11".to_string(),
             _base_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
             _root_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
         }
@@ -373,7 +373,7 @@ impl<'a, C, A> CloudResourceManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.10`.
+    /// It defaults to `google-api-rust-client/1.0.11`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

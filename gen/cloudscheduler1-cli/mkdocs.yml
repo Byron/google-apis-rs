@@ -1,4 +1,4 @@
-site_name: Cloud Scheduler v1.0.10+20190617
+site_name: Cloud Scheduler v1.0.11+20190617
 site_url: http://byron.github.io/google-apis-rs/google-cloudscheduler1-cli
 site_description: A complete library to interact with Cloud Scheduler (protocol v1)
 

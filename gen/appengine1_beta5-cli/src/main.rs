@@ -2289,7 +2289,7 @@ fn main() {
     
     let mut app = App::new("appengine1-beta5")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20181005")
+           .version("1.0.11+20181005")
            .about("The App Engine Admin API enables developers to provision and manage their App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_beta5_cli")
            .arg(Arg::with_name("url")

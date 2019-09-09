@@ -5,22 +5,22 @@ DO NOT EDIT !
 -->
 The `google-content2_sandbox` library allows access to all features of the *Google Shopping Content* service.
 
-This documentation was generated from *Shopping Content* crate version *1.0.10+20181009*, where *20181009* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.10*.
+This documentation was generated from *Shopping Content* crate version *1.0.11+20181009*, where *20181009* is the exact revision of the *content:v2sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.11*.
 
 Everything else about the *Shopping Content* *v2_sandbox* API can be found at the
 [official documentation site](https://developers.google.com/shopping-content).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.ShoppingContent.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.ShoppingContent.html) ... 
 
 * orderinvoices
- * [*createchargeinvoice*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderinvoiceCreatechargeinvoiceCall.html) and [*createrefundinvoice*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderinvoiceCreaterefundinvoiceCall.html)
+ * [*createchargeinvoice*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderinvoiceCreatechargeinvoiceCall.html) and [*createrefundinvoice*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderinvoiceCreaterefundinvoiceCall.html)
 * orderpayments
- * [*notifyauthapproved*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderpaymentNotifyauthapprovedCall.html), [*notifyauthdeclined*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderpaymentNotifyauthdeclinedCall.html), [*notifycharge*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderpaymentNotifychargeCall.html) and [*notifyrefund*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderpaymentNotifyrefundCall.html)
+ * [*notifyauthapproved*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderpaymentNotifyauthapprovedCall.html), [*notifyauthdeclined*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderpaymentNotifyauthdeclinedCall.html), [*notifycharge*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderpaymentNotifychargeCall.html) and [*notifyrefund*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderpaymentNotifyrefundCall.html)
 * orderreturns
- * [*get*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderreturnGetCall.html) and [*list*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderreturnListCall.html)
-* [orders](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.Order.html)
- * [*acknowledge*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderAcknowledgeCall.html), [*advancetestorder*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderAdvancetestorderCall.html), [*cancel*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderCancelCall.html), [*cancellineitem*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderCancellineitemCall.html), [*canceltestorderbycustomer*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderCanceltestorderbycustomerCall.html), [*createtestorder*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderCreatetestorderCall.html), [*createtestreturn*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderCreatetestreturnCall.html), [*custombatch*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderCustombatchCall.html), [*get*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderGetCall.html), [*getbymerchantorderid*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderGetbymerchantorderidCall.html), [*gettestordertemplate*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderGettestordertemplateCall.html), [*instorerefundlineitem*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderInstorerefundlineitemCall.html), [*list*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderListCall.html), [*refund*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderRefundCall.html), [*rejectreturnlineitem*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderRejectreturnlineitemCall.html), [*returnlineitem*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderReturnlineitemCall.html), [*returnrefundlineitem*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderReturnrefundlineitemCall.html), [*setlineitemmetadata*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderSetlineitemmetadataCall.html), [*shiplineitems*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderShiplineitemCall.html), [*updatelineitemshippingdetails*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderUpdatelineitemshippingdetailCall.html), [*updatemerchantorderid*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderUpdatemerchantorderidCall.html) and [*updateshipment*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.OrderUpdateshipmentCall.html)
+ * [*get*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderreturnGetCall.html) and [*list*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderreturnListCall.html)
+* [orders](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.Order.html)
+ * [*acknowledge*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderAcknowledgeCall.html), [*advancetestorder*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderAdvancetestorderCall.html), [*cancel*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderCancelCall.html), [*cancellineitem*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderCancellineitemCall.html), [*canceltestorderbycustomer*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderCanceltestorderbycustomerCall.html), [*createtestorder*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderCreatetestorderCall.html), [*createtestreturn*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderCreatetestreturnCall.html), [*custombatch*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderCustombatchCall.html), [*get*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderGetCall.html), [*getbymerchantorderid*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderGetbymerchantorderidCall.html), [*gettestordertemplate*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderGettestordertemplateCall.html), [*instorerefundlineitem*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderInstorerefundlineitemCall.html), [*list*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderListCall.html), [*refund*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderRefundCall.html), [*rejectreturnlineitem*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderRejectreturnlineitemCall.html), [*returnlineitem*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderReturnlineitemCall.html), [*returnrefundlineitem*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderReturnrefundlineitemCall.html), [*setlineitemmetadata*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderSetlineitemmetadataCall.html), [*shiplineitems*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderShiplineitemCall.html), [*updatelineitemshippingdetails*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderUpdatelineitemshippingdetailCall.html), [*updatemerchantorderid*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderUpdatemerchantorderidCall.html) and [*updateshipment*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.OrderUpdateshipmentCall.html)
 
 
 
@@ -29,17 +29,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/struct.ShoppingContent.html)**
+* **[Hub](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/struct.ShoppingContent.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.CallBuilder.html)
+* **[Resources](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -158,17 +158,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -178,29 +178,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.Delegate.html) to the 
+[Method Builder](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.RequestValue.html) and 
+[decodable](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-content2_sandbox/1.0.10+20181009/google_content2_sandbox/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-content2_sandbox/1.0.11+20181009/google_content2_sandbox/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

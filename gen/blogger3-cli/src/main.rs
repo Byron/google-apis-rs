@@ -3497,7 +3497,7 @@ fn main() {
     
     let mut app = App::new("blogger3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20150422")
+           .version("1.0.11+20150422")
            .about("API for access to the data within Blogger.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_blogger3_cli")
            .arg(Arg::with_name("url")

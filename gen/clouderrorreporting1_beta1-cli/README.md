@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Clouderrorreporting* API at revision *20190626*. The CLI is at version *1.0.10*.
+This documentation was generated from the *Clouderrorreporting* API at revision *20190626*. The CLI is at version *1.0.11*.
 
 ```bash
 clouderrorreporting1-beta1 [options]

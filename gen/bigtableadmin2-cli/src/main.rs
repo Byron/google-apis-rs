@@ -3833,7 +3833,7 @@ fn main() {
     
     let mut app = App::new("bigtableadmin2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20190506")
+           .version("1.0.11+20190506")
            .about("Administer your Cloud Bigtable tables and instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli")
            .arg(Arg::with_name("url")

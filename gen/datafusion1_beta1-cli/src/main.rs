@@ -1781,7 +1781,7 @@ fn main() {
     
     let mut app = App::new("datafusion1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20190617")
+           .version("1.0.11+20190617")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for
                quickly building and managing data pipelines. It provides a graphical interface to increase
                time efficiency and reduce complexity, and allows business users, developers, and data

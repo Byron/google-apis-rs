@@ -4,12 +4,12 @@
 [package]
 
 name = "google-containeranalysis1_beta1"
-version = "1.0.10+20190625"
+version = "1.0.11+20190625"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container Analysis (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/containeranalysis1_beta1"
 homepage = "https://cloud.google.com/container-analysis/api/reference/rest/"
-documentation = "https://docs.rs/google-containeranalysis1_beta1/1.0.10+20190625"
+documentation = "https://docs.rs/google-containeranalysis1_beta1/1.0.11+20190625"
 license = "MIT"
 keywords = ["containeranalysis", "google", "protocol", "web", "api"]
 autobins = false
@@ -24,9 +24,12 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 1.0"
+yup-oauth2 = { version = "^ 1.0", default-features = false }
 url = "= 1.7"
 
 [features]
+default = ["openssl"]
+openssl = ["yup-oauth2/default"]
+rustls = ["yup-oauth2/no-openssl"]
 
 

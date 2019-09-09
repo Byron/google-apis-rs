@@ -1,4 +1,4 @@
-site_name: People Service v1.0.10+20190702
+site_name: People Service v1.0.11+20190702
 site_url: http://byron.github.io/google-apis-rs/google-people1-cli
 site_description: A complete library to interact with People Service (protocol v1)
 

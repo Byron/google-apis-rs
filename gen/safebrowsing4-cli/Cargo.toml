@@ -4,7 +4,7 @@
 [package]
 
 name = "google-safebrowsing4-cli"
-version = "1.0.10+20190702"
+version = "1.0.11+20190702"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with safebrowsing (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/safebrowsing4-cli"
@@ -27,16 +27,19 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 1.0"
+yup-oauth2 = { version = "^ 1.0", default-features = false }
 strsim = "^0.5"
 hyper-rustls = "^0.6"
 yup-hyper-mock = "^2.0"
 clap = "^2.0"
 
 [features]
+default = ["openssl"]
+openssl = ["yup-oauth2/default"]
+rustls = ["yup-oauth2/no-openssl"]
 
 
 
 [dependencies.google-safebrowsing4]
 path = "../safebrowsing4"
-version = "1.0.10+20190702"
+version = "1.0.11+20190702"

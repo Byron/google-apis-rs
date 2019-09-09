@@ -1553,7 +1553,7 @@ fn main() {
     
     let mut app = App::new("tasks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20190628")
+           .version("1.0.11+20190628")
            .about("Manages your tasks and task lists.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tasks1_cli")
            .arg(Arg::with_name("url")
