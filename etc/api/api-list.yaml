@@ -173,8 +173,6 @@ api:
     - v2beta1
     dns:
     - v1
-    docs:
-    - v1
     doubleclickbidmanager:
     - v1
     doubleclicksearch:
