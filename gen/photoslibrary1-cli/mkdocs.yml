@@ -1,4 +1,4 @@
-site_name: Photos Library v1.0.11+20190702
+site_name: Photos Library v1.0.12+20190702
 site_url: http://byron.github.io/google-apis-rs/google-photoslibrary1-cli
 site_description: A complete library to interact with Photos Library (protocol v1)
 
@@ -29,5 +29,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
 

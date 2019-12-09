@@ -1650,7 +1650,7 @@ fn main() {
     
     let mut app = App::new("firebasehosting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190626")
+           .version("1.0.12+20190626")
            .about("The Firebase Hosting REST API enables programmatic and customizable deployments to your Firebase-hosted sites. Use this REST API to deploy new or updated hosting configurations and content files.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Pubsub v1.0.11+20190625
+site_name: Pubsub v1.0.12+20190625
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1_beta2-cli
 site_description: A complete library to interact with Pubsub (protocol v1beta2)
 
@@ -32,5 +32,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
 

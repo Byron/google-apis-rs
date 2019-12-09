@@ -4,7 +4,7 @@
 [package]
 
 name = "google-datastore1_beta3-cli"
-version = "1.0.11+20190421"
+version = "1.0.12+20190421"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with datastore (protocol v1beta3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/datastore1_beta3-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-datastore1_beta3]
 path = "../datastore1_beta3"
-version = "1.0.11+20190421"
+version = "1.0.12+20190421"

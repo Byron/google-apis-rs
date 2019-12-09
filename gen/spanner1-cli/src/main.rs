@@ -4619,7 +4619,7 @@ fn main() {
     
     let mut app = App::new("spanner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190613")
+           .version("1.0.12+20190613")
            .about("Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spanner1_cli")
            .arg(Arg::with_name("url")

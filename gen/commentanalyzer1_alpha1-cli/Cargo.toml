@@ -4,7 +4,7 @@
 [package]
 
 name = "google-commentanalyzer1_alpha1-cli"
-version = "1.0.11+20190616"
+version = "1.0.12+20190616"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Comment Analyzer (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/commentanalyzer1_alpha1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-commentanalyzer1_alpha1]
 path = "../commentanalyzer1_alpha1"
-version = "1.0.11+20190616"
+version = "1.0.12+20190616"

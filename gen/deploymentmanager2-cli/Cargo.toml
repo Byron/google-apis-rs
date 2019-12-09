@@ -4,7 +4,7 @@
 [package]
 
 name = "google-deploymentmanager2-cli"
-version = "1.0.11+20181207"
+version = "1.0.12+20181207"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Deployment Manager (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-deploymentmanager2]
 path = "../deploymentmanager2"
-version = "1.0.11+20181207"
+version = "1.0.12+20181207"

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Approval* API at revision *20190628*. The CLI is at version *1.0.11*.
+This documentation was generated from the *Access Approval* API at revision *20190628*. The CLI is at version *1.0.12*.
 
 ```bash
 accessapproval1-beta1 [options]

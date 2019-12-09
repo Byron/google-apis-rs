@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-sheets4` library allows access to all features of the *Google Sheets* service.
 
-This documentation was generated from *Sheets* crate version *1.0.11+20190625*, where *20190625* is the exact revision of the *sheets:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.11*.
+This documentation was generated from *Sheets* crate version *1.0.12+20190625*, where *20190625* is the exact revision of the *sheets:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
 
 Everything else about the *Sheets* *v4* API can be found at the
 [official documentation site](https://developers.google.com/sheets/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.Sheets.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.Sheets.html) ... 
 
-* [spreadsheets](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.Spreadsheet.html)
- * [*batch update*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetBatchUpdateCall.html), [*create*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetCreateCall.html), [*developer metadata get*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetDeveloperMetadataGetCall.html), [*developer metadata search*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetDeveloperMetadataSearchCall.html), [*get*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetGetCall.html), [*get by data filter*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetGetByDataFilterCall.html), [*sheets copy to*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetSheetCopyToCall.html), [*values append*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueAppendCall.html), [*values batch clear*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueBatchClearCall.html), [*values batch clear by data filter*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueBatchClearByDataFilterCall.html), [*values batch get*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueBatchGetCall.html), [*values batch get by data filter*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueBatchGetByDataFilterCall.html), [*values batch update*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueBatchUpdateCall.html), [*values batch update by data filter*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueBatchUpdateByDataFilterCall.html), [*values clear*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueClearCall.html), [*values get*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueGetCall.html) and [*values update*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.SpreadsheetValueUpdateCall.html)
+* [spreadsheets](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.Spreadsheet.html)
+ * [*batch update*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetBatchUpdateCall.html), [*create*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetCreateCall.html), [*developer metadata get*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetDeveloperMetadataGetCall.html), [*developer metadata search*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetDeveloperMetadataSearchCall.html), [*get*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetGetCall.html), [*get by data filter*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetGetByDataFilterCall.html), [*sheets copy to*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetSheetCopyToCall.html), [*values append*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueAppendCall.html), [*values batch clear*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueBatchClearCall.html), [*values batch clear by data filter*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueBatchClearByDataFilterCall.html), [*values batch get*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueBatchGetCall.html), [*values batch get by data filter*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueBatchGetByDataFilterCall.html), [*values batch update*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueBatchUpdateCall.html), [*values batch update by data filter*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueBatchUpdateByDataFilterCall.html), [*values clear*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueClearCall.html), [*values get*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueGetCall.html) and [*values update*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.SpreadsheetValueUpdateCall.html)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/struct.Sheets.html)**
+* **[Hub](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/struct.Sheets.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.CallBuilder.html)
+* **[Resources](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -151,17 +151,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -171,29 +171,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.Delegate.html) to the 
+[Method Builder](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.RequestValue.html) and 
+[decodable](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-sheets4/1.0.11+20190625/google_sheets4/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-sheets4/1.0.12+20190625/google_sheets4/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

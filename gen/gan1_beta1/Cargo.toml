@@ -4,12 +4,12 @@
 [package]
 
 name = "google-gan1_beta1"
-version = "1.0.11+20130205"
+version = "1.0.12+20130205"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with gan (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gan1_beta1"
 homepage = "https://developers.google.com/affiliate-network/"
-documentation = "https://docs.rs/google-gan1_beta1/1.0.11+20130205"
+documentation = "https://docs.rs/google-gan1_beta1/1.0.12+20130205"
 license = "MIT"
 keywords = ["gan", "google", "protocol", "web", "api"]
 autobins = false

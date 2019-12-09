@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudtasks2_beta3-cli"
-version = "1.0.11+20190618"
+version = "1.0.12+20190618"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Tasks (protocol v2beta3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2_beta3-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-cloudtasks2_beta3]
 path = "../cloudtasks2_beta3"
-version = "1.0.11+20190618"
+version = "1.0.12+20190618"

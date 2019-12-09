@@ -4,7 +4,7 @@
 [package]
 
 name = "google-firebase1_beta1-cli"
-version = "1.0.11+20190703"
+version = "1.0.12+20190703"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Management (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/firebase1_beta1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-firebase1_beta1]
 path = "../firebase1_beta1"
-version = "1.0.11+20190703"
+version = "1.0.12+20190703"

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-vision1-cli"
-version = "1.0.11+20190628"
+version = "1.0.12+20190628"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Vision (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/vision1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-vision1]
 path = "../vision1"
-version = "1.0.11+20190628"
+version = "1.0.12+20190628"

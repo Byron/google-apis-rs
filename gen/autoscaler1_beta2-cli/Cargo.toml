@@ -4,7 +4,7 @@
 [package]
 
 name = "google-autoscaler1_beta2-cli"
-version = "1.0.11+20150629"
+version = "1.0.12+20150629"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with autoscaler (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/autoscaler1_beta2-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-autoscaler1_beta2]
 path = "../autoscaler1_beta2"
-version = "1.0.11+20150629"
+version = "1.0.12+20150629"

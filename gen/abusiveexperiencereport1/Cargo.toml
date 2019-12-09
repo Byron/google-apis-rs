@@ -4,12 +4,12 @@
 [package]
 
 name = "google-abusiveexperiencereport1"
-version = "1.0.11+20190624"
+version = "1.0.12+20190624"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Abusive Experience Report (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/abusiveexperiencereport1"
 homepage = "https://developers.google.com/abusive-experience-report/"
-documentation = "https://docs.rs/google-abusiveexperiencereport1/1.0.11+20190624"
+documentation = "https://docs.rs/google-abusiveexperiencereport1/1.0.12+20190624"
 license = "MIT"
 keywords = ["abusiveexperiencerep", "google", "protocol", "web", "api"]
 autobins = false

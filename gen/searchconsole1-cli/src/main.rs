@@ -259,7 +259,7 @@ fn main() {
     
     let mut app = App::new("searchconsole1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190629")
+           .version("1.0.12+20190629")
            .about("Provides tools for running validation tests against single URLs")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_searchconsole1_cli")
            .arg(Arg::with_name("folder")

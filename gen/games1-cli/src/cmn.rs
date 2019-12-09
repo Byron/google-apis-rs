@@ -406,7 +406,7 @@ pub fn writer_from_opts(arg: Option<&str>) -> Result<Box<Write>, io::Error> {
     let f = arg.unwrap_or("-");
     match f {
         "-" => Ok(Box::new(stdout())),
-        _ => match fs::OpenOptions::new().create(true).write(true).open(f) {
+        _ => match fs::OpenOptions::new().create(true).truncate(true).write(true).open(f) {
             Ok(f) => Ok(Box::new(f)),
             Err(io_err) => Err(io_err),
         },
@@ -488,7 +488,7 @@ impl TokenStorage for JsonTokenStorage {
                 }
             }
             Some(token) => {
-                match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
+                match fs::OpenOptions::new().create(true).write(true).truncate(true).open(&self.path(scope_hash)) {
                     Ok(mut f) => {
                         match json::to_writer_pretty(&mut f, &token) {
                             Ok(_) => Ok(()),
@@ -769,6 +769,7 @@ pub fn application_secret_from_directory(dir: &str,
                     err = match fs::OpenOptions::new()
                                     .create(true)
                                     .write(true)
+                                    .truncate(true)
                                     .open(&secret_path) {
                         Err(cfe) => cfe,
                         Ok(mut f) => {

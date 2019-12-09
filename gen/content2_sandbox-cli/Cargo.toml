@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2_sandbox-cli"
-version = "1.0.11+20181009"
+version = "1.0.12+20181009"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Shopping Content (protocol v2sandbox)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2_sandbox-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-content2_sandbox]
 path = "../content2_sandbox"
-version = "1.0.11+20181009"
+version = "1.0.12+20181009"

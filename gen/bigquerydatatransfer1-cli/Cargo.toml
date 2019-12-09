@@ -4,7 +4,7 @@
 [package]
 
 name = "google-bigquerydatatransfer1-cli"
-version = "1.0.11+20190629"
+version = "1.0.12+20190629"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with BigQuery Data Transfer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquerydatatransfer1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-bigquerydatatransfer1]
 path = "../bigquerydatatransfer1"
-version = "1.0.11+20190629"
+version = "1.0.12+20190629"

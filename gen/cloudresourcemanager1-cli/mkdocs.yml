@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v1.0.11+20190701
+site_name: Cloud Resource Manager v1.0.12+20190701
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager1-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v1)
 
@@ -50,5 +50,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
 

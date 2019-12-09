@@ -722,7 +722,7 @@ fn main() {
     
     let mut app = App::new("oslogin1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190614")
+           .version("1.0.12+20190614")
            .about("You can use OS Login to manage access to your VM instances using IAM roles. For more information, read [OS Login](/compute/docs/oslogin/).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oslogin1_cli")
            .arg(Arg::with_name("url")

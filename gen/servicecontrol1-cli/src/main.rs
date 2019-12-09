@@ -567,7 +567,7 @@ fn main() {
     
     let mut app = App::new("servicecontrol1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190622")
+           .version("1.0.12+20190622")
            .about("Provides control plane functionality to managed services, such as logging, monitoring, and status checks.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_servicecontrol1_cli")
            .arg(Arg::with_name("url")

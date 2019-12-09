@@ -4,7 +4,7 @@
 [package]
 
 name = "google-discovery1-cli"
-version = "1.0.11+20190619"
+version = "1.0.12+20190619"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with discovery (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/discovery1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-discovery1]
 path = "../discovery1"
-version = "1.0.11+20190619"
+version = "1.0.12+20190619"

@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.11+20190624
+site_name: Android Enterprise v1.0.12+20190624
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 
@@ -98,5 +98,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
 

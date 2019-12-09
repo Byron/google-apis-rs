@@ -4,7 +4,7 @@
 [package]
 
 name = "google-iam1-cli"
-version = "1.0.11+20190627"
+version = "1.0.12+20190627"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with iam (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/iam1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-iam1]
 path = "../iam1"
-version = "1.0.11+20190627"
+version = "1.0.12+20190627"

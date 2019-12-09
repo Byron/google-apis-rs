@@ -2673,7 +2673,7 @@ fn main() {
     
     let mut app = App::new("securitycenter1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190628")
+           .version("1.0.12+20190628")
            .about("Cloud Security Command Center API provides access to temporal views of assets and findings within an organization.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_securitycenter1_cli")
            .arg(Arg::with_name("url")

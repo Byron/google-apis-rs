@@ -1,4 +1,4 @@
-site_name: Games v1.0.11+20190627
+site_name: Games v1.0.12+20190627
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: A complete library to interact with Games (protocol v1)
 
@@ -65,5 +65,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
 

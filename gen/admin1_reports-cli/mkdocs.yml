@@ -1,4 +1,4 @@
-site_name: reports v1.0.11+20190521
+site_name: reports v1.0.12+20190521
 site_url: http://byron.github.io/google-apis-rs/google-admin1_reports-cli
 site_description: A complete library to interact with reports (protocol reports_v1)
 
@@ -18,5 +18,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2019, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
 

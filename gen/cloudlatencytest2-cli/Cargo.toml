@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudlatencytest2-cli"
-version = "1.0.11+20160309"
+version = "1.0.12+20160309"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudlatencytest (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlatencytest2-cli"
@@ -41,4 +41,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-cloudlatencytest2]
 path = "../cloudlatencytest2"
-version = "1.0.11+20160309"
+version = "1.0.12+20160309"

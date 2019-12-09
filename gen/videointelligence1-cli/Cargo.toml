@@ -4,7 +4,7 @@
 [package]
 
 name = "google-videointelligence1-cli"
-version = "1.0.11+20190626"
+version = "1.0.12+20190626"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Video Intelligence (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/videointelligence1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-videointelligence1]
 path = "../videointelligence1"
-version = "1.0.11+20190626"
+version = "1.0.12+20190626"

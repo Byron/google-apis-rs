@@ -1493,7 +1493,7 @@ fn main() {
     
     let mut app = App::new("fitness1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190701")
+           .version("1.0.12+20190701")
            .about("Stores and accesses user data in the fitness store from apps on any platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fitness1_cli")
            .arg(Arg::with_name("url")

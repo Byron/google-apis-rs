@@ -465,7 +465,7 @@ fn main() {
     
     let mut app = App::new("cloudasset1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190625")
+           .version("1.0.12+20190625")
            .about("The cloud asset API manages the history and inventory of cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudasset1_cli")
            .arg(Arg::with_name("url")

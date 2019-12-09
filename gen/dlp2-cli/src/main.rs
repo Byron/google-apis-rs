@@ -5167,7 +5167,7 @@ fn main() {
     
     let mut app = App::new("dlp2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.11+20190629")
+           .version("1.0.12+20190629")
            .about("Provides methods for detection, risk analysis, and de-identification of privacy-sensitive fragments in text, images, and Google Cloud Platform storage repositories.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_cli")
            .arg(Arg::with_name("url")

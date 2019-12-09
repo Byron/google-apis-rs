@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container Analysis* API at revision *20190625*. The CLI is at version *1.0.11*.
+This documentation was generated from the *Container Analysis* API at revision *20190625*. The CLI is at version *1.0.12*.
 
 ```bash
 containeranalysis1-beta1 [options]

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *IAM Credentials* crate version *1.0.11+20190620*, where *20190620* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.11*.
+//! This documentation was generated from *IAM Credentials* crate version *1.0.12+20190620*, where *20190620* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
 //! 
 //! Everything else about the *IAM Credentials* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials).
@@ -329,7 +329,7 @@ impl<'a, C, A> IAMCredentials<C, A>
         IAMCredentials {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.11".to_string(),
+            _user_agent: "google-api-rust-client/1.0.12".to_string(),
             _base_url: "https://iamcredentials.googleapis.com/".to_string(),
             _root_url: "https://iamcredentials.googleapis.com/".to_string(),
         }
@@ -340,7 +340,7 @@ impl<'a, C, A> IAMCredentials<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.11`.
+    /// It defaults to `google-api-rust-client/1.0.12`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
