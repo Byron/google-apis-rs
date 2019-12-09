@@ -78,7 +78,7 @@ directories:
   # The subdirectory to contain documentation from all APIs and related programs
   doc_subdir: doc
 cargo:
-  build_version: "1.0.11"
+  build_version: "1.0.12"
   repo_base_url: https://github.com/Byron/google-apis-rs
   authors:
     # don't forget to possibly add them to copyright authors
@@ -90,7 +90,7 @@ urls:
   authenticator_delegate: https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html
 copyright:
   license_abbrev: "MIT"
-  years: '2015-2019'
+  years: '2015-2020'
   authors:
     - 'Sebastian Thiel'
     
