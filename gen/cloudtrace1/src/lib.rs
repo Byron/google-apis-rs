@@ -689,7 +689,7 @@ pub struct ProjectTraceGetCall<'a, C, A>
     hub: &'a CloudTrace<C, A>,
     _project_id: String,
     _trace_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -704,7 +704,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -851,7 +851,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTraceGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectTraceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -955,7 +955,7 @@ pub struct ProjectPatchTraceCall<'a, C, A>
     hub: &'a CloudTrace<C, A>,
     _request: Traces,
     _project_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -970,7 +970,7 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1130,7 +1130,7 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectPatchTraceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectPatchTraceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1237,7 +1237,7 @@ pub struct ProjectTraceListCall<'a, C, A>
     _order_by: Option<String>,
     _filter: Option<String>,
     _end_time: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1252,7 +1252,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1505,7 +1505,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTraceListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectTraceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

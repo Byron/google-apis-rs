@@ -641,8 +641,8 @@ def build_all_params(c, m):
         params.insert(0, schema_to_required_property(request_value, REQUEST_VALUE_PROPERTY_NAME))
     # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
     dp = type(m)({ 'name': DELEGATE_PROPERTY_NAME,
-           TREF: "&'a mut %s" % DELEGATE_TYPE,
-          'input_type': "&'a mut %s" % DELEGATE_TYPE,
+           TREF: "&'a mut dyn %s" % DELEGATE_TYPE,
+          'input_type': "&'a mut dyn %s" % DELEGATE_TYPE,
           'clone_value': '{}',
           'skip_example' : True,
           'priority': 0,
@@ -855,10 +855,10 @@ def to_extern_crate_name(crate_name):
 
 def docs_rs_url(base_url, crate_name, version):
     return base_url + '/' + crate_name + '/' + version
-    
+
 def crate_name(name, version, make):
     return library_to_crate_name(library_name(name, version), make.target_suffix)
-    
+
 def gen_crate_dir(name, version, ti):
     return to_extern_crate_name(library_to_crate_name(library_name(name, version), ti.target_suffix))
 

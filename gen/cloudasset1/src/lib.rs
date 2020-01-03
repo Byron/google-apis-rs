@@ -1396,7 +1396,7 @@ pub struct OperationGetCall<'a, C, A>
 
     hub: &'a CloudAsset<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1412,7 +1412,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1551,7 +1551,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1658,7 +1658,7 @@ pub struct MethodBatchGetAssetsHistoryCall<'a, C, A>
     _read_time_window_end_time: Option<String>,
     _content_type: Option<String>,
     _asset_names: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1674,7 +1674,7 @@ impl<'a, C, A> MethodBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1868,7 +1868,7 @@ impl<'a, C, A> MethodBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodBatchGetAssetsHistoryCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> MethodBatchGetAssetsHistoryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1971,7 +1971,7 @@ pub struct MethodExportAssetCall<'a, C, A>
     hub: &'a CloudAsset<C, A>,
     _request: ExportAssetsRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1987,7 +1987,7 @@ impl<'a, C, A> MethodExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2153,7 +2153,7 @@ impl<'a, C, A> MethodExportAssetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodExportAssetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> MethodExportAssetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

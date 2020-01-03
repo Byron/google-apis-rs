@@ -8670,7 +8670,7 @@ pub struct ChannelSectionListCall<'a, C, A>
     _id: Option<String>,
     _hl: Option<String>,
     _channel_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8685,7 +8685,7 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8860,7 +8860,7 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelSectionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8977,7 +8977,7 @@ pub struct ChannelSectionInsertCall<'a, C, A>
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8992,7 +8992,7 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9175,7 +9175,7 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelSectionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9266,7 +9266,7 @@ pub struct ChannelSectionDeleteCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9281,7 +9281,7 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9397,7 +9397,7 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelSectionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9512,7 +9512,7 @@ pub struct ChannelSectionUpdateCall<'a, C, A>
     _request: ChannelSection,
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9527,7 +9527,7 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9696,7 +9696,7 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelSectionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9796,7 +9796,7 @@ pub struct PlaylistInsertCall<'a, C, A>
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9811,7 +9811,7 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9982,7 +9982,7 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10087,7 +10087,7 @@ pub struct PlaylistListCall<'a, C, A>
     _id: Option<String>,
     _hl: Option<String>,
     _channel_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10102,7 +10102,7 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10305,7 +10305,7 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10396,7 +10396,7 @@ pub struct PlaylistDeleteCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10411,7 +10411,7 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10527,7 +10527,7 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10625,7 +10625,7 @@ pub struct PlaylistUpdateCall<'a, C, A>
     _request: Playlist,
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10640,7 +10640,7 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10799,7 +10799,7 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10896,7 +10896,7 @@ pub struct VideoReportAbuseCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: VideoAbuseReport,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10911,7 +10911,7 @@ impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11040,7 +11040,7 @@ impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoReportAbuseCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoReportAbuseCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11153,7 +11153,7 @@ pub struct VideoListCall<'a, C, A>
     _id: Option<String>,
     _hl: Option<String>,
     _chart: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11168,7 +11168,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11413,7 +11413,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11503,7 +11503,7 @@ pub struct VideoRateCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _id: String,
     _rating: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11518,7 +11518,7 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11633,7 +11633,7 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoRateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoRateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11724,7 +11724,7 @@ pub struct VideoGetRatingCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11739,7 +11739,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11866,7 +11866,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoGetRatingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoGetRatingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11957,7 +11957,7 @@ pub struct VideoDeleteCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11972,7 +11972,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12088,7 +12088,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12186,7 +12186,7 @@ pub struct VideoUpdateCall<'a, C, A>
     _request: Video,
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12201,7 +12201,7 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12362,7 +12362,7 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12469,7 +12469,7 @@ pub struct VideoInsertCall<'a, C, A>
     _on_behalf_of_content_owner: Option<String>,
     _notify_subscribers: Option<bool>,
     _auto_levels: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12485,7 +12485,7 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12593,9 +12593,9 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                            (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
                         },
-                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                        _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
@@ -12800,7 +12800,7 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12905,7 +12905,7 @@ pub struct ActivityListCall<'a, C, A>
     _max_results: Option<u32>,
     _home: Option<bool>,
     _channel_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12920,7 +12920,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13117,7 +13117,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13215,7 +13215,7 @@ pub struct ActivityInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: Activity,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13230,7 +13230,7 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13375,7 +13375,7 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ActivityInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13495,7 +13495,7 @@ pub struct LiveStreamUpdateCall<'a, C, A>
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13510,7 +13510,7 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13699,7 +13699,7 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveStreamUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13792,7 +13792,7 @@ pub struct LiveStreamDeleteCall<'a, C, A>
     _id: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13807,7 +13807,7 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13937,7 +13937,7 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveStreamDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14055,7 +14055,7 @@ pub struct LiveStreamListCall<'a, C, A>
     _mine: Option<bool>,
     _max_results: Option<u32>,
     _id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14070,7 +14070,7 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14258,7 +14258,7 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveStreamListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14378,7 +14378,7 @@ pub struct LiveStreamInsertCall<'a, C, A>
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14393,7 +14393,7 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14580,7 +14580,7 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveStreamInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14678,7 +14678,7 @@ pub struct ChannelUpdateCall<'a, C, A>
     _request: Channel,
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14693,7 +14693,7 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14852,7 +14852,7 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14961,7 +14961,7 @@ pub struct ChannelListCall<'a, C, A>
     _hl: Option<String>,
     _for_username: Option<String>,
     _category_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14976,7 +14976,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15197,7 +15197,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15296,7 +15296,7 @@ pub struct WatermarkSetCall<'a, C, A>
     _request: InvideoBranding,
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15312,7 +15312,7 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15404,9 +15404,9 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                            (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
                         },
-                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                        _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
@@ -15564,7 +15564,7 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkSetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> WatermarkSetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15655,7 +15655,7 @@ pub struct WatermarkUnsetCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15670,7 +15670,7 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15786,7 +15786,7 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkUnsetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> WatermarkUnsetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15882,7 +15882,7 @@ pub struct LiveChatModeratorInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: LiveChatModerator,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15897,7 +15897,7 @@ impl<'a, C, A> LiveChatModeratorInsertCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16042,7 +16042,7 @@ impl<'a, C, A> LiveChatModeratorInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatModeratorInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatModeratorInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16151,7 +16151,7 @@ pub struct LiveChatModeratorListCall<'a, C, A>
     _part: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16166,7 +16166,7 @@ impl<'a, C, A> LiveChatModeratorListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16317,7 +16317,7 @@ impl<'a, C, A> LiveChatModeratorListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatModeratorListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatModeratorListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16406,7 +16406,7 @@ pub struct LiveChatModeratorDeleteCall<'a, C, A>
 
     hub: &'a YouTube<C, A>,
     _id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16421,7 +16421,7 @@ impl<'a, C, A> LiveChatModeratorDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16525,7 +16525,7 @@ impl<'a, C, A> LiveChatModeratorDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatModeratorDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatModeratorDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16618,7 +16618,7 @@ pub struct CaptionDeleteCall<'a, C, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16633,7 +16633,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16759,7 +16759,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CaptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16862,7 +16862,7 @@ pub struct CaptionInsertCall<'a, C, A>
     _sync: Option<bool>,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16878,7 +16878,7 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16980,9 +16980,9 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                            (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
                         },
-                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                        _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
@@ -17169,7 +17169,7 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CaptionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17269,7 +17269,7 @@ pub struct CaptionDownloadCall<'a, C, A>
     _tfmt: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17284,7 +17284,7 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17451,7 +17451,7 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionDownloadCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CaptionDownloadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17561,7 +17561,7 @@ pub struct CaptionListCall<'a, C, A>
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
     _id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17576,7 +17576,7 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17739,7 +17739,7 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CaptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17842,7 +17842,7 @@ pub struct CaptionUpdateCall<'a, C, A>
     _sync: Option<bool>,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17858,7 +17858,7 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17960,9 +17960,9 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                            (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
                         },
-                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                        _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
@@ -18149,7 +18149,7 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CaptionUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CaptionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18240,7 +18240,7 @@ pub struct I18nLanguageListCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _part: String,
     _hl: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18255,7 +18255,7 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18380,7 +18380,7 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nLanguageListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> I18nLanguageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18475,7 +18475,7 @@ pub struct GuideCategoryListCall<'a, C, A>
     _region_code: Option<String>,
     _id: Option<String>,
     _hl: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18490,7 +18490,7 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18635,7 +18635,7 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GuideCategoryListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> GuideCategoryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18744,7 +18744,7 @@ pub struct CommentThreadListCall<'a, C, A>
     _id: Option<String>,
     _channel_id: Option<String>,
     _all_threads_related_to_channel_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18759,7 +18759,7 @@ impl<'a, C, A> CommentThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18984,7 +18984,7 @@ impl<'a, C, A> CommentThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentThreadListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentThreadListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19080,7 +19080,7 @@ pub struct CommentThreadUpdateCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: CommentThread,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19095,7 +19095,7 @@ impl<'a, C, A> CommentThreadUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19240,7 +19240,7 @@ impl<'a, C, A> CommentThreadUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentThreadUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentThreadUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19336,7 +19336,7 @@ pub struct CommentThreadInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: CommentThread,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19351,7 +19351,7 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19496,7 +19496,7 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentThreadInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentThreadInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19592,7 +19592,7 @@ pub struct CommentInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: Comment,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19607,7 +19607,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19752,7 +19752,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19841,7 +19841,7 @@ pub struct CommentDeleteCall<'a, C, A>
 
     hub: &'a YouTube<C, A>,
     _id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19856,7 +19856,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19960,7 +19960,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20059,7 +20059,7 @@ pub struct CommentListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20074,7 +20074,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20245,7 +20245,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20337,7 +20337,7 @@ pub struct CommentSetModerationStatuCall<'a, C, A>
     _id: String,
     _moderation_status: String,
     _ban_author: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20352,7 +20352,7 @@ impl<'a, C, A> CommentSetModerationStatuCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20479,7 +20479,7 @@ impl<'a, C, A> CommentSetModerationStatuCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentSetModerationStatuCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentSetModerationStatuCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20575,7 +20575,7 @@ pub struct CommentUpdateCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: Comment,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20590,7 +20590,7 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20735,7 +20735,7 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20824,7 +20824,7 @@ pub struct CommentMarkAsSpamCall<'a, C, A>
 
     hub: &'a YouTube<C, A>,
     _id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20839,7 +20839,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20943,7 +20943,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentMarkAsSpamCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CommentMarkAsSpamCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21041,7 +21041,7 @@ pub struct PlaylistItemInsertCall<'a, C, A>
     _request: PlaylistItem,
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21056,7 +21056,7 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21213,7 +21213,7 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistItemInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21304,7 +21304,7 @@ pub struct PlaylistItemDeleteCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21319,7 +21319,7 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21435,7 +21435,7 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistItemDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21536,7 +21536,7 @@ pub struct PlaylistItemListCall<'a, C, A>
     _on_behalf_of_content_owner: Option<String>,
     _max_results: Option<u32>,
     _id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21551,7 +21551,7 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21730,7 +21730,7 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistItemListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21828,7 +21828,7 @@ pub struct PlaylistItemUpdateCall<'a, C, A>
     _request: PlaylistItem,
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21843,7 +21843,7 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22002,7 +22002,7 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PlaylistItemUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22115,7 +22115,7 @@ pub struct LiveChatMessageListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _hl: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22130,7 +22130,7 @@ impl<'a, C, A> LiveChatMessageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22303,7 +22303,7 @@ impl<'a, C, A> LiveChatMessageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatMessageListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatMessageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22392,7 +22392,7 @@ pub struct LiveChatMessageDeleteCall<'a, C, A>
 
     hub: &'a YouTube<C, A>,
     _id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22407,7 +22407,7 @@ impl<'a, C, A> LiveChatMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22511,7 +22511,7 @@ impl<'a, C, A> LiveChatMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatMessageDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatMessageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22607,7 +22607,7 @@ pub struct LiveChatMessageInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: LiveChatMessage,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22622,7 +22622,7 @@ impl<'a, C, A> LiveChatMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22767,7 +22767,7 @@ impl<'a, C, A> LiveChatMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatMessageInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatMessageInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22862,7 +22862,7 @@ pub struct VideoCategoryListCall<'a, C, A>
     _region_code: Option<String>,
     _id: Option<String>,
     _hl: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22877,7 +22877,7 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23022,7 +23022,7 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoCategoryListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoCategoryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23113,7 +23113,7 @@ pub struct I18nRegionListCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _part: String,
     _hl: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23128,7 +23128,7 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23253,7 +23253,7 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nRegionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> I18nRegionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23349,7 +23349,7 @@ pub struct SubscriptionInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: Subscription,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23364,7 +23364,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23509,7 +23509,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SubscriptionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23598,7 +23598,7 @@ pub struct SubscriptionDeleteCall<'a, C, A>
 
     hub: &'a YouTube<C, A>,
     _id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23613,7 +23613,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23717,7 +23717,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SubscriptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23828,7 +23828,7 @@ pub struct SubscriptionListCall<'a, C, A>
     _id: Option<String>,
     _for_channel_id: Option<String>,
     _channel_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23843,7 +23843,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24076,7 +24076,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SubscriptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24172,7 +24172,7 @@ pub struct LiveChatBanInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: LiveChatBan,
     _part: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24187,7 +24187,7 @@ impl<'a, C, A> LiveChatBanInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24332,7 +24332,7 @@ impl<'a, C, A> LiveChatBanInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatBanInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatBanInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24421,7 +24421,7 @@ pub struct LiveChatBanDeleteCall<'a, C, A>
 
     hub: &'a YouTube<C, A>,
     _id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24436,7 +24436,7 @@ impl<'a, C, A> LiveChatBanDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24540,7 +24540,7 @@ impl<'a, C, A> LiveChatBanDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveChatBanDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveChatBanDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24650,7 +24650,7 @@ pub struct SponsorListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24665,7 +24665,7 @@ impl<'a, C, A> SponsorListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24815,7 +24815,7 @@ impl<'a, C, A> SponsorListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SponsorListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SponsorListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24921,7 +24921,7 @@ pub struct VideoAbuseReportReasonListCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _part: String,
     _hl: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24936,7 +24936,7 @@ impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -25066,7 +25066,7 @@ impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoAbuseReportReasonListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> VideoAbuseReportReasonListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25182,7 +25182,7 @@ pub struct LiveBroadcastControlCall<'a, C, A>
     _on_behalf_of_content_owner: Option<String>,
     _offset_time_ms: Option<String>,
     _display_slate: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -25197,7 +25197,7 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -25390,7 +25390,7 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastControlCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveBroadcastControlCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25510,7 +25510,7 @@ pub struct LiveBroadcastUpdateCall<'a, C, A>
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -25525,7 +25525,7 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -25714,7 +25714,7 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveBroadcastUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25825,7 +25825,7 @@ pub struct LiveBroadcastTransitionCall<'a, C, A>
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -25840,7 +25840,7 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26010,7 +26010,7 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastTransitionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveBroadcastTransitionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26130,7 +26130,7 @@ pub struct LiveBroadcastInsertCall<'a, C, A>
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -26145,7 +26145,7 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26332,7 +26332,7 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveBroadcastInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26425,7 +26425,7 @@ pub struct LiveBroadcastDeleteCall<'a, C, A>
     _id: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -26440,7 +26440,7 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26570,7 +26570,7 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveBroadcastDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26692,7 +26692,7 @@ pub struct LiveBroadcastListCall<'a, C, A>
     _id: Option<String>,
     _broadcast_type: Option<String>,
     _broadcast_status: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -26707,7 +26707,7 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26915,7 +26915,7 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveBroadcastListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -27027,7 +27027,7 @@ pub struct LiveBroadcastBindCall<'a, C, A>
     _stream_id: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -27042,7 +27042,7 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -27211,7 +27211,7 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastBindCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiveBroadcastBindCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -27315,7 +27315,7 @@ pub struct ChannelBannerInsertCall<'a, C, A>
     _request: ChannelBannerResource,
     _on_behalf_of_content_owner: Option<String>,
     _channel_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -27331,7 +27331,7 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -27426,9 +27426,9 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                            (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
                         },
-                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                        _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
@@ -27593,7 +27593,7 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelBannerInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelBannerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -27742,7 +27742,7 @@ pub struct SearchListCall<'a, C, A>
     _event_type: Option<String>,
     _channel_type: Option<String>,
     _channel_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -27757,7 +27757,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -28186,7 +28186,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SearchListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SearchListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -28296,7 +28296,7 @@ pub struct SuperChatEventListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _hl: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -28311,7 +28311,7 @@ impl<'a, C, A> SuperChatEventListCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -28463,7 +28463,7 @@ impl<'a, C, A> SuperChatEventListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SuperChatEventListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SuperChatEventListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -28555,7 +28555,7 @@ pub struct ThumbnailSetCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _video_id: String,
     _on_behalf_of_content_owner: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -28571,7 +28571,7 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -28805,7 +28805,7 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThumbnailSetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ThumbnailSetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

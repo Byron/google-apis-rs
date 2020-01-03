@@ -2961,7 +2961,7 @@ pub struct ProjectScanConfigListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2977,7 +2977,7 @@ impl<'a, C, A> ProjectScanConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3147,7 +3147,7 @@ impl<'a, C, A> ProjectScanConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectScanConfigListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectScanConfigListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3253,7 +3253,7 @@ pub struct ProjectNoteTestIamPermissionCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3269,7 +3269,7 @@ impl<'a, C, A> ProjectNoteTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3433,7 +3433,7 @@ impl<'a, C, A> ProjectNoteTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteTestIamPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3540,7 +3540,7 @@ pub struct ProjectOccurrenceSetIamPolicyCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3556,7 +3556,7 @@ impl<'a, C, A> ProjectOccurrenceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3720,7 +3720,7 @@ impl<'a, C, A> ProjectOccurrenceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceSetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3820,7 +3820,7 @@ pub struct ProjectOccurrenceBatchCreateCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: BatchCreateOccurrencesRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3836,7 +3836,7 @@ impl<'a, C, A> ProjectOccurrenceBatchCreateCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4000,7 +4000,7 @@ impl<'a, C, A> ProjectOccurrenceBatchCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceBatchCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceBatchCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4093,7 +4093,7 @@ pub struct ProjectNoteGetCall<'a, C, A>
 
     hub: &'a ContainerAnalysis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4109,7 +4109,7 @@ impl<'a, C, A> ProjectNoteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4249,7 +4249,7 @@ impl<'a, C, A> ProjectNoteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4342,7 +4342,7 @@ pub struct ProjectOccurrenceGetCall<'a, C, A>
 
     hub: &'a ContainerAnalysis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4358,7 +4358,7 @@ impl<'a, C, A> ProjectOccurrenceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4498,7 +4498,7 @@ impl<'a, C, A> ProjectOccurrenceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4600,7 +4600,7 @@ pub struct ProjectNotePatchCall<'a, C, A>
     _request: Note,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4616,7 +4616,7 @@ impl<'a, C, A> ProjectNotePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4790,7 +4790,7 @@ impl<'a, C, A> ProjectNotePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNotePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNotePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4891,7 +4891,7 @@ pub struct ProjectNoteOccurrenceListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4907,7 +4907,7 @@ impl<'a, C, A> ProjectNoteOccurrenceListCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5077,7 +5077,7 @@ impl<'a, C, A> ProjectNoteOccurrenceListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteOccurrenceListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteOccurrenceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5176,7 +5176,7 @@ pub struct ProjectNoteListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5192,7 +5192,7 @@ impl<'a, C, A> ProjectNoteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5363,7 +5363,7 @@ impl<'a, C, A> ProjectNoteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5465,7 +5465,7 @@ pub struct ProjectOccurrencePatchCall<'a, C, A>
     _request: Occurrence,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5481,7 +5481,7 @@ impl<'a, C, A> ProjectOccurrencePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5655,7 +5655,7 @@ impl<'a, C, A> ProjectOccurrencePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrencePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrencePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5750,7 +5750,7 @@ pub struct ProjectOccurrenceGetVulnerabilitySummaryCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _parent: String,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5766,7 +5766,7 @@ impl<'a, C, A> ProjectOccurrenceGetVulnerabilitySummaryCall<'a, C, A> where C: B
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5916,7 +5916,7 @@ impl<'a, C, A> ProjectOccurrenceGetVulnerabilitySummaryCall<'a, C, A> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceGetVulnerabilitySummaryCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceGetVulnerabilitySummaryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6016,7 +6016,7 @@ pub struct ProjectOccurrenceCreateCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: Occurrence,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6032,7 +6032,7 @@ impl<'a, C, A> ProjectOccurrenceCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6196,7 +6196,7 @@ impl<'a, C, A> ProjectOccurrenceCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6303,7 +6303,7 @@ pub struct ProjectNoteGetIamPolicyCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: GetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6319,7 +6319,7 @@ impl<'a, C, A> ProjectNoteGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6483,7 +6483,7 @@ impl<'a, C, A> ProjectNoteGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6590,7 +6590,7 @@ pub struct ProjectNoteSetIamPolicyCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6606,7 +6606,7 @@ impl<'a, C, A> ProjectNoteSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6770,7 +6770,7 @@ impl<'a, C, A> ProjectNoteSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteSetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6864,7 +6864,7 @@ pub struct ProjectOccurrenceGetNoteCall<'a, C, A>
 
     hub: &'a ContainerAnalysis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6880,7 +6880,7 @@ impl<'a, C, A> ProjectOccurrenceGetNoteCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7020,7 +7020,7 @@ impl<'a, C, A> ProjectOccurrenceGetNoteCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceGetNoteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceGetNoteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7120,7 +7120,7 @@ pub struct ProjectScanConfigUpdateCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: ScanConfig,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7136,7 +7136,7 @@ impl<'a, C, A> ProjectScanConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7300,7 +7300,7 @@ impl<'a, C, A> ProjectScanConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectScanConfigUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectScanConfigUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7399,7 +7399,7 @@ pub struct ProjectOccurrenceListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7415,7 +7415,7 @@ impl<'a, C, A> ProjectOccurrenceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7586,7 +7586,7 @@ impl<'a, C, A> ProjectOccurrenceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7681,7 +7681,7 @@ pub struct ProjectOccurrenceDeleteCall<'a, C, A>
 
     hub: &'a ContainerAnalysis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7697,7 +7697,7 @@ impl<'a, C, A> ProjectOccurrenceDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7837,7 +7837,7 @@ impl<'a, C, A> ProjectOccurrenceDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7937,7 +7937,7 @@ pub struct ProjectNoteBatchCreateCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: BatchCreateNotesRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7953,7 +7953,7 @@ impl<'a, C, A> ProjectNoteBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8117,7 +8117,7 @@ impl<'a, C, A> ProjectNoteBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteBatchCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteBatchCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8210,7 +8210,7 @@ pub struct ProjectNoteDeleteCall<'a, C, A>
 
     hub: &'a ContainerAnalysis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8226,7 +8226,7 @@ impl<'a, C, A> ProjectNoteDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8366,7 +8366,7 @@ impl<'a, C, A> ProjectNoteDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8459,7 +8459,7 @@ pub struct ProjectScanConfigGetCall<'a, C, A>
 
     hub: &'a ContainerAnalysis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8475,7 +8475,7 @@ impl<'a, C, A> ProjectScanConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8615,7 +8615,7 @@ impl<'a, C, A> ProjectScanConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectScanConfigGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectScanConfigGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8722,7 +8722,7 @@ pub struct ProjectOccurrenceGetIamPolicyCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: GetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8738,7 +8738,7 @@ impl<'a, C, A> ProjectOccurrenceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8902,7 +8902,7 @@ impl<'a, C, A> ProjectOccurrenceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9004,7 +9004,7 @@ pub struct ProjectNoteCreateCall<'a, C, A>
     _request: Note,
     _parent: String,
     _note_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9020,7 +9020,7 @@ impl<'a, C, A> ProjectNoteCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9194,7 +9194,7 @@ impl<'a, C, A> ProjectNoteCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectNoteCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectNoteCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9300,7 +9300,7 @@ pub struct ProjectOccurrenceTestIamPermissionCall<'a, C, A>
     hub: &'a ContainerAnalysis<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9316,7 +9316,7 @@ impl<'a, C, A> ProjectOccurrenceTestIamPermissionCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9480,7 +9480,7 @@ impl<'a, C, A> ProjectOccurrenceTestIamPermissionCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOccurrenceTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectOccurrenceTestIamPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

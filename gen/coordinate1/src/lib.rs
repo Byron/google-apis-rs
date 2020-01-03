@@ -1389,7 +1389,7 @@ pub struct JobGetCall<'a, C, A>
     hub: &'a Coordinate<C, A>,
     _team_id: String,
     _job_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1404,7 +1404,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1551,7 +1551,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> JobGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1668,7 +1668,7 @@ pub struct JobUpdateCall<'a, C, A>
     _custom_field: Vec<String>,
     _assignee: Option<String>,
     _address: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1683,7 +1683,7 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1957,7 +1957,7 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> JobUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2074,7 +2074,7 @@ pub struct JobPatchCall<'a, C, A>
     _custom_field: Vec<String>,
     _assignee: Option<String>,
     _address: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2089,7 +2089,7 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2363,7 +2363,7 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> JobPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2460,7 +2460,7 @@ pub struct JobListCall<'a, C, A>
     _omit_job_changes: Option<bool>,
     _min_modified_timestamp_ms: Option<String>,
     _max_results: Option<u32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2475,7 +2475,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2651,7 +2651,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> JobListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2761,7 +2761,7 @@ pub struct JobInsertCall<'a, C, A>
     _customer_name: Option<String>,
     _custom_field: Vec<String>,
     _assignee: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2776,7 +2776,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3033,7 +3033,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> JobInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3138,7 +3138,7 @@ pub struct ScheduleUpdateCall<'a, C, A>
     _end_time: Option<String>,
     _duration: Option<String>,
     _all_day: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3153,7 +3153,7 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3364,7 +3364,7 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScheduleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3469,7 +3469,7 @@ pub struct SchedulePatchCall<'a, C, A>
     _end_time: Option<String>,
     _duration: Option<String>,
     _all_day: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3484,7 +3484,7 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3695,7 +3695,7 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchedulePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SchedulePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3785,7 +3785,7 @@ pub struct ScheduleGetCall<'a, C, A>
     hub: &'a Coordinate<C, A>,
     _team_id: String,
     _job_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3800,7 +3800,7 @@ impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3947,7 +3947,7 @@ impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScheduleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4036,7 +4036,7 @@ pub struct WorkerListCall<'a, C, A>
 
     hub: &'a Coordinate<C, A>,
     _team_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4051,7 +4051,7 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4187,7 +4187,7 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WorkerListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> WorkerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4282,7 +4282,7 @@ pub struct LocationListCall<'a, C, A>
     _start_timestamp_ms: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4297,7 +4297,7 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4475,7 +4475,7 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LocationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4569,7 +4569,7 @@ pub struct TeamListCall<'a, C, A>
     _worker: Option<bool>,
     _dispatcher: Option<bool>,
     _admin: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4584,7 +4584,7 @@ impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4718,7 +4718,7 @@ impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TeamListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> TeamListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4807,7 +4807,7 @@ pub struct CustomFieldDefListCall<'a, C, A>
 
     hub: &'a Coordinate<C, A>,
     _team_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4822,7 +4822,7 @@ impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4958,7 +4958,7 @@ impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomFieldDefListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> CustomFieldDefListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

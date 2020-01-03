@@ -1031,7 +1031,7 @@ pub struct FolderVersionSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1047,7 +1047,7 @@ impl<'a, C, A> FolderVersionSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1225,7 +1225,7 @@ impl<'a, C, A> FolderVersionSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderVersionSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderVersionSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1325,7 +1325,7 @@ pub struct FolderCatalogSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1341,7 +1341,7 @@ impl<'a, C, A> FolderCatalogSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1518,7 +1518,7 @@ impl<'a, C, A> FolderCatalogSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderCatalogSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderCatalogSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1618,7 +1618,7 @@ pub struct FolderProductSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1634,7 +1634,7 @@ impl<'a, C, A> FolderProductSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1812,7 +1812,7 @@ impl<'a, C, A> FolderProductSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderProductSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderProductSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1912,7 +1912,7 @@ pub struct OrganizationCatalogSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1928,7 +1928,7 @@ impl<'a, C, A> OrganizationCatalogSearchCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2105,7 +2105,7 @@ impl<'a, C, A> OrganizationCatalogSearchCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationCatalogSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationCatalogSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2205,7 +2205,7 @@ pub struct OrganizationVersionSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2221,7 +2221,7 @@ impl<'a, C, A> OrganizationVersionSearchCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2399,7 +2399,7 @@ impl<'a, C, A> OrganizationVersionSearchCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationVersionSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationVersionSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2499,7 +2499,7 @@ pub struct OrganizationProductSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2515,7 +2515,7 @@ impl<'a, C, A> OrganizationProductSearchCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2693,7 +2693,7 @@ impl<'a, C, A> OrganizationProductSearchCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationProductSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationProductSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2793,7 +2793,7 @@ pub struct ProjectProductSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2809,7 +2809,7 @@ impl<'a, C, A> ProjectProductSearchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2987,7 +2987,7 @@ impl<'a, C, A> ProjectProductSearchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectProductSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectProductSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3087,7 +3087,7 @@ pub struct ProjectVersionSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3103,7 +3103,7 @@ impl<'a, C, A> ProjectVersionSearchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3281,7 +3281,7 @@ impl<'a, C, A> ProjectVersionSearchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectVersionSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectVersionSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3381,7 +3381,7 @@ pub struct ProjectCatalogSearchCall<'a, C, A>
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3397,7 +3397,7 @@ impl<'a, C, A> ProjectCatalogSearchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3574,7 +3574,7 @@ impl<'a, C, A> ProjectCatalogSearchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectCatalogSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectCatalogSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

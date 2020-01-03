@@ -493,7 +493,7 @@ match result {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match ${delegate} {
+        let mut dlg: &mut dyn Delegate = match ${delegate} {
             Some(d) => d,
             None => &mut dd
         };
@@ -722,9 +722,9 @@ else {
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                  .add_part(&mut reader, size, reader_mime_type.clone());
                         let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                        (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
                     },
-                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                    _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
                 };
             % endif
                 let mut client = &mut *self.hub.client.borrow_mut();

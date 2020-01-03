@@ -1264,7 +1264,7 @@ pub struct ProjectLocationInstanceImportCall<'a, C, A>
     hub: &'a CloudRedis<C, A>,
     _request: ImportInstanceRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1280,7 +1280,7 @@ impl<'a, C, A> ProjectLocationInstanceImportCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1445,7 +1445,7 @@ impl<'a, C, A> ProjectLocationInstanceImportCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceImportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstanceImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1539,7 +1539,7 @@ pub struct ProjectLocationInstanceDeleteCall<'a, C, A>
 
     hub: &'a CloudRedis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1555,7 +1555,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1696,7 +1696,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstanceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1801,7 +1801,7 @@ pub struct ProjectLocationInstanceExportCall<'a, C, A>
     hub: &'a CloudRedis<C, A>,
     _request: ExportInstanceRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1817,7 +1817,7 @@ impl<'a, C, A> ProjectLocationInstanceExportCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1982,7 +1982,7 @@ impl<'a, C, A> ProjectLocationInstanceExportCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceExportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstanceExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2075,7 +2075,7 @@ pub struct ProjectLocationGetCall<'a, C, A>
 
     hub: &'a CloudRedis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2091,7 +2091,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2230,7 +2230,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2326,7 +2326,7 @@ pub struct ProjectLocationOperationDeleteCall<'a, C, A>
 
     hub: &'a CloudRedis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2342,7 +2342,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2481,7 +2481,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationOperationDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2574,7 +2574,7 @@ pub struct ProjectLocationInstanceGetCall<'a, C, A>
 
     hub: &'a CloudRedis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2590,7 +2590,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2731,7 +2731,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstanceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2832,7 +2832,7 @@ pub struct ProjectLocationInstanceFailoverCall<'a, C, A>
     hub: &'a CloudRedis<C, A>,
     _request: FailoverInstanceRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2848,7 +2848,7 @@ impl<'a, C, A> ProjectLocationInstanceFailoverCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3013,7 +3013,7 @@ impl<'a, C, A> ProjectLocationInstanceFailoverCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceFailoverCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstanceFailoverCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3119,7 +3119,7 @@ pub struct ProjectLocationInstancePatchCall<'a, C, A>
     _request: Instance,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3135,7 +3135,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3323,7 +3323,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstancePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstancePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3422,7 +3422,7 @@ pub struct ProjectLocationListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3438,7 +3438,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3607,7 +3607,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3720,7 +3720,7 @@ pub struct ProjectLocationInstanceCreateCall<'a, C, A>
     _request: Instance,
     _parent: String,
     _instance_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3736,7 +3736,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3918,7 +3918,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstanceCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4013,7 +4013,7 @@ pub struct ProjectLocationOperationGetCall<'a, C, A>
 
     hub: &'a CloudRedis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4029,7 +4029,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4168,7 +4168,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationOperationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4276,7 +4276,7 @@ pub struct ProjectLocationOperationListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4292,7 +4292,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4461,7 +4461,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationOperationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4565,7 +4565,7 @@ pub struct ProjectLocationInstanceListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4581,7 +4581,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4749,7 +4749,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationInstanceListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationInstanceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4851,7 +4851,7 @@ pub struct ProjectLocationOperationCancelCall<'a, C, A>
 
     hub: &'a CloudRedis<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4867,7 +4867,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5006,7 +5006,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationOperationCancelCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

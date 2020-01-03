@@ -3729,7 +3729,7 @@ pub struct AccountContainerWorkspaceZoneCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Zone,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3745,7 +3745,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneCreateCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3908,7 +3908,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneCreateCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceZoneCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceZoneCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4010,7 +4010,7 @@ pub struct AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A>
     _variable_id: Vec<String>,
     _trigger_id: Vec<String>,
     _tag_id: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4026,7 +4026,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4217,7 +4217,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4306,7 +4306,7 @@ pub struct AccountContainerVersionHeaderLatestCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4322,7 +4322,7 @@ impl<'a, C, A> AccountContainerVersionHeaderLatestCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4461,7 +4461,7 @@ impl<'a, C, A> AccountContainerVersionHeaderLatestCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionHeaderLatestCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionHeaderLatestCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4557,7 +4557,7 @@ pub struct AccountContainerWorkspaceTriggerCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Trigger,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4573,7 +4573,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4736,7 +4736,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4827,7 +4827,7 @@ pub struct AccountContainerWorkspaceListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4843,7 +4843,7 @@ impl<'a, C, A> AccountContainerWorkspaceListCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4992,7 +4992,7 @@ impl<'a, C, A> AccountContainerWorkspaceListCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5083,7 +5083,7 @@ pub struct AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _type_: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5099,7 +5099,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> wher
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5248,7 +5248,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5339,7 +5339,7 @@ pub struct AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _type_: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5355,7 +5355,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> wher
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5496,7 +5496,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5592,7 +5592,7 @@ pub struct AccountContainerEnvironmentCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Environment,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5608,7 +5608,7 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5771,7 +5771,7 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5862,7 +5862,7 @@ pub struct AccountContainerVersionPublishCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5878,7 +5878,7 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6027,7 +6027,7 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionPublishCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6116,7 +6116,7 @@ pub struct AccountContainerWorkspaceTemplateGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6132,7 +6132,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateGetCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6271,7 +6271,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateGetCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6362,7 +6362,7 @@ pub struct AccountContainerWorkspaceZoneRevertCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6378,7 +6378,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneRevertCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6527,7 +6527,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneRevertCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceZoneRevertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceZoneRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6623,7 +6623,7 @@ pub struct AccountContainerWorkspaceTagCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Tag,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6639,7 +6639,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagCreateCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6802,7 +6802,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagCreateCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTagCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTagCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6891,7 +6891,7 @@ pub struct AccountContainerEnvironmentDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6907,7 +6907,7 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7035,7 +7035,7 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7124,7 +7124,7 @@ pub struct AccountContainerWorkspaceGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7140,7 +7140,7 @@ impl<'a, C, A> AccountContainerWorkspaceGetCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7279,7 +7279,7 @@ impl<'a, C, A> AccountContainerWorkspaceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7368,7 +7368,7 @@ pub struct AccountContainerGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7384,7 +7384,7 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7523,7 +7523,7 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7619,7 +7619,7 @@ pub struct AccountUserPermissionCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: UserPermission,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7635,7 +7635,7 @@ impl<'a, C, A> AccountUserPermissionCreateCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7798,7 +7798,7 @@ impl<'a, C, A> AccountUserPermissionCreateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserPermissionCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountUserPermissionCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7889,7 +7889,7 @@ pub struct AccountContainerWorkspaceFolderListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7905,7 +7905,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderListCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8054,7 +8054,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderListCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8150,7 +8150,7 @@ pub struct AccountContainerEnvironmentReauthorizeCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Environment,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8166,7 +8166,7 @@ impl<'a, C, A> AccountContainerEnvironmentReauthorizeCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8329,7 +8329,7 @@ impl<'a, C, A> AccountContainerEnvironmentReauthorizeCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentReauthorizeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerEnvironmentReauthorizeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8418,7 +8418,7 @@ pub struct AccountContainerWorkspaceDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8434,7 +8434,7 @@ impl<'a, C, A> AccountContainerWorkspaceDeleteCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8562,7 +8562,7 @@ impl<'a, C, A> AccountContainerWorkspaceDeleteCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8658,7 +8658,7 @@ pub struct AccountContainerWorkspaceCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Workspace,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8674,7 +8674,7 @@ impl<'a, C, A> AccountContainerWorkspaceCreateCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8837,7 +8837,7 @@ impl<'a, C, A> AccountContainerWorkspaceCreateCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8928,7 +8928,7 @@ pub struct AccountUserPermissionListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8944,7 +8944,7 @@ impl<'a, C, A> AccountUserPermissionListCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9093,7 +9093,7 @@ impl<'a, C, A> AccountUserPermissionListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserPermissionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountUserPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9182,7 +9182,7 @@ pub struct AccountContainerWorkspaceTemplateDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9198,7 +9198,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9326,7 +9326,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9415,7 +9415,7 @@ pub struct AccountContainerWorkspaceQuickPreviewCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9431,7 +9431,7 @@ impl<'a, C, A> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9570,7 +9570,7 @@ impl<'a, C, A> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9659,7 +9659,7 @@ pub struct AccountContainerWorkspaceVariableGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9675,7 +9675,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableGetCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9814,7 +9814,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableGetCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceVariableGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceVariableGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9903,7 +9903,7 @@ pub struct AccountContainerVersionSetLatestCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9919,7 +9919,7 @@ impl<'a, C, A> AccountContainerVersionSetLatestCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10058,7 +10058,7 @@ impl<'a, C, A> AccountContainerVersionSetLatestCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionSetLatestCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionSetLatestCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10156,7 +10156,7 @@ pub struct AccountContainerWorkspaceVariableUpdateCall<'a, C, A>
     _request: Variable,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10172,7 +10172,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10345,7 +10345,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10436,7 +10436,7 @@ pub struct AccountContainerEnvironmentListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10452,7 +10452,7 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10601,7 +10601,7 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerEnvironmentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10692,7 +10692,7 @@ pub struct AccountContainerWorkspaceTagListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10708,7 +10708,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagListCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10857,7 +10857,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagListCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTagListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTagListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10948,7 +10948,7 @@ pub struct AccountContainerWorkspaceTemplateListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10964,7 +10964,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateListCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11113,7 +11113,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateListCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTemplateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11211,7 +11211,7 @@ pub struct AccountContainerWorkspaceZoneUpdateCall<'a, C, A>
     _request: Zone,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11227,7 +11227,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11400,7 +11400,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11489,7 +11489,7 @@ pub struct AccountContainerWorkspaceZoneGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11505,7 +11505,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneGetCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11644,7 +11644,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneGetCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceZoneGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceZoneGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11740,7 +11740,7 @@ pub struct AccountContainerWorkspaceCreateVersionCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: CreateContainerVersionRequestVersionOptions,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11756,7 +11756,7 @@ impl<'a, C, A> AccountContainerWorkspaceCreateVersionCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11919,7 +11919,7 @@ impl<'a, C, A> AccountContainerWorkspaceCreateVersionCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceCreateVersionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceCreateVersionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12008,7 +12008,7 @@ pub struct AccountContainerDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12024,7 +12024,7 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12152,7 +12152,7 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12248,7 +12248,7 @@ pub struct AccountContainerWorkspaceTemplateCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: CustomTemplate,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12264,7 +12264,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12427,7 +12427,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12516,7 +12516,7 @@ pub struct AccountContainerVersionDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12532,7 +12532,7 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12660,7 +12660,7 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12758,7 +12758,7 @@ pub struct AccountUpdateCall<'a, C, A>
     _request: Account,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12774,7 +12774,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12947,7 +12947,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13040,7 +13040,7 @@ pub struct AccountContainerVersionHeaderListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _include_deleted: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13056,7 +13056,7 @@ impl<'a, C, A> AccountContainerVersionHeaderListCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13215,7 +13215,7 @@ impl<'a, C, A> AccountContainerVersionHeaderListCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionHeaderListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionHeaderListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13306,7 +13306,7 @@ pub struct AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13322,7 +13322,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> where 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13471,7 +13471,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13562,7 +13562,7 @@ pub struct AccountContainerWorkspaceTriggerListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13578,7 +13578,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerListCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13727,7 +13727,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerListCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTriggerListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTriggerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13823,7 +13823,7 @@ pub struct AccountUserPermissionUpdateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: UserPermission,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13839,7 +13839,7 @@ impl<'a, C, A> AccountUserPermissionUpdateCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14002,7 +14002,7 @@ impl<'a, C, A> AccountUserPermissionUpdateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserPermissionUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountUserPermissionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14093,7 +14093,7 @@ pub struct AccountContainerWorkspaceZoneListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14109,7 +14109,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneListCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14258,7 +14258,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneListCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceZoneListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceZoneListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14356,7 +14356,7 @@ pub struct AccountContainerWorkspaceTemplateUpdateCall<'a, C, A>
     _request: CustomTemplate,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14372,7 +14372,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14545,7 +14545,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14634,7 +14634,7 @@ pub struct AccountGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14650,7 +14650,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14789,7 +14789,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14878,7 +14878,7 @@ pub struct AccountContainerVersionLiveCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14894,7 +14894,7 @@ impl<'a, C, A> AccountContainerVersionLiveCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15033,7 +15033,7 @@ impl<'a, C, A> AccountContainerVersionLiveCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionLiveCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionLiveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15123,7 +15123,7 @@ pub struct AccountListCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15138,7 +15138,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15252,7 +15252,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15343,7 +15343,7 @@ pub struct AccountContainerWorkspaceVariableListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15359,7 +15359,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableListCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15508,7 +15508,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableListCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceVariableListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceVariableListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15597,7 +15597,7 @@ pub struct AccountContainerVersionUndeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15613,7 +15613,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15752,7 +15752,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUndeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15843,7 +15843,7 @@ pub struct AccountContainerWorkspaceVariableRevertCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15859,7 +15859,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableRevertCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16008,7 +16008,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableRevertCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceVariableRevertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceVariableRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16097,7 +16097,7 @@ pub struct AccountContainerWorkspaceZoneDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16113,7 +16113,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16241,7 +16241,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16330,7 +16330,7 @@ pub struct AccountContainerWorkspaceFolderGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16346,7 +16346,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16485,7 +16485,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16581,7 +16581,7 @@ pub struct AccountContainerWorkspaceFolderCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Folder,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16597,7 +16597,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderCreateCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16760,7 +16760,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderCreateCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16849,7 +16849,7 @@ pub struct AccountContainerWorkspaceTagDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16865,7 +16865,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagDeleteCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16993,7 +16993,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagDeleteCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTagDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTagDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17091,7 +17091,7 @@ pub struct AccountContainerUpdateCall<'a, C, A>
     _request: Container,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17107,7 +17107,7 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17280,7 +17280,7 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17369,7 +17369,7 @@ pub struct AccountContainerEnvironmentGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17385,7 +17385,7 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17524,7 +17524,7 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerEnvironmentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17622,7 +17622,7 @@ pub struct AccountContainerWorkspaceFolderUpdateCall<'a, C, A>
     _request: Folder,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17638,7 +17638,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17811,7 +17811,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17902,7 +17902,7 @@ pub struct AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _type_: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17918,7 +17918,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> wher
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18070,7 +18070,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18161,7 +18161,7 @@ pub struct AccountContainerListCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _parent: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18177,7 +18177,7 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18326,7 +18326,7 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18417,7 +18417,7 @@ pub struct AccountContainerWorkspaceFolderEntityCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _page_token: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18433,7 +18433,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18582,7 +18582,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18671,7 +18671,7 @@ pub struct AccountContainerWorkspaceTriggerDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18687,7 +18687,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18815,7 +18815,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18904,7 +18904,7 @@ pub struct AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18920,7 +18920,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19048,7 +19048,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19137,7 +19137,7 @@ pub struct AccountContainerWorkspaceSyncCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19153,7 +19153,7 @@ impl<'a, C, A> AccountContainerWorkspaceSyncCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19292,7 +19292,7 @@ impl<'a, C, A> AccountContainerWorkspaceSyncCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceSyncCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceSyncCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19383,7 +19383,7 @@ pub struct AccountContainerWorkspaceTagRevertCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19399,7 +19399,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagRevertCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19548,7 +19548,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagRevertCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTagRevertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTagRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19646,7 +19646,7 @@ pub struct AccountContainerWorkspaceTagUpdateCall<'a, C, A>
     _request: Tag,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19662,7 +19662,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagUpdateCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19835,7 +19835,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagUpdateCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTagUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTagUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19926,7 +19926,7 @@ pub struct AccountContainerWorkspaceTemplateRevertCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19942,7 +19942,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20091,7 +20091,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20187,7 +20187,7 @@ pub struct AccountContainerCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Container,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20203,7 +20203,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20366,7 +20366,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20464,7 +20464,7 @@ pub struct AccountContainerWorkspaceTriggerUpdateCall<'a, C, A>
     _request: Trigger,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20480,7 +20480,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20653,7 +20653,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20749,7 +20749,7 @@ pub struct AccountContainerWorkspaceVariableCreateCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _request: Variable,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20765,7 +20765,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableCreateCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20928,7 +20928,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableCreateCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceVariableCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceVariableCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21017,7 +21017,7 @@ pub struct AccountUserPermissionGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21033,7 +21033,7 @@ impl<'a, C, A> AccountUserPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21172,7 +21172,7 @@ impl<'a, C, A> AccountUserPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserPermissionGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountUserPermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21263,7 +21263,7 @@ pub struct AccountContainerWorkspaceTriggerRevertCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21279,7 +21279,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21428,7 +21428,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21517,7 +21517,7 @@ pub struct AccountContainerWorkspaceVariableDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21533,7 +21533,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21661,7 +21661,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21750,7 +21750,7 @@ pub struct AccountContainerWorkspaceTagGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21766,7 +21766,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagGetCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21905,7 +21905,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTagGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTagGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22003,7 +22003,7 @@ pub struct AccountContainerWorkspaceResolveConflictCall<'a, C, A>
     _request: Entity,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22019,7 +22019,7 @@ impl<'a, C, A> AccountContainerWorkspaceResolveConflictCall<'a, C, A> where C: B
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22181,7 +22181,7 @@ impl<'a, C, A> AccountContainerWorkspaceResolveConflictCall<'a, C, A> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceResolveConflictCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceResolveConflictCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22279,7 +22279,7 @@ pub struct AccountContainerEnvironmentUpdateCall<'a, C, A>
     _request: Environment,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22295,7 +22295,7 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22468,7 +22468,7 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22557,7 +22557,7 @@ pub struct AccountContainerWorkspaceTriggerGetCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22573,7 +22573,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerGetCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22712,7 +22712,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerGetCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceTriggerGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceTriggerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22803,7 +22803,7 @@ pub struct AccountContainerWorkspaceFolderRevertCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22819,7 +22819,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderRevertCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22968,7 +22968,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderRevertCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceFolderRevertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceFolderRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23057,7 +23057,7 @@ pub struct AccountContainerWorkspaceGetStatuCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23073,7 +23073,7 @@ impl<'a, C, A> AccountContainerWorkspaceGetStatuCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23212,7 +23212,7 @@ impl<'a, C, A> AccountContainerWorkspaceGetStatuCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceGetStatuCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceGetStatuCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23310,7 +23310,7 @@ pub struct AccountContainerVersionUpdateCall<'a, C, A>
     _request: ContainerVersion,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23326,7 +23326,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23499,7 +23499,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23590,7 +23590,7 @@ pub struct AccountContainerVersionGetCall<'a, C, A>
     hub: &'a TagManager<C, A>,
     _path: String,
     _container_version_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23606,7 +23606,7 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23755,7 +23755,7 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerVersionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23853,7 +23853,7 @@ pub struct AccountContainerWorkspaceUpdateCall<'a, C, A>
     _request: Workspace,
     _path: String,
     _fingerprint: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23869,7 +23869,7 @@ impl<'a, C, A> AccountContainerWorkspaceUpdateCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24042,7 +24042,7 @@ impl<'a, C, A> AccountContainerWorkspaceUpdateCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerWorkspaceUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountContainerWorkspaceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24131,7 +24131,7 @@ pub struct AccountUserPermissionDeleteCall<'a, C, A>
 
     hub: &'a TagManager<C, A>,
     _path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24147,7 +24147,7 @@ impl<'a, C, A> AccountUserPermissionDeleteCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24275,7 +24275,7 @@ impl<'a, C, A> AccountUserPermissionDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUserPermissionDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountUserPermissionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

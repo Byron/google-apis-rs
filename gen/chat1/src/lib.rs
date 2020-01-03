@@ -1185,7 +1185,7 @@ pub struct SpaceListCall<'a, C, A>
     hub: &'a HangoutsChat<C, A>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -1199,7 +1199,7 @@ impl<'a, C, A> SpaceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1320,7 +1320,7 @@ impl<'a, C, A> SpaceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1390,7 +1390,7 @@ pub struct SpaceMessageGetCall<'a, C, A>
 
     hub: &'a HangoutsChat<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -1405,7 +1405,7 @@ impl<'a, C, A> SpaceMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1542,7 +1542,7 @@ impl<'a, C, A> SpaceMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceMessageGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceMessageGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1612,7 +1612,7 @@ pub struct SpaceGetCall<'a, C, A>
 
     hub: &'a HangoutsChat<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -1627,7 +1627,7 @@ impl<'a, C, A> SpaceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1763,7 +1763,7 @@ impl<'a, C, A> SpaceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1842,7 +1842,7 @@ pub struct SpaceMessageUpdateCall<'a, C, A>
     _request: Message,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -1857,7 +1857,7 @@ impl<'a, C, A> SpaceMessageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2029,7 +2029,7 @@ impl<'a, C, A> SpaceMessageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceMessageUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceMessageUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2103,7 +2103,7 @@ pub struct SpaceMemberListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2118,7 +2118,7 @@ impl<'a, C, A> SpaceMemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2277,7 +2277,7 @@ impl<'a, C, A> SpaceMemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceMemberListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceMemberListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2347,7 +2347,7 @@ pub struct SpaceMemberGetCall<'a, C, A>
 
     hub: &'a HangoutsChat<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2362,7 +2362,7 @@ impl<'a, C, A> SpaceMemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2499,7 +2499,7 @@ impl<'a, C, A> SpaceMemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceMemberGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceMemberGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2569,7 +2569,7 @@ pub struct SpaceMessageDeleteCall<'a, C, A>
 
     hub: &'a HangoutsChat<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2584,7 +2584,7 @@ impl<'a, C, A> SpaceMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2721,7 +2721,7 @@ impl<'a, C, A> SpaceMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceMessageDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceMessageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2800,7 +2800,7 @@ pub struct SpaceMessageCreateCall<'a, C, A>
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2815,7 +2815,7 @@ impl<'a, C, A> SpaceMessageCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2992,7 +2992,7 @@ impl<'a, C, A> SpaceMessageCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpaceMessageCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpaceMessageCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

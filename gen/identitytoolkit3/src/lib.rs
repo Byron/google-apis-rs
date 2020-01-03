@@ -2385,7 +2385,7 @@ pub struct RelyingpartyEmailLinkSigninCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyEmailLinkSigninRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2400,7 +2400,7 @@ impl<'a, C, A> RelyingpartyEmailLinkSigninCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2528,7 +2528,7 @@ impl<'a, C, A> RelyingpartyEmailLinkSigninCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyEmailLinkSigninCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyEmailLinkSigninCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2623,7 +2623,7 @@ pub struct RelyingpartyGetOobConfirmationCodeCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: Relyingparty,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2638,7 +2638,7 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2766,7 +2766,7 @@ impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2854,7 +2854,7 @@ pub struct RelyingpartyGetPublicKeyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a IdentityToolkit<C, A>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2869,7 +2869,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2973,7 +2973,7 @@ impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3068,7 +3068,7 @@ pub struct RelyingpartyCreateAuthUriCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyCreateAuthUriRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3083,7 +3083,7 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3211,7 +3211,7 @@ impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyCreateAuthUriCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyCreateAuthUriCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3299,7 +3299,7 @@ pub struct RelyingpartyGetRecaptchaParamCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a IdentityToolkit<C, A>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3314,7 +3314,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3418,7 +3418,7 @@ impl<'a, C, A> RelyingpartyGetRecaptchaParamCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetRecaptchaParamCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyGetRecaptchaParamCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3513,7 +3513,7 @@ pub struct RelyingpartySignOutUserCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartySignOutUserRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3528,7 +3528,7 @@ impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3656,7 +3656,7 @@ impl<'a, C, A> RelyingpartySignOutUserCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySignOutUserCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartySignOutUserCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3751,7 +3751,7 @@ pub struct RelyingpartyVerifyAssertionCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyVerifyAssertionRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3766,7 +3766,7 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3894,7 +3894,7 @@ impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyAssertionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyVerifyAssertionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3989,7 +3989,7 @@ pub struct RelyingpartyUploadAccountCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyUploadAccountRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4004,7 +4004,7 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4132,7 +4132,7 @@ impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyUploadAccountCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyUploadAccountCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4227,7 +4227,7 @@ pub struct RelyingpartyGetAccountInfoCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyGetAccountInfoRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4242,7 +4242,7 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4370,7 +4370,7 @@ impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetAccountInfoCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyGetAccountInfoCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4465,7 +4465,7 @@ pub struct RelyingpartyVerifyCustomTokenCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4480,7 +4480,7 @@ impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4608,7 +4608,7 @@ impl<'a, C, A> RelyingpartyVerifyCustomTokenCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyCustomTokenCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyVerifyCustomTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4703,7 +4703,7 @@ pub struct RelyingpartyResetPasswordCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyResetPasswordRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4718,7 +4718,7 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4846,7 +4846,7 @@ impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyResetPasswordCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyResetPasswordCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4941,7 +4941,7 @@ pub struct RelyingpartyDownloadAccountCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyDownloadAccountRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4956,7 +4956,7 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5084,7 +5084,7 @@ impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyDownloadAccountCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyDownloadAccountCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5179,7 +5179,7 @@ pub struct RelyingpartySetAccountInfoCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartySetAccountInfoRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5194,7 +5194,7 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5322,7 +5322,7 @@ impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySetAccountInfoCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartySetAccountInfoCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5417,7 +5417,7 @@ pub struct RelyingpartyDeleteAccountCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyDeleteAccountRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5432,7 +5432,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5560,7 +5560,7 @@ impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyDeleteAccountCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyDeleteAccountCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5655,7 +5655,7 @@ pub struct RelyingpartySignupNewUserCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartySignupNewUserRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5670,7 +5670,7 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5798,7 +5798,7 @@ impl<'a, C, A> RelyingpartySignupNewUserCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySignupNewUserCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartySignupNewUserCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5893,7 +5893,7 @@ pub struct RelyingpartyVerifyPhoneNumberCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5908,7 +5908,7 @@ impl<'a, C, A> RelyingpartyVerifyPhoneNumberCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6036,7 +6036,7 @@ impl<'a, C, A> RelyingpartyVerifyPhoneNumberCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyPhoneNumberCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyVerifyPhoneNumberCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6131,7 +6131,7 @@ pub struct RelyingpartyVerifyPasswordCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyVerifyPasswordRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6146,7 +6146,7 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6274,7 +6274,7 @@ impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyPasswordCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyVerifyPasswordCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6369,7 +6369,7 @@ pub struct RelyingpartySetProjectConfigCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartySetProjectConfigRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6384,7 +6384,7 @@ impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6512,7 +6512,7 @@ impl<'a, C, A> RelyingpartySetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySetProjectConfigCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartySetProjectConfigCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6607,7 +6607,7 @@ pub struct RelyingpartySendVerificationCodeCall<'a, C, A>
 
     hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartySendVerificationCodeRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6622,7 +6622,7 @@ impl<'a, C, A> RelyingpartySendVerificationCodeCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6750,7 +6750,7 @@ impl<'a, C, A> RelyingpartySendVerificationCodeCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySendVerificationCodeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartySendVerificationCodeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6842,7 +6842,7 @@ pub struct RelyingpartyGetProjectConfigCall<'a, C, A>
     hub: &'a IdentityToolkit<C, A>,
     _project_number: Option<String>,
     _delegated_project_number: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6857,7 +6857,7 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6981,7 +6981,7 @@ impl<'a, C, A> RelyingpartyGetProjectConfigCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetProjectConfigCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RelyingpartyGetProjectConfigCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

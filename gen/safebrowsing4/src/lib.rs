@@ -1441,7 +1441,7 @@ pub struct EncodedFullHasheGetCall<'a, C, A>
     _encoded_request: String,
     _client_version: Option<String>,
     _client_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -1455,7 +1455,7 @@ impl<'a, C, A> EncodedFullHasheGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1607,7 +1607,7 @@ impl<'a, C, A> EncodedFullHasheGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EncodedFullHasheGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> EncodedFullHasheGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1683,7 +1683,7 @@ pub struct FullHasheFindCall<'a, C, A>
 
     hub: &'a Safebrowsing<C, A>,
     _request: FindFullHashesRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -1697,7 +1697,7 @@ impl<'a, C, A> FullHasheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1820,7 +1820,7 @@ impl<'a, C, A> FullHasheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FullHasheFindCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FullHasheFindCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1897,7 +1897,7 @@ pub struct ThreatListUpdateFetchCall<'a, C, A>
 
     hub: &'a Safebrowsing<C, A>,
     _request: FetchThreatListUpdatesRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -1911,7 +1911,7 @@ impl<'a, C, A> ThreatListUpdateFetchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2034,7 +2034,7 @@ impl<'a, C, A> ThreatListUpdateFetchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThreatListUpdateFetchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ThreatListUpdateFetchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2108,7 +2108,7 @@ pub struct EncodedUpdateGetCall<'a, C, A>
     _encoded_request: String,
     _client_version: Option<String>,
     _client_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2122,7 +2122,7 @@ impl<'a, C, A> EncodedUpdateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2274,7 +2274,7 @@ impl<'a, C, A> EncodedUpdateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EncodedUpdateGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> EncodedUpdateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2343,7 +2343,7 @@ pub struct ThreatListListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Safebrowsing<C, A>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2357,7 +2357,7 @@ impl<'a, C, A> ThreatListListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2456,7 +2456,7 @@ impl<'a, C, A> ThreatListListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThreatListListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ThreatListListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2532,7 +2532,7 @@ pub struct ThreatMatcheFindCall<'a, C, A>
 
     hub: &'a Safebrowsing<C, A>,
     _request: FindThreatMatchesRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2546,7 +2546,7 @@ impl<'a, C, A> ThreatMatcheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2669,7 +2669,7 @@ impl<'a, C, A> ThreatMatcheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThreatMatcheFindCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ThreatMatcheFindCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2746,7 +2746,7 @@ pub struct ThreatHitCreateCall<'a, C, A>
 
     hub: &'a Safebrowsing<C, A>,
     _request: ThreatHit,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -2760,7 +2760,7 @@ impl<'a, C, A> ThreatHitCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2883,7 +2883,7 @@ impl<'a, C, A> ThreatHitCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThreatHitCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ThreatHitCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

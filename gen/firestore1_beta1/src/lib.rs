@@ -2458,7 +2458,7 @@ pub struct ProjectDatabaseIndexeListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2474,7 +2474,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2643,7 +2643,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseIndexeListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseIndexeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2748,7 +2748,7 @@ pub struct ProjectDatabaseDocumentCreateDocumentCall<'a, C, A>
     _collection_id: String,
     _mask_field_paths: Vec<String>,
     _document_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2764,7 +2764,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2966,7 +2966,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3078,7 +3078,7 @@ pub struct ProjectDatabaseIndexeCreateCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: GoogleFirestoreAdminV1beta1Index,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3094,7 +3094,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3258,7 +3258,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseIndexeCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseIndexeCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3358,7 +3358,7 @@ pub struct ProjectDatabaseDocumentRollbackCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: RollbackRequest,
     _database: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3374,7 +3374,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3538,7 +3538,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentRollbackCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentRollbackCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3646,7 +3646,7 @@ pub struct ProjectDatabaseDocumentListCall<'a, C, A>
     _page_size: Option<i32>,
     _order_by: Option<String>,
     _mask_field_paths: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3662,7 +3662,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3899,7 +3899,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3992,7 +3992,7 @@ pub struct ProjectDatabaseIndexeGetCall<'a, C, A>
 
     hub: &'a Firestore<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4008,7 +4008,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4148,7 +4148,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseIndexeGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseIndexeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4247,7 +4247,7 @@ pub struct ProjectDatabaseDocumentGetCall<'a, C, A>
     _transaction: Option<String>,
     _read_time: Option<String>,
     _mask_field_paths: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4263,7 +4263,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4438,7 +4438,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4538,7 +4538,7 @@ pub struct ProjectDatabaseDocumentWriteCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: WriteRequest,
     _database: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4554,7 +4554,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4719,7 +4719,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentWriteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentWriteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4819,7 +4819,7 @@ pub struct ProjectDatabaseDocumentRunQueryCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: RunQueryRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4835,7 +4835,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5003,7 +5003,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentRunQueryCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentRunQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5107,7 +5107,7 @@ pub struct ProjectDatabaseImportDocumentCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: GoogleFirestoreAdminV1beta1ImportDocumentsRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5123,7 +5123,7 @@ impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5287,7 +5287,7 @@ impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseImportDocumentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseImportDocumentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5395,7 +5395,7 @@ pub struct ProjectDatabaseDocumentPatchCall<'a, C, A>
     _mask_field_paths: Vec<String>,
     _current_document_update_time: Option<String>,
     _current_document_exists: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5411,7 +5411,7 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5625,7 +5625,7 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5728,7 +5728,7 @@ pub struct ProjectDatabaseDocumentBatchGetCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: BatchGetDocumentsRequest,
     _database: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5744,7 +5744,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5908,7 +5908,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentBatchGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentBatchGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6008,7 +6008,7 @@ pub struct ProjectDatabaseDocumentBeginTransactionCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: BeginTransactionRequest,
     _database: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6024,7 +6024,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6188,7 +6188,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6288,7 +6288,7 @@ pub struct ProjectDatabaseDocumentListCollectionIdCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: ListCollectionIdsRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6304,7 +6304,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6470,7 +6470,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6577,7 +6577,7 @@ pub struct ProjectDatabaseExportDocumentCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: GoogleFirestoreAdminV1beta1ExportDocumentsRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6593,7 +6593,7 @@ impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6757,7 +6757,7 @@ impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseExportDocumentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseExportDocumentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6850,7 +6850,7 @@ pub struct ProjectDatabaseIndexeDeleteCall<'a, C, A>
 
     hub: &'a Firestore<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6866,7 +6866,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7006,7 +7006,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseIndexeDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseIndexeDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7103,7 +7103,7 @@ pub struct ProjectDatabaseDocumentDeleteCall<'a, C, A>
     _name: String,
     _current_document_update_time: Option<String>,
     _current_document_exists: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7119,7 +7119,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7281,7 +7281,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7381,7 +7381,7 @@ pub struct ProjectDatabaseDocumentCommitCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: CommitRequest,
     _database: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7397,7 +7397,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7561,7 +7561,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentCommitCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentCommitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7661,7 +7661,7 @@ pub struct ProjectDatabaseDocumentListenCall<'a, C, A>
     hub: &'a Firestore<C, A>,
     _request: ListenRequest,
     _database: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7677,7 +7677,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7841,7 +7841,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseDocumentListenCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDatabaseDocumentListenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

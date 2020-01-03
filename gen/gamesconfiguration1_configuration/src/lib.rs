@@ -1091,7 +1091,7 @@ pub struct ImageConfigurationUploadCall<'a, C, A>
     hub: &'a GamesConfiguration<C, A>,
     _resource_id: String,
     _image_type: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1107,7 +1107,7 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1361,7 +1361,7 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ImageConfigurationUploadCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ImageConfigurationUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1454,7 +1454,7 @@ pub struct AchievementConfigurationListCall<'a, C, A>
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1469,7 +1469,7 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1625,7 +1625,7 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementConfigurationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1721,7 +1721,7 @@ pub struct AchievementConfigurationUpdateCall<'a, C, A>
     hub: &'a GamesConfiguration<C, A>,
     _request: AchievementConfiguration,
     _achievement_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1736,7 +1736,7 @@ impl<'a, C, A> AchievementConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1896,7 +1896,7 @@ impl<'a, C, A> AchievementConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementConfigurationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1992,7 +1992,7 @@ pub struct AchievementConfigurationInsertCall<'a, C, A>
     hub: &'a GamesConfiguration<C, A>,
     _request: AchievementConfiguration,
     _application_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2007,7 +2007,7 @@ impl<'a, C, A> AchievementConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2167,7 +2167,7 @@ impl<'a, C, A> AchievementConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementConfigurationInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2256,7 +2256,7 @@ pub struct AchievementConfigurationGetCall<'a, C, A>
 
     hub: &'a GamesConfiguration<C, A>,
     _achievement_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2271,7 +2271,7 @@ impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2407,7 +2407,7 @@ impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementConfigurationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2503,7 +2503,7 @@ pub struct AchievementConfigurationPatchCall<'a, C, A>
     hub: &'a GamesConfiguration<C, A>,
     _request: AchievementConfiguration,
     _achievement_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2518,7 +2518,7 @@ impl<'a, C, A> AchievementConfigurationPatchCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2678,7 +2678,7 @@ impl<'a, C, A> AchievementConfigurationPatchCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementConfigurationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2767,7 +2767,7 @@ pub struct AchievementConfigurationDeleteCall<'a, C, A>
 
     hub: &'a GamesConfiguration<C, A>,
     _achievement_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2782,7 +2782,7 @@ impl<'a, C, A> AchievementConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2907,7 +2907,7 @@ impl<'a, C, A> AchievementConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementConfigurationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3003,7 +3003,7 @@ pub struct LeaderboardConfigurationInsertCall<'a, C, A>
     hub: &'a GamesConfiguration<C, A>,
     _request: LeaderboardConfiguration,
     _application_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3018,7 +3018,7 @@ impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3178,7 +3178,7 @@ impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3267,7 +3267,7 @@ pub struct LeaderboardConfigurationGetCall<'a, C, A>
 
     hub: &'a GamesConfiguration<C, A>,
     _leaderboard_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3282,7 +3282,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3418,7 +3418,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3514,7 +3514,7 @@ pub struct LeaderboardConfigurationPatchCall<'a, C, A>
     hub: &'a GamesConfiguration<C, A>,
     _request: LeaderboardConfiguration,
     _leaderboard_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3529,7 +3529,7 @@ impl<'a, C, A> LeaderboardConfigurationPatchCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3689,7 +3689,7 @@ impl<'a, C, A> LeaderboardConfigurationPatchCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3785,7 +3785,7 @@ pub struct LeaderboardConfigurationUpdateCall<'a, C, A>
     hub: &'a GamesConfiguration<C, A>,
     _request: LeaderboardConfiguration,
     _leaderboard_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3800,7 +3800,7 @@ impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3960,7 +3960,7 @@ impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4053,7 +4053,7 @@ pub struct LeaderboardConfigurationListCall<'a, C, A>
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4068,7 +4068,7 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4224,7 +4224,7 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4313,7 +4313,7 @@ pub struct LeaderboardConfigurationDeleteCall<'a, C, A>
 
     hub: &'a GamesConfiguration<C, A>,
     _leaderboard_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4328,7 +4328,7 @@ impl<'a, C, A> LeaderboardConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4453,7 +4453,7 @@ impl<'a, C, A> LeaderboardConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

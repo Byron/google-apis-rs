@@ -1222,7 +1222,7 @@ pub struct FolderUpdateAccessApprovalSettingCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: AccessApprovalSettings,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1238,7 +1238,7 @@ impl<'a, C, A> FolderUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1406,7 +1406,7 @@ impl<'a, C, A> FolderUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderUpdateAccessApprovalSettingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderUpdateAccessApprovalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1509,7 +1509,7 @@ pub struct FolderApprovalRequestApproveCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: ApproveApprovalRequestMessage,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1525,7 +1525,7 @@ impl<'a, C, A> FolderApprovalRequestApproveCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1688,7 +1688,7 @@ impl<'a, C, A> FolderApprovalRequestApproveCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderApprovalRequestApproveCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderApprovalRequestApproveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1781,7 +1781,7 @@ pub struct FolderGetAccessApprovalSettingCall<'a, C, A>
 
     hub: &'a AccessApproval<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1797,7 +1797,7 @@ impl<'a, C, A> FolderGetAccessApprovalSettingCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1936,7 +1936,7 @@ impl<'a, C, A> FolderGetAccessApprovalSettingCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderGetAccessApprovalSettingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderGetAccessApprovalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2029,7 +2029,7 @@ pub struct FolderApprovalRequestGetCall<'a, C, A>
 
     hub: &'a AccessApproval<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2045,7 +2045,7 @@ impl<'a, C, A> FolderApprovalRequestGetCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2184,7 +2184,7 @@ impl<'a, C, A> FolderApprovalRequestGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderApprovalRequestGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderApprovalRequestGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2285,7 +2285,7 @@ pub struct FolderApprovalRequestListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2301,7 +2301,7 @@ impl<'a, C, A> FolderApprovalRequestListCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2479,7 +2479,7 @@ impl<'a, C, A> FolderApprovalRequestListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderApprovalRequestListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderApprovalRequestListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2588,7 +2588,7 @@ pub struct FolderApprovalRequestDismisCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: DismissApprovalRequestMessage,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2604,7 +2604,7 @@ impl<'a, C, A> FolderApprovalRequestDismisCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2767,7 +2767,7 @@ impl<'a, C, A> FolderApprovalRequestDismisCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FolderApprovalRequestDismisCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderApprovalRequestDismisCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2868,7 +2868,7 @@ pub struct OrganizationUpdateAccessApprovalSettingCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: AccessApprovalSettings,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2884,7 +2884,7 @@ impl<'a, C, A> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3052,7 +3052,7 @@ impl<'a, C, A> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3155,7 +3155,7 @@ pub struct OrganizationApprovalRequestApproveCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: ApproveApprovalRequestMessage,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3171,7 +3171,7 @@ impl<'a, C, A> OrganizationApprovalRequestApproveCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3334,7 +3334,7 @@ impl<'a, C, A> OrganizationApprovalRequestApproveCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationApprovalRequestApproveCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationApprovalRequestApproveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3435,7 +3435,7 @@ pub struct OrganizationApprovalRequestListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3451,7 +3451,7 @@ impl<'a, C, A> OrganizationApprovalRequestListCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3629,7 +3629,7 @@ impl<'a, C, A> OrganizationApprovalRequestListCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationApprovalRequestListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationApprovalRequestListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3722,7 +3722,7 @@ pub struct OrganizationGetAccessApprovalSettingCall<'a, C, A>
 
     hub: &'a AccessApproval<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3738,7 +3738,7 @@ impl<'a, C, A> OrganizationGetAccessApprovalSettingCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3877,7 +3877,7 @@ impl<'a, C, A> OrganizationGetAccessApprovalSettingCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationGetAccessApprovalSettingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationGetAccessApprovalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3970,7 +3970,7 @@ pub struct OrganizationApprovalRequestGetCall<'a, C, A>
 
     hub: &'a AccessApproval<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3986,7 +3986,7 @@ impl<'a, C, A> OrganizationApprovalRequestGetCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4125,7 +4125,7 @@ impl<'a, C, A> OrganizationApprovalRequestGetCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationApprovalRequestGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationApprovalRequestGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4234,7 +4234,7 @@ pub struct OrganizationApprovalRequestDismisCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: DismissApprovalRequestMessage,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4250,7 +4250,7 @@ impl<'a, C, A> OrganizationApprovalRequestDismisCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4413,7 +4413,7 @@ impl<'a, C, A> OrganizationApprovalRequestDismisCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationApprovalRequestDismisCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationApprovalRequestDismisCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4514,7 +4514,7 @@ pub struct ProjectApprovalRequestListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4530,7 +4530,7 @@ impl<'a, C, A> ProjectApprovalRequestListCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4708,7 +4708,7 @@ impl<'a, C, A> ProjectApprovalRequestListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectApprovalRequestListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectApprovalRequestListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4801,7 +4801,7 @@ pub struct ProjectGetAccessApprovalSettingCall<'a, C, A>
 
     hub: &'a AccessApproval<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4817,7 +4817,7 @@ impl<'a, C, A> ProjectGetAccessApprovalSettingCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4956,7 +4956,7 @@ impl<'a, C, A> ProjectGetAccessApprovalSettingCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectGetAccessApprovalSettingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectGetAccessApprovalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5049,7 +5049,7 @@ pub struct ProjectApprovalRequestGetCall<'a, C, A>
 
     hub: &'a AccessApproval<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5065,7 +5065,7 @@ impl<'a, C, A> ProjectApprovalRequestGetCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5204,7 +5204,7 @@ impl<'a, C, A> ProjectApprovalRequestGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectApprovalRequestGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectApprovalRequestGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5307,7 +5307,7 @@ pub struct ProjectApprovalRequestApproveCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: ApproveApprovalRequestMessage,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5323,7 +5323,7 @@ impl<'a, C, A> ProjectApprovalRequestApproveCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5486,7 +5486,7 @@ impl<'a, C, A> ProjectApprovalRequestApproveCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectApprovalRequestApproveCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectApprovalRequestApproveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5587,7 +5587,7 @@ pub struct ProjectUpdateAccessApprovalSettingCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: AccessApprovalSettings,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5603,7 +5603,7 @@ impl<'a, C, A> ProjectUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5771,7 +5771,7 @@ impl<'a, C, A> ProjectUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectUpdateAccessApprovalSettingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectUpdateAccessApprovalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5880,7 +5880,7 @@ pub struct ProjectApprovalRequestDismisCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: DismissApprovalRequestMessage,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5896,7 +5896,7 @@ impl<'a, C, A> ProjectApprovalRequestDismisCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6059,7 +6059,7 @@ impl<'a, C, A> ProjectApprovalRequestDismisCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectApprovalRequestDismisCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectApprovalRequestDismisCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

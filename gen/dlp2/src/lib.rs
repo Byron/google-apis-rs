@@ -5837,7 +5837,7 @@ pub struct OrganizationInspectTemplateGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5853,7 +5853,7 @@ impl<'a, C, A> OrganizationInspectTemplateGetCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5994,7 +5994,7 @@ impl<'a, C, A> OrganizationInspectTemplateGetCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationInspectTemplateGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationInspectTemplateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6089,7 +6089,7 @@ pub struct OrganizationDeidentifyTemplateDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6105,7 +6105,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6246,7 +6246,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6349,7 +6349,7 @@ pub struct OrganizationDeidentifyTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6365,7 +6365,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6529,7 +6529,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationDeidentifyTemplateCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationDeidentifyTemplateCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6631,7 +6631,7 @@ pub struct OrganizationDeidentifyTemplatePatchCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6647,7 +6647,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplatePatchCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6812,7 +6812,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplatePatchCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationDeidentifyTemplatePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationDeidentifyTemplatePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6914,7 +6914,7 @@ pub struct OrganizationStoredInfoTypeCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6930,7 +6930,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7094,7 +7094,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationStoredInfoTypeCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationStoredInfoTypeCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7189,7 +7189,7 @@ pub struct OrganizationStoredInfoTypeGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7205,7 +7205,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7346,7 +7346,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationStoredInfoTypeGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationStoredInfoTypeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7440,7 +7440,7 @@ pub struct OrganizationInspectTemplateDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7456,7 +7456,7 @@ impl<'a, C, A> OrganizationInspectTemplateDeleteCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7597,7 +7597,7 @@ impl<'a, C, A> OrganizationInspectTemplateDeleteCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationInspectTemplateDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationInspectTemplateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7699,7 +7699,7 @@ pub struct OrganizationInspectTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateInspectTemplateRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7715,7 +7715,7 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7879,7 +7879,7 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationInspectTemplateCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationInspectTemplateCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7980,7 +7980,7 @@ pub struct OrganizationInspectTemplatePatchCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2UpdateInspectTemplateRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7996,7 +7996,7 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8161,7 +8161,7 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationInspectTemplatePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationInspectTemplatePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8261,7 +8261,7 @@ pub struct OrganizationInspectTemplateListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8277,7 +8277,7 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8461,7 +8461,7 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationInspectTemplateListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationInspectTemplateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8562,7 +8562,7 @@ pub struct OrganizationStoredInfoTypeListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8578,7 +8578,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8763,7 +8763,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationStoredInfoTypeListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationStoredInfoTypeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8858,7 +8858,7 @@ pub struct OrganizationStoredInfoTypeDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8874,7 +8874,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9015,7 +9015,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationStoredInfoTypeDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationStoredInfoTypeDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9110,7 +9110,7 @@ pub struct OrganizationDeidentifyTemplateGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9126,7 +9126,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9267,7 +9267,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationDeidentifyTemplateGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationDeidentifyTemplateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9370,7 +9370,7 @@ pub struct OrganizationStoredInfoTypePatchCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2UpdateStoredInfoTypeRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9386,7 +9386,7 @@ impl<'a, C, A> OrganizationStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9551,7 +9551,7 @@ impl<'a, C, A> OrganizationStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationStoredInfoTypePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationStoredInfoTypePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9652,7 +9652,7 @@ pub struct OrganizationDeidentifyTemplateListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9668,7 +9668,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9852,7 +9852,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationDeidentifyTemplateListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationDeidentifyTemplateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9950,7 +9950,7 @@ pub struct InfoTypeListCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _language_code: Option<String>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9965,7 +9965,7 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10092,7 +10092,7 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InfoTypeListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> InfoTypeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10186,7 +10186,7 @@ pub struct ProjectInspectTemplateGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10202,7 +10202,7 @@ impl<'a, C, A> ProjectInspectTemplateGetCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10343,7 +10343,7 @@ impl<'a, C, A> ProjectInspectTemplateGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInspectTemplateGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInspectTemplateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10438,7 +10438,7 @@ pub struct ProjectDeidentifyTemplateGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10454,7 +10454,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10595,7 +10595,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeidentifyTemplateGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDeidentifyTemplateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10696,7 +10696,7 @@ pub struct ProjectInspectTemplatePatchCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2UpdateInspectTemplateRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10712,7 +10712,7 @@ impl<'a, C, A> ProjectInspectTemplatePatchCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10877,7 +10877,7 @@ impl<'a, C, A> ProjectInspectTemplatePatchCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInspectTemplatePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInspectTemplatePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10972,7 +10972,7 @@ pub struct ProjectStoredInfoTypeDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10988,7 +10988,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11129,7 +11129,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectStoredInfoTypeDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectStoredInfoTypeDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11230,7 +11230,7 @@ pub struct ProjectJobTriggerPatchCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2UpdateJobTriggerRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11246,7 +11246,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11410,7 +11410,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectJobTriggerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11518,7 +11518,7 @@ pub struct ProjectLocationContentDeidentifyCall<'a, C, A>
     _request: GooglePrivacyDlpV2DeidentifyContentRequest,
     _parent: String,
     _location: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11534,7 +11534,7 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11709,7 +11709,7 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11817,7 +11817,7 @@ pub struct ProjectContentInspectCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2InspectContentRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11833,7 +11833,7 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11996,7 +11996,7 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectContentInspectCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectContentInspectCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12090,7 +12090,7 @@ pub struct ProjectInspectTemplateDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12106,7 +12106,7 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12247,7 +12247,7 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInspectTemplateDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInspectTemplateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12349,7 +12349,7 @@ pub struct ProjectDeidentifyTemplatePatchCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12365,7 +12365,7 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12530,7 +12530,7 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeidentifyTemplatePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDeidentifyTemplatePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12624,7 +12624,7 @@ pub struct ProjectJobTriggerGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12640,7 +12640,7 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12780,7 +12780,7 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectJobTriggerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12875,7 +12875,7 @@ pub struct ProjectStoredInfoTypeGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12891,7 +12891,7 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13032,7 +13032,7 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectStoredInfoTypeGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectStoredInfoTypeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13134,7 +13134,7 @@ pub struct ProjectInspectTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateInspectTemplateRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13150,7 +13150,7 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13314,7 +13314,7 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInspectTemplateCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInspectTemplateCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13416,7 +13416,7 @@ pub struct ProjectJobTriggerCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateJobTriggerRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13432,7 +13432,7 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13595,7 +13595,7 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectJobTriggerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13701,7 +13701,7 @@ pub struct ProjectDlpJobCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateDlpJobRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13717,7 +13717,7 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13880,7 +13880,7 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDlpJobCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDlpJobCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13983,7 +13983,7 @@ pub struct ProjectStoredInfoTypePatchCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2UpdateStoredInfoTypeRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13999,7 +13999,7 @@ impl<'a, C, A> ProjectStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14164,7 +14164,7 @@ impl<'a, C, A> ProjectStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectStoredInfoTypePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectStoredInfoTypePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14267,7 +14267,7 @@ pub struct ProjectDeidentifyTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14283,7 +14283,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14447,7 +14447,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeidentifyTemplateCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDeidentifyTemplateCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14552,7 +14552,7 @@ pub struct ProjectDlpJobListCall<'a, C, A>
     _page_size: Option<i32>,
     _order_by: Option<String>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14568,7 +14568,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14796,7 +14796,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDlpJobListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDlpJobListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14897,7 +14897,7 @@ pub struct ProjectDeidentifyTemplateListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14913,7 +14913,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15097,7 +15097,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeidentifyTemplateListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDeidentifyTemplateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15201,7 +15201,7 @@ pub struct ProjectDlpJobCancelCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CancelDlpJobRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15217,7 +15217,7 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15380,7 +15380,7 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDlpJobCancelCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDlpJobCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15480,7 +15480,7 @@ pub struct ProjectInspectTemplateListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15496,7 +15496,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15680,7 +15680,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInspectTemplateListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInspectTemplateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15775,7 +15775,7 @@ pub struct ProjectDlpJobGetCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15791,7 +15791,7 @@ impl<'a, C, A> ProjectDlpJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15930,7 +15930,7 @@ impl<'a, C, A> ProjectDlpJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDlpJobGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDlpJobGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16037,7 +16037,7 @@ pub struct ProjectContentDeidentifyCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2DeidentifyContentRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16053,7 +16053,7 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16216,7 +16216,7 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectContentDeidentifyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectContentDeidentifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16317,7 +16317,7 @@ pub struct ProjectJobTriggerActivateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2ActivateJobTriggerRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16333,7 +16333,7 @@ impl<'a, C, A> ProjectJobTriggerActivateCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16497,7 +16497,7 @@ impl<'a, C, A> ProjectJobTriggerActivateCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerActivateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectJobTriggerActivateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16592,7 +16592,7 @@ pub struct ProjectDeidentifyTemplateDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16608,7 +16608,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateDeleteCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16749,7 +16749,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateDeleteCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeidentifyTemplateDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDeidentifyTemplateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16851,7 +16851,7 @@ pub struct ProjectStoredInfoTypeCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16867,7 +16867,7 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17031,7 +17031,7 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectStoredInfoTypeCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectStoredInfoTypeCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17125,7 +17125,7 @@ pub struct ProjectJobTriggerDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17141,7 +17141,7 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17281,7 +17281,7 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectJobTriggerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17384,7 +17384,7 @@ pub struct ProjectContentReidentifyCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2ReidentifyContentRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17400,7 +17400,7 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17563,7 +17563,7 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectContentReidentifyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectContentReidentifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17665,7 +17665,7 @@ pub struct ProjectJobTriggerListCall<'a, C, A>
     _page_size: Option<i32>,
     _order_by: Option<String>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17681,7 +17681,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17899,7 +17899,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectJobTriggerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17996,7 +17996,7 @@ pub struct ProjectDlpJobDeleteCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18012,7 +18012,7 @@ impl<'a, C, A> ProjectDlpJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18151,7 +18151,7 @@ impl<'a, C, A> ProjectDlpJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDlpJobDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDlpJobDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18258,7 +18258,7 @@ pub struct ProjectImageRedactCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2RedactImageRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18274,7 +18274,7 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18437,7 +18437,7 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectImageRedactCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectImageRedactCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18538,7 +18538,7 @@ pub struct ProjectStoredInfoTypeListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18554,7 +18554,7 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18739,7 +18739,7 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectStoredInfoTypeListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectStoredInfoTypeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

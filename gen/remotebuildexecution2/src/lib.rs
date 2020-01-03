@@ -2011,7 +2011,7 @@ pub struct OperationWaitExecutionCall<'a, C, A>
     hub: &'a RemoteBuildExecution<C, A>,
     _request: BuildBazelRemoteExecutionV2WaitExecutionRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2027,7 +2027,7 @@ impl<'a, C, A> OperationWaitExecutionCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2191,7 +2191,7 @@ impl<'a, C, A> OperationWaitExecutionCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationWaitExecutionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OperationWaitExecutionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2303,7 +2303,7 @@ pub struct ActionResultGetCall<'a, C, A>
     _inline_stdout: Option<bool>,
     _inline_stderr: Option<bool>,
     _inline_output_files: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2319,7 +2319,7 @@ impl<'a, C, A> ActionResultGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2522,7 +2522,7 @@ impl<'a, C, A> ActionResultGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActionResultGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ActionResultGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2641,7 +2641,7 @@ pub struct ActionResultUpdateCall<'a, C, A>
     _hash: String,
     _size_bytes: String,
     _results_cache_policy_priority: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2657,7 +2657,7 @@ impl<'a, C, A> ActionResultUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2864,7 +2864,7 @@ impl<'a, C, A> ActionResultUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActionResultUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ActionResultUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2969,7 +2969,7 @@ pub struct BlobFindMissingCall<'a, C, A>
     hub: &'a RemoteBuildExecution<C, A>,
     _request: BuildBazelRemoteExecutionV2FindMissingBlobsRequest,
     _instance_name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2985,7 +2985,7 @@ impl<'a, C, A> BlobFindMissingCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3152,7 +3152,7 @@ impl<'a, C, A> BlobFindMissingCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlobFindMissingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> BlobFindMissingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3275,7 +3275,7 @@ pub struct BlobBatchUpdateCall<'a, C, A>
     hub: &'a RemoteBuildExecution<C, A>,
     _request: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest,
     _instance_name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3291,7 +3291,7 @@ impl<'a, C, A> BlobBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3458,7 +3458,7 @@ impl<'a, C, A> BlobBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlobBatchUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> BlobBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3577,7 +3577,7 @@ pub struct BlobBatchReadCall<'a, C, A>
     hub: &'a RemoteBuildExecution<C, A>,
     _request: BuildBazelRemoteExecutionV2BatchReadBlobsRequest,
     _instance_name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3593,7 +3593,7 @@ impl<'a, C, A> BlobBatchReadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -3760,7 +3760,7 @@ impl<'a, C, A> BlobBatchReadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlobBatchReadCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> BlobBatchReadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3879,7 +3879,7 @@ pub struct BlobGetTreeCall<'a, C, A>
     _size_bytes: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -3895,7 +3895,7 @@ impl<'a, C, A> BlobGetTreeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4086,7 +4086,7 @@ impl<'a, C, A> BlobGetTreeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlobGetTreeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> BlobGetTreeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4248,7 +4248,7 @@ pub struct ActionExecuteCall<'a, C, A>
     hub: &'a RemoteBuildExecution<C, A>,
     _request: BuildBazelRemoteExecutionV2ExecuteRequest,
     _instance_name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4264,7 +4264,7 @@ impl<'a, C, A> ActionExecuteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4431,7 +4431,7 @@ impl<'a, C, A> ActionExecuteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActionExecuteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ActionExecuteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4531,7 +4531,7 @@ pub struct MethodGetCapabilityCall<'a, C, A>
 
     hub: &'a RemoteBuildExecution<C, A>,
     _instance_name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4547,7 +4547,7 @@ impl<'a, C, A> MethodGetCapabilityCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4690,7 +4690,7 @@ impl<'a, C, A> MethodGetCapabilityCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodGetCapabilityCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> MethodGetCapabilityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

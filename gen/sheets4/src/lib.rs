@@ -5988,7 +5988,7 @@ pub struct SpreadsheetGetByDataFilterCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: GetSpreadsheetByDataFilterRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6003,7 +6003,7 @@ impl<'a, C, A> SpreadsheetGetByDataFilterCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6163,7 +6163,7 @@ impl<'a, C, A> SpreadsheetGetByDataFilterCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetGetByDataFilterCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetGetByDataFilterCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6262,7 +6262,7 @@ pub struct SpreadsheetCreateCall<'a, C, A>
 
     hub: &'a Sheets<C, A>,
     _request: Spreadsheet,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6277,7 +6277,7 @@ impl<'a, C, A> SpreadsheetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6405,7 +6405,7 @@ impl<'a, C, A> SpreadsheetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6508,7 +6508,7 @@ pub struct SpreadsheetValueBatchClearCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: BatchClearValuesRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6523,7 +6523,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6683,7 +6683,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueBatchClearCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueBatchClearCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6800,7 +6800,7 @@ pub struct SpreadsheetGetCall<'a, C, A>
     _spreadsheet_id: String,
     _ranges: Vec<String>,
     _include_grid_data: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6815,7 +6815,7 @@ impl<'a, C, A> SpreadsheetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6975,7 +6975,7 @@ impl<'a, C, A> SpreadsheetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7077,7 +7077,7 @@ pub struct SpreadsheetValueBatchGetCall<'a, C, A>
     _ranges: Vec<String>,
     _major_dimension: Option<String>,
     _date_time_render_option: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7092,7 +7092,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7281,7 +7281,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueBatchGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueBatchGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7405,7 +7405,7 @@ pub struct SpreadsheetValueAppendCall<'a, C, A>
     _response_date_time_render_option: Option<String>,
     _insert_data_option: Option<String>,
     _include_values_in_response: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7420,7 +7420,7 @@ impl<'a, C, A> SpreadsheetValueAppendCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7648,7 +7648,7 @@ impl<'a, C, A> SpreadsheetValueAppendCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueAppendCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueAppendCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7749,7 +7749,7 @@ pub struct SpreadsheetValueGetCall<'a, C, A>
     _value_render_option: Option<String>,
     _major_dimension: Option<String>,
     _date_time_render_option: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7764,7 +7764,7 @@ impl<'a, C, A> SpreadsheetValueGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7951,7 +7951,7 @@ impl<'a, C, A> SpreadsheetValueGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8053,7 +8053,7 @@ pub struct SpreadsheetSheetCopyToCall<'a, C, A>
     _request: CopySheetToAnotherSpreadsheetRequest,
     _spreadsheet_id: String,
     _sheet_id: i32,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8068,7 +8068,7 @@ impl<'a, C, A> SpreadsheetSheetCopyToCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8239,7 +8239,7 @@ impl<'a, C, A> SpreadsheetSheetCopyToCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetSheetCopyToCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetSheetCopyToCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8343,7 +8343,7 @@ pub struct SpreadsheetValueClearCall<'a, C, A>
     _request: ClearValuesRequest,
     _spreadsheet_id: String,
     _range: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8358,7 +8358,7 @@ impl<'a, C, A> SpreadsheetValueClearCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8529,7 +8529,7 @@ impl<'a, C, A> SpreadsheetValueClearCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueClearCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueClearCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8640,7 +8640,7 @@ pub struct SpreadsheetValueUpdateCall<'a, C, A>
     _response_value_render_option: Option<String>,
     _response_date_time_render_option: Option<String>,
     _include_values_in_response: Option<bool>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8655,7 +8655,7 @@ impl<'a, C, A> SpreadsheetValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8876,7 +8876,7 @@ impl<'a, C, A> SpreadsheetValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8979,7 +8979,7 @@ pub struct SpreadsheetValueBatchUpdateCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: BatchUpdateValuesRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8994,7 +8994,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9154,7 +9154,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueBatchUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9257,7 +9257,7 @@ pub struct SpreadsheetValueBatchGetByDataFilterCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: BatchGetValuesByDataFilterRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9272,7 +9272,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9432,7 +9432,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9536,7 +9536,7 @@ pub struct SpreadsheetValueBatchClearByDataFilterCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: BatchClearValuesByDataFilterRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9551,7 +9551,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9711,7 +9711,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9814,7 +9814,7 @@ pub struct SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: BatchUpdateValuesByDataFilterRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9829,7 +9829,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9989,7 +9989,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10107,7 +10107,7 @@ pub struct SpreadsheetBatchUpdateCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: BatchUpdateSpreadsheetRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10122,7 +10122,7 @@ impl<'a, C, A> SpreadsheetBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10282,7 +10282,7 @@ impl<'a, C, A> SpreadsheetBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetBatchUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10386,7 +10386,7 @@ pub struct SpreadsheetDeveloperMetadataSearchCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _request: SearchDeveloperMetadataRequest,
     _spreadsheet_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10401,7 +10401,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10561,7 +10561,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10657,7 +10657,7 @@ pub struct SpreadsheetDeveloperMetadataGetCall<'a, C, A>
     hub: &'a Sheets<C, A>,
     _spreadsheet_id: String,
     _metadata_id: i32,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10672,7 +10672,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataGetCall<'a, C, A> where C: BorrowMut<
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10819,7 +10819,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SpreadsheetDeveloperMetadataGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SpreadsheetDeveloperMetadataGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

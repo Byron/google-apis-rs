@@ -163,7 +163,7 @@ pub trait Delegate {
     /// impending failure.
     /// The given Error provides information about why the token couldn't be acquired in the
     /// first place
-    fn token(&mut self, err: &error::Error) -> Option<oauth2::Token> {
+    fn token(&mut self, err: &dyn error::Error) -> Option<oauth2::Token> {
         let _ = err;
         None
     }
@@ -274,7 +274,7 @@ pub enum Error {
     MissingAPIKey,
 
     /// We required a Token, but didn't get one from the Authenticator
-    MissingToken(Box<error::Error>),
+    MissingToken(Box<dyn error::Error>),
 
     /// The delgate instructed to cancel the operation
     Cancelled,
@@ -303,16 +303,16 @@ impl Display for Error {
                 writeln!(f, "It is used as there are no Scopes defined for this method.")
             },
             Error::BadRequest(ref err) => {
-                try!(writeln!(f, "Bad Request ({}): {}", err.error.code, err.error.message));
+                writeln!(f, "Bad Request ({}): {}", err.error.code, err.error.message)?;
                 for err in err.error.errors.iter() {
-                    try!(writeln!(f, "    {}: {}, {}{}",
-                                            err.domain,
-                                            err.message,
-                                            err.reason,
-                                            match &err.location {
-                                                &Some(ref loc) => format!("@{}", loc),
-                                                &None => String::new(),
-                                            }));
+                    writeln!(f, "    {}: {}, {}{}",
+                             err.domain,
+                             err.message,
+                             err.reason,
+                             match &err.location {
+                                 &Some(ref loc) => format!("@{}", loc),
+                                 &None => String::new(),
+                             })?;
                 }
                 Ok(())
             },
@@ -339,10 +339,10 @@ impl error::Error for Error {
         }
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         match *self {
-            Error::HttpError(ref err) => err.cause(),
-            Error::JsonDecodeError(_, ref err) => err.cause(),
+            Error::HttpError(ref err) => err.source(),
+            Error::JsonDecodeError(_, ref err) => err.source(),
             _ => None
         }
     }
@@ -365,8 +365,8 @@ const BOUNDARY: &'static str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
 /// to google APIs, and might not be a fully-featured implementation.
 #[derive(Default)]
 pub struct MultiPartReader<'a> {
-    raw_parts: Vec<(Headers, &'a mut Read)>,
-    current_part: Option<(Cursor<Vec<u8>>, &'a mut Read)>,
+    raw_parts: Vec<(Headers, &'a mut dyn Read)>,
+    current_part: Option<(Cursor<Vec<u8>>, &'a mut dyn Read)>,
     last_part_boundary: Option<Cursor<Vec<u8>>>,
 }
 
@@ -388,7 +388,7 @@ impl<'a> MultiPartReader<'a> {
     /// `size`    - the amount of bytes provided by the reader. It will be put onto the header as
     ///             content-size.
     /// `mime`    - It will be put onto the content type
-    pub fn add_part(&mut self, reader: &'a mut Read, size: u64, mime_type: Mime) -> &mut MultiPartReader<'a> {
+    pub fn add_part(&mut self, reader: &'a mut dyn Read, size: u64, mime_type: Mime) -> &mut MultiPartReader<'a> {
         let mut headers = Headers::new();
         headers.set(ContentType(mime_type));
         headers.set(ContentLength(size));
@@ -569,10 +569,10 @@ impl Header for ContentRange {
 
 impl HeaderFormat for ContentRange {
     fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        try!(fmt.write_str("bytes "));
+        fmt.write_str("bytes ")?;
         match self.range {
-            Some(ref c) => try!(c.fmt(fmt)),
-            None => try!(fmt.write_str("*"))
+            Some(ref c) => c.fmt(fmt)?,
+            None => fmt.write_str("*")?
         }
         (write!(fmt, "/{}", self.total_length)).ok();
         Ok(())
@@ -613,13 +613,13 @@ impl HeaderFormat for RangeResponseHeader {
 /// A utility type to perform a resumable upload from start to end.
 pub struct ResumableUploadHelper<'a, A: 'a> {
     pub client: &'a mut hyper::client::Client,
-    pub delegate: &'a mut Delegate,
+    pub delegate: &'a mut dyn Delegate,
     pub start_at: Option<u64>,
     pub auth: &'a mut A,
     pub user_agent: &'a str,
     pub auth_header: Authorization<Bearer>,
     pub url: &'a str,
-    pub reader: &'a mut ReadSeek,
+    pub reader: &'a mut dyn ReadSeek,
     pub media_type: Mime,
     pub content_length: u64
 }

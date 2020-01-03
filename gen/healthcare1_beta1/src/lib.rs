@@ -4311,7 +4311,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A>
     _page: Option<String>,
     _count: Option<i32>,
     _at: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4327,7 +4327,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> where C:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4524,7 +4524,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> where C:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4628,7 +4628,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: IngestMessageRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4644,7 +4644,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, C, A> where
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4807,7 +4807,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, C, A> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4900,7 +4900,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4916,7 +4916,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, C, A> where
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5055,7 +5055,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, C, A> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5148,7 +5148,7 @@ pub struct ProjectLocationGetCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5164,7 +5164,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5303,7 +5303,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5398,7 +5398,7 @@ pub struct ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5414,7 +5414,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> wher
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5565,7 +5565,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5668,7 +5668,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5684,7 +5684,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, C, A> where C: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -5823,7 +5823,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, C, A> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5937,7 +5937,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirPatchCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: HttpBody,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -5953,7 +5953,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, C, A> where C: B
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6116,7 +6116,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, C, A> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6228,7 +6228,7 @@ pub struct ProjectLocationDatasetFhirStoreExportCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: ExportResourcesRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6244,7 +6244,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreExportCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6409,7 +6409,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreExportCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreExportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6504,7 +6504,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, C,
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6520,7 +6520,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6673,7 +6673,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6769,7 +6769,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -6785,7 +6785,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRendered
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -6937,7 +6937,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRendered
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7034,7 +7034,7 @@ pub struct ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7050,7 +7050,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> where 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7203,7 +7203,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7305,7 +7305,7 @@ pub struct ProjectLocationDatasetFhirStoreCreateCall<'a, C, A>
     _request: FhirStore,
     _parent: String,
     _fhir_store_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7321,7 +7321,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreCreateCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7495,7 +7495,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreCreateCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7592,7 +7592,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRendere
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7608,7 +7608,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRen
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -7760,7 +7760,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRen
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7854,7 +7854,7 @@ pub struct ProjectLocationDatasetHl7V2StoreDeleteCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -7870,7 +7870,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8009,7 +8009,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8137,7 +8137,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A>
     _request: HttpBody,
     _parent: String,
     _type_: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8153,7 +8153,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8330,7 +8330,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8436,7 +8436,7 @@ pub struct ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8452,7 +8452,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> wh
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8616,7 +8616,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> wh
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8758,7 +8758,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: SearchResourcesRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -8774,7 +8774,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -8937,7 +8937,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9059,7 +9059,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A>
     _request: HttpBody,
     _parent: String,
     _type_: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9075,7 +9075,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9251,7 +9251,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9344,7 +9344,7 @@ pub struct ProjectLocationDatasetGetCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9360,7 +9360,7 @@ impl<'a, C, A> ProjectLocationDatasetGetCall<'a, C, A> where C: BorrowMut<hyper:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9500,7 +9500,7 @@ impl<'a, C, A> ProjectLocationDatasetGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9601,7 +9601,7 @@ pub struct ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9617,7 +9617,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, C, A> where C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -9781,7 +9781,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, C, A> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9877,7 +9877,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, C, 
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -9893,7 +9893,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10045,7 +10045,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10147,7 +10147,7 @@ pub struct ProjectLocationDatasetHl7V2StorePatchCall<'a, C, A>
     _request: Hl7V2Store,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10163,7 +10163,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StorePatchCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10339,7 +10339,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StorePatchCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10436,7 +10436,7 @@ pub struct ProjectLocationDatasetListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10452,7 +10452,7 @@ impl<'a, C, A> ProjectLocationDatasetListCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10613,7 +10613,7 @@ impl<'a, C, A> ProjectLocationDatasetListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10721,7 +10721,7 @@ pub struct ProjectLocationDatasetCreateCall<'a, C, A>
     _request: Dataset,
     _parent: String,
     _dataset_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -10737,7 +10737,7 @@ impl<'a, C, A> ProjectLocationDatasetCreateCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -10912,7 +10912,7 @@ impl<'a, C, A> ProjectLocationDatasetCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11021,7 +11021,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A>
     _name: String,
     _start: Option<String>,
     _end: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11037,7 +11037,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11198,7 +11198,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11297,7 +11297,7 @@ pub struct ProjectLocationDatasetDicomStoreListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11313,7 +11313,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreListCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11485,7 +11485,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreListCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11593,7 +11593,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _type_: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11609,7 +11609,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -11761,7 +11761,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11857,7 +11857,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCa
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -11873,7 +11873,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFra
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12025,7 +12025,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFra
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12120,7 +12120,7 @@ pub struct ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12136,7 +12136,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> where
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12288,7 +12288,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12394,7 +12394,7 @@ pub struct ProjectLocationDatasetTestIamPermissionCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12410,7 +12410,7 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12574,7 +12574,7 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12675,7 +12675,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A>
     _page_size: Option<i32>,
     _order_by: Option<String>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -12691,7 +12691,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> where C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -12915,7 +12915,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13014,7 +13014,7 @@ pub struct ProjectLocationListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13030,7 +13030,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13199,7 +13199,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13296,7 +13296,7 @@ pub struct ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13312,7 +13312,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> where C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13465,7 +13465,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13567,7 +13567,7 @@ pub struct ProjectLocationDatasetHl7V2StoreCreateCall<'a, C, A>
     _request: Hl7V2Store,
     _parent: String,
     _hl7_v2_store_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13583,7 +13583,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreCreateCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -13757,7 +13757,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreCreateCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13852,7 +13852,7 @@ pub struct ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -13868,7 +13868,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14020,7 +14020,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14113,7 +14113,7 @@ pub struct ProjectLocationDatasetFhirStoreGetCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14129,7 +14129,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14268,7 +14268,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14365,7 +14365,7 @@ pub struct ProjectLocationDatasetGetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14381,7 +14381,7 @@ impl<'a, C, A> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14534,7 +14534,7 @@ impl<'a, C, A> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14637,7 +14637,7 @@ pub struct ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A>
     _request: HttpBody,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14653,7 +14653,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -14829,7 +14829,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14931,7 +14931,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A>
     _request: Message,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -14947,7 +14947,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A> where 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15127,7 +15127,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15232,7 +15232,7 @@ pub struct ProjectLocationDatasetDicomStoreImportCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: ImportDicomDataRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15248,7 +15248,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreImportCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15412,7 +15412,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreImportCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreImportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15508,7 +15508,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15524,7 +15524,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> whe
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15676,7 +15676,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> whe
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15769,7 +15769,7 @@ pub struct ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -15785,7 +15785,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -15924,7 +15924,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16032,7 +16032,7 @@ pub struct ProjectLocationDatasetOperationListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16048,7 +16048,7 @@ impl<'a, C, A> ProjectLocationDatasetOperationListCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16217,7 +16217,7 @@ impl<'a, C, A> ProjectLocationDatasetOperationListCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetOperationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16319,7 +16319,7 @@ pub struct ProjectLocationDatasetDicomStoreCreateCall<'a, C, A>
     _request: DicomStore,
     _parent: String,
     _dicom_store_id: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16335,7 +16335,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16509,7 +16509,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16617,7 +16617,7 @@ pub struct ProjectLocationDatasetDeidentifyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: DeidentifyDatasetRequest,
     _source_dataset: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16633,7 +16633,7 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -16797,7 +16797,7 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDeidentifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16892,7 +16892,7 @@ pub struct ProjectLocationDatasetOperationGetCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -16908,7 +16908,7 @@ impl<'a, C, A> ProjectLocationDatasetOperationGetCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17047,7 +17047,7 @@ impl<'a, C, A> ProjectLocationDatasetOperationGetCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetOperationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17167,7 +17167,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: HttpBody,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17183,7 +17183,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17346,7 +17346,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17441,7 +17441,7 @@ pub struct ProjectLocationDatasetDeleteCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17457,7 +17457,7 @@ impl<'a, C, A> ProjectLocationDatasetDeleteCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17597,7 +17597,7 @@ impl<'a, C, A> ProjectLocationDatasetDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17692,7 +17692,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17708,7 +17708,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C,
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -17861,7 +17861,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17963,7 +17963,7 @@ pub struct ProjectLocationDatasetPatchCall<'a, C, A>
     _request: Dataset,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -17979,7 +17979,7 @@ impl<'a, C, A> ProjectLocationDatasetPatchCall<'a, C, A> where C: BorrowMut<hype
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18155,7 +18155,7 @@ impl<'a, C, A> ProjectLocationDatasetPatchCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18250,7 +18250,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18266,7 +18266,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18418,7 +18418,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18526,7 +18526,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18542,7 +18542,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> where C: Bo
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18681,7 +18681,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18787,7 +18787,7 @@ pub struct ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -18803,7 +18803,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, C, A> w
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -18967,7 +18967,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, C, A> w
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19068,7 +19068,7 @@ pub struct ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19084,7 +19084,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A> where 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19248,7 +19248,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19359,7 +19359,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19375,7 +19375,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A>
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19514,7 +19514,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19608,7 +19608,7 @@ pub struct ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19624,7 +19624,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -19763,7 +19763,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19867,7 +19867,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -19883,7 +19883,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> where C: B
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20022,7 +20022,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20119,7 +20119,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20135,7 +20135,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadata
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20287,7 +20287,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadata
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20382,7 +20382,7 @@ pub struct ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20398,7 +20398,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A> w
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20551,7 +20551,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A> w
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20644,7 +20644,7 @@ pub struct ProjectLocationDatasetDicomStoreGetCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20660,7 +20660,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -20799,7 +20799,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20921,7 +20921,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: HttpBody,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -20937,7 +20937,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> wh
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21100,7 +21100,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> wh
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21196,7 +21196,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21212,7 +21212,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstance
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21364,7 +21364,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstance
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21460,7 +21460,7 @@ pub struct ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21476,7 +21476,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21628,7 +21628,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21723,7 +21723,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -21739,7 +21739,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -21891,7 +21891,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21993,7 +21993,7 @@ pub struct ProjectLocationDatasetDicomStorePatchCall<'a, C, A>
     _request: DicomStore,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22009,7 +22009,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStorePatchCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22185,7 +22185,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStorePatchCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStorePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStorePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22288,7 +22288,7 @@ pub struct ProjectLocationDatasetDicomStoreExportCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: ExportDicomDataRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22304,7 +22304,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreExportCall<'a, C, A> where C: Bor
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22468,7 +22468,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreExportCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreExportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22590,7 +22590,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A>
     _request: HttpBody,
     _parent: String,
     _type_: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22606,7 +22606,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> where C: 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -22783,7 +22783,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22876,7 +22876,7 @@ pub struct ProjectLocationDatasetHl7V2StoreGetCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -22892,7 +22892,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23031,7 +23031,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23130,7 +23130,7 @@ pub struct ProjectLocationDatasetFhirStoreListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23146,7 +23146,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreListCall<'a, C, A> where C: Borrow
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23318,7 +23318,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreListCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23415,7 +23415,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23431,7 +23431,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> wh
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23570,7 +23570,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> wh
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23669,7 +23669,7 @@ pub struct ProjectLocationDatasetHl7V2StoreListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23685,7 +23685,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreListCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -23857,7 +23857,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreListCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23953,7 +23953,7 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -23969,7 +23969,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24121,7 +24121,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24216,7 +24216,7 @@ pub struct ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24232,7 +24232,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> where C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24383,7 +24383,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24510,7 +24510,7 @@ pub struct ProjectLocationDatasetFhirStoreImportCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: ImportResourcesRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24526,7 +24526,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24691,7 +24691,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24793,7 +24793,7 @@ pub struct ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A>
 
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -24809,7 +24809,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> where
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -24948,7 +24948,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25049,7 +25049,7 @@ pub struct ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -25065,7 +25065,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, C, A> where 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -25229,7 +25229,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, C, A> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25332,7 +25332,7 @@ pub struct ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A>
     _request: HttpBody,
     _parent: String,
     _dicom_web_path: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -25348,7 +25348,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> where
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -25524,7 +25524,7 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25625,7 +25625,7 @@ pub struct ProjectLocationDatasetSetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: SetIamPolicyRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -25641,7 +25641,7 @@ impl<'a, C, A> ProjectLocationDatasetSetIamPolicyCall<'a, C, A> where C: BorrowM
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -25805,7 +25805,7 @@ impl<'a, C, A> ProjectLocationDatasetSetIamPolicyCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetSetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25902,7 +25902,7 @@ pub struct ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -25918,7 +25918,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> where 
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26071,7 +26071,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26166,7 +26166,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _name: String,
     _view: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -26182,7 +26182,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, C, A> where C:
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26332,7 +26332,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, C, A> where C:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26438,7 +26438,7 @@ pub struct ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: TestIamPermissionsRequest,
     _resource: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -26454,7 +26454,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> w
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26618,7 +26618,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> w
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26720,7 +26720,7 @@ pub struct ProjectLocationDatasetFhirStorePatchCall<'a, C, A>
     _request: FhirStore,
     _name: String,
     _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -26736,7 +26736,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -26912,7 +26912,7 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -27017,7 +27017,7 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, C, A>
     hub: &'a CloudHealthcare<C, A>,
     _request: CreateMessageRequest,
     _parent: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -27033,7 +27033,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, C, A> where
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -27196,7 +27196,7 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, C, A> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
