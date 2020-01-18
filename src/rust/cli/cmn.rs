@@ -400,7 +400,7 @@ pub fn input_mime_from_opts(mime: &str, err: &mut InvalidOptionsError) -> Option
     }
 }
 
-pub fn writer_from_opts(arg: Option<&str>) -> Result<Box<Write>, io::Error> {
+pub fn writer_from_opts(arg: Option<&str>) -> Result<Box<dyn Write>, io::Error> {
     let f = arg.unwrap_or("-");
     match f {
         "-" => Ok(Box::new(stdout())),
@@ -698,7 +698,7 @@ pub struct InvalidOptionsError {
 impl fmt::Display for InvalidOptionsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         for issue in &self.issues {
-            try!(issue.fmt(f));
+            issue.fmt(f)?;
         }
         Ok(())
     }
