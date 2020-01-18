@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: false
 
 language: rust
@@ -29,7 +29,7 @@ after_success:
 
 env:
   global:
-    - PYENV_VERSION: 2.7.13
+    - PYENV_VERSION: 2.7.16
     - PYENV_ROOT: $HOME/.pyenv
     - secure: Plj5DqAQX/4+KPM+nOAZ2sCbGIsoSrHo1YggfesQnU7paR734XO/4IayWnsNO/3q6bDi4GIcn56RUZAD3xBJJBNLia2CYIickIIYORRqLWbLdbzQaxBbD670ahtzEuUSFJTRKURPwFteAnsWYgNMNzwXOVNwLS5IUBqWTcS+N0g=
 
