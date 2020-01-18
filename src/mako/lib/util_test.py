@@ -87,7 +87,7 @@ class UtilsTest(unittest.TestCase):
         test_properties = (
             ('Album', 'title', 'String'), # string
             ('Status', 'code', 'i32'), # numeric
-            ('Album', 'mediaItemsCount', 'i64'), # numeric via "count" keyword
+            ('Album', 'mediaItemsCount', 'String'), # numeric via "count" keyword
             ('Album', 'isWriteable', 'bool'), # boolean
             ('Album', 'shareInfo', 'ShareInfo'), # reference type
             ('SearchMediaItemsResponse', 'mediaItems', 'Vec<MediaItem>'), # array
