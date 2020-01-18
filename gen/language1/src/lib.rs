@@ -1139,7 +1139,7 @@ pub struct DocumentAnalyzeSyntaxCall<'a, C, A>
 
     hub: &'a CloudNaturalLanguage<C, A>,
     _request: AnalyzeSyntaxRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1154,7 +1154,7 @@ impl<'a, C, A> DocumentAnalyzeSyntaxCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1282,7 +1282,7 @@ impl<'a, C, A> DocumentAnalyzeSyntaxCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentAnalyzeSyntaxCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentAnalyzeSyntaxCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1381,7 +1381,7 @@ pub struct DocumentAnalyzeSentimentCall<'a, C, A>
 
     hub: &'a CloudNaturalLanguage<C, A>,
     _request: AnalyzeSentimentRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1396,7 +1396,7 @@ impl<'a, C, A> DocumentAnalyzeSentimentCall<'a, C, A> where C: BorrowMut<hyper::
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1524,7 +1524,7 @@ impl<'a, C, A> DocumentAnalyzeSentimentCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentAnalyzeSentimentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentAnalyzeSentimentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1623,7 +1623,7 @@ pub struct DocumentClassifyTextCall<'a, C, A>
 
     hub: &'a CloudNaturalLanguage<C, A>,
     _request: ClassifyTextRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1638,7 +1638,7 @@ impl<'a, C, A> DocumentClassifyTextCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1766,7 +1766,7 @@ impl<'a, C, A> DocumentClassifyTextCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentClassifyTextCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentClassifyTextCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1866,7 +1866,7 @@ pub struct DocumentAnalyzeEntitySentimentCall<'a, C, A>
 
     hub: &'a CloudNaturalLanguage<C, A>,
     _request: AnalyzeEntitySentimentRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1881,7 +1881,7 @@ impl<'a, C, A> DocumentAnalyzeEntitySentimentCall<'a, C, A> where C: BorrowMut<h
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2009,7 +2009,7 @@ impl<'a, C, A> DocumentAnalyzeEntitySentimentCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentAnalyzeEntitySentimentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentAnalyzeEntitySentimentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2110,7 +2110,7 @@ pub struct DocumentAnalyzeEntityCall<'a, C, A>
 
     hub: &'a CloudNaturalLanguage<C, A>,
     _request: AnalyzeEntitiesRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2125,7 +2125,7 @@ impl<'a, C, A> DocumentAnalyzeEntityCall<'a, C, A> where C: BorrowMut<hyper::Cli
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2253,7 +2253,7 @@ impl<'a, C, A> DocumentAnalyzeEntityCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentAnalyzeEntityCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentAnalyzeEntityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2353,7 +2353,7 @@ pub struct DocumentAnnotateTextCall<'a, C, A>
 
     hub: &'a CloudNaturalLanguage<C, A>,
     _request: AnnotateTextRequest,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -2368,7 +2368,7 @@ impl<'a, C, A> DocumentAnnotateTextCall<'a, C, A> where C: BorrowMut<hyper::Clie
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2496,7 +2496,7 @@ impl<'a, C, A> DocumentAnnotateTextCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentAnnotateTextCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentAnnotateTextCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

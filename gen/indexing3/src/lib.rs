@@ -570,7 +570,7 @@ pub struct UrlNotificationPublishCall<'a, C, A>
 
     hub: &'a Indexing<C, A>,
     _request: UrlNotification,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -585,7 +585,7 @@ impl<'a, C, A> UrlNotificationPublishCall<'a, C, A> where C: BorrowMut<hyper::Cl
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -713,7 +713,7 @@ impl<'a, C, A> UrlNotificationPublishCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlNotificationPublishCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> UrlNotificationPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -809,7 +809,7 @@ pub struct UrlNotificationGetMetadataCall<'a, C, A>
 
     hub: &'a Indexing<C, A>,
     _url: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -824,7 +824,7 @@ impl<'a, C, A> UrlNotificationGetMetadataCall<'a, C, A> where C: BorrowMut<hyper
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -938,7 +938,7 @@ impl<'a, C, A> UrlNotificationGetMetadataCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlNotificationGetMetadataCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> UrlNotificationGetMetadataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

@@ -879,7 +879,7 @@ pub struct ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A>
     hub: &'a IAMCredentials<C, A>,
     _request: GenerateIdentityBindingAccessTokenRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
@@ -894,7 +894,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1055,7 +1055,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1132,7 +1132,7 @@ pub struct ProjectServiceAccountSignBlobCall<'a, C, A>
     hub: &'a IAMCredentials<C, A>,
     _request: SignBlobRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1148,7 +1148,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1314,7 +1314,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectServiceAccountSignBlobCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountSignBlobCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1414,7 +1414,7 @@ pub struct ProjectServiceAccountSignJwtCall<'a, C, A>
     hub: &'a IAMCredentials<C, A>,
     _request: SignJwtRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1430,7 +1430,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1596,7 +1596,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1696,7 +1696,7 @@ pub struct ProjectServiceAccountGenerateIdTokenCall<'a, C, A>
     hub: &'a IAMCredentials<C, A>,
     _request: GenerateIdTokenRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1712,7 +1712,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -1878,7 +1878,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1978,7 +1978,7 @@ pub struct ProjectServiceAccountGenerateAccessTokenCall<'a, C, A>
     hub: &'a IAMCredentials<C, A>,
     _request: GenerateAccessTokenRequest,
     _name: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -1994,7 +1994,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: B
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -2160,7 +2160,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
