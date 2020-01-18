@@ -3,7 +3,6 @@ sudo: false
 
 language: rust
 os:
-  - linux
   - osx
 rust:
   - stable
