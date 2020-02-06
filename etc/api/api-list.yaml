@@ -4,406 +4,408 @@
 api:
   list:
     abusiveexperiencereport:
-    - v1
+      - v1
     acceleratedmobilepageurl:
-    - v1
+      - v1
     accessapproval:
-    - v1beta1
+      - v1beta1
     accesscontextmanager:
-    - v1
-    - v1beta
+      - v1
+      - v1beta
     adexchangebuyer:
-    - v1.3
-    - v1.4
+      - v1.3
+      - v1.4
     adexchangebuyer2:
-    - v2beta1
+      - v2beta1
     adexchangeseller:
-    - v2.0
+      - v2.0
     adexperiencereport:
-    - v1
+      - v1
     admin:
-    - directory_v1
-    - reports_v1
+      - directory_v1
+      - reports_v1
     adsense:
-    - v1.4
+      - v1.4
     adsensehost:
-    - v4.1
+      - v4.1
     alertcenter:
-    - v1beta1
+      - v1beta1
     analytics:
-    - v3
+      - v3
     analyticsreporting:
-    - v4
+      - v4
     androiddeviceprovisioning:
-    - v1
+      - v1
     androidenterprise:
-    - v1
+      - v1
     androidmanagement:
-    - v1
+      - v1
     androidpublisher:
-    - v2
-    - v3
+      - v2
+      - v3
     appengine:
-    - v1
-    - v1beta4
-    - v1beta5
+      - v1
+      - v1beta4
+      - v1beta5
     appsactivity:
-    - v1
+      - v1
     appstate:
-    - v1
+      - v1
     audit:
-    - v1
+      - v1
     autoscaler:
-    - v1beta2
+      - v1beta2
     bigquery:
-    - v2
+      - v2
     bigquerydatatransfer:
-    - v1
+      - v1
     bigtableadmin:
-    - v2
+      - v2
     binaryauthorization:
-    - v1beta1
+      - v1beta1
     blogger:
-    - v3
+      - v3
     books:
-    - v1
+      - v1
     calendar:
-    - v3
+      - v3
     chat:
-    - v1
+      - v1
     civicinfo:
-    - v2
+      - v2
     classroom:
-    - v1
+      - v1
     cloudasset:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     cloudbilling:
-    - v1
+      - v1
     cloudbuild:
-    - v1
+      - v1
     clouddebugger:
-    - v2
+      - v2
     clouderrorreporting:
-    - v1beta1
+      - v1beta1
     cloudfunctions:
-    - v1
+      - v1
     cloudidentity:
-    - v1
+      - v1
     cloudiot:
-    - v1
+      - v1
     cloudkms:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     cloudlatencytest:
-    - v2
+      - v2
     cloudmonitoring:
-    - v2beta2
+      - v2beta2
     cloudprivatecatalog:
-    - v1beta1
+      - v1beta1
     cloudprivatecatalogproducer:
-    - v1beta1
+      - v1beta1
     cloudprofiler:
-    - v2
+      - v2
     cloudresourcemanager:
-    - v1
-    - v1beta1
-    - v2
+      - v1
+      - v1beta1
+      - v2
     cloudscheduler:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     cloudsearch:
-    - v1
+      - v1
     cloudshell:
-    - v1
+      - v1
     cloudtasks:
-    - v2
-    - v2beta2
-    - v2beta3
+      - v2
+      - v2beta2
+      - v2beta3
     cloudtrace:
-    - v1
-    - v2
+      - v1
+      - v2
     clouduseraccounts:
-    - vm_beta
+      - vm_beta
     commentanalyzer:
-    - v1alpha1
+      - v1alpha1
     composer:
-    - v1
+      - v1
     compute:
-    - v1
+      - v1
     consumersurveys:
-    - v2
+      - v2
     container:
-    - v1
+      - v1
     containeranalysis:
-    - v1beta1
+      - v1beta1
     content:
-    - v2
-    - v2sandbox
+      - v2
+      - v2sandbox
     coordinate:
-    - v1
+      - v1
     customsearch:
-    - v1
+      - v1
     dataflow:
-    - v1b4
+      - v1b4
     datafusion:
-    - v1beta1
+      - v1beta1
     dataproc:
-    - v1
+      - v1
     datastore:
-    - v1
-    - v1beta3
+      - v1
+      - v1beta3
     deploymentmanager:
-    - v2
-    - v2beta2
+      - v2
+      - v2beta2
     dfareporting:
-    - v2.8
-    - v3.0
-    - v3.2
-    - v3.3
+      - v2.8
+      - v3.0
+      - v3.2
+      - v3.3
     dialogflow:
-    - v2
-    - v2beta1
+      - v2
+      - v2beta1
     digitalassetlinks:
-    - v1
+      - v1
     discovery:
-    - v1
+      - v1
     dlp:
-    - v2
-    - v2beta1
+      - v2
+      - v2beta1
     dns:
-    - v1
+      - v1
     doubleclickbidmanager:
-    - v1
+      - v1
     doubleclicksearch:
-    - v2
+      - v2
     drive:
-    - v2
-    - v3
+      - v2
+      - v3
     driveactivity:
-    - v2
+      - v2
     factchecktools:
-    - v1alpha1
+      - v1alpha1
     fcm:
-    - v1
+      - v1
     file:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     firebase:
-    - v1beta1
+      - v1beta1
     firebasedynamiclinks:
-    - v1
+      - v1
     firebasehosting:
-    - v1beta1
+      - v1beta1
     firebaseremoteconfig:
-    - v1
+      - v1
     firebaserules:
-    - v1
+      - v1
     firestore:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     fitness:
-    - v1
+      - v1
     freebase:
-    - v1sandbox
+      - v1sandbox
     fusiontables:
-    - v2
+      - v2
     games:
-    - v1
+      - v1
     gamesconfiguration:
-    - v1configuration
+      - v1configuration
     gamesmanagement:
-    - v1management
+      - v1management
     gan:
-    - v1beta1
+      - v1beta1
     genomics:
-    - v1
+      - v1
     gmail:
-    - v1
+      - v1
     groupsmigration:
-    - v1
+      - v1
     groupssettings:
-    - v1
+      - v1
     healthcare:
-    - v1beta1
+      - v1beta1
     iam:
-    - v1
+      - v1
     iamcredentials:
-    - v1
+      - v1
     iap:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     identitytoolkit:
-    - v3
+      - v3
     indexing:
-    - v3
+      - v3
     jobs:
-    - v3
+      - v3
     kgsearch:
-    - v1
+      - v1
     language:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     libraryagent:
-    - v1
+      - v1
     licensing:
-    - v1
+      - v1
     logging:
-    - v2
-    - v2beta1
+      - v2
+      - v2beta1
     manager:
-    - v1beta2
+      - v1beta2
     manufacturers:
-    - v1
+      - v1
     mapsengine:
-    - v1
+      - v1
     mirror:
-    - v1
+      - v1
     ml:
-    - v1
+      - v1
     monitoring:
-    - v3
+      - v3
+    mybusiness:
+      - v4
     oauth2:
-    - v2
+      - v2
     osconfig:
-    - v1alpha2
+      - v1alpha2
     oslogin:
-    - v1
-    - v1beta
+      - v1
+      - v1beta
     pagespeedonline:
-    - v2
-    - v4
-    - v5
+      - v2
+      - v4
+      - v5
     partners:
-    - v2
+      - v2
     people:
-    - v1
+      - v1
     photoslibrary:
-    - v1
+      - v1
     playcustomapp:
-    - v1
+      - v1
     playmoviespartner:
-    - v1
+      - v1
     plus:
-    - v1
+      - v1
     plusdomains:
-    - v1
+      - v1
     poly:
-    - v1
+      - v1
     prediction:
-    - v1.6
+      - v1.6
     proximitybeacon:
-    - v1beta1
+      - v1beta1
     pubsub:
-    - v1
-    - v1beta2
+      - v1
+      - v1beta2
     qpxexpress:
-    - v1
+      - v1
     redis:
-    - v1
+      - v1
     remotebuildexecution:
-    - v2
+      - v2
     replicapool:
-    - v1beta2
+      - v1beta2
     replicapoolupdater:
-    - v1beta1
+      - v1beta1
     reseller:
-    - v1sandbox
+      - v1sandbox
     resourceviews:
-    - v1beta2
+      - v1beta2
     run:
-    - v1
+      - v1
     runtimeconfig:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     safebrowsing:
-    - v4
+      - v4
     script:
-    - v1
+      - v1
     searchconsole:
-    - v1
+      - v1
     securitycenter:
-    - v1
+      - v1
     servicebroker:
-    - v1
+      - v1
     serviceconsumermanagement:
-    - v1
+      - v1
     servicecontrol:
-    - v1
+      - v1
     servicemanagement:
-    - v1
+      - v1
     servicenetworking:
-    - v1
-    - v1beta
+      - v1
+      - v1beta
     serviceregistry:
-    - alpha
+      - alpha
     serviceusage:
-    - v1
+      - v1
     serviceuser:
-    - v1
+      - v1
     sheets:
-    - v4
+      - v4
     siteverification:
-    - v1
+      - v1
     slides:
-    - v1
+      - v1
     sourcerepo:
-    - v1
+      - v1
     spanner:
-    - v1
+      - v1
     spectrum:
-    - v1explorer
+      - v1explorer
     speech:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     sqladmin:
-    - v1beta4
+      - v1beta4
     storage:
-    - v1
+      - v1
     storagetransfer:
-    - v1
+      - v1
     streetviewpublish:
-    - v1
+      - v1
     surveys:
-    - v2
+      - v2
     tagmanager:
-    - v1
-    - v2
+      - v1
+      - v2
     taskqueue:
-    - v1beta2
+      - v1beta2
     tasks:
-    - v1
+      - v1
     testing:
-    - v1
+      - v1
     texttospeech:
-    - v1
+      - v1
     toolresults:
-    - v1beta3
+      - v1beta3
     tpu:
-    - v1
-    - v1alpha1
+      - v1
+      - v1alpha1
     translate:
-    - v2
+      - v2
     urlshortener:
-    - v1
+      - v1
     vault:
-    - v1
+      - v1
     videointelligence:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
     vision:
-    - v1
+      - v1
     webfonts:
-    - v1
+      - v1
     webmasters:
-    - v3
+      - v3
     websecurityscanner:
-    - v1
-    - v1beta
+      - v1
+      - v1beta
     youtube:
-    - v3
+      - v3
     youtubeanalytics:
-    - v1
-    - v2
+      - v1
+      - v2
     youtubereporting:
-    - v1
+      - v1

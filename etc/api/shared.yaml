@@ -43,6 +43,9 @@ api:
     # returned by google APIs, but can't be fetched
     - osconfig
   manually_added:
+    - name: mybusiness
+      version: v4
+      discovery_rest_url: https://developers.google.com/my-business/samples/mybusiness_google_rest_v4p5.json
     - name: photoslibrary
       version: v1
       discovery_rest_url: https://photoslibrary.googleapis.com/$discovery/rest?version=v1
