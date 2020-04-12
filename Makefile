@@ -38,7 +38,7 @@ endif
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
 MAKO_LIB_DIR = $(MAKO_SRC)/lib
 MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
-MAKO = PREPROC=$(PREPROC) PYTHONPATH=$(MAKO_LIB_DIR):$(PYTHONPATH) $(TPL) --template-dir '.'
+MAKO = export PREPROC=$(PREPROC); export PYTHONPATH=$(MAKO_LIB_DIR):$(PYTHONPATH); $(TPL) --template-dir '.'
 MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER) $(PREPROC)
 
 help:
